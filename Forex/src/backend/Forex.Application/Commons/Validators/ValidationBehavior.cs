@@ -4,12 +4,12 @@ using FluentValidation;
 using MediatR;
 
 public class ValidationBehavior<TRequest, TResponse>(
-    IEnumerable<IValidator<TRequest>> validators) 
+    IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
 {
     public async Task<TResponse> Handle(
-        TRequest request, 
-        CancellationToken cancellationToken, 
+        TRequest request,
+        CancellationToken cancellationToken,
         RequestHandlerDelegate<TResponse> next)
     {
         var context = new ValidationContext<TRequest>(request);

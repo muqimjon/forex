@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forex.Domain", "src\backend
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forex.Application", "src\backend\Forex.Application\Forex.Application.csproj", "{5EC310C8-70CE-4037-954F-051A800EE968}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forex.Infrastructure", "src\backend\Forex.Infrastructure\Forex.Infrastructure.csproj", "{98A89A43-DD28-41E2-BD90-6854AB5A846E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{5EC310C8-70CE-4037-954F-051A800EE968}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EC310C8-70CE-4037-954F-051A800EE968}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EC310C8-70CE-4037-954F-051A800EE968}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98A89A43-DD28-41E2-BD90-6854AB5A846E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98A89A43-DD28-41E2-BD90-6854AB5A846E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98A89A43-DD28-41E2-BD90-6854AB5A846E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98A89A43-DD28-41E2-BD90-6854AB5A846E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -33,6 +39,7 @@ Global
 		{66E22908-CE35-417F-B07E-4978AE59AA89} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5364377D-8553-44E3-9A9B-48BE3F933D77} = {66E22908-CE35-417F-B07E-4978AE59AA89}
 		{5EC310C8-70CE-4037-954F-051A800EE968} = {66E22908-CE35-417F-B07E-4978AE59AA89}
+		{98A89A43-DD28-41E2-BD90-6854AB5A846E} = {66E22908-CE35-417F-B07E-4978AE59AA89}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68EE427E-D5C1-4E8A-B597-D8916D90924C}
