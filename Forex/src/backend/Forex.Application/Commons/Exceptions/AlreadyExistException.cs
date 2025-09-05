@@ -2,7 +2,6 @@
 
 using System.Net;
 
-[Serializable]
 public class AlreadyExistException : AppException
 {
     public AlreadyExistException(string? value) : base($"Bunday {value} avvaldan mavjud", HttpStatusCode.Conflict) { }

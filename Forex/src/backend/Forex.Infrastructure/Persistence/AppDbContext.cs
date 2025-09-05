@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class AppDbContext : DbContext, IAppDbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options), IAppDbContext
 {
     public DbSet<User> Users { get; set; } = default!;
+    public DbSet<Account> Accounts { get; set; } = default!;
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellation)
-        => await base.SaveChangesAsync(cancellation);
+    public async Task<bool> SaveAsync(CancellationToken cancellation)
+        => await SaveChangesAsync(cancellation) > 0;
 }

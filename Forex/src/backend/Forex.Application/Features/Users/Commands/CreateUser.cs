@@ -15,6 +15,7 @@ public record CreateUserCommand(
     string Phone,
     Role Role,
     string Address,
+    decimal Balance,
     string Description)
     : IRequest<long>;
 
@@ -25,15 +26,21 @@ public class CreateUserCommandHandler(
     public async Task<long> Handle(CreateUserCommand request, CancellationToken cancellation)
     {
         var isExist = await context.Users
-                    .AnyAsync(user => user.Phone == request.Phone, cancellation);
+            .AnyAsync(user => user.Phone == request.Phone, cancellation);
 
         if (isExist)
-            throw new AlreadyExistException(nameof(User), nameof(request.Name), request.Name);
+            throw new AlreadyExistException(nameof(User), nameof(User.Phone), request.Phone);
 
         var user = mapper.Map<User>(request);
         context.Users.Add(user);
+        context.Accounts.Add(new()
+        {
+            BeginSumm = request.Balance,
+            Balance = request.Balance,
+            User = user,
+        });
 
-        await context.SaveChangesAsync(cancellation);
+        await context.SaveAsync(cancellation);
         return user.Id;
     }
 }

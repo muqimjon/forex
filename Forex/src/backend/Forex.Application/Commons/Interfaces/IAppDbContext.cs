@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 public interface IAppDbContext
 {
     DbSet<User> Users { get; }
+    DbSet<Account> Accounts { get; }
 
-    Task<int> SaveChangesAsync(CancellationToken cancellation);
+    Task<bool> SaveAsync(CancellationToken cancellation);
 }
