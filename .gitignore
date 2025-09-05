@@ -418,3 +418,4 @@ FodyWeavers.xsd
 *.msp
 /Forex/src/backend/Forex.WebApi/appsettings.Development.json
 /Forex/src/backend/Forex.Infrastructure/Persistence/Migrations
+/Forex/src/backend/Forex.Infrastructure/Migrations
