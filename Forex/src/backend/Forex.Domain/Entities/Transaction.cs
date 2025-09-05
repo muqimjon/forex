@@ -14,7 +14,7 @@ public class Transaction : Auditable
     public string? Description { get; set; }
     public DateTime Date { get; set; }
 
-    public Cash Cash { get; set; } = default!;
+    public ShopCash Cash { get; set; } = default!;
     public User User { get; set; } = default!;
     public Currency Currency { get; set; } = default!;
 }

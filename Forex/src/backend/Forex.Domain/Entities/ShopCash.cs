@@ -1,10 +1,9 @@
-﻿namespace Forex.Application.Features.Cashes.DTOs;
+﻿namespace Forex.Domain.Entities;
 
-using Forex.Domain.Entities;
+using Forex.Domain.Commons;
 
-public class CashDto
+public class ShopCash : Auditable
 {
-    public long Id { get; set; }
     public long ShopId { get; set; }
     public long CurrencyId { get; set; }
     public decimal Balance { get; set; }

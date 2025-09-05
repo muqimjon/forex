@@ -12,11 +12,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Account> Accounts { get; set; }
-    public DbSet<Cash> Cashes { get; set; }
+    public DbSet<ShopCash> ShopCashes { get; set; }
     public DbSet<ContainerEntry> ContainerEntries { get; set; }
     public DbSet<Currency> Currency { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
-    public DbSet<Manufactory> Manufactorys { get; set; }
+    public DbSet<Manufactory> Manufactories { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductEntry> ProductEntries { get; set; }
     public DbSet<ProductItem> ProductItems { get; set; }
@@ -25,7 +25,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Sale> Sales { get; set; }
     public DbSet<SaleItem> SaleItems { get; set; }
     public DbSet<SemiProduct> SemiProducts { get; set; }
-    public DbSet<SemiProductEntry> SemiProductsEntries { get; set; }
+    public DbSet<SemiProductEntry> SemiProductEntries { get; set; }
     public DbSet<Shop> Shops { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 

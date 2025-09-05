@@ -8,11 +8,11 @@ public interface IAppDbContext
 {
     DbSet<User> Users { get; }
     DbSet<Account> Accounts { get; }
-    DbSet<Cash> Cashes { get; }
+    DbSet<ShopCash> ShopCashes { get; }
     DbSet<ContainerEntry> ContainerEntries { get; }
-    DbSet<Currency> Currency { get; }
+    DbSet<Currency> Currencies { get; }
     DbSet<Invoice> Invoices { get; }
-    DbSet<Manufactory> Manufactorys { get; }
+    DbSet<Manufactory> Manufactories { get; }
     DbSet<Product> Products { get; }
     DbSet<ProductEntry> ProductEntries { get; }
     DbSet<ProductItem> ProductItems { get; }
@@ -21,7 +21,7 @@ public interface IAppDbContext
     DbSet<Sale> Sales { get; }
     DbSet<SaleItem> SaleItems { get; }
     DbSet<SemiProduct> SemiProducts { get; }
-    DbSet<SemiProductEntry> SemiProductsEntries { get; }
+    DbSet<SemiProductEntry> SemiProductEntries { get; }
     DbSet<Shop> Shops { get; }
     DbSet<Transaction> Transactions { get; }
 
