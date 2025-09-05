@@ -7,17 +7,11 @@ using global::Minio.DataModel.Args;
 public class MinioFileStorageService(IMinioClient client, MinioOptions options) : IFileStorageService
 {
     private readonly string bucketName = options.BucketName;
+    private readonly string publicPolicy = BucketPolicyBuilder.BuildPublicReadPolicy(options.BucketName);
 
     public async Task<string> UploadAsync(Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default)
     {
-        var exists = await client.BucketExistsAsync(
-            new BucketExistsArgs().WithBucket(bucketName), cancellationToken);
-
-        if (!exists)
-        {
-            await client.MakeBucketAsync(
-                new MakeBucketArgs().WithBucket(bucketName), cancellationToken);
-        }
+        await EnsurePublicBucketAsync(cancellationToken);
 
         await client.PutObjectAsync(new PutObjectArgs()
             .WithBucket(bucketName)
@@ -26,7 +20,21 @@ public class MinioFileStorageService(IMinioClient client, MinioOptions options) 
             .WithObjectSize(fileStream.Length)
             .WithContentType(contentType), cancellationToken);
 
-        return fileName;
+        var fileUrl = $"http://{options.Endpoint}/{bucketName}/{fileName}";
+        return fileUrl;
+    }
+
+    private async Task EnsurePublicBucketAsync(CancellationToken cancellationToken)
+    {
+        var exists = await client.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName), cancellationToken);
+        if (!exists)
+        {
+            await client.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName), cancellationToken);
+
+            await client.SetPolicyAsync(new SetPolicyArgs()
+                .WithBucket(bucketName)
+                .WithPolicy(publicPolicy), cancellationToken);
+        }
     }
 
     public async Task<Stream> DownloadAsync(string fileName, CancellationToken cancellationToken = default)

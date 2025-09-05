@@ -1,8 +1,7 @@
-﻿namespace Forex.WebApi.Models.SemiProducts;
+﻿namespace Forex.WebApi.Models;
 
-public class UpdateSemiProductRequest
+public class SemiProductRequest
 {
-    public long Id { get; set; }
     public long ManufactoryId { get; set; }
     public string? Name { get; set; }
     public int Code { get; set; }

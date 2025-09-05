@@ -2,17 +2,18 @@
 
 using Forex.Application.Features.SemiProducts.Commands;
 using Forex.Application.Features.SemiProducts.Queries;
+using Forex.WebApi.Models;
 using Forex.WebApi.Models.Commons;
-using Forex.WebApi.Models.SemiProducts;
 using Microsoft.AspNetCore.Mvc;
 
 public class SemiProductsController : BaseController
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreateSemiProductRequest dto)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Create([FromForm] SemiProductRequest dto)
         => Ok(new Response
         {
-            Data = await Mediator.Send(new CreateSemiProductCommand(
+            Data = await Mediator.Send(new SemiProductCommand(
             dto.ManufactoryId,
             dto.Name,
             dto.Code,
@@ -24,7 +25,8 @@ public class SemiProductsController : BaseController
         });
 
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> UpdateSemiProduct(long id, [FromForm] UpdateSemiProductRequest dto)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UpdateSemiProduct(long id, [FromForm] SemiProductRequest dto)
         => Ok(new Response
         {
             Data = await Mediator.Send(new UpdateSemiProductCommand(
@@ -38,7 +40,6 @@ public class SemiProductsController : BaseController
             dto.Photo?.ContentType
         ))
         });
-
 
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)

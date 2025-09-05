@@ -7,7 +7,7 @@ using Forex.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public record CreateSemiProductCommand(
+public record SemiProductCommand(
     long ManufactoryId,
     string? Name,
     int Code,
@@ -21,9 +21,9 @@ public class CreateSemiProductCommandHandler(
     IAppDbContext context,
     IMapper mapper,
     IFileStorageService fileStorage
-) : IRequestHandler<CreateSemiProductCommand, long>
+) : IRequestHandler<SemiProductCommand, long>
 {
-    public async Task<long> Handle(CreateSemiProductCommand request, CancellationToken cancellationToken)
+    public async Task<long> Handle(SemiProductCommand request, CancellationToken cancellationToken)
     {
         await EnsureCodeIsUnique(request.Code, cancellationToken);
 
@@ -44,7 +44,7 @@ public class CreateSemiProductCommandHandler(
             throw new AlreadyExistException(nameof(SemiProduct), nameof(code), code);
     }
 
-    private async Task<string> UploadPhotoIfExists(CreateSemiProductCommand request, CancellationToken ct)
+    private async Task<string> UploadPhotoIfExists(SemiProductCommand request, CancellationToken ct)
     {
         if (request.Photo is null) return string.Empty;
 

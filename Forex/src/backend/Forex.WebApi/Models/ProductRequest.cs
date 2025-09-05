@@ -1,6 +1,6 @@
-﻿namespace Forex.WebApi.Models.Products;
+﻿namespace Forex.WebApi.Models;
 
-public class CreateProductRequest
+public class ProductRequest
 {
     public string Name { get; set; } = default!;
     public int Code { get; set; }

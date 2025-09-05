@@ -2,14 +2,15 @@
 
 using Forex.Application.Features.Products.Commands;
 using Forex.Application.Features.Products.Queries;
+using Forex.WebApi.Models;
 using Forex.WebApi.Models.Commons;
-using Forex.WebApi.Models.Products;
 using Microsoft.AspNetCore.Mvc;
 
 public class ProductsController : BaseController
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreateProductRequest request)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Create([FromForm] ProductRequest request)
         => Ok(new Response
         {
             Data = await Mediator.Send(new CreateProductCommand(
@@ -22,9 +23,9 @@ public class ProductsController : BaseController
         ))
         });
 
-
     [HttpPut("{id:long}")]
-    public async Task<IActionResult> Update(long id, [FromForm] UpdateProductRequest request)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Update(long id, [FromForm] ProductRequest request)
         => Ok(new Response
         {
             Data = await Mediator.Send(new UpdateProductCommand(
@@ -37,7 +38,6 @@ public class ProductsController : BaseController
             request.Photo?.ContentType
         ))
         });
-
 
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
