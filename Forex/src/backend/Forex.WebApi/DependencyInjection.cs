@@ -1,11 +1,11 @@
 ﻿namespace Forex.WebApi;
 
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Scalar.AspNetCore;
-using System.Text.Json.Serialization;
 using Forex.Application;
 using Forex.Infrastructure;
 using Forex.WebApi.Conventions;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Scalar.AspNetCore;
+using System.Text.Json.Serialization;
 
 public static class DependencyInjection
 {

@@ -4,9 +4,9 @@ using Forex.Domain.Commons;
 
 public class ProductEntry : Auditable
 {
-    public int ProductId { get; set; }
-    public int ShopId { get; set; }
-    public int UserId { get; set; }
+    public long ProductId { get; set; }
+    public long ShopId { get; set; }
+    public long UserId { get; set; }
     public decimal Quantity { get; set; }
     public decimal CostPrice { get; set; }
     public decimal CostPreparation { get; set; }

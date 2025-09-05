@@ -22,15 +22,15 @@ public class DeleteUserCommandHandler(
             .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(User), nameof(request.Id), request.Id);
 
-        if(!IsEmptyAccount(user.Account))
+        if (!IsEmptyAccount(user.Account))
             throw new ForbiddenException($"Hisob: {user.Account.Balance}, Chegirmasi: {user.Account.Discount}");
-        
+
         user.IsDeleted = true;
         user.Account.IsDeleted = true;
         return await context.SaveAsync(cancellationToken);
     }
 
     private static bool IsEmptyAccount(Account account)
-        => Math.Round(account.Discount, 2) == 0m && 
+        => Math.Round(account.Discount, 2) == 0m &&
         Math.Round(account.Balance, 2) == 0m;
 }

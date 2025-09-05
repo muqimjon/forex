@@ -23,10 +23,10 @@ public class CreateUserCommandHandler(
     IAppDbContext context,
     IMapper mapper) : IRequestHandler<CreateUserCommand, long>
 {
-    public async Task<long> Handle(CreateUserCommand request, CancellationToken cancellation)
+    public async Task<long> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var isExist = await context.Users
-            .AnyAsync(user => user.Phone == request.Phone, cancellation);
+            .AnyAsync(user => user.Phone == request.Phone, cancellationToken);
 
         if (isExist)
             throw new AlreadyExistException(nameof(User), nameof(User.Phone), request.Phone);
@@ -40,7 +40,7 @@ public class CreateUserCommandHandler(
             User = user,
         });
 
-        await context.SaveAsync(cancellation);
+        await context.SaveAsync(cancellationToken);
         return user.Id;
     }
 }

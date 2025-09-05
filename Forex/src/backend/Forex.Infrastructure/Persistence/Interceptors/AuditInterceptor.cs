@@ -1,8 +1,8 @@
 ﻿namespace Forex.Infrastructure.Persistence.Interceptors;
 
+using Forex.Domain.Commons;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Forex.Domain.Commons;
 
 public class AuditInterceptor : SaveChangesInterceptor
 {

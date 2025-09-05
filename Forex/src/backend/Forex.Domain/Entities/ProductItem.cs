@@ -4,8 +4,8 @@ using Forex.Domain.Commons;
 
 public class ProductItem : Auditable
 {
-    public int ProductId { get; set; }
-    public int SemiProductId { get; set; }
+    public long ProductId { get; set; }
+    public long SemiProductId { get; set; }
     public decimal Quantity { get; set; }
 
     public Product Product { get; set; } = default!;

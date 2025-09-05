@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Commons.Validators;
 
 using FluentValidation;
+using Forex.Application.Commons.Exceptions;
 using MediatR;
 
 public class ValidationBehavior<TRequest, TResponse>(
@@ -20,7 +21,7 @@ public class ValidationBehavior<TRequest, TResponse>(
             .ToList();
 
         if (failures.Count != 0)
-            throw new ValidationException(failures);
+            throw new ValidationAppException(failures);
 
         return await next();
     }

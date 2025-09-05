@@ -4,7 +4,7 @@ using Forex.Domain.Commons;
 
 public class SemiProduct : Auditable
 {
-    public int ManufactoryId { get; set; }
+    public long ManufactoryId { get; set; }
     public string? Name { get; set; }
     public string NormalizedName { get; set; } = string.Empty;
     public int Code { get; set; }

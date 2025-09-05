@@ -4,9 +4,9 @@ using Forex.Domain.Commons;
 
 public class ContainerEntry : Auditable
 {
-    public int UserId { get; set; }
-    public int InvoceId { get; set; }
-    public int Count { get; set; }
+    public long UserId { get; set; }
+    public long InvoceId { get; set; }
+    public long Count { get; set; }
     public decimal Price { get; set; }
 
     public User User { get; set; } = default!;

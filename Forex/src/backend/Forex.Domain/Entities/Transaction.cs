@@ -5,10 +5,10 @@ using Forex.Domain.Enums;
 
 public class Transaction : Auditable
 {
-    public int CashId { get; set; }
-    public int UserId { get; set; }
+    public long CashId { get; set; }
+    public long UserId { get; set; }
     public decimal Amount { get; set; }
-    public int CurrencyId { get; set; }
+    public long CurrencyId { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public bool IsIncome { get; set; }
     public string? Description { get; set; }

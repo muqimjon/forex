@@ -12,7 +12,7 @@ public record GetAllUsersQuery : IRequest<List<UserDto>>;
 
 public class GetAllUsersQueryHandler(
     IAppDbContext context,
-    IMapper mapper) 
+    IMapper mapper)
     : IRequestHandler<GetAllUsersQuery, List<UserDto>>
 {
     public async Task<List<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
