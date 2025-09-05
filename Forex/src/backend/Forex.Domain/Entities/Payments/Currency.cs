@@ -1,10 +1,10 @@
-﻿namespace Forex.Domain.Entities;
+﻿namespace Forex.Domain.Entities.Payments;
 
 using Forex.Domain.Commons;
 
-public class Manufactory : Auditable
+public class Currency : Auditable
 {
     public string Name { get; set; } = string.Empty;
     public string NormalizedName { get; set; } = string.Empty;
-    public ICollection<SemiProduct> SemiProducts { get; set; } = [];
+    public string Symbol { get; set; } = string.Empty;
 }

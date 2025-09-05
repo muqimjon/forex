@@ -1,8 +1,8 @@
-﻿namespace Forex.Domain.Entities;
+﻿namespace Forex.Domain.Entities.Manufactories;
 
 using Forex.Domain.Commons;
 
-public class ResidueManufactory : Auditable
+public class SemiProductResidue : Auditable
 {
     public long SemiProductId { get; set; }
     public long ManufactoryId { get; set; }

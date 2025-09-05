@@ -1,6 +1,8 @@
-﻿namespace Forex.Domain.Entities;
+﻿namespace Forex.Domain.Entities.Users;
 
 using Forex.Domain.Commons;
+using Forex.Domain.Entities.Payments;
+using Forex.Domain.Entities.Sales;
 using Forex.Domain.Enums;
 
 public class User : Auditable
@@ -13,4 +15,6 @@ public class User : Auditable
     public string Description { get; set; } = string.Empty;
 
     public Account Account { get; set; } = default!;
+    public ICollection<Sale> Sales { get; set; } = default!;
+    public ICollection<Transaction> Transactions { get; set; } = default!;
 }

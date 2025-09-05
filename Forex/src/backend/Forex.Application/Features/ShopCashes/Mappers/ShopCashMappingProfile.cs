@@ -3,7 +3,7 @@
 using AutoMapper;
 using Forex.Application.Features.ShopCashes.Commands;
 using Forex.Application.Features.ShopCashes.DTOs;
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Shops;
 
 public class ShopCashMappingProfile : Profile
 {

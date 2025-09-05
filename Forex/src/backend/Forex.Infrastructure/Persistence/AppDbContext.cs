@@ -1,7 +1,11 @@
 ﻿namespace Forex.Infrastructure.Persistence;
 
 using Forex.Application.Commons.Interfaces;
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Manufactories;
+using Forex.Domain.Entities.Payments;
+using Forex.Domain.Entities.Sales;
+using Forex.Domain.Entities.Shops;
+using Forex.Domain.Entities.Users;
 using Forex.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -20,8 +24,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductEntry> ProductEntries { get; set; }
     public DbSet<ProductItem> ProductItems { get; set; }
-    public DbSet<ResidueManufactory> ResidueManufactories { get; set; }
-    public DbSet<ResidueShop> ResidueShops { get; set; }
+    public DbSet<SemiProductResidue> SemiProductResidues { get; set; }
+    public DbSet<ProductResidue> ResidueShops { get; set; }
     public DbSet<Sale> Sales { get; set; }
     public DbSet<SaleItem> SaleItems { get; set; }
     public DbSet<SemiProduct> SemiProducts { get; set; }

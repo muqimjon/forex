@@ -4,7 +4,7 @@ using AutoMapper;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Features.Manufactories.Commands;
 using Forex.Application.Features.Manufactories.DTOs;
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Manufactories;
 
 public class ManufactoryMappingProfile : Profile
 {

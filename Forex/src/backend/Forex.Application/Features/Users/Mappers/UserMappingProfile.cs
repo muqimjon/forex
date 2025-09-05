@@ -4,7 +4,7 @@ using AutoMapper;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Features.Users.Commands;
 using Forex.Application.Features.Users.DTOs;
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Users;
 
 public class UserMappingProfile : Profile
 {

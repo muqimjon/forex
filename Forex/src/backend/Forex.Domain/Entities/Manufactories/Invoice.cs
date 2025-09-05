@@ -1,4 +1,4 @@
-﻿namespace Forex.Domain.Entities;
+﻿namespace Forex.Domain.Entities.Manufactories;
 
 using Forex.Domain.Commons;
 
@@ -9,6 +9,6 @@ public class Invoice : Auditable
     public decimal CostDelivery { get; set; }
     public decimal TransferFee { get; set; }
 
-    public ICollection<ContainerEntry> ContainerEntries { get; set; } = new List<ContainerEntry>();
-    public ICollection<SemiProductEntry> SameProductEntries { get; set; } = new List<SemiProductEntry>();
+    public ICollection<ContainerEntry> ContainerEntries { get; set; } = default!;
+    public ICollection<SemiProductEntry> SemiProductEntries { get; set; } = default!;
 }

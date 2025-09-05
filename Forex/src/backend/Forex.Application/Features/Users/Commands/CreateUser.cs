@@ -3,7 +3,7 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Users;
 using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

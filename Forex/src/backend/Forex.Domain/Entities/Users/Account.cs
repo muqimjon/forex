@@ -1,4 +1,4 @@
-﻿namespace Forex.Domain.Entities;
+﻿namespace Forex.Domain.Entities.Users;
 
 using Forex.Domain.Commons;
 

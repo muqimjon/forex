@@ -1,6 +1,7 @@
-﻿namespace Forex.Domain.Entities;
+﻿namespace Forex.Domain.Entities.Sales;
 
 using Forex.Domain.Commons;
+using Forex.Domain.Entities.Users;
 
 public class Sale : Auditable
 {

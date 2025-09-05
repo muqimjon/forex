@@ -1,6 +1,10 @@
 ﻿namespace Forex.Application.Commons.Interfaces;
 
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Manufactories;
+using Forex.Domain.Entities.Payments;
+using Forex.Domain.Entities.Sales;
+using Forex.Domain.Entities.Shops;
+using Forex.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -16,8 +20,8 @@ public interface IAppDbContext
     DbSet<Product> Products { get; }
     DbSet<ProductEntry> ProductEntries { get; }
     DbSet<ProductItem> ProductItems { get; }
-    DbSet<ResidueManufactory> ResidueManufactories { get; }
-    DbSet<ResidueShop> ResidueShops { get; }
+    DbSet<SemiProductResidue> SemiProductResidues { get; }
+    DbSet<ProductResidue> ResidueShops { get; }
     DbSet<Sale> Sales { get; }
     DbSet<SaleItem> SaleItems { get; }
     DbSet<SemiProduct> SemiProducts { get; }

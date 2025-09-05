@@ -4,7 +4,7 @@ using AutoMapper;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Features.Shops.Commands;
 using Forex.Application.Features.Shops.DTOs;
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Shops;
 
 public class ShopMappingProfile : Profile
 {

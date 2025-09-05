@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Features.ShopCashes.DTOs;
 
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Payments;
+using Forex.Domain.Entities.Shops;
 
 public class ShopCashDto
 {
