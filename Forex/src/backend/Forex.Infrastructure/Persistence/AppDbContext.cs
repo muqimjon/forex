@@ -14,7 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Account> Accounts { get; set; }
     public DbSet<ShopCash> ShopCashes { get; set; }
     public DbSet<ContainerEntry> ContainerEntries { get; set; }
-    public DbSet<Currency> Currency { get; set; }
+    public DbSet<Currency> Currencies { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Manufactory> Manufactories { get; set; }
     public DbSet<Product> Products { get; set; }

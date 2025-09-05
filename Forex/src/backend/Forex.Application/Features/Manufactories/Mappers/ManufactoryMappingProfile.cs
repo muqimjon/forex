@@ -1,17 +1,23 @@
 ﻿namespace Forex.Application.Features.Manufactories.Mappers;
 
 using AutoMapper;
+using Forex.Application.Commons.Extensions;
 using Forex.Application.Features.Manufactories.Commands;
 using Forex.Application.Features.Manufactories.DTOs;
-using Forex.Application.Features.ShopCashes.Commands;
 using Forex.Domain.Entities;
 
 public class ManufactoryMappingProfile : Profile
 {
     public ManufactoryMappingProfile()
     {
-        CreateMap<CreateShopCashCommand, Manufactory>();
-        CreateMap<UpdateManufactoryCommand, Manufactory>();
+        CreateMap<CreateManufactoryCommand, Manufactory>()
+            .ForMember(dest => dest.NormalizedName,
+            opt => opt.MapFrom(src => src.Name.ToNormalized()));
+
+        CreateMap<UpdateManufactoryCommand, Manufactory>()
+            .ForMember(dest => dest.NormalizedName,
+            opt => opt.MapFrom(src => src.Name.ToNormalized()));
+
         CreateMap<Manufactory, ManufactoryDto>();
     }
 }

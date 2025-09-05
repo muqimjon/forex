@@ -29,7 +29,7 @@ public class CreateUserCommandHandler(
             .AnyAsync(user => user.Phone == request.Phone, cancellationToken);
 
         if (isExist)
-            throw new AlreadyExistException(nameof(User), nameof(User.Phone), request.Phone);
+            throw new AlreadyExistException(nameof(User), nameof(request.Phone), request.Phone);
 
         var user = mapper.Map<User>(request);
         context.Users.Add(user);
