@@ -1,0 +1,51 @@
+﻿namespace Forex.Infrastructure.FileStorage.Minio;
+
+using Forex.Application.Commons.Interfaces;
+using global::Minio;
+using global::Minio.DataModel.Args;
+
+public class MinioFileStorageService(IMinioClient client, MinioOptions options) : IFileStorageService
+{
+    private readonly string bucketName = options.BucketName;
+
+    public async Task<string> UploadAsync(Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default)
+    {
+        var exists = await client.BucketExistsAsync(
+            new BucketExistsArgs().WithBucket(bucketName), cancellationToken);
+
+        if (!exists)
+        {
+            await client.MakeBucketAsync(
+                new MakeBucketArgs().WithBucket(bucketName), cancellationToken);
+        }
+
+        await client.PutObjectAsync(new PutObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(fileName)
+            .WithStreamData(fileStream)
+            .WithObjectSize(fileStream.Length)
+            .WithContentType(contentType), cancellationToken);
+
+        return fileName;
+    }
+
+    public async Task<Stream> DownloadAsync(string fileName, CancellationToken cancellationToken = default)
+    {
+        var ms = new MemoryStream();
+
+        await client.GetObjectAsync(new GetObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(fileName)
+            .WithCallbackStream(stream => stream.CopyTo(ms)), cancellationToken);
+
+        ms.Position = 0;
+        return ms;
+    }
+
+    public async Task DeleteAsync(string fileName, CancellationToken cancellationToken = default)
+    {
+        await client.RemoveObjectAsync(new RemoveObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(fileName), cancellationToken);
+    }
+}

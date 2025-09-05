@@ -1,8 +1,12 @@
 ﻿namespace Forex.WebApi;
 
+using FluentValidation.Results;
 using Forex.Application;
+using Forex.Application.Commons.Exceptions;
 using Forex.Infrastructure;
 using Forex.WebApi.Conventions;
+using Forex.WebApi.Middlewares;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Scalar.AspNetCore;
 using System.Text.Json.Serialization;
@@ -16,6 +20,14 @@ public static class DependencyInjection
         services.AddControllers(options
             => options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())))
                 .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.InvalidModelStateResponseFactory = context =>
+                throw new ValidationAppException(context.ModelState
+                    .SelectMany(kvp => kvp.Value!.Errors
+                        .Select(e => new ValidationFailure(kvp.Key, e.ErrorMessage))));
+        });
 
         services.AddOpenApi();
     }
@@ -38,6 +50,8 @@ public static class DependencyInjection
 
     public static void UseInfrastructure(this WebApplication app)
     {
+        app.UseMiddleware<ExceptionHandlerMiddleware>();
+
         app.UseHttpsRedirection();
         app.UseStaticFiles();
 

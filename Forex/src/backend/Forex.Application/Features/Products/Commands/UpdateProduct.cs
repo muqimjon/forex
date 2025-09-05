@@ -14,21 +14,45 @@ public record UpdateProductCommand(
     string Name,
     int Code,
     string Measure,
-    string PhotoPath)
+    Stream? Photo,
+    string? Extension,
+    string? ContentType)
     : IRequest<bool>;
 
 public class UpdateProductCommandHandler(
     IAppDbContext context,
-    IMapper mapper)
+    IMapper mapper,
+    IFileStorageService fileStorage)
     : IRequestHandler<UpdateProductCommand, bool>
 {
     public async Task<bool> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await context.Products
-            .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken)
-            ?? throw new NotFoundException(nameof(Product), nameof(request.Id), request.Id);
+        var product = await GetProduct(request.Id, cancellationToken);
 
-        mapper.Map(request, product);
+        if (request.Photo is not null)
+            product.PhotoPath = await UploadNewPhoto(product, request, cancellationToken);
+
+        UpdateProductFields(product, request);
+
         return await context.SaveAsync(cancellationToken);
+    }
+
+    private async Task<Product> GetProduct(long id, CancellationToken ct)
+        => await context.Products
+            .FirstOrDefaultAsync(p => p.Id == id, ct)
+            ?? throw new NotFoundException(nameof(Product), nameof(id), id);
+
+    private async Task<string> UploadNewPhoto(Product product, UpdateProductCommand request, CancellationToken ct)
+    {
+        if (!string.IsNullOrEmpty(product.PhotoPath))
+            await fileStorage.DeleteAsync(product.PhotoPath, ct);
+
+        var fileName = $"{Guid.NewGuid():N}{request.Extension}";
+        return await fileStorage.UploadAsync(request.Photo!, fileName, request.ContentType ?? "application/octet-stream", ct);
+    }
+
+    private void UpdateProductFields(Product product, UpdateProductCommand request)
+    {
+        mapper.Map(request, product);
     }
 }

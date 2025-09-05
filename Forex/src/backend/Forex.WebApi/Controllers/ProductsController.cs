@@ -2,27 +2,50 @@
 
 using Forex.Application.Features.Products.Commands;
 using Forex.Application.Features.Products.Queries;
-using Forex.WebApi.Models;
+using Forex.WebApi.Models.Commons;
+using Forex.WebApi.Models.Products;
 using Microsoft.AspNetCore.Mvc;
-using VoltStream.WebApi.Controllers;
 
 public class ProductsController : BaseController
 {
     [HttpPost]
-    public async Task<IActionResult> Create(CreateProductCommand command)
-        => Ok(new Response { Data = await Mediator.Send(command) });
+    public async Task<IActionResult> Create([FromForm] CreateProductRequest request)
+        => Ok(new Response
+        {
+            Data = await Mediator.Send(new CreateProductCommand(
+            request.Name,
+            request.Code,
+            request.Measure,
+            request.Photo?.OpenReadStream(),
+            request.Photo?.ContentType,
+            Path.GetExtension(request.Photo?.FileName)
+        ))
+        });
 
-    [HttpPut]
-    public async Task<IActionResult> Update(UpdateProductCommand command)
-        => Ok(new Response { Data = await Mediator.Send(command) });
 
-    [HttpDelete("{Id:long}")]
-    public async Task<IActionResult> Delete(long Id)
-        => Ok(new Response { Data = await Mediator.Send(new DeleteProductCommand(Id)) });
+    [HttpPut("{id:long}")]
+    public async Task<IActionResult> Update(long id, [FromForm] UpdateProductRequest request)
+        => Ok(new Response
+        {
+            Data = await Mediator.Send(new UpdateProductCommand(
+            id,
+            request.Name,
+            request.Code,
+            request.Measure,
+            request.Photo?.OpenReadStream(),
+            Path.GetExtension(request.Photo?.FileName ?? string.Empty),
+            request.Photo?.ContentType
+        ))
+        });
 
-    [HttpGet("{Id:long}")]
-    public async Task<IActionResult> GetById(long Id)
-        => Ok(new Response { Data = await Mediator.Send(new GetProductByIdQuery(Id)) });
+
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> Delete(long id)
+        => Ok(new Response { Data = await Mediator.Send(new DeleteProductCommand(id)) });
+
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> GetById(long id)
+        => Ok(new Response { Data = await Mediator.Send(new GetProductByIdQuery(id)) });
 
     [HttpGet]
     public async Task<IActionResult> GetAll()

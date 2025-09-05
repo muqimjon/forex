@@ -1,4 +1,4 @@
-﻿namespace Forex.WebApi.Models;
+﻿namespace Forex.WebApi.Models.Commons;
 
 using System.Net;
 

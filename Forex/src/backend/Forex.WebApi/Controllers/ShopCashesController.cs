@@ -2,9 +2,8 @@
 
 using Forex.Application.Features.ShopCashes.Commands;
 using Forex.Application.Features.ShopCashes.Queries;
-using Forex.WebApi.Models;
+using Forex.WebApi.Models.Commons;
 using Microsoft.AspNetCore.Mvc;
-using VoltStream.WebApi.Controllers;
 
 public class ShopCashesController : BaseController
 {
@@ -16,13 +15,13 @@ public class ShopCashesController : BaseController
     public async Task<IActionResult> Update(UpdateShopCashCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 
-    [HttpDelete("{Id:long}")]
-    public async Task<IActionResult> Delete(long Id)
-        => Ok(new Response { Data = await Mediator.Send(new DeleteShopCashCommand(Id)) });
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> Delete(long id)
+        => Ok(new Response { Data = await Mediator.Send(new DeleteShopCashCommand(id)) });
 
-    [HttpGet("{Id:long}")]
-    public async Task<IActionResult> GetById(long Id)
-        => Ok(new Response { Data = await Mediator.Send(new GetShopCashByIdQuery(Id)) });
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> GetById(long id)
+        => Ok(new Response { Data = await Mediator.Send(new GetShopCashByIdQuery(id)) });
 
     [HttpGet]
     public async Task<IActionResult> GetAll()

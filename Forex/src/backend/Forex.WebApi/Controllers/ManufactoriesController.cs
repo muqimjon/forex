@@ -2,9 +2,8 @@
 
 using Forex.Application.Features.Manufactories.Commands;
 using Forex.Application.Features.Manufactories.Queries;
-using Forex.WebApi.Models;
+using Forex.WebApi.Models.Commons;
 using Microsoft.AspNetCore.Mvc;
-using VoltStream.WebApi.Controllers;
 
 public class ManufactoriesController : BaseController
 {
@@ -16,13 +15,13 @@ public class ManufactoriesController : BaseController
     public async Task<IActionResult> Update(UpdateManufactoryCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 
-    [HttpDelete("{Id:long}")]
-    public async Task<IActionResult> Delete(long Id)
-        => Ok(new Response { Data = await Mediator.Send(new DeleteManufactoryCommand(Id)) });
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> Delete(long id)
+        => Ok(new Response { Data = await Mediator.Send(new DeleteManufactoryCommand(id)) });
 
-    [HttpGet("{Id:long}")]
-    public async Task<IActionResult> GetById(long Id)
-        => Ok(new Response { Data = await Mediator.Send(new GetManufactoryByIdQuery(Id)) });
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> GetById(long id)
+        => Ok(new Response { Data = await Mediator.Send(new GetManufactoryByIdQuery(id)) });
 
     [HttpGet]
     public async Task<IActionResult> GetAll()

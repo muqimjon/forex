@@ -8,18 +8,19 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     public CreateUserCommandValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required");
+            .NotEmpty().WithMessage("Foydalanuvchi nomi kiritilishi shart");
 
         RuleFor(x => x.Phone)
-            .NotEmpty().WithMessage("Phone is required")
-            .Matches(@"^\+?[0-9]{9,15}$")
-            .WithMessage("Invalid phone number format");
+            .NotEmpty().WithMessage("Telefon raqami kiritilishi shart")
+            .Matches(@"^\+998\d{9}$")
+            .WithMessage("Faqat O‘zbekiston telefon raqami formatida bo‘lishi kerak (masalan: +998901234567)");
 
         RuleFor(x => x.Role)
-            .IsInEnum().WithMessage("Invalid role");
+            .IsInEnum().WithMessage("Noto‘g‘ri rol tanlandi");
 
         RuleFor(x => x.Address)
-            .NotEmpty().WithMessage("Address is required");
+            .NotEmpty().WithMessage("Manzil kiritilishi shart");
     }
 }
+
 

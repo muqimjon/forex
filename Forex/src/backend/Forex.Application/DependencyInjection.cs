@@ -14,8 +14,10 @@ public static class DependencyInjection
 
         services.AddMediatR(assembly);
         services.AddAutoMapper(assembly);
+
         services.AddValidatorsFromAssemblyContaining<CreateUserCommandValidator>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
 
         return services;
     }

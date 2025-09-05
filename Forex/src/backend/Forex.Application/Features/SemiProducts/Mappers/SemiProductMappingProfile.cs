@@ -12,11 +12,11 @@ public class SemiProductMappingProfile : Profile
     {
         CreateMap<CreateSemiProductCommand, SemiProduct>()
             .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name.ToNormalized()));
+                opt => opt.MapFrom(src => src.Name!.ToNormalized()));
 
         CreateMap<UpdateSemiProductCommand, SemiProduct>()
             .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name.ToNormalized()));
+                opt => opt.MapFrom(src => src.Name!.ToNormalized()));
 
         CreateMap<SemiProduct, SemiProductDto>();
     }

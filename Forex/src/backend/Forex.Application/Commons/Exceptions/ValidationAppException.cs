@@ -7,5 +7,7 @@ public class ValidationAppException(IEnumerable<ValidationFailure> failures) :
     AppException(BuildErrorMessage(failures), HttpStatusCode.BadRequest)
 {
     private static string BuildErrorMessage(IEnumerable<ValidationFailure> failures)
-        => string.Join("; ", failures.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+        => string.Join("; ", failures
+            .GroupBy(f => f.PropertyName)
+            .Select(g => $"{g.Key}: {string.Join(", ", g.Select(f => f.ErrorMessage).Distinct())}"));
 }

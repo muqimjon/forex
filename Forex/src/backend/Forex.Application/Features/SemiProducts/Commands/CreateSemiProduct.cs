@@ -6,32 +6,59 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record CreateSemiProductCommand(
     long ManufactoryId,
     string? Name,
     int Code,
     string Measure,
-    string? PhotoPath)
-    : IRequest<long>;
+    Stream? Photo,
+    string? Extension,
+    string? ContentType
+) : IRequest<long>;
 
 public class CreateSemiProductCommandHandler(
     IAppDbContext context,
-    IMapper mapper) : IRequestHandler<CreateSemiProductCommand, long>
+    IMapper mapper,
+    IFileStorageService fileStorage
+) : IRequestHandler<CreateSemiProductCommand, long>
 {
     public async Task<long> Handle(CreateSemiProductCommand request, CancellationToken cancellationToken)
     {
-        var isExist = await context.SemiProducts
-            .AnyAsync(user => user.Code == request.Code, cancellationToken);
-
-        if (isExist)
-            throw new AlreadyExistException(nameof(SemiProduct), nameof(request.Code), request.Code);
+        await EnsureCodeIsUnique(request.Code, cancellationToken);
 
         var semiProduct = mapper.Map<SemiProduct>(request);
-        context.SemiProducts.Add(semiProduct);
-        await context.SaveAsync(cancellationToken);
+
+        semiProduct.PhotoPath = await UploadPhotoIfExists(request, cancellationToken);
+
+        await SaveSemiProduct(semiProduct, cancellationToken);
+
         return semiProduct.Id;
+    }
+
+    private async Task EnsureCodeIsUnique(int code, CancellationToken ct)
+    {
+        var isExist = await context.SemiProducts.AnyAsync(sp => sp.Code == code, ct);
+
+        if (isExist)
+            throw new AlreadyExistException(nameof(SemiProduct), nameof(code), code);
+    }
+
+    private async Task<string> UploadPhotoIfExists(CreateSemiProductCommand request, CancellationToken ct)
+    {
+        if (request.Photo is null) return string.Empty;
+
+        var fileName = $"{Guid.NewGuid():N}{request.Extension}";
+        return await fileStorage.UploadAsync(
+            request.Photo,
+            fileName,
+            request.ContentType ?? "application/octet-stream",
+            ct);
+    }
+
+    private async Task SaveSemiProduct(SemiProduct semiProduct, CancellationToken ct)
+    {
+        context.SemiProducts.Add(semiProduct);
+        await context.SaveAsync(ct);
     }
 }
