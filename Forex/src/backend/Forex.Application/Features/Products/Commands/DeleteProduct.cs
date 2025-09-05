@@ -16,11 +16,11 @@ public class DeleteProductCommandHandler(
 {
     public async Task<bool> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        var user = await context.Products
+        var product = await context.Products
             .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(Product), nameof(request.Id), request.Id);
 
-        user.IsDeleted = true;
+        product.IsDeleted = true;
         return await context.SaveAsync(cancellationToken);
     }
 }
