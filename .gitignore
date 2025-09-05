@@ -416,3 +416,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/Forex/src/backend/Forex.WebApi/appsettings.Development.json
