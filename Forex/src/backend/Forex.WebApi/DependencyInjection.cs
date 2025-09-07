@@ -25,30 +25,8 @@ public static class DependencyInjection
         services.AddApiControllers();
         services.AddValidation();
 
-        services.AddOpenApi("v1", options => { options.AddDocumentTransformer<BearerSecuritySchemeTransformer>(); });
-
-        services.AddAuthentication(x =>
-        {
-            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(x =>
-        {
-            x.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-
-                ValidIssuer = conf["Jwt:Issuer"],
-                ValidAudience = conf["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(conf["Jwt:Key"]!)
-                )
-            };
-        });
-
+        services.AddOpenApiDocumentation();
+        services.AddJwtAuthentication(conf);
         services.AddAppCors();
     }
 
@@ -81,6 +59,39 @@ public static class DependencyInjection
     }
 
     #region private helpers
+
+    private static void AddOpenApiDocumentation(this IServiceCollection services)
+    {
+        services.AddOpenApi("v1", options =>
+        {
+            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        });
+    }
+
+    private static void AddJwtAuthentication(this IServiceCollection services, IConfiguration conf)
+    {
+        services.AddAuthentication(x =>
+        {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(x =>
+        {
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = conf["Jwt:Issuer"],
+                ValidAudience = conf["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(conf["Jwt:Key"]!)
+                )
+            };
+        });
+    }
 
     private static void AddApiControllers(this IServiceCollection services)
     {
