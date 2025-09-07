@@ -12,24 +12,34 @@ public class JwtTokenGenerator(IConfiguration config) : IJwtTokenGenerator
 {
     public string GenerateToken(User user, IList<string> roles)
     {
-        var claims = new List<Claim>
+        var claims = new List<Claim>();
+
+        if (!string.IsNullOrWhiteSpace(user.Name))
+            claims.Add(new Claim(ClaimTypes.Name, user.Name));
+
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+
+        if (!string.IsNullOrWhiteSpace(user.Email))
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+
+        if (!string.IsNullOrWhiteSpace(user.Phone))
+            claims.Add(new Claim(ClaimTypes.MobilePhone, user.Phone));
+
+        if (roles is not null && roles.Count > 0)
         {
-            new(ClaimTypes.Name, user.Name!),
-            new(ClaimTypes.NameIdentifier, $"{user.Id}"),
-            new(ClaimTypes.Email, user.Email!),
-            new(ClaimTypes.MobilePhone, user.Phone)
-        };
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+        }
 
-        claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(config["Jwt:Key"]!)
+        );
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
             issuer: config["Jwt:Issuer"],
             audience: config["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.Now.AddHours(1),
+            expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

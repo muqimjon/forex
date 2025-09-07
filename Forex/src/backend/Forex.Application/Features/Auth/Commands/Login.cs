@@ -24,7 +24,7 @@ public class LoginCommandHandler(
             u => u.Phone == request.EmailOrPhone || u.Email == request.EmailOrPhone,
             cancellationToken);
 
-        if (user is null || !hasher.VerifyPassword(request.Password, user.PasswordHash!))
+        if (user is null || !hasher.VerifyPassword(user.PasswordHash!, request.Password))
             throw new ConflictException("Login yoki parol noto‘g‘ri.");
 
         var roles = new List<string> { user.Role.ToString() };

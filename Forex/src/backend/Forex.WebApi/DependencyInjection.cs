@@ -1,15 +1,18 @@
 ﻿namespace Forex.WebApi;
 
-using FluentValidation.Results;
 using Forex.Application;
 using Forex.Application.Commons.Exceptions;
 using Forex.Infrastructure;
 using Forex.WebApi.Conventions;
 using Forex.WebApi.Extensions;
 using Forex.WebApi.Middlewares;
+using Forex.WebApi.OpenApi;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 using System.Text.Json.Serialization;
 
 public static class DependencyInjection
@@ -22,7 +25,29 @@ public static class DependencyInjection
         services.AddApiControllers();
         services.AddValidation();
 
-        services.AddOpenApi();
+        services.AddOpenApi("v1", options => { options.AddDocumentTransformer<BearerSecuritySchemeTransformer>(); });
+
+        services.AddAuthentication(x =>
+        {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(x =>
+        {
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = conf["Jwt:Issuer"],
+                ValidAudience = conf["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(conf["Jwt:Key"]!)
+                )
+            };
+        });
 
         services.AddAppCors();
     }
@@ -74,7 +99,7 @@ public static class DependencyInjection
             options.InvalidModelStateResponseFactory = context =>
                 throw new ValidationAppException(context.ModelState
                     .SelectMany(kvp => kvp.Value!.Errors
-                        .Select(e => new ValidationFailure(kvp.Key, e.ErrorMessage))));
+                        .Select(e => new FluentValidation.Results.ValidationFailure(kvp.Key, e.ErrorMessage))));
         }));
     }
 

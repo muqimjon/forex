@@ -30,13 +30,15 @@ public class RegisterCommandHandler(
     public async Task<string> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var exists = await context.Users
-            .AnyAsync(u => u.Phone == request.Phone || u.Email == request.Email, cancellationToken);
+            .AnyAsync(u => !string.IsNullOrEmpty(request.Phone) && u.Phone == request.Phone ||
+                !string.IsNullOrEmpty(request.Email) && u.Email == request.Email, cancellationToken);
 
         if (exists)
             throw new AlreadyExistException(nameof(User));
 
         var user = mapper.Map<User>(request);
         user.PasswordHash = hasher.HashPassword(request.Password);
+        Console.WriteLine($"[DEBUG] DBdagi hash: {user.PasswordHash}");
 
         context.Users.Add(user);
         await context.SaveAsync(cancellationToken);
