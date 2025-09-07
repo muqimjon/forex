@@ -5,6 +5,7 @@ using Forex.Application;
 using Forex.Application.Commons.Exceptions;
 using Forex.Infrastructure;
 using Forex.WebApi.Conventions;
+using Forex.WebApi.Extensions;
 using Forex.WebApi.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -17,19 +18,27 @@ public static class DependencyInjection
     {
         services.AddApplicationServices();
         services.AddInfrastructureServices(conf);
-        services.AddControllers(options
-            => options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())))
-                .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-        services.Configure<ApiBehaviorOptions>(options =>
-        {
-            options.InvalidModelStateResponseFactory = context =>
-                throw new ValidationAppException(context.ModelState
-                    .SelectMany(kvp => kvp.Value!.Errors
-                        .Select(e => new ValidationFailure(kvp.Key, e.ErrorMessage))));
-        });
+        services.AddApiControllers();
+        services.AddValidation();
 
         services.AddOpenApi();
+
+        services.AddAppCors();
+    }
+
+    public static void UseInfrastructure(this WebApplication app)
+    {
+        app.UseMiddleware<ExceptionHandlerMiddleware>();
+
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        app.UseCors("DefaultPolicy");
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.ApplyMigrations();
     }
 
     public static void UseOpenApiDocumentation(this WebApplication app)
@@ -42,24 +51,43 @@ public static class DependencyInjection
                 opt.WithTheme(ScalarTheme.BluePlanet);
                 opt.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
                 opt.WithTitle("Forex API Documentation");
-                //opt.WithLayout(ScalarLayout.Classic);
-                //opt.WithFavicon("favicon.ico");
             });
         }
     }
 
-    public static void UseInfrastructure(this WebApplication app)
+    #region private helpers
+
+    private static void AddApiControllers(this IServiceCollection services)
     {
-        app.UseMiddleware<ExceptionHandlerMiddleware>();
-
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-
-        app.UseCors(s => s
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-
-        app.UseAuthorization();
+        services.AddControllers(options =>
+        {
+            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+        })
+        .AddJsonOptions(opt =>
+            opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     }
+
+    private static void AddValidation(this IServiceCollection services)
+    {
+        services.Configure((Action<ApiBehaviorOptions>)(options =>
+        {
+            options.InvalidModelStateResponseFactory = context =>
+                throw new ValidationAppException(context.ModelState
+                    .SelectMany(kvp => kvp.Value!.Errors
+                        .Select(e => new ValidationFailure(kvp.Key, e.ErrorMessage))));
+        }));
+    }
+
+    private static void AddAppCors(this IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("DefaultPolicy", policy =>
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader());
+        });
+    }
+
+    #endregion
 }

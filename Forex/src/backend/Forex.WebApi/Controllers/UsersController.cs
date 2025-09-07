@@ -2,7 +2,7 @@
 
 using Forex.Application.Features.Users.Commands;
 using Forex.Application.Features.Users.Queries;
-using Forex.WebApi.Models.Commons;
+using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 public class UsersController : BaseController

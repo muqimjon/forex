@@ -3,7 +3,6 @@
 using Forex.Application.Features.Products.Commands;
 using Forex.Application.Features.Products.Queries;
 using Forex.WebApi.Models;
-using Forex.WebApi.Models.Commons;
 using Microsoft.AspNetCore.Mvc;
 
 public class ProductsController : BaseController

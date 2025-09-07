@@ -12,11 +12,15 @@ public class UserMappingProfile : Profile
     {
         CreateMap<CreateUserCommand, User>()
             .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name.ToNormalized()));
+                opt => opt.MapFrom(src => src.Name.ToNormalized()))
+            .ForMember(dest => dest.NormalizedEmail,
+                opt => opt.MapFrom(src => src.Email!.ToNormalized()));
 
         CreateMap<UpdateUserCommand, User>()
             .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name.ToNormalized()));
+                opt => opt.MapFrom(src => src.Name.ToNormalized()))
+            .ForMember(dest => dest.NormalizedEmail,
+                opt => opt.MapFrom(src => src.Email!.ToNormalized()));
 
         CreateMap<User, UserDto>();
     }

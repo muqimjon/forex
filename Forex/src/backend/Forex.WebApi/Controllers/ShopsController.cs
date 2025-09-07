@@ -2,7 +2,7 @@
 
 using Forex.Application.Features.Shops.Commands;
 using Forex.Application.Features.Shops.Queries;
-using Forex.WebApi.Models.Commons;
+using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 public class ShopsController : BaseController

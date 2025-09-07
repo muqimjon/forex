@@ -2,7 +2,7 @@
 
 using Forex.Application.Features.Currencies.Commands;
 using Forex.Application.Features.Currencies.Queries;
-using Forex.WebApi.Models.Commons;
+using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 public class CurrenciesController : BaseController

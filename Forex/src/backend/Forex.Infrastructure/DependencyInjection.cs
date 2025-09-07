@@ -2,8 +2,10 @@
 
 using Forex.Application.Commons.Interfaces;
 using Forex.Infrastructure.FileStorage.Minio;
+using Forex.Infrastructure.Identity;
 using Forex.Infrastructure.Persistence;
 using Forex.Infrastructure.Persistence.Interceptors;
+using Forex.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +15,19 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration conf)
     {
+        services.AddHttpContextAccessor();
+
         services.AddDbContext(conf);
         services.AddFileStorage(conf);
-
+        services.AddIdentity();
         return services;
+    }
+
+    private static void AddIdentity(this IServiceCollection services)
+    {
+        services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
     }
 
     private static void AddDbContext(this IServiceCollection services, IConfiguration conf)
@@ -27,7 +38,7 @@ public static class DependencyInjection
                    .AddInterceptors(sp.GetRequiredService<AuditInterceptor>()));
     }
 
-    public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
+    public static void AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
         var options = configuration.GetSection("Minio").Get<MinioOptions>()!;
 
@@ -39,7 +50,5 @@ public static class DependencyInjection
         services.AddSingleton(options);
         services.AddSingleton(minioClient);
         services.AddScoped<IFileStorageService, MinioFileStorageService>();
-
-        return services;
     }
 }

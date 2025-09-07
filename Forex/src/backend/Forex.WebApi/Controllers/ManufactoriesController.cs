@@ -2,7 +2,7 @@
 
 using Forex.Application.Features.Manufactories.Commands;
 using Forex.Application.Features.Manufactories.Queries;
-using Forex.WebApi.Models.Commons;
+using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 public class ManufactoriesController : BaseController

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 public record CreateUserCommand(
     string Name,
     string Phone,
+    string Email,
     Role Role,
     string Address,
     decimal Balance,

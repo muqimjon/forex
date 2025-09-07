@@ -89,4 +89,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         optionsBuilder.AddInterceptors(new AuditInterceptor());
     }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Ignore<System.Transactions.Transaction>();
+    }
 }

@@ -14,6 +14,7 @@ public record UpdateUserCommand(
     long Id,
     string Name,
     string Phone,
+    string? Email,
     Role Role,
     string Address,
     decimal Balance,
