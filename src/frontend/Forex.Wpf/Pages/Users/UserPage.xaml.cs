@@ -97,21 +97,21 @@ public partial class UserPage : Page
                 brDiscount.Visibility = Visibility.Visible;
                 brAccount.Visibility = Visibility.Visible;
                 btnSave.Visibility = Visibility.Visible;
-                spAccount.Visibility = Visibility.Visible;
+                //spAccount.Visibility = Visibility.Visible;
                 break;
 
             case "Yetkazuvchi":
                 brDiscount.Visibility = Visibility.Collapsed;
                 brAccount.Visibility = Visibility.Visible;
                 btnSave.Visibility = Visibility.Visible;
-                spAccount.Visibility = Visibility.Visible;
+                //spAccount.Visibility = Visibility.Visible;
                 break;
 
             case "Hodim":
                 brDiscount.Visibility = Visibility.Collapsed;
                 brAccount.Visibility = Visibility.Visible;
                 btnSave.Visibility = Visibility.Visible;
-                spAccount.Visibility = Visibility.Visible;
+                //spAccount.Visibility = Visibility.Visible;
                 break;
 
             default:

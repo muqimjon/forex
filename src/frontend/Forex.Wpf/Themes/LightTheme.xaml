@@ -8,6 +8,8 @@
 
     <SolidColorBrush x:Key="PrimaryBorderColor" Color="#E0F2FE"/>
     <SolidColorBrush x:Key="SecondaryBorderColor" Color="#0FB27D"/>
+    <SolidColorBrush x:Key="SelectedBorderColor" Color="Black"/>
+
 
     <SolidColorBrush x:Key="PrimaryTextColor" Color="White" />
     <SolidColorBrush x:Key="SecondaryTextColor" Color="Black" />    
