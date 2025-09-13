@@ -2,8 +2,10 @@
 
 using Forex.Application.Features.Auth.Commands;
 using Forex.WebApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[AllowAnonymous]
 public class AuthController : BaseController
 {
     [HttpPost("register")]

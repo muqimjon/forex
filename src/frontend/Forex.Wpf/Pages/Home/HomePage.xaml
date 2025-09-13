@@ -1,0 +1,106 @@
+﻿<Page x:Class="Forex.Wpf.Pages.Home.HomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:local="clr-namespace:Forex.Wpf.Pages.Home"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="HomePage">
+
+    <StackPanel Background="{DynamicResource PrimaryBackground}">
+        <Border x:Name="mainMenu"
+                Background="#FF4FC3F7"
+                md:ElevationAssist.Elevation="Dp8"
+                Height="60"
+                Margin="10"
+                CornerRadius="10">
+            <TextBlock Text="Forex tizimiga xush kelibsiz!"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+        </Border>
+
+        <WrapPanel Margin="35 20">
+            <Button x:Name="btnUser" 
+                    md:ElevationAssist.Elevation="Dp24" 
+                    MinWidth="220" 
+                    md:ButtonAssist.CornerRadius="10"  
+                    Background="#FF1565C0"
+                    Foreground="{DynamicResource PrimaryTextColor}" 
+                    FontSize="24" 
+                    FontWeight="Medium" 
+                    Margin="10" 
+                    Height="120" Click="BtnUser_Click">
+                👤 User
+            </Button>
+
+            <Button x:Name="btnProduct" 
+                    md:ElevationAssist.Elevation="Dp24"
+                    MinWidth="220"
+                    md:ButtonAssist.CornerRadius="10"
+                    Background="#FF2E7D32"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Margin="10"
+                    Height="120">
+                👟 Mahsulot
+            </Button>
+
+            <Button x:Name="btnCash" 
+                    md:ElevationAssist.Elevation="Dp24"
+                    MinWidth="220"
+                    md:ButtonAssist.CornerRadius="10"
+                    Background="#FF005F73"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Margin="10"
+                    Height="120">
+                💵 Kassa
+            </Button>
+
+            <Button x:Name="btnSale"
+                    md:ElevationAssist.Elevation="Dp24"
+                    MinWidth="220"
+                    md:ButtonAssist.CornerRadius="10"
+                    Background="#FF00C9A7"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Margin="10"
+                    Height="120">
+                🛒 Sotuv
+            </Button>
+
+            <Button x:Name="btnSaleHistory" 
+                    md:ElevationAssist.Elevation="Dp24"
+                    MinWidth="220"
+                    md:ButtonAssist.CornerRadius="10"
+                    Background="#FF4527A0"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Margin="10"
+                    Height="120">
+                📜 Sotuv tarixi
+            </Button>
+
+            <Button x:Name="btnSettings" 
+                    md:ElevationAssist.Elevation="Dp24"
+                    MinWidth="220"
+                    md:ButtonAssist.CornerRadius="10"
+                    Background="#FFC62828"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Margin="10"
+                    Height="120">
+                ⚙️ Sozlash
+            </Button>
+        </WrapPanel>
+    </StackPanel>
+</Page>
