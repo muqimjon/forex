@@ -16,6 +16,7 @@ public partial class App : Application
         base.OnStartup(e);
 
         var client = new ForexClient("https://localhost:7041/api");
+
         var mainWindow = new MainWindow();
         mainWindow.Initialize(client);
         mainWindow.Show();

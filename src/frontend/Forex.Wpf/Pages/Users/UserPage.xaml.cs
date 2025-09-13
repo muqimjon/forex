@@ -191,12 +191,12 @@ public partial class UserPage : Page
         string text = tb.Text ?? string.Empty;
         cbRole.IsDropDownOpen = true;
 
-        var roles = Enum.GetNames(typeof(Role)).ToList();
+        var roles = Enum.GetNames<Role>().ToList();
         roles.Insert(0, "");
 
         cbRole.ItemsSource = string.IsNullOrWhiteSpace(text)
             ? roles
-            : roles.Where(r => r.Contains(text, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            : [.. roles.Where(r => r.Contains(text, StringComparison.InvariantCultureIgnoreCase))];
 
         tb.SelectionStart = tb.Text!.Length;
     }
