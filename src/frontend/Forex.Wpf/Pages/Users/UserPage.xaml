@@ -37,18 +37,18 @@
         <WrapPanel Grid.Row="1" Orientation="Horizontal">
             <Border BorderThickness="1" BorderBrush="{DynamicResource SelectedBorderColor }" Margin="1 0 1 2" Width="120" Background="{DynamicResource SelectedBackground}" CornerRadius="4">
                 <ComboBox x:Name="cbRole"
-                              IsEditable="False"
-                              Padding="5 0 2 0"
-                              StaysOpenOnEdit="True"
-                              IsTextSearchEnabled="False"
-                              md:HintAssist.Hint="Tanlash"
-                              BorderThickness="0"
-                              FontSize="16"
-                              Width="105"
-                              KeyDown="TextBox_KeyDown"
-                              Loaded="cbRole_Loaded"
-                              SelectionChanged="cbRole_SelectionChanged"/>
-                </Border>
+                        IsEditable="False"
+                        Padding="5 0 2 0"
+                        StaysOpenOnEdit="True"
+                        IsTextSearchEnabled="False"
+                        md:HintAssist.Hint="Tanlash"
+                        BorderThickness="0"
+                        FontSize="16"
+                        Width="105"
+                        KeyDown="TextBox_KeyDown"
+                        Loaded="cbRole_Loaded"
+                        SelectionChanged="cbRole_SelectionChanged"/>
+            </Border>
                 <Border BorderThickness="1" BorderBrush="{DynamicResource SelectedBorderColor }" Margin="1 0 1 2" Width="115" Background="{DynamicResource SelectedBackground}" CornerRadius="4">
                     <TextBox x:Name="txtName" KeyDown="TextBox_KeyDown" FontSize="16" BorderThickness="0" Width="112" md:HintAssist.Hint="Nomi" Padding="5" />
                 </Border>
