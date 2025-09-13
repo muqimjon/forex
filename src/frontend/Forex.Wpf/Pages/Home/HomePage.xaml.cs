@@ -1,4 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Home;
+
 using Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.SaleHistories;
 using Forex.Wpf.Pages.Sales;

@@ -1,4 +1,8 @@
 ﻿namespace Forex.Wpf.Pages.ShopCashes;
+
+using Forex.Wpf.Pages.Home;
+using Forex.Wpf.Windows;
+using System.Windows;
 using System.Windows.Controls;
 
 /// <summary>
@@ -6,8 +10,17 @@ using System.Windows.Controls;
 /// </summary>
 public partial class ShopCashPage : Page
 {
+    private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
     public ShopCashPage()
     {
         InitializeComponent();
+    }
+
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
+        if (NavigationService?.CanGoBack == true)
+            NavigationService.GoBack();
+        else
+            Main.NavigateTo<HomePage>();
     }
 }

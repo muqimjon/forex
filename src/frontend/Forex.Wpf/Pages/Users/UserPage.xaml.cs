@@ -35,7 +35,6 @@ public partial class UserPage : Page
         ]);
     }
 
-
     private void BtnBack_Click(object sender, RoutedEventArgs e)
     {
         if (NavigationService?.CanGoBack == true)

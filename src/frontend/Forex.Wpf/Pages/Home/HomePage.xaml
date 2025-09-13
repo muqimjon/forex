@@ -33,7 +33,8 @@
                     FontSize="24" 
                     FontWeight="Medium" 
                     Margin="10" 
-                    Height="120" Click="BtnUser_Click">
+                    Height="120" 
+                    Click="BtnUser_Click">
                 👤 User
             </Button>
 
@@ -46,7 +47,8 @@
                     FontSize="24"
                     FontWeight="Medium"
                     Margin="10"
-                    Height="120">
+                    Height="120"
+                    Click="BtnProduct_Click">
                 👟 Mahsulot
             </Button>
 
@@ -59,7 +61,8 @@
                     FontSize="24"
                     FontWeight="Medium"
                     Margin="10"
-                    Height="120">
+                    Height="120"
+                    Click="BtnCash_Click">
                 💵 Kassa
             </Button>
 
@@ -72,7 +75,8 @@
                     FontSize="24"
                     FontWeight="Medium"
                     Margin="10"
-                    Height="120">
+                    Height="120"
+                    Click="BtnSale_Click">
                 🛒 Sotuv
             </Button>
 
@@ -85,7 +89,8 @@
                     FontSize="24"
                     FontWeight="Medium"
                     Margin="10"
-                    Height="120">
+                    Height="120"
+                    Click="BtnSaleHistory_Click">
                 📜 Sotuv tarixi
             </Button>
 
@@ -98,7 +103,8 @@
                     FontSize="24"
                     FontWeight="Medium"
                     Margin="10"
-                    Height="120">
+                    Height="120"
+                    Click="BtnSettings_Click">
                 ⚙️ Sozlash
             </Button>
         </WrapPanel>
