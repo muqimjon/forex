@@ -13,4 +13,8 @@
     <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Forex.ClientService\Forex.ClientService.csproj" />
+  </ItemGroup>
+
 </Project>

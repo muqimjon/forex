@@ -1,23 +1,23 @@
 ﻿namespace Forex.Wpf.Windows;
 
+using Forex.ClientService;
 using Forex.Wpf.Pages.Home;
 using System.Windows;
 using System.Windows.Controls;
 
 public partial class MainWindow : Window
 {
+    public ForexClient Client { get; private set; } = default!;
+
     public MainWindow()
     {
         InitializeComponent();
-
-        Loaded += (_, _) => MainFrame.Navigate(new HomePage());
     }
 
-    public void NavigateTo<T>() where T : Page, new()
+    public void Initialize(ForexClient client)
     {
-        var page = new T();
-        Console.WriteLine($"Navigating to: {typeof(T).Name}");
-        MainFrame.Navigate(page);
+        Client = client;
+        Loaded += (_, _) => NavigateTo(new HomePage(client));
     }
 
     public void NavigateTo(Page page)
