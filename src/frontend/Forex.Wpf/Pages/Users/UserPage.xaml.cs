@@ -66,15 +66,12 @@ public partial class UserPage : Page
 
     private void UpdateRoleList()
     {
-        var roles = rawUsers
-            .Select(u => u.Role.ToString())
-            .Distinct()
-            .OrderBy(r => r)
-            .ToList();
-
-        roles.Insert(0, ""); // Tanlanmagan
+        var roles = Enum.GetNames<Role>().ToList();
+        roles.Insert(0, "");
         cbRole.ItemsSource = roles;
+        cbRole.SelectedItem = roles[0];
     }
+
 
     private void ApplyFilters()
     {
@@ -120,7 +117,7 @@ public partial class UserPage : Page
 
     private void CbRole_GotFocus(object sender, RoutedEventArgs e)
     {
-        LoadUsers(); // Har safar focus bo‘lganda yangilansin
+        LoadUsers();
     }
 
     private async void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -149,7 +146,7 @@ public partial class UserPage : Page
             {
                 MessageBox.Show("Foydalanuvchi muvaffaqiyatli qo‘shildi.");
                 ClearForm();
-                LoadUsers(); // 🔄 Jadvalni yangilash
+                LoadUsers();
             }
             else
             {
@@ -194,18 +191,14 @@ public partial class UserPage : Page
         string text = tb.Text ?? string.Empty;
         cbRole.IsDropDownOpen = true;
 
-        var roles = rawUsers
-            .Select(u => u.Role.ToString())
-            .Distinct()
-            .OrderBy(r => r)
-            .ToList();
-
+        var roles = Enum.GetNames(typeof(Role)).ToList();
         roles.Insert(0, "");
 
         cbRole.ItemsSource = string.IsNullOrWhiteSpace(text)
             ? roles
-            : [.. roles.Where(r => r.Contains(text, StringComparison.InvariantCultureIgnoreCase))];
+            : roles.Where(r => r.Contains(text, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
         tb.SelectionStart = tb.Text!.Length;
     }
+
 }

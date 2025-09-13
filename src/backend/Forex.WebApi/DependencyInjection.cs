@@ -35,7 +35,6 @@ public static class DependencyInjection
         app.UseMiddleware<ExceptionHandlerMiddleware>();
 
         app.UseHttpsRedirection();
-        app.UseStaticFiles();
         app.UseCors("DefaultPolicy");
 
         app.UseAuthentication();
