@@ -3,6 +3,8 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
+using Forex.Application.Features.Auth.DTOs;
+using Forex.Application.Features.Users.DTOs;
 using Forex.Domain.Entities.Users;
 using Forex.Domain.Enums;
 using MediatR;
@@ -18,16 +20,16 @@ public record RegisterCommand(
     string? Address,
     string? Description,
     string Password)
-    : IRequest<string>;
+    : IRequest<AuthResponse>;
 
 public class RegisterCommandHandler(
     IAppDbContext context,
     IMapper mapper,
     IPasswordHasher hasher,
     IJwtTokenGenerator jwt)
-    : IRequestHandler<RegisterCommand, string>
+    : IRequestHandler<RegisterCommand, AuthResponse>
 {
-    public async Task<string> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var exists = await context.Users
             .AnyAsync(u => !string.IsNullOrEmpty(request.Phone) && u.Phone == request.Phone ||
@@ -46,6 +48,10 @@ public class RegisterCommandHandler(
         var roles = new List<string> { user.Role.ToString() };
         var token = jwt.GenerateToken(user, roles);
 
-        return token;
+        return new()
+        {
+            Token = jwt.GenerateToken(user, roles),
+            User = mapper.Map<UserDto>(user),
+        };
     }
 }

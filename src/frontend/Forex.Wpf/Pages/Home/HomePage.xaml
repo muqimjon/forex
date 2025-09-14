@@ -15,13 +15,36 @@
                 md:ElevationAssist.Elevation="Dp8"
                 Height="60"
                 Margin="10"
-                CornerRadius="10">
-            <TextBlock Text="Forex tizimiga xush kelibsiz!"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
+                CornerRadius="10"
+                Padding="0,0,10,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Chap taraf: logotip yoki sarlavha -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <Image Source="/Assets/logo.png" Height="32" Margin="0,0,10,0"/>
+                    <TextBlock Text="Forex" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                </StackPanel>
+
+                <!-- O‘ng taraf: ism + chiqish -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10">
+                    <TextBlock Text="Muqimjon Ismoilov" FontSize="16" Foreground="White" VerticalAlignment="Center"
+                               Margin="0 0 10 0"/>
+                    <Button Content="🚪 Chiqish"
+                    Background="#FF1565C0"
+                    Foreground="White"
+                    Padding="6,2"
+                    FontWeight="SemiBold"
+                    BorderThickness="0"
+                    md:ButtonAssist.CornerRadius="6"
+                    Click="BtnLogout_Click"/>
+                </StackPanel>
+            </Grid>
         </Border>
+
 
         <WrapPanel Margin="35 20">
             <Button x:Name="btnUser" 

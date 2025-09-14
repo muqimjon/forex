@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options), IAppDbContext
-{ 
+{
     public DbSet<User> Users { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<ShopCash> ShopCashes { get; set; }

@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Home;
 
 using Forex.ClientService;
+using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.SaleHistories;
 using Forex.Wpf.Pages.Sales;
@@ -42,4 +43,9 @@ public partial class HomePage : Page
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new SettingsPage(client));
+
+    private void BtnLogout_Click(object sender, RoutedEventArgs e)
+    {
+        ((MainWindow)Application.Current.MainWindow).NavigateTo(new LoginPage(client));
+    }
 }
