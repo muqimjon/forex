@@ -419,3 +419,4 @@ FodyWeavers.xsd
 # Entity Framework migrations
 **/Migrations/
 /src/backend/Forex.WebApi/appsettings.Development.json
+/src/backend/Forex.Infrastructure/Persistence/Migrations/AppDbContextModelSnapshot.cs
