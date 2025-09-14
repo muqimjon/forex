@@ -416,6 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+# Entity Framework migrations
+**/Migrations/
 /src/backend/Forex.WebApi/appsettings.Development.json
-/src/backend/Forex.Infrastructure/Persistence/Migrations
-/src/backend/Forex.Infrastructure/Migrations
