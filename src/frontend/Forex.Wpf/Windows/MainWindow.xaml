@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Asosiy oyna" Height="500" Width="820">
+        Title="Asosiy oyna" Height="450" Width="500">
     <Grid Background="{DynamicResource PrimaryBackground}">
         <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
     </Grid>

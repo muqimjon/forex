@@ -6,8 +6,9 @@
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.Home"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="HomePage">
+      d:DesignHeight="570" d:DesignWidth="810"
+      Title="HomePage"
+      Loaded="Page_Loaded">
 
     <StackPanel Background="{DynamicResource PrimaryBackground}">
         <Border x:Name="mainMenu"
@@ -24,23 +25,40 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Chap taraf: logotip yoki sarlavha -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
-                    <Image Source="/Assets/logo.png" Height="32" Margin="0,0,10,0"/>
-                    <TextBlock Text="Forex" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                </StackPanel>
+                <Border VerticalAlignment="Center"
+                        Margin="10,0,0,0"
+                        HorizontalAlignment="Left"
+                        Width="120"
+                        Height="45"
+                        CornerRadius="10"
+                        md:ElevationAssist.Elevation="Dp2">
+                    <Border.Background>
+                        <ImageBrush ImageSource="/Assets/logo.png"
+                                    Stretch="UniformToFill"/>
+                    </Border.Background>
+                </Border>
 
                 <!-- O‘ng taraf: ism + chiqish -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10">
-                    <TextBlock Text="Muqimjon Ismoilov" FontSize="16" Foreground="White" VerticalAlignment="Center"
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Margin="10">
+                    
+                    <TextBlock Text="{Binding FullName}" 
+                               FontSize="16" 
+                               Foreground="White" 
+                               VerticalAlignment="Center"
                                Margin="0 0 10 0"/>
+                    
                     <Button Content="🚪 Chiqish"
-                    Background="#FF1565C0"
-                    Foreground="White"
-                    Padding="6,2"
-                    FontWeight="SemiBold"
-                    BorderThickness="0"
-                    md:ButtonAssist.CornerRadius="6"
-                    Click="BtnLogout_Click"/>
+                            Background="#FF1565C0"
+                            Foreground="White"
+                            Padding="6,2"
+                            FontWeight="SemiBold"
+                            BorderThickness="0"
+                            md:ButtonAssist.CornerRadius="6"
+                            Click="BtnLogout_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -130,6 +148,22 @@
                     Click="BtnSettings_Click">
                 ⚙️ Sozlash
             </Button>
+
+
+            <Button x:Name="btnSemiProductEntry" 
+                    md:ElevationAssist.Elevation="Dp24"
+                    MinWidth="220"
+                    md:ButtonAssist.CornerRadius="10"
+                    Background="#FF8E24AA"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Margin="10"
+                    Height="120"
+                    Click="BtnSemiProduct_Click">
+                🏭 Yarim tayyor mahsulot kirimi
+            </Button>
+
         </WrapPanel>
     </StackPanel>
 </Page>

@@ -1,85 +1,59 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
 using Forex.ClientService;
-using Forex.Wpf.Windows;
-using System;
+using Forex.Wpf.Pages.Home;
+using Forex.Wpf.Services;
+using Forex.Wpf.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
 public partial class RegisterPage : Page
 {
     private readonly ForexClient client;
+    private readonly RegisterViewModel vm;
 
     public RegisterPage(ForexClient client)
     {
         InitializeComponent();
         this.client = client;
+        this.vm = new RegisterViewModel(client);
+        DataContext = vm;
         tbName.Focus();
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current.MainWindow is Window mainWindow)
+            WindowResizer.AnimateToSize(mainWindow, 500, 550);
     }
 
     private async void BtnRegister_Click(object sender, RoutedEventArgs e)
     {
-        HideMessages();
+        lblError.Visibility = Visibility.Collapsed;
 
-        var name = tbName.Text.Trim();
-        var email = tbEmail.Text.Trim();
-        var phone = tbPhone.Text.Trim();
-        var pass = pbPassword.Password;
-        var confirm = pbConfirm.Password;
+        var vm = (RegisterViewModel)DataContext;
 
-        if (string.IsNullOrWhiteSpace(name) ||
-            (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(phone)) ||
-            string.IsNullOrWhiteSpace(pass))
+        var success = await vm.RegisterAsync(
+            tbName.Text.Trim(),
+            tbEmail.Text.Trim(),
+            tbPhone.Text.Trim(),
+            pbPassword.Password,
+            pbConfirm.Password);
+
+        if (success)
+            NavigationService?.Navigate(new HomePage(client));
+        else
         {
-            ShowError("Name, contact and password are required.");
-            return;
-        }
-
-        if (!string.Equals(pass, confirm, StringComparison.Ordinal))
-        {
-            ShowError("Passwords do not match.");
-            return;
-        }
-
-        try
-        {
-            var resp = await client.Auth.Register(new()
-            {
-                Name = name,
-                Email = email,
-                Phone = phone,
-                Password = pass
-            });
-
-            if (resp.StatusCode != 200)
-            {
-                ShowError(resp.Message ?? "Registration failed.");
-                return;
-            }
-
-            lblOk.Text = "Account created successfully. You can log in now.";
-            lblOk.Visibility = Visibility.Visible;
-        }
-        catch (Exception ex)
-        {
-            ShowError("Error: " + ex.Message);
+            lblError.Text = vm.ErrorMessage;
+            lblError.Visibility = Visibility.Visible;
         }
     }
 
     private void BtnGoLogin_Click(object sender, RoutedEventArgs e)
     {
-        ((MainWindow)Application.Current.MainWindow).NavigateTo(new LoginPage(client));
-    }
-
-    private void HideMessages()
-    {
-        lblOk.Visibility = Visibility.Collapsed;
-        lblError.Visibility = Visibility.Collapsed;
-    }
-
-    private void ShowError(string msg)
-    {
-        lblError.Text = msg;
-        lblError.Visibility = Visibility.Visible;
+        if (NavigationService?.CanGoBack == true)
+            NavigationService.GoBack();
+        else
+            NavigationService?.Navigate(new LoginPage(client));
     }
 }

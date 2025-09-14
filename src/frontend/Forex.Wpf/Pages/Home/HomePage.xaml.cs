@@ -1,13 +1,16 @@
 ﻿namespace Forex.Wpf.Pages.Home;
 
 using Forex.ClientService;
+using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.SaleHistories;
 using Forex.Wpf.Pages.Sales;
+using Forex.Wpf.Pages.SemiProducts;
 using Forex.Wpf.Pages.Settings;
 using Forex.Wpf.Pages.ShopCashes;
 using Forex.Wpf.Pages.Users;
+using Forex.Wpf.Services;
 using Forex.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +27,14 @@ public partial class HomePage : Page
     {
         InitializeComponent();
         this.client = client;
+
+        DataContext = AuthStore.Instance;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current.MainWindow is Window mainWindow)
+            WindowResizer.AnimateToSize(mainWindow, 810, 570);
     }
 
     private void BtnUser_Click(object sender, RoutedEventArgs e)
@@ -44,8 +55,12 @@ public partial class HomePage : Page
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new SettingsPage(client));
 
+    private void BtnSemiProduct_Click(object sender, RoutedEventArgs e)
+        => Main.NavigateTo(new SemiProductPage(client));
+
     private void BtnLogout_Click(object sender, RoutedEventArgs e)
     {
-        ((MainWindow)Application.Current.MainWindow).NavigateTo(new LoginPage(client));
+        AuthStore.Instance.Logout();
+        Main.NavigateTo(new LoginPage(client));
     }
 }

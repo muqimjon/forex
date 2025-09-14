@@ -2,7 +2,8 @@
 
 using Forex.ClientService;
 using Forex.Wpf.Pages.Home;
-using System;
+using Forex.Wpf.Services;
+using Forex.Wpf.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -12,42 +13,37 @@ using System.Windows.Controls;
 public partial class LoginPage : Page
 {
     private readonly ForexClient client;
+    private readonly LoginViewModel viewModel;
 
     public LoginPage(ForexClient client)
     {
         InitializeComponent();
         this.client = client;
+        this.viewModel = new LoginViewModel(client);
+
         tbLogin.Focus();
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current.MainWindow is Window mainWindow)
+            WindowResizer.AnimateToSize(mainWindow, 500, 450);
     }
 
     private async void BtnLogin_Click(object sender, RoutedEventArgs e)
     {
         lblError.Visibility = Visibility.Collapsed;
 
-        var login = tbLogin.Text.Trim();
-        var password = pbPassword.Password;
+        var success = await viewModel.LoginAsync(tbLogin.Text.Trim(), pbPassword.Password);
 
-        if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+        if (success)
         {
-            ShowError("Login va parol majburiy.");
-            return;
-        }
-
-        try
-        {
-            var resp = await client.Auth.Login(new() { EmailOrPhone = login, Password = password });
-
-            if (resp.StatusCode != 200)
-            {
-                ShowError(resp.Message ?? "Login muvaffaqiyatsiz.");
-                return;
-            }
-
             NavigationService?.Navigate(new HomePage(client));
         }
-        catch (Exception ex)
+        else
         {
-            ShowError(ex.Message);
+            lblError.Text = viewModel.ErrorMessage;
+            lblError.Visibility = Visibility.Visible;
         }
     }
 
@@ -55,11 +51,7 @@ public partial class LoginPage : Page
     {
         NavigationService?.Navigate(new RegisterPage(client));
     }
-
-    private void ShowError(string msg)
-    {
-        lblError.Text = msg;
-        lblError.Visibility = Visibility.Visible;
-    }
 }
+
+
 

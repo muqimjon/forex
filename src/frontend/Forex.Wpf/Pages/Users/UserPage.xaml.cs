@@ -34,7 +34,7 @@ public partial class UserPage : Page
         txtSearch.Focus();
         LoadUsers();
 
-        FocusNavigatorService.AttachEnterNavigation(
+        FocusNavigator.AttachEnterNavigation(
         [
             txtSearch,
             cbRole,

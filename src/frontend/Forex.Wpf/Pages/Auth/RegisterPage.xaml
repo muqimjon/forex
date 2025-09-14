@@ -6,8 +6,9 @@
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.Auth"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="RegisterPage">
+      d:DesignHeight="550" d:DesignWidth="500"
+      Title="RegisterPage"
+      Loaded="Page_Loaded">
 
     <Grid Background="#1E1E2F">
         <Grid.RowDefinitions>

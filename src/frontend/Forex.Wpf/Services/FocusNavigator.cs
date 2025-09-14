@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 
-public static class FocusNavigatorService
+public static class FocusNavigator
 {
     public static void AttachEnterNavigation(List<UIElement> focusOrder)
     {

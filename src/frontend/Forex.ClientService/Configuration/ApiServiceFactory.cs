@@ -1,24 +1,17 @@
 ﻿namespace Forex.ClientService.Configuration;
 
-using Forex.ClientService.Services;
 using Refit;
-using System;
 using System.Net.Http;
 
 public static class ApiServiceFactory
 {
-    public static T Create<T>(string baseUrl) where T : class
+    public static T Create<T>(string baseUrl)
     {
-        var httpClient = new HttpClient { BaseAddress = new Uri(baseUrl) };
-
-        var token = AuthStore.Instance.Token;
-        if (!string.IsNullOrWhiteSpace(token))
+        var httpClient = new HttpClient(new AuthHeaderHandler())
         {
-            httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-        }
+            BaseAddress = new Uri(baseUrl)
+        };
 
         return RestService.For<T>(httpClient);
     }
 }
-
