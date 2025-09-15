@@ -5,9 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.Home"
-      mc:Ignorable="d" 
-      Height="570" Width="810"
+      mc:Ignorable="d"
       Title="HomePage"
+      d:DesignHeight="580" d:DesignWidth="810"
       Loaded="Page_Loaded">
 
     <StackPanel Background="{DynamicResource PrimaryBackground}">
