@@ -19,13 +19,13 @@ public class RegisterViewModel(ForexClient client) : ViewModelBase
             string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(phone) ||
             string.IsNullOrWhiteSpace(password))
         {
-            ErrorMessage = "Name, contact va password majburiy.";
+            ErrorMessage = "Ism, telefon raqam va parol majburiy.";
             return false;
         }
 
         if (password != confirm)
         {
-            ErrorMessage = "Passwords do not match.";
+            ErrorMessage = "Parol tasdiqlanmadi";
             return false;
         }
 
@@ -43,7 +43,6 @@ public class RegisterViewModel(ForexClient client) : ViewModelBase
             return false;
         }
 
-        // ✅ Agar muvaffaqiyatli bo‘lsa, darhol login qilamiz
         var loginResp = resp.Data;
         AuthStore.Instance.SetAuth(loginResp.Token, loginResp.User.Name, loginResp.User.Id);
 

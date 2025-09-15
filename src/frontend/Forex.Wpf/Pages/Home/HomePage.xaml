@@ -135,6 +135,26 @@
                 📜 Sotuv tarixi
             </Button>
 
+            <Button x:Name="btnSemiProductEntry" 
+                    md:ElevationAssist.Elevation="Dp24"
+                    MinWidth="220"
+                    md:ButtonAssist.CornerRadius="10"
+                    Background="#FF8E24AA"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Margin="10"
+                    Height="120"
+                    Click="BtnSemiProduct_Click">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center">📦</TextBlock>
+                    <TextBlock TextWrapping="Wrap" 
+                                TextAlignment="Center">
+                        Yarim tayyor<LineBreak/>mahsulot
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+
             <Button x:Name="btnSettings" 
                     md:ElevationAssist.Elevation="Dp24"
                     MinWidth="220"
@@ -147,21 +167,6 @@
                     Height="120"
                     Click="BtnSettings_Click">
                 ⚙️ Sozlash
-            </Button>
-
-
-            <Button x:Name="btnSemiProductEntry" 
-                    md:ElevationAssist.Elevation="Dp24"
-                    MinWidth="220"
-                    md:ButtonAssist.CornerRadius="10"
-                    Background="#FF8E24AA"
-                    Foreground="{DynamicResource PrimaryTextColor}"
-                    FontSize="24"
-                    FontWeight="Medium"
-                    Margin="10"
-                    Height="120"
-                    Click="BtnSemiProduct_Click">
-                🏭 Yarim tayyor mahsulot kirimi
             </Button>
 
         </WrapPanel>

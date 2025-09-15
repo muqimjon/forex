@@ -13,10 +13,10 @@ public static class NotificationService
 {
     public static void Show(
         string message,
-        NotificationPosition position = NotificationPosition.BottomRight,
-        int durationSeconds = 3,
-        double opacity = 0.7,
         NotificationType type = NotificationType.Error,
+        NotificationPosition position = NotificationPosition.BottomRight,
+        int durationSeconds = 5,
+        double opacity = 0.7,
         int maxLineLength = 40)
     {
         if (Application.Current.MainWindow is not Window mainWindow)

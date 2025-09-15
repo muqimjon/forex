@@ -13,7 +13,7 @@ public partial class SaleHistoryPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
     private readonly ForexClient client;
-    public SaleHistoryPage(ClientService.ForexClient client)
+    public SaleHistoryPage(ForexClient client)
     {
         InitializeComponent();
         this.client = client;

@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
 using Forex.ClientService;
+using Forex.Wpf.Enums;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Services;
 using Forex.Wpf.ViewModels;
@@ -38,6 +39,7 @@ public partial class LoginPage : Page
 
         if (success)
         {
+            NotificationService.Show("Kirish muvaffaqiyatli amalga oshdi", NotificationType.Success);
             NavigationService?.Navigate(new HomePage(client));
         }
         else

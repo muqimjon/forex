@@ -34,7 +34,7 @@ public partial class HomePage : Page
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         if (Application.Current.MainWindow is Window mainWindow)
-            WindowResizer.AnimateToSize(mainWindow, 810, 570);
+            WindowResizer.AnimateToSize(mainWindow, 810, 580);
     }
 
     private void BtnUser_Click(object sender, RoutedEventArgs e)
