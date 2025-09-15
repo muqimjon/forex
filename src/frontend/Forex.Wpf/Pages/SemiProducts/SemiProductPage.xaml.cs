@@ -15,6 +15,7 @@ public partial class SemiProductPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
     private readonly ForexClient client;
+
     public SemiProductPage(ForexClient client)
     {
         InitializeComponent();
@@ -23,17 +24,25 @@ public partial class SemiProductPage : Page
         FocusNavigator.AttachEnterNavigation([
             cbSender,
             cbOrg,
-            txPayment,
+            txContainerCount,
+            txTransferFeePerContainer,
+            txDeliveryPrice,
             txNote,
-            cbName.comboBox,
-            iCode.inputBox,
-            iMeasure.comboBox,
-            iQuantity.inputBox,
-            iCost.inputBox,
-            iDelivery.inputBox,
-            iTransfer.inputBox,
+            fcbName.comboBox,
+            fibCode.inputBox,
+            fcbMeasure.comboBox,
+            fibQuantity.inputBox,
+            fibCost.inputBox,
+            fibDelivery.inputBox,
+            fibTransfer.inputBox,
             btnAdd,
             ]);
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (Application.Current.MainWindow is Window mainWindow)
+            WindowResizer.AnimateToSize(mainWindow, 810, 580);
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

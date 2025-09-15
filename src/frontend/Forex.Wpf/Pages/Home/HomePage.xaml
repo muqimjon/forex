@@ -24,7 +24,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Chap taraf: logotip yoki sarlavha -->
+                <!-- LOGO -->
                 <Border VerticalAlignment="Center"
                         Margin="10,0,0,0"
                         HorizontalAlignment="Left"
@@ -38,7 +38,7 @@
                     </Border.Background>
                 </Border>
 
-                <!-- O‘ng taraf: ism + chiqish -->
+                <!-- NAME + LOGOUT -->
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             VerticalAlignment="Center"

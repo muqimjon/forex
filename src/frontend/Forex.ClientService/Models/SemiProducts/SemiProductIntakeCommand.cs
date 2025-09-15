@@ -10,6 +10,7 @@ public class SemiProductIntakeCommand
     public List<ContainerDto> Containers { get; set; } = default!;
     public List<ItemFormData> Items { get; set; } = default!;
 }
+
 public class ContainerDto
 {
     public long Count { get; set; }

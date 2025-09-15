@@ -31,7 +31,6 @@ public partial class UserPage : Page
         txtSearch.TextChanged += TxtSearch_TextChanged;
         btnSave.Click += BtnSave_Click;
 
-        txtSearch.Focus();
         LoadUsers();
 
         FocusNavigator.AttachEnterNavigation(

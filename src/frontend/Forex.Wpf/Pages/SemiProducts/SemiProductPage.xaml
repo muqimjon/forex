@@ -8,12 +8,15 @@
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       mc:Ignorable="d"
       d:DesignHeight="580" d:DesignWidth="810"
+      Loaded="Page_Loaded"
       Title="SemiProductPage">
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <!-- Header -->
+            <RowDefinition Height="12"/>
+            <!-- Chok -->
             <RowDefinition Height="Auto"/>
             <!-- Entry row -->
             <RowDefinition Height="*"/>
@@ -23,20 +26,22 @@
         </Grid.RowDefinitions>
 
         <!-- 1) HEADER -->
-        <Grid Grid.Row="0" Margin="0 0 0 12">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MaxWidth="500"/>
-                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- HEADER: minimal Grid bilan -->
-            <Grid Grid.Row="0" Margin="0,0,0,12">
+            <!-- HEADER LEFT -->
+            <Grid Grid.Row="0">
+                
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    
                     <RowDefinition Height="Auto"/>
                     <!-- Sana -->
                     <RowDefinition Height="Auto"/>
@@ -44,45 +49,154 @@
                     <RowDefinition Height="Auto"/>
                     <!-- Tashkilot -->
                     <RowDefinition Height="Auto"/>
-                    <!-- Toʻlov -->
+                    <!-- Kontinerlar soni -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Dona kontiner uchun to'lov -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Yo'l xarajatlari -->
                     <RowDefinition Height="Auto"/>
                     <!-- Izoh -->
                 </Grid.RowDefinitions>
 
                 <!-- Sana -->
                 <TextBlock Text="Sana:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
-                <DatePicker x:Name="dpDate" Grid.Row="0" Grid.Column="1"/>
+                <DatePicker x:Name="dpDate" Grid.Row="0" Grid.Column="1" SelectedDate="2025-09-16"/>
 
                 <!-- Yuboruvchi -->
                 <TextBlock Text="Yuboruvchi:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
-                <ComboBox x:Name="cbSender" Grid.Row="1" Grid.Column="1" IsEditable="True"/>
+                <ComboBox x:Name="cbSender" Grid.Row="1" Grid.Column="1" IsEditable="True">
+                    <ComboBoxItem Content="Sender A"/>
+                    <ComboBoxItem Content="Sender B"/>
+                    <ComboBoxItem Content="Sender C"/>
+                </ComboBox>
 
                 <!-- Tashkilot -->
                 <TextBlock Text="Tashkilot:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
-                <ComboBox x:Name="cbOrg" Grid.Row="2" Grid.Column="1" IsEditable="True"/>
+                <ComboBox x:Name="cbOrg" Grid.Row="2" Grid.Column="1" IsEditable="True" >
+                    <ComboBoxItem Content="Fraganoos"/>
+                    <ComboBoxItem Content="Ovoza Plus"/>
+                    <ComboBoxItem Content="Nike"/>
+                </ComboBox>
 
-                <!-- Toʻlov -->
-                <TextBlock Text="To‘lov:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
-                <TextBox x:Name="txPayment" Grid.Row="3" Grid.Column="1"/>
+                <!-- Kontiner soni -->
+                <TextBlock Text="Kontiner soni:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <TextBox x:Name="txContainerCount" Grid.Row="3" Grid.Column="1" Text="3"/>
                 
+                <!-- Ta'minotchiga to'lov -->
+                <TextBlock Text="Har bir container uchun to'lov:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <TextBox x:Name="txTransferFeePerContainer" Grid.Row="4" Grid.Column="1" Text="3 000"/>
+                
+                <!-- Yo'l xarajatlari -->
+                <TextBlock Text="Yetkazib berish harajatlari:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <TextBox x:Name="txDeliveryPrice" Grid.Row="5" Grid.Column="1" Text="5 500"/>
+
                 <!-- Izoh -->
-                <TextBlock Text="Izoh:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
-                <TextBox x:Name="txNote" Grid.Row="4" Grid.Column="1"/>
+                <TextBlock Text="Izoh:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <TextBox x:Name="txNote" Grid.Row="6" Grid.Column="1" Text="Izoh yo‘q"/>
             </Grid>
 
-                <!-- Back button -->
-            <Button x:Name="btnBack"
-                    Grid.Column="2"
-                    Content="🔙 Orqaga"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    md:ButtonAssist.CornerRadius="4"
-                    Background="{DynamicResource OtherBackground}"
-                    Click="BtnBack_Click"/>
+            <!-- HEADER RIGHT -->
+            <Grid Grid.Column="2" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Button x:Name="btnBack" 
+                        Content="🔙 Orqaga" 
+                        md:ButtonAssist.CornerRadius="4"
+                        HorizontalAlignment="Right"
+                        Margin="0 0 0 4"
+                        Background="{DynamicResource OtherBackground}" 
+                        Click="BtnBack_Click"/>
+                
+                <Border Grid.Row="1" CornerRadius="4" BorderBrush="Black" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <!-- Header: Invoice -->
+                            <RowDefinition Height="*"/>
+                            <!-- Hisob kitoblar -->
+                            <RowDefinition Height="Auto"/>
+                            <!-- Jami summa -->
+                        </Grid.RowDefinitions>
+
+                        <Label HorizontalAlignment="Center" Content="Invoice" Padding="8,4"/>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <!-- Mahsulot jonli hisob kitoblari -->
+                                <ColumnDefinition Width="5"/>
+                                <!-- Chok -->
+                                <ColumnDefinition/>
+                                <!-- Umumiy chiqimlar -->
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <!-- Transfer fee -->
+                                <RowDefinition/>
+                                <!-- Delivery price -->
+                                <RowDefinition/>
+                                <!-- Cost price -->
+                            </Grid.RowDefinitions>
+
+                            <!-- 1 -->
+                            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                <Label Content="Ta'minotchi haqi:"/>
+                                <Label Content="3 000"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2">
+                                <Label Content="Ta'minotchi haqi:"/>
+                                <Label Content="3 000"/>
+                            </StackPanel>
+
+                            <!-- 2 -->
+                            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                <Label Content="Ta'minotchi haqi:"/>
+                                <Label Content="3 000"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2">
+                                <Label Content="Yo'l harajatlari:"/>
+                                <Label Content="5 000"/>
+                            </StackPanel>
+
+                            <!-- 3 -->
+                            <StackPanel Orientation="Horizontal" Grid.Row="2">
+                                <Label Content="Mahsulot soni:"/>
+                                <Label Content="7250"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="2">
+                                <Label Content="Mahsulot tannarxi:"/>
+                                <Label Content="5 000"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Grid.Row="2" Background="AliceBlue" CornerRadius="0 0 4 4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <!-- Nomi -->
+                                    <ColumnDefinition/>
+                                    <!-- Qiymati -->
+                                </Grid.ColumnDefinitions>
+                                <Label  Content="Ja'mi summa:"/>
+                                <Label Grid.Column="1" Content="25 000"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                </Border>
+            </Grid>
+
+
         </Grid>
 
         <!-- 2) ITEM ENTRY ROW -->
-        <Grid Grid.Row="1" Margin="0,0,0,12">
+        <Grid Grid.Row="2" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <!-- Name -->
@@ -102,13 +216,13 @@
                 <!-- Add -->
             </Grid.ColumnDefinitions>
 
-            <controls:FloatingComboBox x:Name="cbName" Grid.Column="0" Label="Nomi" Text="{Binding CurrentItem.Name}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="iCode" Grid.Column="1" Label="Kod" Text="{Binding CurrentItem.Code}" Margin="2,0"/>
-            <controls:FloatingComboBox x:Name="iMeasure" Grid.Column="2" Label="O‘lchov" Text="{Binding CurrentItem.Measure}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="iQuantity" Grid.Column="3" Label="Miqdor" Text="{Binding CurrentItem.Quantity}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="iCost" Grid.Column="4" Label="Narxi" Text="{Binding CurrentItem.CostPrice}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="iDelivery" Grid.Column="5" Label="Yetkazish" Text="{Binding CurrentItem.CostDelivery}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="iTransfer" Grid.Column="6" Label="Transfer" Text="{Binding CurrentItem.TransferFee}" Margin="2,0"/>
+            <controls:FloatingComboBox x:Name="fcbName" Grid.Column="0" Label="Nomi" Text="{Binding CurrentItem.Name}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="fibCode" Grid.Column="1" Label="Kod" Text="{Binding CurrentItem.Code}" Margin="2,0"/>
+            <controls:FloatingComboBox x:Name="fcbMeasure" Grid.Column="2" Label="O‘lchov" Text="{Binding CurrentItem.Measure}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="fibQuantity" Grid.Column="3" Label="Miqdor" Text="{Binding CurrentItem.Quantity}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="fibCost" Grid.Column="4" Label="Narxi" Text="{Binding CurrentItem.CostPrice}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="fibDelivery" Grid.Column="5" Label="Yetkazish" Text="{Binding CurrentItem.CostDelivery}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="fibTransfer" Grid.Column="6" Label="Transfer" Text="{Binding CurrentItem.TransferFee}" Margin="2,0"/>
 
             <Button x:Name="btnAdd"
                     Grid.Column="7"
@@ -120,13 +234,13 @@
         </Grid>
 
         <!-- 3) ITEMS LIST -->
-        <DataGrid Grid.Row="2"
+        <DataGrid Grid.Row="3"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
                   HeadersVisibility="Column"
                   RowHeaderWidth="0"
                   IsReadOnly="True">
-            
+
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Nomi"        Binding="{Binding Name}"         Width="*"/>
                 <DataGridTextColumn Header="Kod"         Binding="{Binding Code}"         Width="*"/>
@@ -139,7 +253,7 @@
         </DataGrid>
 
         <!-- 4) SUBMIT -->
-        <Button Grid.Row="3" 
+        <Button Grid.Row="4" 
                 Content="Yuborish" 
                 Margin="0 12 0 0" 
                 HorizontalAlignment="Right"
