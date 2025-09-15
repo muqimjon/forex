@@ -1,5 +1,7 @@
 ﻿namespace Forex.WebApi.Controllers;
 
+using Forex.Application.Features.SemiProductEntries.Commands;
+using Forex.Application.Features.SemiProductEntries.DTOs;
 using Forex.Application.Features.SemiProducts.Commands;
 using Forex.Application.Features.SemiProducts.Queries;
 using Forex.WebApi.Models;
@@ -51,4 +53,32 @@ public class SemiProductsController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetAll()
         => Ok(new Response { Data = await Mediator.Send(new GetAllSemiProductsQuery()) });
+
+    [HttpPost("intake")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateIntake([FromForm] SemiProductIntakeRequest request)
+    {
+        var command = new CreateSemiProductIntakeCommand(
+            request.SenderId,
+            request.ManufactoryId,
+            request.EntryDate,
+            request.TransferFeePerContainer,
+            request.Containers,
+            request.Items.Select(i => new ItemDto(
+                i.SemiProductId,
+                i.Name,
+                i.Code,
+                i.Measure,
+                i.Photo?.OpenReadStream(),
+                i.Photo?.ContentType,
+                Path.GetExtension(i.Photo?.FileName ?? string.Empty),
+                i.Quantity,
+                i.CostPrice,
+                i.CostDelivery,
+                i.TransferFee
+            ))
+        );
+
+        return Ok(new Response { Data = await Mediator.Send(command) });
+    }
 }

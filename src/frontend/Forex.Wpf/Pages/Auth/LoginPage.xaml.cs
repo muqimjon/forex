@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
 using Forex.ClientService;
+using Forex.ClientService.Services;
 using Forex.Wpf.Enums;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Services;
@@ -23,6 +24,13 @@ public partial class LoginPage : Page
         this.viewModel = new LoginViewModel(client);
 
         tbLogin.Focus();
+
+        FocusNavigator.AttachEnterNavigation([
+            tbLogin,
+            pbPassword,
+            chRemember,
+            btnLogin,
+            ]);
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -39,7 +47,7 @@ public partial class LoginPage : Page
 
         if (success)
         {
-            NotificationService.Show("Kirish muvaffaqiyatli amalga oshdi", NotificationType.Success);
+            NotificationService.Show($"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi", NotificationType.Success);
             NavigationService?.Navigate(new HomePage(client));
         }
         else

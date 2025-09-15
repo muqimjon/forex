@@ -6,7 +6,7 @@
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.Home"
       mc:Ignorable="d" 
-      d:DesignHeight="570" d:DesignWidth="810"
+      Height="570" Width="810"
       Title="HomePage"
       Loaded="Page_Loaded">
 
@@ -33,7 +33,7 @@
                         CornerRadius="10"
                         md:ElevationAssist.Elevation="Dp2">
                     <Border.Background>
-                        <ImageBrush ImageSource="/Assets/logo.png"
+                        <ImageBrush ImageSource="/Resources/Assets/logo.png"
                                     Stretch="UniformToFill"/>
                     </Border.Background>
                 </Border>

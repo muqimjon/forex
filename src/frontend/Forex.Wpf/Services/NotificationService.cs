@@ -152,25 +152,20 @@ public static class NotificationService
         return null;
     }
 
-    private static Brush GetBackground(NotificationType type) => type switch
+    private static SolidColorBrush GetBackground(NotificationType type) => type switch
     {
         NotificationType.Info => new SolidColorBrush(Color.FromRgb(33, 150, 243)),
         NotificationType.Success => new SolidColorBrush(Color.FromRgb(76, 175, 80)),
         NotificationType.Warning => new SolidColorBrush(Color.FromRgb(255, 152, 0)),
         NotificationType.Error => new SolidColorBrush(Color.FromRgb(244, 67, 54)),
-        _ => Brushes.Gray
+        _ => new SolidColorBrush(Colors.Gray)
     };
 
-    private static Brush GetDarkerBrush(Brush baseBrush)
+    private static SolidColorBrush GetDarkerBrush(SolidColorBrush baseBrush)
     {
-        if (baseBrush is SolidColorBrush solid)
-        {
-            var c = solid.Color;
-            byte Darken(byte value) => (byte)Math.Max(0, value * 0.7);
-            return new SolidColorBrush(Color.FromRgb(Darken(c.R), Darken(c.G), Darken(c.B)));
-        }
-
-        return Brushes.Gray;
+        var c = baseBrush.Color;
+        static byte Darken(byte value) => (byte)Math.Max(0, value * 0.7);
+        return new SolidColorBrush(Color.FromRgb(Darken(c.R), Darken(c.G), Darken(c.B)));
     }
 
     private static VerticalAlignment GetVerticalAlignment(NotificationPosition position) => position switch

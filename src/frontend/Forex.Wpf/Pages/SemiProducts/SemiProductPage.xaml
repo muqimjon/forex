@@ -2,23 +2,147 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Forex.Wpf.Pages.SemiProducts"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
       Title="SemiProductPage">
 
-    <Grid Margin="24">
-        <Button x:Name="btnBack"
-                Content="🔙 Orqaga"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,0,0,12"
-                Padding="8,4"
-                md:ButtonAssist.CornerRadius="4"
-                Background="{DynamicResource OtherBackground}"
-                Click="BtnBack_Click"/>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Header -->
+            <RowDefinition Height="Auto"/>
+            <!-- Entry row -->
+            <RowDefinition Height="*"/>
+            <!-- Items list -->
+            <RowDefinition Height="Auto"/>
+            <!-- Submit -->
+        </Grid.RowDefinitions>
 
+        <!-- 1) HEADER -->
+        <Grid Grid.Row="0" Margin="0 0 0 12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="500"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- HEADER: minimal Grid bilan -->
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Sana -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Yuboruvchi -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Tashkilot -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Toʻlov -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Izoh -->
+                </Grid.RowDefinitions>
+
+                <!-- Sana -->
+                <TextBlock Text="Sana:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <DatePicker x:Name="dpDate" Grid.Row="0" Grid.Column="1"/>
+
+                <!-- Yuboruvchi -->
+                <TextBlock Text="Yuboruvchi:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <ComboBox x:Name="cbSender" Grid.Row="1" Grid.Column="1" IsEditable="True"/>
+
+                <!-- Tashkilot -->
+                <TextBlock Text="Tashkilot:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <ComboBox x:Name="cbOrg" Grid.Row="2" Grid.Column="1" IsEditable="True"/>
+
+                <!-- Toʻlov -->
+                <TextBlock Text="To‘lov:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <TextBox x:Name="txPayment" Grid.Row="3" Grid.Column="1"/>
+                
+                <!-- Izoh -->
+                <TextBlock Text="Izoh:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,2"/>
+                <TextBox x:Name="txNote" Grid.Row="4" Grid.Column="1"/>
+            </Grid>
+
+                <!-- Back button -->
+            <Button x:Name="btnBack"
+                    Grid.Column="2"
+                    Content="🔙 Orqaga"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="{DynamicResource OtherBackground}"
+                    Click="BtnBack_Click"/>
+        </Grid>
+
+        <!-- 2) ITEM ENTRY ROW -->
+        <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <!-- Name -->
+                <ColumnDefinition Width="*"/>
+                <!-- Code -->
+                <ColumnDefinition Width="*"/>
+                <!-- Measure -->
+                <ColumnDefinition Width="*"/>
+                <!-- Quantity -->
+                <ColumnDefinition Width="*"/>
+                <!-- CostPrice -->
+                <ColumnDefinition Width="*"/>
+                <!-- CostDelivery -->
+                <ColumnDefinition Width="*"/>
+                <!-- TransferFee -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- Add -->
+            </Grid.ColumnDefinitions>
+
+            <controls:FloatingComboBox x:Name="cbName" Grid.Column="0" Label="Nomi" Text="{Binding CurrentItem.Name}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="iCode" Grid.Column="1" Label="Kod" Text="{Binding CurrentItem.Code}" Margin="2,0"/>
+            <controls:FloatingComboBox x:Name="iMeasure" Grid.Column="2" Label="O‘lchov" Text="{Binding CurrentItem.Measure}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="iQuantity" Grid.Column="3" Label="Miqdor" Text="{Binding CurrentItem.Quantity}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="iCost" Grid.Column="4" Label="Narxi" Text="{Binding CurrentItem.CostPrice}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="iDelivery" Grid.Column="5" Label="Yetkazish" Text="{Binding CurrentItem.CostDelivery}" Margin="2,0"/>
+            <controls:FloatingInput x:Name="iTransfer" Grid.Column="6" Label="Transfer" Text="{Binding CurrentItem.TransferFee}" Margin="2,0"/>
+
+            <Button x:Name="btnAdd"
+                    Grid.Column="7"
+                    Content="Qo‘shish"
+                    Padding="8,4"
+                    Margin="2,0"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="{DynamicResource OtherBackground}"/>
+        </Grid>
+
+        <!-- 3) ITEMS LIST -->
+        <DataGrid Grid.Row="2"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  HeadersVisibility="Column"
+                  RowHeaderWidth="0"
+                  IsReadOnly="True">
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nomi"        Binding="{Binding Name}"         Width="*"/>
+                <DataGridTextColumn Header="Kod"         Binding="{Binding Code}"         Width="*"/>
+                <DataGridTextColumn Header="O‘lchov"     Binding="{Binding Measure}"      Width="*"/>
+                <DataGridTextColumn Header="Miqdor"      Binding="{Binding Quantity}"     Width="*"/>
+                <DataGridTextColumn Header="Narxi"       Binding="{Binding CostPrice}"    Width="*"/>
+                <DataGridTextColumn Header="Yetkazish"   Binding="{Binding CostDelivery}" Width="*"/>
+                <DataGridTextColumn Header="Transfer"    Binding="{Binding TransferFee}"  Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- 4) SUBMIT -->
+        <Button Grid.Row="3" 
+                Content="Yuborish" 
+                Margin="0 12 0 0" 
+                HorizontalAlignment="Right"
+                md:ButtonAssist.CornerRadius="4"
+                Background="{DynamicResource OtherBackground}"/>
     </Grid>
 </Page>

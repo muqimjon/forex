@@ -1,6 +1,5 @@
 ﻿namespace Forex.Wpf.Services;
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,18 +10,30 @@ public static class FocusNavigator
         if (focusOrder is null || focusOrder.Count == 0)
             return;
 
+        focusOrder[0].Focus();
+
         foreach (var control in focusOrder)
         {
-            control.PreviewKeyDown += (_, e) =>
+            control.PreviewKeyDown += (s, e) =>
             {
-                if (e.Key != Key.Enter) return;
+                if (e.Key != Key.Enter && e.Key != Key.Tab)
+                    return;
 
-                int index = focusOrder.IndexOf(control);
-                if (index >= 0 && index < focusOrder.Count - 1)
+                int idx = focusOrder.IndexOf(control);
+                bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+
+                if (shift)
                 {
-                    focusOrder[index + 1].Focus();
-                    e.Handled = true;
+                    if (idx > 0)
+                        focusOrder[idx - 1].Focus();
                 }
+                else
+                {
+                    if (idx < focusOrder.Count - 1)
+                        focusOrder[idx + 1].Focus();
+                }
+
+                e.Handled = true;
             };
         }
     }

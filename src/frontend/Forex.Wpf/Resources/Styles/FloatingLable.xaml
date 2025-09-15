@@ -1,0 +1,33 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Forex.Wpf.Resources.Converters"
+                    >
+
+
+    <local:StringIsNotEmptyConverter x:Key="StringIsNotEmptyConverter"/>
+    
+    <Style x:Key="FloatingLabelStyle" TargetType="TextBlock">
+        <!--<Setter Property="FontSize" Value="14"/>-->
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="10,2"/>
+        <Setter Property="Foreground" Value="#b0b9c6"/>
+        <Style.Triggers>
+            <!-- текст не пустой -->
+            <DataTrigger Binding="{Binding Tag.Text, RelativeSource={RelativeSource Self}, Converter={StaticResource StringIsNotEmptyConverter}}" Value="True">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="Margin" Value="6,-11,0,0"/>
+                <Setter Property="Foreground" Value="#888"/>
+            </DataTrigger>
+
+            <!-- фокус в TextBox -->
+            <DataTrigger Binding="{Binding Tag.IsKeyboardFocusWithin, RelativeSource={RelativeSource Self}}" Value="True">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="Margin" Value="6,-11,0,0"/>
+                <Setter Property="Foreground" Value="#4a90e2"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

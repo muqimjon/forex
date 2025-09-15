@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
 using Forex.ClientService;
+using Forex.ClientService.Services;
 using Forex.Wpf.Enums;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Services;
@@ -20,6 +21,15 @@ public partial class RegisterPage : Page
         this.vm = new RegisterViewModel(client);
         DataContext = vm;
         tbName.Focus();
+
+        FocusNavigator.AttachEnterNavigation([
+            tbName,
+            tbEmail,
+            tbPhone,
+            pbPassword,
+            pbConfirm,
+            btnRegister,
+            ]);
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -43,7 +53,7 @@ public partial class RegisterPage : Page
 
         if (success)
         {
-            NotificationService.Show("Ro'yxatdan o'tish muvaffaqiyatli amalga oshdi", NotificationType.Success);
+            NotificationService.Show($"{AuthStore.Instance.FullName} Forex tizimiga hush kelibsiz", NotificationType.Success);
             NavigationService?.Navigate(new HomePage(client));
         }
         else

@@ -2,13 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Forex.Wpf"
-             xmlns:System="clr-namespace:System;assembly=mscorlib">
+             xmlns:convs="clr-namespace:Forex.Wpf.Resources.Converters;assembly=Forex.Wpf">
 
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- begin::Custom Theme -->
-                <ResourceDictionary Source="/Themes/LightTheme.xaml"/>
+                <ResourceDictionary Source="/Resources/Themes/LightTheme.xaml"/>
                 <!-- end::Custom Theme -->
 
                 <!-- begin::Material Design -->
@@ -17,6 +17,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Blue.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Lime.xaml"/>
                 <!-- end::Material Design -->
+
+                <!-- Custom styles -->
+                <ResourceDictionary Source="/Resources/Styles/FloatingLable.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Global font style -->
