@@ -1,6 +1,4 @@
 ﻿namespace Forex.Wpf.Pages.Settings;
-
-using Forex.ClientService;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Windows;
 using System.Windows;
@@ -12,11 +10,10 @@ using System.Windows.Controls;
 public partial class SettingsPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-    private readonly ForexClient client;
-    public SettingsPage(ForexClient client)
+
+    public SettingsPage()
     {
         InitializeComponent();
-        this.client = client;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -24,6 +21,6 @@ public partial class SettingsPage : Page
         if (NavigationService?.CanGoBack == true)
             NavigationService.GoBack();
         else
-            Main.NavigateTo(new HomePage(client));
+            Main.NavigateTo(new HomePage());
     }
 }

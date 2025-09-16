@@ -3,8 +3,8 @@
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Models.Users;
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
-using Forex.Wpf.Services;
 using Forex.Wpf.Windows;
 using System;
 using System.Collections.Generic;
@@ -17,14 +17,13 @@ public partial class UserPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
 
-    private readonly ForexClient client;
+    private readonly ForexClient client = App.Client;
     private List<UserDto> rawUsers = [];
     private ObservableCollection<UserDto> filteredUsers = [];
 
-    public UserPage(ForexClient client)
+    public UserPage()
     {
         InitializeComponent();
-        this.client = client;
 
         cbRole.GotFocus += CbRole_GotFocus;
         cbRole.SelectionChanged += CbRole_SelectionChanged;
@@ -174,7 +173,7 @@ public partial class UserPage : Page
         if (NavigationService?.CanGoBack == true)
             NavigationService.GoBack();
         else
-            Main.NavigateTo(new HomePage(client));
+            Main.NavigateTo(new HomePage());
     }
 
     private void CbRole_Loaded(object sender, RoutedEventArgs e)

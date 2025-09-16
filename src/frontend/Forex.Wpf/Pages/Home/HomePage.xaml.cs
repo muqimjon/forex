@@ -1,7 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.Home;
-
-using Forex.ClientService;
 using Forex.ClientService.Services;
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.SaleHistories;
@@ -10,7 +9,6 @@ using Forex.Wpf.Pages.SemiProducts;
 using Forex.Wpf.Pages.Settings;
 using Forex.Wpf.Pages.ShopCashes;
 using Forex.Wpf.Pages.Users;
-using Forex.Wpf.Services;
 using Forex.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,12 +19,10 @@ using System.Windows.Controls;
 public partial class HomePage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-    private readonly ForexClient client;
 
-    public HomePage(ForexClient client)
+    public HomePage()
     {
         InitializeComponent();
-        this.client = client;
 
         DataContext = AuthStore.Instance;
     }
@@ -38,29 +34,29 @@ public partial class HomePage : Page
     }
 
     private void BtnUser_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new UserPage(client));
+        => Main.NavigateTo(new UserPage());
 
     private void BtnProduct_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new ProductPage(client));
+        => Main.NavigateTo(new ProductPage());
 
     private void BtnCash_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new ShopCashPage(client));
+        => Main.NavigateTo(new ShopCashPage());
 
     private void BtnSale_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SalePage(client));
+        => Main.NavigateTo(new SalePage());
 
     private void BtnSaleHistory_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SaleHistoryPage(client));
+        => Main.NavigateTo(new SaleHistoryPage());
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SettingsPage(client));
+        => Main.NavigateTo(new SettingsPage());
 
     private void BtnSemiProduct_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SemiProductPage(client));
+        => Main.NavigateTo(new SemiProductPage());
 
     private void BtnLogout_Click(object sender, RoutedEventArgs e)
     {
         AuthStore.Instance.Logout();
-        Main.NavigateTo(new LoginPage(client));
+        Main.NavigateTo(new LoginPage());
     }
 }

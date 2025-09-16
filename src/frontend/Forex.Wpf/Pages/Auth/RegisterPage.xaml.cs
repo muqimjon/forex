@@ -2,22 +2,22 @@
 
 using Forex.ClientService;
 using Forex.ClientService.Services;
-using Forex.Wpf.Enums;
+using Forex.Wpf.Common.Enums;
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
-using Forex.Wpf.Services;
 using System.Windows;
 using System.Windows.Controls;
 
 public partial class RegisterPage : Page
 {
-    private readonly ForexClient client;
+    private readonly ForexClient client = App.Client;
     private readonly RegisterViewModel vm;
 
-    public RegisterPage(ForexClient client)
+    public RegisterPage()
     {
         InitializeComponent();
-        this.client = client;
-        this.vm = new RegisterViewModel(client);
+
+        this.vm = new RegisterViewModel();
         DataContext = vm;
         tbName.Focus();
 
@@ -53,7 +53,7 @@ public partial class RegisterPage : Page
         if (success)
         {
             NotificationService.Show($"{AuthStore.Instance.FullName} Forex tizimiga hush kelibsiz", NotificationType.Success);
-            NavigationService?.Navigate(new HomePage(client));
+            NavigationService?.Navigate(new HomePage());
         }
         else
         {
@@ -67,6 +67,6 @@ public partial class RegisterPage : Page
         if (NavigationService?.CanGoBack == true)
             NavigationService.GoBack();
         else
-            NavigationService?.Navigate(new LoginPage(client));
+            NavigationService?.Navigate(new LoginPage());
     }
 }

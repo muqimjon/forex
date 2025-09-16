@@ -2,9 +2,9 @@
 
 using Forex.ClientService;
 using Forex.ClientService.Services;
-using Forex.Wpf.Enums;
+using Forex.Wpf.Common.Enums;
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
-using Forex.Wpf.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,13 +13,12 @@ using System.Windows.Controls;
 /// </summary>
 public partial class LoginPage : Page
 {
-    private readonly ForexClient client;
+    private readonly ForexClient client = App.Client;
     private readonly LoginViewModel viewModel;
 
-    public LoginPage(ForexClient client)
+    public LoginPage()
     {
         InitializeComponent();
-        this.client = client;
         this.viewModel = new LoginViewModel(client);
 
         tbLogin.Focus();
@@ -47,7 +46,7 @@ public partial class LoginPage : Page
         if (success)
         {
             NotificationService.Show($"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi", NotificationType.Success);
-            NavigationService?.Navigate(new HomePage(client));
+            NavigationService?.Navigate(new HomePage());
         }
         else
         {
@@ -58,7 +57,7 @@ public partial class LoginPage : Page
 
     private void BtnGoRegister_Click(object sender, RoutedEventArgs e)
     {
-        NavigationService?.Navigate(new RegisterPage(client));
+        NavigationService?.Navigate(new RegisterPage());
     }
 }
 

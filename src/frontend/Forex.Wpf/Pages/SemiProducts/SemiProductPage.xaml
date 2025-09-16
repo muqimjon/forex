@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.SemiProducts"
       xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+      xmlns:conv="clr-namespace:Forex.Wpf.Common.Converters"
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       mc:Ignorable="d"
       d:DesignHeight="580"
@@ -289,53 +290,57 @@
                 <!-- Add -->
             </Grid.ColumnDefinitions>
 
+            <!-- ENTRY ROW -->
             <controls:FloatingComboBox x:Name="fcbName"
                                        Grid.Column="0"
                                        Label="Nomi"
-                                       Text="{Binding CurrentItem.Name}"
+                                       Text="{Binding CurrentItem.Name, UpdateSourceTrigger=PropertyChanged}"
                                        Margin="2 0" />
             <controls:FloatingInput x:Name="fibCode"
                                     Grid.Column="1"
                                     Label="Kod"
-                                    Text="{Binding CurrentItem.Code}"
+                                    Text="{Binding CurrentItem.Code, UpdateSourceTrigger=PropertyChanged}"
                                     Margin="2 0" />
             <controls:FloatingComboBox x:Name="fcbMeasure"
                                        Grid.Column="2"
                                        Label="O‘lchov"
-                                       Text="{Binding CurrentItem.Measure}"
+                                       Text="{Binding CurrentItem.Measure, UpdateSourceTrigger=PropertyChanged}"
                                        Margin="2 0" />
             <controls:FloatingInput x:Name="fibQuantity"
                                     Grid.Column="3"
                                     Label="Miqdor"
-                                    Text="{Binding CurrentItem.Quantity}"
+                                    Text="{Binding CurrentItem.Quantity, UpdateSourceTrigger=PropertyChanged}"
                                     Margin="2 0" />
             <controls:FloatingInput x:Name="fibCost"
                                     Grid.Column="4"
                                     Label="Narxi"
-                                    Text="{Binding CurrentItem.CostPrice}"
+                                    Text="{Binding CurrentItem.CostPrice, UpdateSourceTrigger=PropertyChanged}"
                                     Margin="2 0" />
             <controls:FloatingInput x:Name="fibDelivery"
                                     Grid.Column="5"
                                     Label="Yetkazish"
-                                    Text="{Binding CurrentItem.CostDelivery}"
+                                    Text="{Binding CurrentItem.CostDelivery, UpdateSourceTrigger=PropertyChanged}"
                                     Margin="2 0" />
             <controls:FloatingInput x:Name="fibTransfer"
                                     Grid.Column="6"
                                     Label="Transfer"
-                                    Text="{Binding CurrentItem.TransferFee}"
+                                    Text="{Binding CurrentItem.TransferFee, UpdateSourceTrigger=PropertyChanged}"
                                     Margin="2 0" />
             <controls:FloatingFileInput x:Name="ffiPhoto"
                                         Label="Rasm yuklash"
                                         Grid.Column="7"
-                                        Margin="2 0" />
+                                        Margin="2 0"
+                                        FileName="{Binding CurrentItem.PhotoPath, UpdateSourceTrigger=PropertyChanged}" />
 
             <Button x:Name="btnAdd"
                     Grid.Column="8"
-                    Content="Qo‘shish"
+                    Content="{Binding IsEditing, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Saqlash|Qo‘shish'}"
+                    Command="{Binding SaveCommand}"
                     Padding="8,4"
                     Margin="2,0"
                     md:ButtonAssist.CornerRadius="4"
                     Background="{DynamicResource OtherBackground}" />
+
         </Grid>
 
         <!-- 3) ITEMS LIST -->
@@ -345,9 +350,45 @@
                   HeadersVisibility="Column"
                   RowHeaderWidth="0"
                   IsReadOnly="True"
-                  ItemsSource="{Binding SemiProducts}">
+                  ItemsSource="{Binding Intake.Items}">
 
             <DataGrid.Columns>
+
+                <DataGridTemplateColumn Width="Auto">
+                    <DataGridTemplateColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding"
+                                    Value="0" />
+                            <Setter Property="Margin"
+                                    Value="0" />
+                            <Setter Property="HorizontalContentAlignment"
+                                    Value="Center" />
+                            <Setter Property="VerticalContentAlignment"
+                                    Value="Center" />
+                            <Setter Property="Background"
+                                    Value="Transparent" />
+                            <Setter Property="FocusVisualStyle"
+                                    Value="{x:Null}" />
+                            <Setter Property="BorderThickness"
+                                    Value="0" />
+                            <Setter Property="BorderBrush"
+                                    Value="Transparent" />
+                        </Style>
+                    </DataGridTemplateColumn.CellStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding PreviewImage}"
+                                   Width="30"
+                                   Height="30"
+                                   Stretch="UniformToFill"
+                                   Margin="4"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   SnapsToDevicePixels="True" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
                 <DataGridTextColumn Header="Nomi"
                                     Binding="{Binding Name}"
                                     Width="*" />
@@ -397,7 +438,9 @@
                     </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <controls:ActionButton />
+                            <controls:ActionButton 
+                                EditCommand="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                DeleteCommand="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -407,6 +450,7 @@
         <!-- 4) SUBMIT -->
         <Button Grid.Row="4"
                 Content="Yuborish"
+                Command="{Binding SubmitCommand}"
                 Margin="0 12 0 0"
                 HorizontalAlignment="Right"
                 md:ButtonAssist.CornerRadius="4"

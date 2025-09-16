@@ -10,11 +10,13 @@ public partial class FloatingInput : UserControl
         InitializeComponent();
     }
 
+    // Label property
     public static readonly DependencyProperty LabelProperty =
-        DependencyProperty.Register(nameof(Label), typeof(string), typeof(FloatingInput), new PropertyMetadata(""));
-
-    public static readonly DependencyProperty TextProperty =
-        DependencyProperty.Register(nameof(Text), typeof(string), typeof(FloatingInput), new PropertyMetadata(""));
+        DependencyProperty.Register(
+            nameof(Label),
+            typeof(string),
+            typeof(FloatingInput),
+            new PropertyMetadata(""));
 
     public string Label
     {
@@ -22,9 +24,17 @@ public partial class FloatingInput : UserControl
         set => SetValue(LabelProperty, value);
     }
 
-    public string Text
+    // Text property (universal object type)
+    public static readonly DependencyProperty TextProperty =
+        DependencyProperty.Register(
+            nameof(Text),
+            typeof(object),
+            typeof(FloatingInput),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+    public object? Text
     {
-        get => (string)GetValue(TextProperty);
+        get => GetValue(TextProperty);
         set => SetValue(TextProperty, value);
     }
 }

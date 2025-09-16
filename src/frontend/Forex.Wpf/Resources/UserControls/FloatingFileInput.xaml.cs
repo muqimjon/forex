@@ -15,7 +15,23 @@ public partial class FloatingFileInput : UserControl
         DependencyProperty.Register(nameof(Label), typeof(string), typeof(FloatingFileInput), new PropertyMetadata(""));
 
     public static readonly DependencyProperty FileNameProperty =
-        DependencyProperty.Register(nameof(FileName), typeof(string), typeof(FloatingFileInput), new PropertyMetadata(""));
+    DependencyProperty.Register(
+        nameof(FileName),
+        typeof(string),
+        typeof(FloatingFileInput),
+        new FrameworkPropertyMetadata(
+            string.Empty,
+            FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+            OnFileNameChanged));
+
+    private static void OnFileNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var control = (FloatingFileInput)d;
+
+        if (e.NewValue is null)
+            control.fileNameBox.Text = string.Empty;
+    }
+
 
     public string Label
     {

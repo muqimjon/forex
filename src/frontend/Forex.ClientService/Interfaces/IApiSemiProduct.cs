@@ -32,7 +32,6 @@ public interface IApiSemiProduct
                                 [AliasAs("Measure")] string measure,
                                 [AliasAs("Photo")] StreamPart photo);
 
-    [Multipart]
     [Post("/SemiProducts/intake")]
-    Task<Response<long>> CreateIntake(MultipartFormDataContent content);
+    Task<Response<bool>> CreateIntake([Body] MultipartFormDataContent content);
 }

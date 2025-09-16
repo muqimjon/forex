@@ -2,7 +2,6 @@
 
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.SemiProducts;
-using System.Net.Http;
 
 public static class MultipartBuilder
 {

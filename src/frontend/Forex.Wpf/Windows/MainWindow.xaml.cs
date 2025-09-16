@@ -1,7 +1,7 @@
 ﻿namespace Forex.Wpf.Windows;
 
 using Forex.ClientService;
-using Forex.Wpf.Pages.Auth;
+using Forex.Wpf.Pages.SemiProducts;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -12,12 +12,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-    }
-
-    public void Initialize(ForexClient client)
-    {
-        Client = client;
-        Loaded += (_, _) => NavigateTo(new LoginPage(client));
+        Loaded += (_, _) => NavigateTo(new SemiProductPage());
     }
 
     public void NavigateTo(Page page)

@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Services;
+﻿namespace Forex.Wpf.Common.Services;
 
 using System.Windows;
 using System.Windows.Media.Animation;
@@ -50,8 +50,8 @@ public static class WindowResizer
 
             window.BeginAnimation(Window.LeftProperty, leftAnimation);
             window.BeginAnimation(Window.TopProperty, topAnimation);
-            window.BeginAnimation(Window.WidthProperty, widthAnimation);
-            window.BeginAnimation(Window.HeightProperty, heightAnimation);
+            window.BeginAnimation(FrameworkElement.WidthProperty, widthAnimation);
+            window.BeginAnimation(FrameworkElement.HeightProperty, heightAnimation);
         }
     }
 }

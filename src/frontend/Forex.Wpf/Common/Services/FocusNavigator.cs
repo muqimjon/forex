@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Services;
+﻿namespace Forex.Wpf.Common.Services;
 
 using System.Windows;
 using System.Windows.Controls;

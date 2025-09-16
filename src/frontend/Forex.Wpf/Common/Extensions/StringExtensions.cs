@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Extensions;
+﻿namespace Forex.Wpf.Common.Extensions;
 
 public static class StringExtensions
 {
@@ -43,7 +43,7 @@ public static class StringExtensions
             }
 
             // Agar currentLine + word sig‘sa, qo‘shamiz
-            if ((currentLine.Length + word.Length + 1) <= maxLength)
+            if (currentLine.Length + word.Length + 1 <= maxLength)
             {
                 currentLine += (currentLine.Length > 0 ? " " : "") + word;
             }

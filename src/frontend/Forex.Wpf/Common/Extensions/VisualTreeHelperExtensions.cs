@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Extensions;
+﻿namespace Forex.Wpf.Common.Extensions;
 
 using System.Windows;
 using System.Windows.Media;

@@ -1,11 +1,11 @@
 ﻿<UserControl x:Class="Forex.Wpf.Resources.UserControls.FloatingFileInput"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Height="40"
              
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Forex.Wpf.Resources.UserControls"
+             Height="30"
              mc:Ignorable="d" 
              d:DesignHeight="32" d:DesignWidth="100">
 
@@ -18,12 +18,14 @@
 
         <!-- Display selected file name -->
         <TextBox x:Name="fileNameBox"
-                 Text="{Binding FileName, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                 Text="{Binding FileName, RelativeSource={RelativeSource AncestorType=UserControl}, 
+                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}"
                  IsReadOnly="True"
-                 Height="32"
                  Style="{x:Null}"
+                 VerticalContentAlignment="Center"
                  Background="{DynamicResource InputBackground}"
-                 BorderThickness="1"/>
+                 BorderThickness="1"
+                 BorderBrush="Gray"/>
 
 
         <!-- Hidden file picker trigger -->

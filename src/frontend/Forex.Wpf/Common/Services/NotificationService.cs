@@ -1,7 +1,7 @@
-﻿namespace Forex.Wpf.Services;
+﻿namespace Forex.Wpf.Common.Services;
 
-using Forex.Wpf.Enums;
-using Forex.Wpf.Extensions;
+using Forex.Wpf.Common.Enums;
+using Forex.Wpf.Common.Extensions;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -119,7 +119,7 @@ public static class NotificationService
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };
             Storyboard.SetTarget(opacityAnim, progressBar);
-            Storyboard.SetTargetProperty(opacityAnim, new PropertyPath(Border.OpacityProperty));
+            Storyboard.SetTargetProperty(opacityAnim, new PropertyPath(UIElement.OpacityProperty));
 
             var storyboard = new Storyboard();
             storyboard.Children.Add(cornerAnim);
@@ -127,7 +127,7 @@ public static class NotificationService
             storyboard.Begin();
 
             // ✅ Snackbar fade out
-            System.Threading.Tasks.Task.Delay(durationSeconds * 1000).ContinueWith(_ =>
+            Task.Delay(durationSeconds * 1000).ContinueWith(_ =>
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {

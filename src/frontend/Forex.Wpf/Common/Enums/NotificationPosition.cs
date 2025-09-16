@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Enums;
+﻿namespace Forex.Wpf.Common.Enums;
 
 public enum NotificationPosition
 {

@@ -1,15 +1,14 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
-using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Interfaces;
 using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Common;
 using System.Threading.Tasks;
 
-public class RegisterViewModel(ForexClient client) : ViewModelBase
+public class RegisterViewModel() : ViewModelBase
 {
-    private readonly IApiAuth apiAuth = client.Auth;
+    private readonly IApiAuth apiAuth = App.Client.Auth;
 
     public async Task<bool> RegisterAsync(string name, string email, string phone, string password, string confirm)
     {
