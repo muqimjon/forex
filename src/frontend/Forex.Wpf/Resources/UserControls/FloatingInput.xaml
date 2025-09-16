@@ -12,8 +12,14 @@
 
         <!-- Input -->
         <TextBox x:Name="inputBox"
+                 Style="{x:Null}"
                  Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-                 Margin="1,3"/>
-        
+                 Height="32"
+                 VerticalContentAlignment="Center"
+                 BorderThickness="1"
+                 BorderBrush="Gray"
+                 Background="Transparent"/>
+
+
     </Grid>
 </UserControl>

@@ -5,7 +5,6 @@ using Forex.ClientService.Services;
 using Forex.Wpf.Enums;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Services;
-using Forex.Wpf.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 

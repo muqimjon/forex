@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.ViewModels;
+﻿namespace Forex.Wpf.Pages.SemiProducts;
 
 using Forex.ClientService;
 using Forex.ClientService.Extensions;

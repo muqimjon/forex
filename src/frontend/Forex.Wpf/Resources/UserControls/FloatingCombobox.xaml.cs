@@ -2,12 +2,23 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 public partial class FloatingComboBox : UserControl
 {
     public FloatingComboBox()
     {
         InitializeComponent();
+        comboBox.PreviewKeyDown += ComboBox_PreviewKeyDown;
+    }
+
+    private void ComboBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Space)
+        {
+            comboBox.IsDropDownOpen = !comboBox.IsDropDownOpen;
+            e.Handled = true;
+        }
     }
 
     public static readonly DependencyProperty LabelProperty =

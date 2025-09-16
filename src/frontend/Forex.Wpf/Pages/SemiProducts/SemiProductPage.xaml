@@ -212,20 +212,23 @@
                 <!-- CostDelivery -->
                 <ColumnDefinition Width="*"/>
                 <!-- TransferFee -->
+                <ColumnDefinition Width="*"/>
+                <!-- Add photo -->
                 <ColumnDefinition Width="Auto"/>
                 <!-- Add -->
             </Grid.ColumnDefinitions>
 
-            <controls:FloatingComboBox x:Name="fcbName" Grid.Column="0" Label="Nomi" Text="{Binding CurrentItem.Name}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="fibCode" Grid.Column="1" Label="Kod" Text="{Binding CurrentItem.Code}" Margin="2,0"/>
-            <controls:FloatingComboBox x:Name="fcbMeasure" Grid.Column="2" Label="O‘lchov" Text="{Binding CurrentItem.Measure}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="fibQuantity" Grid.Column="3" Label="Miqdor" Text="{Binding CurrentItem.Quantity}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="fibCost" Grid.Column="4" Label="Narxi" Text="{Binding CurrentItem.CostPrice}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="fibDelivery" Grid.Column="5" Label="Yetkazish" Text="{Binding CurrentItem.CostDelivery}" Margin="2,0"/>
-            <controls:FloatingInput x:Name="fibTransfer" Grid.Column="6" Label="Transfer" Text="{Binding CurrentItem.TransferFee}" Margin="2,0"/>
+            <controls:FloatingComboBox x:Name="fcbName" Grid.Column="0" Label="Nomi" Text="{Binding CurrentItem.Name}" Margin="2 0"/>
+            <controls:FloatingInput x:Name="fibCode" Grid.Column="1" Label="Kod" Text="{Binding CurrentItem.Code}" Margin="2 0"/>
+            <controls:FloatingComboBox x:Name="fcbMeasure" Grid.Column="2" Label="O‘lchov" Text="{Binding CurrentItem.Measure}" Margin="2 0"/>
+            <controls:FloatingInput x:Name="fibQuantity" Grid.Column="3" Label="Miqdor" Text="{Binding CurrentItem.Quantity}" Margin="2 0"/>
+            <controls:FloatingInput x:Name="fibCost" Grid.Column="4" Label="Narxi" Text="{Binding CurrentItem.CostPrice}" Margin="2 0"/>
+            <controls:FloatingInput x:Name="fibDelivery" Grid.Column="5" Label="Yetkazish" Text="{Binding CurrentItem.CostDelivery}" Margin="2 0"/>
+            <controls:FloatingInput x:Name="fibTransfer" Grid.Column="6" Label="Transfer" Text="{Binding CurrentItem.TransferFee}" Margin="2 0"/>
+            <controls:FloatingFileInput x:Name="ffiPhoto" Label="Rasm yuklash" Grid.Column="7" Margin="2 0"/>
 
             <Button x:Name="btnAdd"
-                    Grid.Column="7"
+                    Grid.Column="8"
                     Content="Qo‘shish"
                     Padding="8,4"
                     Margin="2,0"

@@ -35,6 +35,7 @@ public partial class SemiProductPage : Page
             fibCost.inputBox,
             fibDelivery.inputBox,
             fibTransfer.inputBox,
+            ffiPhoto.btnBrowse,
             btnAdd,
             ]);
     }
