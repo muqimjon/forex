@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="Forex.Wpf.Resources.UserControls.ActionButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="Auto" Height="Auto"
+             MinWidth="24" MinHeight="24">
+    <Grid>
+        <!-- 3 nuqta tugma -->
+        <Button x:Name="DotsButton"
+                Content="⋮"
+                FontSize="14"
+                Background="Transparent"
+                BorderThickness="0"
+                Padding="0"
+                Margin="0"
+                Click="DotsButton_Click"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Focusable="False" />
+        
+        <!-- Popup: joy egallamaydi, overlay tarzda ko‘rinadi -->
+        <Popup x:Name="ActionPopup"
+               Placement="Center"
+               PlacementTarget="{Binding ElementName=DotsButton}"
+               AllowsTransparency="True"
+               StaysOpen="False"
+               PopupAnimation="Fade"
+               HorizontalOffset="-15"
+               Margin="0">
+            <Border>
+                <StackPanel Orientation="Horizontal" RenderTransformOrigin="0.5,0.5">
+                    
+                    <StackPanel.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="stackScale" ScaleX="0" ScaleY="0" />
+                            <TranslateTransform x:Name="stackTranslate" X="0" />
+                        </TransformGroup>
+                    </StackPanel.RenderTransform>
+
+                    <Button Content="✏️" Style="{StaticResource ContextMenuButtonStyle}" Click="Edit_Click" />
+                    <Button Content="🗑️" Style="{StaticResource ContextMenuButtonStyle}" Click="Delete_Click" />
+                
+                </StackPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>
