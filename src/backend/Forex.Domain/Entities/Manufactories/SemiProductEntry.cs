@@ -13,6 +13,6 @@ public class SemiProductEntry : Auditable
     public decimal TransferFee { get; set; }
 
     public SemiProduct SemiProduct { get; set; } = default!;
-    public Invoice Invoce { get; set; } = default!;
     public Manufactory Manufactory { get; set; } = default!;
+    public Invoice Invoce { get; set; } = default!;
 }

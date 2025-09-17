@@ -22,7 +22,7 @@ public partial class SemiProductPage : Page
 
         FocusNavigator.AttachEnterNavigation([
             cbSender,
-            cbOrg,
+            cbManufactory,
             txContainerCount,
             txTransferFeePerContainer,
             txDeliveryPrice,
@@ -40,10 +40,16 @@ public partial class SemiProductPage : Page
     }
 
 
-    private void Page_Loaded(object sender, RoutedEventArgs e)
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
         if (Application.Current.MainWindow is Window mainWindow)
             WindowResizer.AnimateToSize(mainWindow, 810, 580);
+
+        if (DataContext is SemiProductPageViewModel vm)
+        {
+            await vm.LoadManufactoriesAsync();
+            await vm.LoadSuppliersAsync();
+        }
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

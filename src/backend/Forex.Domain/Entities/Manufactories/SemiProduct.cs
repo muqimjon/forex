@@ -11,4 +11,5 @@ public class SemiProduct : Auditable
     public string? PhotoPath { get; set; }
 
     public ICollection<SemiProductResidue> SemiProductResidues { get; set; } = default!;
+    public ICollection<SemiProductEntry> SemiProductEntries { get; set; } = default!;
 }

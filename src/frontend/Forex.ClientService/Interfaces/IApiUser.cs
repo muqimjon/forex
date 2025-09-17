@@ -9,6 +9,9 @@ public interface IApiUser
     [Get("/Users")]
     Task<Response<List<UserDto>>> GetAll();
 
+    [Get("/Users/filter")]
+    Task<Response<List<UserDto>>> Filter(FilteringRequest request);
+
     [Get("/Users/{id}")]
     Task<Response<UserDto>> GetById(long id);
 

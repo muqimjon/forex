@@ -5,8 +5,6 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Users.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record GetAllUsersQuery : IRequest<List<UserDto>>;
 

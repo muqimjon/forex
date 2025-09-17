@@ -16,5 +16,8 @@ public class GetAllManufactoriesQueryHandler(
     : IRequestHandler<GetAllManufactoriesQuery, List<ManufactoryDto>>
 {
     public async Task<List<ManufactoryDto>> Handle(GetAllManufactoriesQuery request, CancellationToken cancellationToken)
-        => mapper.Map<List<ManufactoryDto>>(await context.Manufactories.AsNoTracking().ToListAsync(cancellationToken));
+        => mapper.Map<List<ManufactoryDto>>(await context.Manufactories
+            .Include(m => m.SemiProductResidues)
+                .ThenInclude(spr => spr.SemiProduct)
+            .AsNoTracking().ToListAsync(cancellationToken));
 }

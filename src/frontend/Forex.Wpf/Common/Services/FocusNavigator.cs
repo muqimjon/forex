@@ -33,27 +33,25 @@ public static class FocusNavigator
         }
     }
 
-    // cursorni element ichidagi content oxiriga joylash
     private static void FocusElement(UIElement element)
     {
         element.Focus();
 
-        // TextBox bo‘lsa
         if (element is TextBox tb)
         {
-            tb.CaretIndex = tb.Text?.Length ?? 0;
+            tb.SelectAll();
             return;
         }
 
-        // Editable ComboBox bo‘lsa
         if (element is ComboBox cb && cb.IsEditable)
         {
             if (cb.Template.FindName("PART_EditableTextBox", cb) is TextBox innerTextBox)
             {
-                innerTextBox.CaretIndex = innerTextBox.Text?.Length ?? 0;
+                innerTextBox.SelectAll();
             }
         }
 
         // Agar boshqa custom control bo‘lsa, davom etishimiz mumkin...
     }
+
 }

@@ -3,10 +3,16 @@
 using AutoMapper;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
+using Forex.ClientService.Models.Commons;
+using Forex.ClientService.Models.Manufactory;
 using Forex.ClientService.Models.SemiProducts;
+using Forex.ClientService.Models.Users;
 using Forex.ClientService.Services;
 using Forex.Wpf.Common.Commands;
+using Forex.Wpf.Common.Enums;
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Common;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 public class SemiProductPageViewModel : ViewModelBase
@@ -14,7 +20,9 @@ public class SemiProductPageViewModel : ViewModelBase
     private readonly ForexClient client = App.Client;
     private readonly IMapper mapper = App.Mapper;
     private SemiProductItemViewModel? selectedItem;
-    private bool isEditing;
+
+    public ObservableCollection<UserDto> Suppliers { get; } = [];
+    public ObservableCollection<SemiProductDto> SemiProducts { get; } = [];
 
     public SemiProductPageViewModel()
     {
@@ -40,6 +48,52 @@ public class SemiProductPageViewModel : ViewModelBase
     public ICommand DeleteCommand { get; }
     public ICommand EditCommand { get; }
     public ICommand SubmitCommand { get; }
+    public ObservableCollection<ManufactoryDto> Manufactories { get; } = [];
+
+    public async Task LoadManufactoriesAsync()
+    {
+        var response = await client.Manufactory.GetAll().Handle();
+
+        if (response.IsSuccess && response.Data is not null)
+        {
+            Manufactories.Clear();
+            foreach (var m in response.Data)
+                Manufactories.Add(m);
+        }
+        else
+            NotificationService.Show(
+                response.Message ?? "Manufakturalar yuklanmadi",
+                NotificationType.Error);
+    }
+
+    public async Task LoadSuppliersAsync()
+    {
+        var request = new FilteringRequest
+        {
+            Filters = new Dictionary<string, object>
+            {
+                ["Role"] = "Supplier"
+            },
+            SortBy = "FullName",
+            Descending = false,
+            Page = 1,
+            PageSize = 100
+        };
+
+        var response = await client.Users.Filter(request).Handle();
+
+        if (response.IsSuccess && response.Data is not null)
+        {
+            Suppliers.Clear();
+            foreach (var user in response.Data)
+                Suppliers.Add(user);
+        }
+        else
+        {
+            NotificationService.Show(response.Message ?? "Ta'minotchilar yuklanmadi", NotificationType.Error);
+        }
+    }
+
 
     private void SaveItem()
     {
@@ -103,7 +157,6 @@ public class SemiProductPageViewModel : ViewModelBase
         };
     }
 
-
     private async Task SubmitAsync()
     {
         var command = mapper.Map<SemiProductIntakeCommand>(Intake);
@@ -123,6 +176,25 @@ public class SemiProductPageViewModel : ViewModelBase
         }
     }
 
+    private ManufactoryDto? selectedManufactory;
+    public ManufactoryDto? SelectedManufactory
+    {
+        get => selectedManufactory;
+        set
+        {
+            if (SetProperty(ref selectedManufactory, value))
+            {
+                SemiProducts.Clear();
+                if (value?.SemiProducts is not null)
+                {
+                    foreach (var residue in value.SemiProducts)
+                        SemiProducts.Add(residue.SemiProduct);
+                }
+            }
+        }
+    }
+
+    private bool isEditing;
     public bool IsEditing
     {
         get => isEditing;

@@ -1,13 +1,10 @@
 ﻿namespace Forex.Application.Features.SemiProducts.DTOs;
 
-using Forex.Application.Features.Manufactories.DTOs;
-
-public sealed record SemiProductDto(
-    long Id,
-    long ManufactoryId,
-    string? Name,
-    string NormalizedName,
-    int Code,
-    string Measure,
-    string? PhotoPath,
-    ManufactoryDto Manufactory);
+public sealed record SemiProductDto
+{
+    public long Id { get; init; }
+    public string? Name { get; init; }
+    public int Code { get; init; }
+    public string Measure { get; init; } = string.Empty;
+    public string? PhotoPath { get; init; }
+}

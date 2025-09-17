@@ -9,5 +9,4 @@ public class SemiProductResidue : Auditable
     public decimal Quantity { get; set; }
 
     public SemiProduct SemiProduct { get; set; } = default!;
-    public Manufactory Manufactory { get; set; } = default!;
 }

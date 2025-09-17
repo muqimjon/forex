@@ -1,9 +1,7 @@
 ﻿namespace Forex.Application.Features.Manufactories.DTOs;
 
-using Forex.Application.Features.SemiProducts.DTOs;
-
-public class ManufactoryDto
+public sealed class ManufactoryDto
 {
-    public string Name { get; set; } = string.Empty;
-    public ICollection<SemiProductDto> SemiProducts { get; set; } = [];
+    public string Name { get; init; } = string.Empty;
+    public ICollection<SemiProductResidueDto> SemiProducts { get; set; } = default!;
 }

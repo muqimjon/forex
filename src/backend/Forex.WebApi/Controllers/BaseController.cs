@@ -1,12 +1,11 @@
 ﻿namespace Forex.WebApi.Controllers;
 
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+//[Authorize]
 public abstract class BaseController : ControllerBase
 {
     private IMediator? mediator;

@@ -68,7 +68,7 @@
                            Grid.Row="0"
                            Grid.Column="0"
                            VerticalAlignment="Center"
-                           Margin="0,2" />
+                           Margin="0 2" />
                 <DatePicker x:Name="dpDate"
                             Grid.Row="0"
                             Grid.Column="1"
@@ -79,37 +79,37 @@
                            Grid.Row="1"
                            Grid.Column="0"
                            VerticalAlignment="Center"
-                           Margin="0,2" />
+                           Margin="0 2" />
+                
+
                 <ComboBox x:Name="cbSender"
                           Grid.Row="1"
                           Grid.Column="1"
-                          IsEditable="True">
-                    <ComboBoxItem Content="Sender A" />
-                    <ComboBoxItem Content="Sender B" />
-                    <ComboBoxItem Content="Sender C" />
-                </ComboBox>
+                          ItemsSource="{Binding Suppliers}"
+                          SelectedItem="{Binding SelectedSupplier, Mode=TwoWay}"
+                          DisplayMemberPath="Name"
+                          IsEditable="True" />
 
                 <!-- Tashkilot -->
                 <TextBlock Text="Tashkilot:"
                            Grid.Row="2"
                            Grid.Column="0"
                            VerticalAlignment="Center"
-                           Margin="0,2" />
-                <ComboBox x:Name="cbOrg"
+                           Margin="0 2" />
+                <ComboBox x:Name="cbManufactory"
                           Grid.Row="2"
                           Grid.Column="1"
-                          IsEditable="True">
-                    <ComboBoxItem Content="Fraganoos" />
-                    <ComboBoxItem Content="Ovoza Plus" />
-                    <ComboBoxItem Content="Nike" />
-                </ComboBox>
+                          ItemsSource="{Binding Manufactories}"
+                          SelectedItem="{Binding SelectedManufactory, Mode=TwoWay}"
+                          DisplayMemberPath="Name" 
+                          IsEditable="True"/>
 
                 <!-- Kontiner soni -->
                 <TextBlock Text="Kontiner soni:"
                            Grid.Row="3"
                            Grid.Column="0"
                            VerticalAlignment="Center"
-                           Margin="0,2" />
+                           Margin="0 2" />
                 <TextBox x:Name="txContainerCount"
                          Grid.Row="3"
                          Grid.Column="1"
@@ -120,7 +120,7 @@
                            Grid.Row="4"
                            Grid.Column="0"
                            VerticalAlignment="Center"
-                           Margin="0,2" />
+                           Margin="0 2" />
                 <TextBox x:Name="txTransferFeePerContainer"
                          Grid.Row="4"
                          Grid.Column="1"
@@ -131,7 +131,7 @@
                            Grid.Row="5"
                            Grid.Column="0"
                            VerticalAlignment="Center"
-                           Margin="0,2" />
+                           Margin="0 2" />
                 <TextBox x:Name="txDeliveryPrice"
                          Grid.Row="5"
                          Grid.Column="1"
@@ -142,7 +142,7 @@
                            Grid.Row="6"
                            Grid.Column="0"
                            VerticalAlignment="Center"
-                           Margin="0,2" />
+                           Margin="0 2" />
                 <TextBox x:Name="txNote"
                          Grid.Row="6"
                          Grid.Column="1"

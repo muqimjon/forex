@@ -6,9 +6,9 @@ using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[AllowAnonymous]
 public class UsersController : BaseController
 {
-    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Create(CreateUserCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
@@ -17,18 +17,19 @@ public class UsersController : BaseController
     public async Task<IActionResult> Update(UpdateUserCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 
-    [AllowAnonymous]
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
         => Ok(new Response { Data = await Mediator.Send(new DeleteUserCommand(id)) });
 
-    [AllowAnonymous]
     [HttpGet("{id:long}")]
     public async Task<IActionResult> GetById(long id)
         => Ok(new Response { Data = await Mediator.Send(new GetUserByIdQuery(id)) });
 
-    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll()
+        => Ok(new Response { Data = await Mediator.Send(new GetAllUsersQuery()) });
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> GetFiltered()
         => Ok(new Response { Data = await Mediator.Send(new GetAllUsersQuery()) });
 }

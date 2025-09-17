@@ -9,8 +9,6 @@ using Forex.Domain.Entities.Users;
 using Forex.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using System.Threading;
-using System.Threading.Tasks;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options), IAppDbContext
 {
@@ -88,6 +86,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(new AuditInterceptor());
+
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
