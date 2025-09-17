@@ -1,4 +1,4 @@
-﻿namespace Forex.WebApi.Controllers;
+﻿namespace Forex.WebApi.Controllers.Common;
 
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

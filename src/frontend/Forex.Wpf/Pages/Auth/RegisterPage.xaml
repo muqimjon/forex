@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.Auth"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
       mc:Ignorable="d" 
       d:DesignHeight="550" d:DesignWidth="500"
       Title="RegisterPage"
@@ -12,7 +13,7 @@
 
     <Grid Background="#1E1E2F">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Border x:Name="RegisterPanel"
@@ -78,6 +79,7 @@
                         Foreground="White"
                         FontWeight="Bold"
                         Padding="8"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                         BorderThickness="0"
                         md:ButtonAssist.CornerRadius="6"
                         Click="BtnRegister_Click"/>

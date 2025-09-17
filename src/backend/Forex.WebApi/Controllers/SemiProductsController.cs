@@ -3,11 +3,14 @@
 using Forex.Application.Features.SemiProductEntries.Commands;
 using Forex.Application.Features.SemiProductEntries.DTOs;
 using Forex.Application.Features.SemiProducts.Commands;
+using Forex.Application.Features.SemiProducts.DTOs;
 using Forex.Application.Features.SemiProducts.Queries;
+using Forex.WebApi.Controllers.Common;
 using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-public class SemiProductsController : BaseController
+public class SemiProductsController
+    : ReadOnlyController<SemiProductDto, GetAllSemiProductsQuery, GetSemiProductByIdQuery>
 {
     [HttpPost]
     [Consumes("multipart/form-data")]
@@ -15,14 +18,14 @@ public class SemiProductsController : BaseController
         => Ok(new Response
         {
             Data = await Mediator.Send(new SemiProductCommand(
-            dto.ManufactoryId,
-            dto.Name,
-            dto.Code,
-            dto.Measure,
-            dto.Photo?.OpenReadStream(),
-            Path.GetExtension(dto.Photo?.FileName ?? string.Empty),
-            dto.Photo?.ContentType
-        ))
+                dto.ManufactoryId,
+                dto.Name,
+                dto.Code,
+                dto.Measure,
+                dto.Photo?.OpenReadStream(),
+                Path.GetExtension(dto.Photo?.FileName ?? string.Empty),
+                dto.Photo?.ContentType
+            ))
         });
 
     [HttpPut("{id:long}")]
@@ -31,28 +34,20 @@ public class SemiProductsController : BaseController
         => Ok(new Response
         {
             Data = await Mediator.Send(new UpdateSemiProductCommand(
-            id,
-            dto.ManufactoryId,
-            dto.Name,
-            dto.Code,
-            dto.Measure,
-            dto.Photo?.OpenReadStream(),
-            Path.GetExtension(dto.Photo?.FileName ?? string.Empty),
-            dto.Photo?.ContentType
-        ))
+                id,
+                dto.ManufactoryId,
+                dto.Name,
+                dto.Code,
+                dto.Measure,
+                dto.Photo?.OpenReadStream(),
+                Path.GetExtension(dto.Photo?.FileName ?? string.Empty),
+                dto.Photo?.ContentType
+            ))
         });
 
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
         => Ok(new Response { Data = await Mediator.Send(new DeleteSemiProductCommand(id)) });
-
-    [HttpGet("{id:long}")]
-    public async Task<IActionResult> GetById(long id)
-        => Ok(new Response { Data = await Mediator.Send(new GetSemiProductByIdQuery(id)) });
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-        => Ok(new Response { Data = await Mediator.Send(new GetAllSemiProductsQuery()) });
 
     [HttpPost("intake")]
     [Consumes("multipart/form-data")]

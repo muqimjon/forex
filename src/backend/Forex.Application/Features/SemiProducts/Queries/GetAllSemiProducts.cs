@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-public record GetAllSemiProductsQuery : IRequest<List<SemiProductDto>>;
+public record GetAllSemiProductsQuery : IRequest<IReadOnlyCollection<SemiProductDto>>;
 
 public class GetAllSemiProductsQueryHandler(
     IAppDbContext context,
     IMapper mapper)
-    : IRequestHandler<GetAllSemiProductsQuery, List<SemiProductDto>>
+    : IRequestHandler<GetAllSemiProductsQuery, IReadOnlyCollection<SemiProductDto>>
 {
-    public async Task<List<SemiProductDto>> Handle(GetAllSemiProductsQuery request, CancellationToken cancellationToken)
-        => mapper.Map<List<SemiProductDto>>(await context.SemiProducts.AsNoTracking().ToListAsync(cancellationToken));
+    public async Task<IReadOnlyCollection<SemiProductDto>> Handle(GetAllSemiProductsQuery request, CancellationToken cancellationToken)
+        => mapper.Map<IReadOnlyCollection<SemiProductDto>>(await context.SemiProducts.AsNoTracking().ToListAsync(cancellationToken));
 }

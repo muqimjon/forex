@@ -39,7 +39,6 @@ public partial class SemiProductPage : Page
         ]);
     }
 
-
     private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
         if (Application.Current.MainWindow is Window mainWindow)

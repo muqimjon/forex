@@ -1,8 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
-using Forex.ClientService;
-using Forex.ClientService.Services;
-using Forex.Wpf.Common.Enums;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using System.Windows;
@@ -10,7 +7,6 @@ using System.Windows.Controls;
 
 public partial class RegisterPage : Page
 {
-    private readonly ForexClient client = App.Client;
     private readonly RegisterViewModel vm;
 
     public RegisterPage()
@@ -19,7 +15,6 @@ public partial class RegisterPage : Page
 
         this.vm = new RegisterViewModel();
         DataContext = vm;
-        tbName.Focus();
 
         FocusNavigator.AttachEnterNavigation([
             tbName,
@@ -52,7 +47,6 @@ public partial class RegisterPage : Page
 
         if (success)
         {
-            NotificationService.Show($"{AuthStore.Instance.FullName} Forex tizimiga hush kelibsiz", NotificationType.Success);
             NavigationService?.Navigate(new HomePage());
         }
         else

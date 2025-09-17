@@ -5,10 +5,10 @@ using System.Collections.ObjectModel;
 
 public class SemiProductIntakeViewModel : ViewModelBase
 {
-    private DateTime? date;
-    private string? sender;
-    private string? organization;
-    private int containerCount;
+    private DateTime? date = DateTime.Today;
+    private long senderId;
+    private long manufactoryId;
+    private int containerCount = 1;
     private decimal transferFeePerContainer;
     private decimal deliveryPrice;
     private string? note;
@@ -19,16 +19,16 @@ public class SemiProductIntakeViewModel : ViewModelBase
         set => SetProperty(ref date, value);
     }
 
-    public string? Sender
+    public long SenderId
     {
-        get => sender;
-        set => SetProperty(ref sender, value);
+        get => senderId;
+        set => SetProperty(ref senderId, value);
     }
 
-    public string? Organization
+    public long ManufactoryId
     {
-        get => organization;
-        set => SetProperty(ref organization, value);
+        get => manufactoryId;
+        set => SetProperty(ref manufactoryId, value);
     }
 
     public int ContainerCount
@@ -58,9 +58,6 @@ public class SemiProductIntakeViewModel : ViewModelBase
     public decimal TotalTransferFee => ContainerCount * TransferFeePerContainer;
     public decimal TotalCost => TotalTransferFee + DeliveryPrice;
 
-    public ObservableCollection<SemiProductItemViewModel> Items { get; }
-        = [];
-
-    public ObservableCollection<ContainerViewModel> Containers { get; }
-        = [];
+    public ObservableCollection<SemiProductItemViewModel> Items { get; } = [];
+    public ObservableCollection<ContainerViewModel> Containers { get; } = [];
 }

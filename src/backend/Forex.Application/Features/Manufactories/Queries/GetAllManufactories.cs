@@ -8,16 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-public record GetAllManufactoriesQuery : IRequest<List<ManufactoryDto>>;
+public record GetAllManufactoriesQuery : IRequest<IReadOnlyCollection<ManufactoryDto>>;
 
 public class GetAllManufactoriesQueryHandler(
     IAppDbContext context,
     IMapper mapper)
-    : IRequestHandler<GetAllManufactoriesQuery, List<ManufactoryDto>>
+    : IRequestHandler<GetAllManufactoriesQuery, IReadOnlyCollection<ManufactoryDto>>
 {
-    public async Task<List<ManufactoryDto>> Handle(GetAllManufactoriesQuery request, CancellationToken cancellationToken)
-        => mapper.Map<List<ManufactoryDto>>(await context.Manufactories
-            .Include(m => m.SemiProductResidues)
-                .ThenInclude(spr => spr.SemiProduct)
-            .AsNoTracking().ToListAsync(cancellationToken));
+    public async Task<IReadOnlyCollection<ManufactoryDto>> Handle(GetAllManufactoriesQuery request, CancellationToken cancellationToken)
+        => mapper.Map<IReadOnlyCollection<ManufactoryDto>>(await context.Manufactories
+            .AsNoTracking()
+            .ToListAsync(cancellationToken));
 }

@@ -6,10 +6,13 @@ using System.Text.Json;
 
 public static class ApiExtensions
 {
-    public static async Task<Response<T>> Handle<T>(this Task<Response<T>> task)
+    public static async Task<Response<T>> Handle<T>(
+    this Task<Response<T>> task,
+    Action<bool>? setLoading = null)
     {
         try
         {
+            setLoading?.Invoke(true);
             return await task;
         }
         catch (ApiException apiEx)
@@ -17,7 +20,7 @@ public static class ApiExtensions
             try
             {
                 var problem = JsonSerializer.Deserialize<Response<T>>(apiEx.Content ?? "");
-                if (problem != null)
+                if (problem is not null)
                     return problem;
             }
             catch { }
@@ -35,6 +38,10 @@ public static class ApiExtensions
                 StatusCode = 500,
                 Message = ex.Message
             };
+        }
+        finally
+        {
+            setLoading?.Invoke(false);
         }
     }
 }

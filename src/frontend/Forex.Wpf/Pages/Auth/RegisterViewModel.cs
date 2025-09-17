@@ -34,7 +34,7 @@ public class RegisterViewModel() : ViewModelBase
             Email = email,
             Phone = phone,
             Password = password
-        }).Handle();
+        }).Handle(isLoading => IsLoading = isLoading);
 
         if (resp.StatusCode != 200 || resp.Data is null)
         {
@@ -44,6 +44,7 @@ public class RegisterViewModel() : ViewModelBase
 
         var loginResp = resp.Data;
         AuthStore.Instance.SetAuth(loginResp.Token, loginResp.User.Name, loginResp.User.Id);
+        SuccessMessage = $"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi";
 
         return true;
     }

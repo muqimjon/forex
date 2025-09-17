@@ -1,15 +1,14 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
-using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Interfaces;
 using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Common;
 using System.Threading.Tasks;
 
-public class LoginViewModel(ForexClient client) : ViewModelBase
+public class LoginViewModel : ViewModelBase
 {
-    private readonly IApiAuth apiAuth = client.Auth;
+    private readonly IApiAuth apiAuth = App.Client.Auth;
 
     public async Task<bool> LoginAsync(string login, string password)
     {
@@ -21,7 +20,8 @@ public class LoginViewModel(ForexClient client) : ViewModelBase
             return false;
         }
 
-        var resp = await apiAuth.Login(new() { EmailOrPhone = login, Password = password }).Handle();
+        var resp = await apiAuth.Login(new() { EmailOrPhone = login, Password = password })
+            .Handle(isLoading => IsLoading = isLoading);
 
         if (resp.StatusCode != 200 || resp.Data is null)
         {
@@ -31,6 +31,7 @@ public class LoginViewModel(ForexClient client) : ViewModelBase
 
         var loginResp = resp.Data;
         AuthStore.Instance.SetAuth(loginResp.Token, loginResp.User.Name, loginResp.User.Id);
+        SuccessMessage = $"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi";
 
         return true;
     }

@@ -1,8 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Auth;
 
-using Forex.ClientService;
-using Forex.ClientService.Services;
-using Forex.Wpf.Common.Enums;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using System.Windows;
@@ -13,20 +10,19 @@ using System.Windows.Controls;
 /// </summary>
 public partial class LoginPage : Page
 {
-    private readonly ForexClient client = App.Client;
     private readonly LoginViewModel viewModel;
 
     public LoginPage()
     {
         InitializeComponent();
-        this.viewModel = new LoginViewModel(client);
+        this.viewModel = new LoginViewModel();
+        DataContext = viewModel;
 
         tbLogin.Focus();
 
         FocusNavigator.AttachEnterNavigation([
             tbLogin,
             pbPassword,
-            chRemember,
             btnLogin,
             ]);
     }
@@ -41,13 +37,11 @@ public partial class LoginPage : Page
     {
         lblError.Visibility = Visibility.Collapsed;
 
+        Task.Delay(5000);
         var success = await viewModel.LoginAsync(tbLogin.Text.Trim(), pbPassword.Password);
 
         if (success)
-        {
-            NotificationService.Show($"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi", NotificationType.Success);
             NavigationService?.Navigate(new HomePage());
-        }
         else
         {
             lblError.Text = viewModel.ErrorMessage;

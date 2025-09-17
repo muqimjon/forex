@@ -1,11 +1,14 @@
 ﻿namespace Forex.WebApi.Controllers;
 
 using Forex.Application.Features.Products.Commands;
+using Forex.Application.Features.Products.DTOs;
 using Forex.Application.Features.Products.Queries;
+using Forex.WebApi.Controllers.Common;
 using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-public class ProductsController : BaseController
+public class ProductsController
+    : ReadOnlyController<ProductDto, GetAllProductsQuery, GetProductByIdQuery>
 {
     [HttpPost]
     [Consumes("multipart/form-data")]
@@ -13,13 +16,13 @@ public class ProductsController : BaseController
         => Ok(new Response
         {
             Data = await Mediator.Send(new CreateProductCommand(
-            request.Name,
-            request.Code,
-            request.Measure,
-            request.Photo?.OpenReadStream(),
-            request.Photo?.ContentType,
-            Path.GetExtension(request.Photo?.FileName)
-        ))
+                request.Name,
+                request.Code,
+                request.Measure,
+                request.Photo?.OpenReadStream(),
+                request.Photo?.ContentType,
+                Path.GetExtension(request.Photo?.FileName)
+            ))
         });
 
     [HttpPut("{id:long}")]
@@ -28,25 +31,17 @@ public class ProductsController : BaseController
         => Ok(new Response
         {
             Data = await Mediator.Send(new UpdateProductCommand(
-            id,
-            request.Name,
-            request.Code,
-            request.Measure,
-            request.Photo?.OpenReadStream(),
-            Path.GetExtension(request.Photo?.FileName ?? string.Empty),
-            request.Photo?.ContentType
-        ))
+                id,
+                request.Name,
+                request.Code,
+                request.Measure,
+                request.Photo?.OpenReadStream(),
+                Path.GetExtension(request.Photo?.FileName ?? string.Empty),
+                request.Photo?.ContentType
+            ))
         });
 
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
         => Ok(new Response { Data = await Mediator.Send(new DeleteProductCommand(id)) });
-
-    [HttpGet("{id:long}")]
-    public async Task<IActionResult> GetById(long id)
-        => Ok(new Response { Data = await Mediator.Send(new GetProductByIdQuery(id)) });
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-        => Ok(new Response { Data = await Mediator.Send(new GetAllProductsQuery()) });
 }

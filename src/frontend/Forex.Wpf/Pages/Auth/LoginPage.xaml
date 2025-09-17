@@ -12,7 +12,7 @@
 
     <Grid Background="#1E1E2F">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Border x:Name="LoginPanel"
@@ -57,6 +57,7 @@
                         FontWeight="Bold"
                         Padding="8"
                         BorderThickness="0"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                         md:ButtonAssist.CornerRadius="6"
                         Click="BtnLogin_Click"/>
 

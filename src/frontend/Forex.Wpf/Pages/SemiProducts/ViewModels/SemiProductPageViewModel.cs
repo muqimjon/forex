@@ -9,8 +9,6 @@ using Forex.ClientService.Models.SemiProducts;
 using Forex.ClientService.Models.Users;
 using Forex.ClientService.Services;
 using Forex.Wpf.Common.Commands;
-using Forex.Wpf.Common.Enums;
-using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Common;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -52,7 +50,9 @@ public class SemiProductPageViewModel : ViewModelBase
 
     public async Task LoadManufactoriesAsync()
     {
-        var response = await client.Manufactory.GetAll().Handle();
+        var response = await client.Manufactory
+            .GetAll()
+            .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess && response.Data is not null)
         {
@@ -61,9 +61,7 @@ public class SemiProductPageViewModel : ViewModelBase
                 Manufactories.Add(m);
         }
         else
-            NotificationService.Show(
-                response.Message ?? "Manufakturalar yuklanmadi",
-                NotificationType.Error);
+            ErrorMessage = response.Message ?? "Manufakturalar yuklanmadi";
     }
 
     public async Task LoadSuppliersAsync()
@@ -74,13 +72,12 @@ public class SemiProductPageViewModel : ViewModelBase
             {
                 ["Role"] = "Supplier"
             },
-            SortBy = "FullName",
-            Descending = false,
-            Page = 1,
-            PageSize = 100
+            SortBy = "Name",
         };
 
-        var response = await client.Users.Filter(request).Handle();
+        var response = await client.Users
+            .Filter(request)
+            .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess && response.Data is not null)
         {
@@ -90,10 +87,9 @@ public class SemiProductPageViewModel : ViewModelBase
         }
         else
         {
-            NotificationService.Show(response.Message ?? "Ta'minotchilar yuklanmadi", NotificationType.Error);
+            ErrorMessage = response.Message ?? "Ta'minotchilar yuklanmadi";
         }
     }
-
 
     private void SaveItem()
     {
@@ -162,17 +158,19 @@ public class SemiProductPageViewModel : ViewModelBase
         var command = mapper.Map<SemiProductIntakeCommand>(Intake);
         using var form = MultipartBuilder.BuildIntake(command);
 
-        var response = await client.SemiProduct.CreateIntake(form).Handle();
+        var response = await client.SemiProduct
+            .CreateIntake(form)
+            .Handle(isLoading => IsLoading = isLoading);
 
         if (response.StatusCode == 200)
         {
             Intake.Items.Clear();
             Intake.Containers.Clear();
-            // TODO: NotificationService.Success("Muvaffaqiyatli yuborildi");
+            SuccessMessage = "Muvaffaqiyatli yuborildi";
         }
         else
         {
-            // TODO: NotificationService.Error(response.Message);
+            ErrorMessage = response.Message;
         }
     }
 
@@ -190,6 +188,19 @@ public class SemiProductPageViewModel : ViewModelBase
                     foreach (var residue in value.SemiProducts)
                         SemiProducts.Add(residue.SemiProduct);
                 }
+            }
+        }
+    }
+
+    private UserDto? selectedSupplier;
+    public UserDto? SelectedSupplier
+    {
+        get => selectedSupplier;
+        set
+        {
+            if (SetProperty(ref selectedSupplier, value) && value is not null)
+            {
+                Intake.SenderId = value.Id;
             }
         }
     }

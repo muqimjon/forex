@@ -6,13 +6,13 @@ using Forex.Application.Features.Users.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public record GetAllUsersQuery : IRequest<List<UserDto>>;
+public record GetAllUsersQuery : IRequest<IReadOnlyCollection<UserDto>>;
 
 public class GetAllUsersQueryHandler(
     IAppDbContext context,
     IMapper mapper)
-    : IRequestHandler<GetAllUsersQuery, List<UserDto>>
+    : IRequestHandler<GetAllUsersQuery, IReadOnlyCollection<UserDto>>
 {
-    public async Task<List<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
-        => mapper.Map<List<UserDto>>(await context.Users.AsNoTracking().ToListAsync(cancellationToken));
+    public async Task<IReadOnlyCollection<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+        => mapper.Map<IReadOnlyCollection<UserDto>>(await context.Users.AsNoTracking().ToListAsync(cancellationToken));
 }

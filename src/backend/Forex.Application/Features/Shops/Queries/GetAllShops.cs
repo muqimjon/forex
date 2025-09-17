@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-public record GetAllShopsQuery : IRequest<List<ShopDto>>;
+public record GetAllShopsQuery : IRequest<IReadOnlyCollection<ShopDto>>;
 
 public class GetAllShopsQueryHandler(
     IAppDbContext context,
     IMapper mapper)
-    : IRequestHandler<GetAllShopsQuery, List<ShopDto>>
+    : IRequestHandler<GetAllShopsQuery, IReadOnlyCollection<ShopDto>>
 {
-    public async Task<List<ShopDto>> Handle(GetAllShopsQuery request, CancellationToken cancellationToken)
-        => mapper.Map<List<ShopDto>>(await context.Shops.AsNoTracking().ToListAsync(cancellationToken));
+    public async Task<IReadOnlyCollection<ShopDto>> Handle(GetAllShopsQuery request, CancellationToken cancellationToken)
+        => mapper.Map<IReadOnlyCollection<ShopDto>>(await context.Shops.AsNoTracking().ToListAsync(cancellationToken));
 }

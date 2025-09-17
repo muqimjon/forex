@@ -1,6 +1,7 @@
 ﻿namespace Forex.WebApi.Controllers;
 
 using Forex.Application.Features.Auth.Commands;
+using Forex.WebApi.Controllers.Common;
 using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

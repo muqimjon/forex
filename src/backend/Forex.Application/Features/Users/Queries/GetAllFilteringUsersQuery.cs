@@ -18,6 +18,5 @@ public class GetAllFilteringUsersQueryHandler(
     public async Task<List<UserDto>> Handle(GetAllFilteringUsersQuery request, CancellationToken cancellationToken)
         => mapper.Map<List<UserDto>>(await context.Users
             .AsNoTracking()
-            .AsFilterable(request)
-            .ToListAsync(cancellationToken));
+            .ToPagedListAsync(request, cancellationToken));
 }

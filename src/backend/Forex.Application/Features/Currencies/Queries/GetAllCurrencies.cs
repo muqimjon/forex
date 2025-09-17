@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-public record GetAllCurrenciesQuery : IRequest<List<CurrencyDto>>;
+public record GetAllCurrenciesQuery : IRequest<IReadOnlyCollection<CurrencyDto>>;
 
 public class GetAllCurrenciesQueryHandler(
     IAppDbContext context,
     IMapper mapper)
-    : IRequestHandler<GetAllCurrenciesQuery, List<CurrencyDto>>
+    : IRequestHandler<GetAllCurrenciesQuery, IReadOnlyCollection<CurrencyDto>>
 {
-    public async Task<List<CurrencyDto>> Handle(GetAllCurrenciesQuery request, CancellationToken cancellationToken)
-        => mapper.Map<List<CurrencyDto>>(await context.Currencies.AsNoTracking().ToListAsync(cancellationToken));
+    public async Task<IReadOnlyCollection<CurrencyDto>> Handle(GetAllCurrenciesQuery request, CancellationToken cancellationToken)
+        => mapper.Map<IReadOnlyCollection<CurrencyDto>>(await context.Currencies.AsNoTracking().ToListAsync(cancellationToken));
 }

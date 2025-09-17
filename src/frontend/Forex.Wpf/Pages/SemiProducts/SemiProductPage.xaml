@@ -72,7 +72,7 @@
                 <DatePicker x:Name="dpDate"
                             Grid.Row="0"
                             Grid.Column="1"
-                            SelectedDate="2025-09-16" />
+                            SelectedDate="{Binding Intake.Date, Mode=TwoWay}" />
 
                 <!-- Yuboruvchi -->
                 <TextBlock Text="Yuboruvchi:"
@@ -80,8 +80,6 @@
                            Grid.Column="0"
                            VerticalAlignment="Center"
                            Margin="0 2" />
-                
-
                 <ComboBox x:Name="cbSender"
                           Grid.Row="1"
                           Grid.Column="1"
@@ -101,8 +99,8 @@
                           Grid.Column="1"
                           ItemsSource="{Binding Manufactories}"
                           SelectedItem="{Binding SelectedManufactory, Mode=TwoWay}"
-                          DisplayMemberPath="Name" 
-                          IsEditable="True"/>
+                          DisplayMemberPath="Name"
+                          IsEditable="True" />
 
                 <!-- Kontiner soni -->
                 <TextBlock Text="Kontiner soni:"
@@ -113,9 +111,9 @@
                 <TextBox x:Name="txContainerCount"
                          Grid.Row="3"
                          Grid.Column="1"
-                         Text="3" />
+                         Text="{Binding Intake.ContainerCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <!-- Ta'minotchiga to'lov -->
+                <!-- Transfer fee per container -->
                 <TextBlock Text="Har bir container uchun to'lov:"
                            Grid.Row="4"
                            Grid.Column="0"
@@ -124,10 +122,10 @@
                 <TextBox x:Name="txTransferFeePerContainer"
                          Grid.Row="4"
                          Grid.Column="1"
-                         Text="3 000" />
+                         Text="{Binding Intake.TransferFeePerContainer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <!-- Yo'l xarajatlari -->
-                <TextBlock Text="Yetkazib berish harajatlari:"
+                <!-- Delivery price -->
+                <TextBlock Text="Yetkazib berish xarajatlari:"
                            Grid.Row="5"
                            Grid.Column="0"
                            VerticalAlignment="Center"
@@ -135,7 +133,7 @@
                 <TextBox x:Name="txDeliveryPrice"
                          Grid.Row="5"
                          Grid.Column="1"
-                         Text="5 500" />
+                         Text="{Binding Intake.DeliveryPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <!-- Izoh -->
                 <TextBlock Text="Izoh:"
@@ -146,7 +144,7 @@
                 <TextBox x:Name="txNote"
                          Grid.Row="6"
                          Grid.Column="1"
-                         Text="Izoh yo‘q" />
+                         Text="{Binding Intake.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
 
             <!-- HEADER RIGHT -->
@@ -304,6 +302,8 @@
             <controls:FloatingComboBox x:Name="fcbMeasure"
                                        Grid.Column="2"
                                        Label="O‘lchov"
+                                       ItemsSource="{Binding Manufactories.SemiProducts}"
+                                       DisplayMemberPath="SemiProduct.Name"
                                        Text="{Binding CurrentItem.Measure, UpdateSourceTrigger=PropertyChanged}"
                                        Margin="2 0" />
             <controls:FloatingInput x:Name="fibQuantity"
@@ -337,9 +337,11 @@
                     Content="{Binding IsEditing, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Saqlash|Qo‘shish'}"
                     Command="{Binding SaveCommand}"
                     Padding="8,4"
-                    Margin="2,0"
+                    Margin="2,0,2,0"
                     md:ButtonAssist.CornerRadius="4"
-                    Background="{DynamicResource OtherBackground}" />
+                    Background="{DynamicResource OtherBackground}"
+                    Height="32"
+                    VerticalAlignment="Top" />
 
         </Grid>
 
@@ -438,9 +440,8 @@
                     </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <controls:ActionButton 
-                                EditCommand="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                DeleteCommand="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                            <controls:ActionButton EditCommand="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                   DeleteCommand="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -454,6 +455,7 @@
                 Margin="0 12 0 0"
                 HorizontalAlignment="Right"
                 md:ButtonAssist.CornerRadius="4"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                 Background="{DynamicResource OtherBackground}" />
     </Grid>
 </Page>

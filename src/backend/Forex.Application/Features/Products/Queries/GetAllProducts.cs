@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-public record GetAllProductsQuery : IRequest<List<ProductDto>>;
+public record GetAllProductsQuery : IRequest<IReadOnlyCollection<ProductDto>>;
 
 public class GetAllProductsQueryHandler(
     IAppDbContext context,
     IMapper mapper)
-    : IRequestHandler<GetAllProductsQuery, List<ProductDto>>
+    : IRequestHandler<GetAllProductsQuery, IReadOnlyCollection<ProductDto>>
 {
-    public async Task<List<ProductDto>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
-        => mapper.Map<List<ProductDto>>(await context.Products.AsNoTracking().ToListAsync(cancellationToken));
+    public async Task<IReadOnlyCollection<ProductDto>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
+        => mapper.Map<IReadOnlyCollection<ProductDto>>(await context.Products.AsNoTracking().ToListAsync(cancellationToken));
 }
