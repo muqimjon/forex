@@ -16,13 +16,36 @@ public static class FilteringExtensions
             if (prop == null) continue;
 
             var member = Expression.Property(param, prop.Name);
-            var constant = Expression.Constant(Convert.ChangeType(entry.Value, prop.PropertyType));
-            var body = Expression.Equal(member, constant);
+
+            Expression body;
+
+            if (prop.PropertyType == typeof(string))
+            {
+                var notNull = Expression.NotEqual(member, Expression.Constant(null, typeof(string)));
+
+                var memberToLower = Expression.Call(member, nameof(string.ToLower), Type.EmptyTypes);
+                var valueToLower = Expression.Constant(entry.Value.ToString()!.ToLower());
+
+                var equals = Expression.Equal(memberToLower, valueToLower);
+                body = Expression.AndAlso(notNull, equals);
+            }
+            else if (prop.PropertyType.IsEnum)
+            {
+                var enumValue = Enum.Parse(prop.PropertyType, entry.Value.ToString()!, ignoreCase: true);
+                var constant = Expression.Constant(enumValue);
+                body = Expression.Equal(member, constant);
+            }
+            else
+            {
+                var constant = Expression.Constant(Convert.ChangeType(entry.Value, prop.PropertyType));
+                body = Expression.Equal(member, constant);
+            }
+
             var lambda = Expression.Lambda<Func<T, bool>>(body, param);
             query = query.Where(lambda);
         }
 
-        // Global search
+        // 🔎 Global search (case-insensitive)
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             var stringProps = typeof(T).GetProperties().Where(p => p.PropertyType == typeof(string));
@@ -31,9 +54,14 @@ public static class FilteringExtensions
             foreach (var p in stringProps)
             {
                 var member = Expression.Property(param, p.Name);
-                var search = Expression.Constant(request.Search);
-                var contains = Expression.Call(member, nameof(string.Contains), Type.EmptyTypes, search);
-                searchExpr = searchExpr is null ? contains : Expression.OrElse(searchExpr, contains);
+
+                var notNull = Expression.NotEqual(member, Expression.Constant(null, typeof(string)));
+                var memberToLower = Expression.Call(member, nameof(string.ToLower), Type.EmptyTypes);
+                var searchValue = Expression.Constant(request.Search.ToLower());
+                var contains = Expression.Call(memberToLower, nameof(string.Contains), Type.EmptyTypes, searchValue);
+
+                var condition = Expression.AndAlso(notNull, contains);
+                searchExpr = searchExpr is null ? condition : Expression.OrElse(searchExpr, condition);
             }
 
             if (searchExpr is not null)
