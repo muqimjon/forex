@@ -18,8 +18,8 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.Role)
             .IsInEnum().WithMessage("Noto‘g‘ri rol tanlandi");
 
-        RuleFor(x => x.Address)
-            .NotEmpty().WithMessage("Manzil kiritilishi shart");
+        //RuleFor(x => x.Address)
+        //    .NotEmpty().WithMessage("Manzil kiritilishi shart");
     }
 }
 

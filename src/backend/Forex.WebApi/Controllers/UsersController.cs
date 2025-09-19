@@ -15,7 +15,7 @@ public class UsersController
                      UpdateUserCommand,
                      DeleteUserCommand>
 {
-    [HttpGet("filter")]
-    public async Task<IActionResult> GetFiltered(GetAllFilteringUsersQuery query)
+    [HttpPost("filter")]
+    public async Task<IActionResult> GetFiltered(UserFilterQuery query)
         => Ok(new Response { Data = await Mediator.Send(query) });
 }
