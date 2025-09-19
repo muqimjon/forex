@@ -37,7 +37,6 @@ public partial class LoginPage : Page
     {
         lblError.Visibility = Visibility.Collapsed;
 
-        Task.Delay(5000);
         var success = await viewModel.LoginAsync(tbLogin.Text.Trim(), pbPassword.Password);
 
         if (success)

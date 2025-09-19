@@ -68,11 +68,10 @@ public class SemiProductPageViewModel : ViewModelBase
     {
         var request = new FilteringRequest
         {
-            Filters = new Dictionary<string, object>
+            Filters = new Dictionary<string, List<string>>
             {
-                ["Role"] = "Supplier"
-            },
-            SortBy = "Name",
+                ["Role"] = ["Supplier"]
+            }
         };
 
         var response = await client.Users

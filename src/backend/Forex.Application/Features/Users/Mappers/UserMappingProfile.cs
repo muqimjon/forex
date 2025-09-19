@@ -10,6 +10,8 @@ public class UserMappingProfile : Profile
 {
     public UserMappingProfile()
     {
+        CreateMap<User, UserDto>();
+
         CreateMap<CreateUserCommand, User>()
             .ForMember(dest => dest.NormalizedName,
                 opt => opt.MapFrom(src => src.Name.ToNormalized()))
@@ -21,7 +23,5 @@ public class UserMappingProfile : Profile
                 opt => opt.MapFrom(src => src.Name.ToNormalized()))
             .ForMember(dest => dest.NormalizedEmail,
                 opt => opt.MapFrom(src => src.Email!.ToNormalized()));
-
-        CreateMap<User, UserDto>();
     }
 }

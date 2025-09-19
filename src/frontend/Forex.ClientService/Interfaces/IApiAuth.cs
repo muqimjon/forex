@@ -6,9 +6,9 @@ using Refit;
 
 public interface IApiAuth
 {
-    [Post("/Auth/login")]
+    [Post("/auth/login")]
     Task<Response<LoginResponse>> Login([Body] LoginRequest request);
 
-    [Post("/Auth/register")]
+    [Post("/auth/register")]
     Task<Response<LoginResponse>> Register([Body] RegisterRequest request);
 }

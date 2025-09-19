@@ -1,7 +1,6 @@
 ﻿namespace Forex.Application.Commons.Extensions;
 
 using Forex.Application.Commons.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 public static class FilteringExtensions
@@ -9,58 +8,48 @@ public static class FilteringExtensions
     public static IQueryable<T> AsFilterable<T>(this IQueryable<T> query, FilteringRequest request)
     {
         var param = Expression.Parameter(typeof(T), "x");
+        var props = typeof(T).GetProperties();
 
         foreach (var entry in request.Filters ?? [])
         {
-            var prop = typeof(T).GetProperty(entry.Key);
-            if (prop == null) continue;
+            var prop = props.FirstOrDefault(p =>
+                string.Equals(p.Name, entry.Key, StringComparison.OrdinalIgnoreCase));
+            if (prop is null) continue;
 
             var member = Expression.Property(param, prop.Name);
+            Expression? filterExpr = null;
 
-            Expression body;
-
-            if (prop.PropertyType == typeof(string))
+            foreach (var raw in entry.Value)
             {
-                var notNull = Expression.NotEqual(member, Expression.Constant(null, typeof(string)));
-
-                var memberToLower = Expression.Call(member, nameof(string.ToLower), Type.EmptyTypes);
-                var valueToLower = Expression.Constant(entry.Value.ToString()!.ToLower());
-
-                var equals = Expression.Equal(memberToLower, valueToLower);
-                body = Expression.AndAlso(notNull, equals);
-            }
-            else if (prop.PropertyType.IsEnum)
-            {
-                var enumValue = Enum.Parse(prop.PropertyType, entry.Value.ToString()!, ignoreCase: true);
-                var constant = Expression.Constant(enumValue);
-                body = Expression.Equal(member, constant);
-            }
-            else
-            {
-                var constant = Expression.Constant(Convert.ChangeType(entry.Value, prop.PropertyType));
-                body = Expression.Equal(member, constant);
+                var condition = BuildCondition(member, raw, prop.PropertyType);
+                if (condition is not null)
+                    filterExpr = filterExpr is null ? condition : Expression.OrElse(filterExpr, condition);
             }
 
-            var lambda = Expression.Lambda<Func<T, bool>>(body, param);
-            query = query.Where(lambda);
+            if (filterExpr is not null)
+            {
+                var lambda = Expression.Lambda<Func<T, bool>>(filterExpr, param);
+                query = query.Where(lambda);
+            }
         }
 
-        // 🔎 Global search (case-insensitive)
+        // 🔍 Global search
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            var stringProps = typeof(T).GetProperties().Where(p => p.PropertyType == typeof(string));
+            var stringProps = typeof(T).GetProperties()
+                .Where(p => p.PropertyType == typeof(string));
+
             Expression? searchExpr = null;
 
             foreach (var p in stringProps)
             {
                 var member = Expression.Property(param, p.Name);
-
                 var notNull = Expression.NotEqual(member, Expression.Constant(null, typeof(string)));
                 var memberToLower = Expression.Call(member, nameof(string.ToLower), Type.EmptyTypes);
                 var searchValue = Expression.Constant(request.Search.ToLower());
                 var contains = Expression.Call(memberToLower, nameof(string.Contains), Type.EmptyTypes, searchValue);
-
                 var condition = Expression.AndAlso(notNull, contains);
+
                 searchExpr = searchExpr is null ? condition : Expression.OrElse(searchExpr, condition);
             }
 
@@ -71,18 +60,45 @@ public static class FilteringExtensions
             }
         }
 
-        return query.AsSortable(request).AsPagable(request);
+        return query.AsSortable(request);
     }
 
-    public static async Task<PagedList<T>> ToPagedListAsync<T>(
-        this IQueryable<T> query,
-        FilteringRequest request,
-        CancellationToken cancellationToken = default)
+    private static Expression? BuildCondition(Expression member, string raw, Type targetType)
     {
-        var filtered = query.AsFilterable(request);
-        var total = await filtered.CountAsync(cancellationToken);
-        var items = await filtered.ToListAsync(cancellationToken);
+        string value = raw;
+        string op = "=";
 
-        return new PagedList<T>(items, total, request.Page, request.PageSize);
+        if (raw.StartsWith(">=")) { op = ">="; value = raw[2..]; }
+        else if (raw.StartsWith("<=")) { op = "<="; value = raw[2..]; }
+        else if (raw.StartsWith(">")) { op = ">"; value = raw[1..]; }
+        else if (raw.StartsWith("<")) { op = "<"; value = raw[1..]; }
+        else if (raw.StartsWith("contains:", StringComparison.OrdinalIgnoreCase))
+        {
+            op = "contains"; value = raw["contains:".Length..];
+        }
+
+        object? converted;
+        try
+        {
+            converted = ConversionHelper.TryConvert(value, targetType);
+        }
+        catch
+        {
+            return null;
+        }
+
+        var constant = Expression.Constant(converted, targetType);
+
+        return op switch
+        {
+            "=" => Expression.Equal(member, constant),
+            ">" => Expression.GreaterThan(member, constant),
+            ">=" => Expression.GreaterThanOrEqual(member, constant),
+            "<" => Expression.LessThan(member, constant),
+            "<=" => Expression.LessThanOrEqual(member, constant),
+            "contains" when targetType == typeof(string) =>
+                Expression.Call(member, nameof(string.Contains), Type.EmptyTypes, Expression.Constant(value)),
+            _ => null
+        };
     }
 }
