@@ -3,7 +3,7 @@
 public enum Role
 {
     User,
-    Supplier,
-    Customer,
-    Employer,
+    Taminotchi,
+    Mijoz,
+    Hodim
 }

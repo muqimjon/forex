@@ -24,8 +24,7 @@
                    Padding="0"
                    md:HintAssist.Hint="Qidiruv.."
                    BorderBrush="Gray"
-                   BorderThickness="0"
-                   TextChanged="TxtSearch_TextChanged"/>
+                   BorderThickness="0"/>
         </Border>
 
         <Button x:Name="btnBack"
@@ -36,7 +35,7 @@
                 ToolTip="Orqaga"
                 Grid.Row="0"
                 HorizontalAlignment="Right"
-                Click="BtnBack_Click"/>
+                />
 
         <!-- ➕ Qo‘shish formasi -->
         <WrapPanel Grid.Row="1" Orientation="Horizontal">
@@ -50,8 +49,7 @@
                         BorderThickness="0"
                         FontSize="16"
                         Width="105"
-                        Loaded="CbRole_Loaded"
-                        SelectionChanged="CbRole_SelectionChanged"/>
+                        Loaded="CbRole_Loaded"/>
             </Border>
 
             <Border BorderThickness="1" BorderBrush="{DynamicResource SelectedBorderColor }" Margin="1 0 1 2" Width="115" Background="{DynamicResource SelectedBackground}" CornerRadius="4">
@@ -89,8 +87,7 @@
                     Foreground="White"
                     FontWeight="Bold"
                     ToolTip="Saqlash"
-                    Padding="5"
-                    Click="BtnSave_Click"/>
+                    Padding="5"/>
         </WrapPanel>
 
         <!-- 📋 Jadval -->
