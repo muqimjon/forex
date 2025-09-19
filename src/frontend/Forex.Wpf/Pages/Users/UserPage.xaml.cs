@@ -29,9 +29,10 @@ public partial class UserPage : Page
         cbRole.SelectionChanged += CbRole_SelectionChanged;
         txtSearch.TextChanged += TxtSearch_TextChanged;
         btnSave.Click += BtnSave_Click;
+        btnBack.Click += BtnBack_Click;
 
         LoadUsers();
-
+        UpdateRoleList();
         FocusNavigator.AttachEnterNavigation(
         [
             txtSearch,
@@ -53,7 +54,6 @@ public partial class UserPage : Page
             var response = await client.Users.GetAll();
             rawUsers = response.Data?.OrderByDescending(u => u.Id).ToList() ?? [];
 
-            UpdateRoleList();
             ApplyFilters();
         }
         catch (Exception ex)
@@ -65,7 +65,6 @@ public partial class UserPage : Page
     private void UpdateRoleList()
     {
         var roles = Enum.GetNames<Role>().ToList();
-        roles.Insert(0, "");
         cbRole.ItemsSource = roles;
         cbRole.SelectedItem = roles[0];
     }
@@ -109,8 +108,8 @@ public partial class UserPage : Page
         }
 
         brDiscount.Visibility = role == "Mijoz" ? Visibility.Visible : Visibility.Collapsed;
-        brAccount.Visibility = Visibility.Visible;
-        btnSave.Visibility = Visibility.Visible;
+        brAccount.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
+        btnSave.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void CbRole_GotFocus(object sender, RoutedEventArgs e)
