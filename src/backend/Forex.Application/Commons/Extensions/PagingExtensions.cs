@@ -6,16 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 public static class PagingExtensions
 {
-    private static IPagingMetadataWriter? _writer;
-
-    public static void ConfigureWriter(IPagingMetadataWriter writer)
-    {
-        _writer = writer;
-    }
-
     public static async Task<IReadOnlyCollection<T>> ToPagedListAsync<T>(
         this IQueryable<T> query,
         FilteringRequest request,
+        IPagingMetadataWriter? writer = null,
         CancellationToken cancellationToken = default)
     {
         var filtered = query.AsFilterable(request);
@@ -32,7 +26,7 @@ public static class PagingExtensions
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        _writer?.Write(new PagedListMetadata(total, page, pageSize,
+        writer?.Write(new PagedListMetadata(total, page, pageSize,
             (int)Math.Ceiling((double)total / pageSize)));
 
         return items;

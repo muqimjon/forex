@@ -6,6 +6,7 @@ using Forex.Infrastructure.Identity;
 using Forex.Infrastructure.Persistence;
 using Forex.Infrastructure.Persistence.Interceptors;
 using Forex.Infrastructure.Security;
+using Forex.Infrastructure.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,14 +14,13 @@ using Minio;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration conf)
+    public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration conf)
     {
         services.AddHttpContextAccessor();
-
         services.AddDbContext(conf);
         services.AddFileStorage(conf);
         services.AddIdentity();
-        return services;
+        services.AddScoped<IPagingMetadataWriter, HttpPagingMetadataWriter>();
     }
 
     private static void AddIdentity(this IServiceCollection services)

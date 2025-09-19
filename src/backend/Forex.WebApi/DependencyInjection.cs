@@ -22,9 +22,7 @@ public static class DependencyInjection
         services.AddApplicationServices();
         services.AddInfrastructureServices(conf);
 
-        services.AddControllers(options
-            => options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())))
-                .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        services.AddApiControllers();
         services.AddValidation();
 
         services.AddOpenApiDocumentation();

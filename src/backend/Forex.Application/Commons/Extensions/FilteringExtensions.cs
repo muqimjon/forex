@@ -17,14 +17,7 @@ public static class FilteringExtensions
             if (prop is null) continue;
 
             var member = Expression.Property(param, prop.Name);
-            Expression? filterExpr = null;
-
-            foreach (var raw in entry.Value)
-            {
-                var condition = BuildCondition(member, raw, prop.PropertyType);
-                if (condition is not null)
-                    filterExpr = filterExpr is null ? condition : Expression.OrElse(filterExpr, condition);
-            }
+            var filterExpr = BuildCombinedCondition(member, entry.Value, prop.PropertyType);
 
             if (filterExpr is not null)
             {
@@ -33,62 +26,107 @@ public static class FilteringExtensions
             }
         }
 
-        // 🔍 Global search
-        if (!string.IsNullOrWhiteSpace(request.Search))
+        var searchExpr = BuildGlobalSearchExpression<T>(request.Search, param);
+        if (searchExpr is not null)
         {
-            var stringProps = typeof(T).GetProperties()
-                .Where(p => p.PropertyType == typeof(string));
-
-            Expression? searchExpr = null;
-
-            foreach (var p in stringProps)
-            {
-                var member = Expression.Property(param, p.Name);
-                var notNull = Expression.NotEqual(member, Expression.Constant(null, typeof(string)));
-                var memberToLower = Expression.Call(member, nameof(string.ToLower), Type.EmptyTypes);
-                var searchValue = Expression.Constant(request.Search.ToLower());
-                var contains = Expression.Call(memberToLower, nameof(string.Contains), Type.EmptyTypes, searchValue);
-                var condition = Expression.AndAlso(notNull, contains);
-
-                searchExpr = searchExpr is null ? condition : Expression.OrElse(searchExpr, condition);
-            }
-
-            if (searchExpr is not null)
-            {
-                var lambda = Expression.Lambda<Func<T, bool>>(searchExpr, param);
-                query = query.Where(lambda);
-            }
+            var lambda = Expression.Lambda<Func<T, bool>>(searchExpr, param);
+            query = query.Where(lambda);
         }
 
         return query.AsSortable(request);
     }
 
+    #region Logical Operator Detection
+
+    private static ExpressionType DetectLogicalOperator(List<string> values)
+    {
+        var tokens = values.Select(v => v.Trim().ToLower()).ToList();
+
+        if (tokens.Contains("or") || tokens.Contains("||") || tokens.Contains("|"))
+            return ExpressionType.OrElse;
+
+        return ExpressionType.AndAlso;
+    }
+
+    private static bool IsLogicalToken(string token)
+    {
+        var t = token.Trim().ToLower();
+        return t is "and" or "&&" or "&" or "or" or "||" or "|";
+    }
+
+    #endregion
+
+    #region Condition Building
+
     private static Expression? BuildCondition(Expression member, string raw, Type targetType)
     {
-        string value = raw;
+        var opMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [">="] = ">=",
+            ["<="] = "<=",
+            [">"] = ">",
+            ["<"] = "<",
+            ["="] = "=",
+            ["contains:"] = "contains",
+            ["starts:"] = "starts",
+            ["ends:"] = "ends",
+            ["equals:"] = "equals",
+            ["in:"] = "in",
+            ["!"] = "not"
+        };
+
         string op = "=";
+        string value = raw;
 
-        if (raw.StartsWith(">=")) { op = ">="; value = raw[2..]; }
-        else if (raw.StartsWith("<=")) { op = "<="; value = raw[2..]; }
-        else if (raw.StartsWith(">")) { op = ">"; value = raw[1..]; }
-        else if (raw.StartsWith("<")) { op = "<"; value = raw[1..]; }
-        else if (raw.StartsWith("contains:", StringComparison.OrdinalIgnoreCase))
+        foreach (var kvp in opMap)
         {
-            op = "contains"; value = raw["contains:".Length..];
+            if (raw.StartsWith(kvp.Key, StringComparison.OrdinalIgnoreCase))
+            {
+                op = kvp.Value;
+                value = raw[kvp.Key.Length..];
+                break;
+            }
         }
 
+        // NOT operator special case
+        if (op == "not")
+        {
+            var inner = BuildCondition(member, value, targetType);
+            return inner is not null ? Expression.Not(inner) : null;
+        }
+
+        // IN operator
+        if (op == "in")
+        {
+            var values = value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(v => ConversionHelper.TryConvert(v.Trim(), targetType))
+                .ToList();
+
+            var arrayExpr = Expression.Constant(values);
+            return Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), [targetType], arrayExpr, member);
+        }
+
+        // Convert single value
         object? converted;
-        try
-        {
-            converted = ConversionHelper.TryConvert(value, targetType);
-        }
-        catch
-        {
-            return null;
-        }
+        try { converted = ConversionHelper.TryConvert(value, targetType); }
+        catch { return null; }
 
         var constant = Expression.Constant(converted, targetType);
 
+        // String operations
+        if (targetType == typeof(string))
+        {
+            return op switch
+            {
+                "contains" => Expression.Call(member, nameof(string.Contains), Type.EmptyTypes, constant),
+                "starts" => Expression.Call(member, nameof(string.StartsWith), Type.EmptyTypes, constant),
+                "ends" => Expression.Call(member, nameof(string.EndsWith), Type.EmptyTypes, constant),
+                "equals" => Expression.Call(member, nameof(string.Equals), Type.EmptyTypes, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase)),
+                _ => null
+            };
+        }
+
+        // Standard comparisons
         return op switch
         {
             "=" => Expression.Equal(member, constant),
@@ -96,9 +134,62 @@ public static class FilteringExtensions
             ">=" => Expression.GreaterThanOrEqual(member, constant),
             "<" => Expression.LessThan(member, constant),
             "<=" => Expression.LessThanOrEqual(member, constant),
-            "contains" when targetType == typeof(string) =>
-                Expression.Call(member, nameof(string.Contains), Type.EmptyTypes, Expression.Constant(value)),
             _ => null
         };
     }
+
+    private static Expression? BuildCombinedCondition(Expression member, List<string> values, Type targetType)
+    {
+        var logic = DetectLogicalOperator(values);
+        var conditions = values
+            .Where(v => !string.IsNullOrWhiteSpace(v) && !IsLogicalToken(v))
+            .Select(v => BuildCondition(member, v, targetType))
+            .Where(c => c is not null)
+            .ToList();
+
+        if (conditions.Count == 0)
+            return null;
+
+        Expression expr = conditions[0]!;
+
+        for (int i = 1; i < conditions.Count; i++)
+        {
+            expr = logic == ExpressionType.AndAlso
+                ? Expression.AndAlso(expr, conditions[i]!)
+                : Expression.OrElse(expr, conditions[i]!);
+        }
+
+        return expr;
+    }
+
+    #endregion
+
+    #region Global Search
+
+    private static Expression? BuildGlobalSearchExpression<T>(string? search, ParameterExpression param)
+    {
+        if (string.IsNullOrWhiteSpace(search))
+            return null;
+
+        var stringProps = typeof(T).GetProperties()
+            .Where(p => p.PropertyType == typeof(string));
+
+        Expression? searchExpr = null;
+
+        foreach (var p in stringProps)
+        {
+            var member = Expression.Property(param, p.Name);
+            var notNull = Expression.NotEqual(member, Expression.Constant(null, typeof(string)));
+            var memberToLower = Expression.Call(member, nameof(string.ToLower), Type.EmptyTypes);
+            var searchValue = Expression.Constant(search.ToLower());
+            var contains = Expression.Call(memberToLower, nameof(string.Contains), Type.EmptyTypes, searchValue);
+            var condition = Expression.AndAlso(notNull, contains);
+
+            searchExpr = searchExpr is null ? condition : Expression.OrElse(searchExpr, condition);
+        }
+
+        return searchExpr;
+    }
+
+    #endregion
 }
