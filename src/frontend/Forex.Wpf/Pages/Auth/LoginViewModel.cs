@@ -23,9 +23,14 @@ public class LoginViewModel : ViewModelBase
         var resp = await apiAuth.Login(new() { EmailOrPhone = login, Password = password })
             .Handle(isLoading => IsLoading = isLoading);
 
-        if (resp.StatusCode != 200 || resp.Data is null)
+        if (resp.StatusCode != 200)
         {
-            ErrorMessage = resp.Message ?? "Login muvaffaqiyatsiz.";
+            ErrorMessage = resp.Message;
+            return false;
+        }
+        else if (resp.Data is null)
+        {
+            ErrorMessage = "Login muvaffaqiyatsiz.";
             return false;
         }
 

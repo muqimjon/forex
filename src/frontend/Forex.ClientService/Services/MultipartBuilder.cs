@@ -1,11 +1,11 @@
 ﻿namespace Forex.ClientService.Services;
 
 using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.SemiProducts;
+using Forex.ClientService.Models.Invoices;
 
 public static class MultipartBuilder
 {
-    public static MultipartFormDataContent BuildIntake(SemiProductIntakeCommand command)
+    public static MultipartFormDataContent BuildIntake(InvoiceRequest command)
     {
         var content = new MultipartFormDataContent();
 

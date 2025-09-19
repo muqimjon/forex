@@ -18,8 +18,8 @@ public partial class UserPage : Page
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
 
     private readonly ForexClient client = App.Client;
-    private List<UserDto> rawUsers = [];
-    private ObservableCollection<UserDto> filteredUsers = [];
+    private List<UserResponse> rawUsers = [];
+    private ObservableCollection<UserResponse> filteredUsers = [];
 
     public UserPage()
     {
@@ -86,7 +86,7 @@ public partial class UserPage : Page
             )
         ).ToList();
 
-        filteredUsers = new ObservableCollection<UserDto>(filtered);
+        filteredUsers = new ObservableCollection<UserResponse>(filtered);
         dgUsers.ItemsSource = filteredUsers;
     }
 
@@ -128,7 +128,7 @@ public partial class UserPage : Page
                 return;
             }
 
-            var request = new CreateUserRequest
+            var request = new UserRequest
             {
                 Name = txtName.Text.Trim(),
                 Phone = txtPhone.Text.Trim(),

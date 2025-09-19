@@ -2,7 +2,7 @@
 
 using Forex.ClientService;
 using Forex.Wpf.Common.Services;
-using Forex.Wpf.Pages.Auth;
+using Forex.Wpf.Pages.Home;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,7 +16,7 @@ public partial class MainWindow : Window
 
         SpinnerService.Init(this);
 
-        Loaded += (_, _) => NavigateTo(new LoginPage());
+        Loaded += (_, _) => NavigateTo(new HomePage());
     }
 
     public void NavigateTo(Page page)

@@ -7,10 +7,10 @@ using Refit;
 public interface IApiSemiProduct
 {
     [Get("/SemiProducts")]
-    Task<Response<List<SemiProductDto>>> GetAll();
+    Task<Response<List<SemiProductResponse>>> GetAll();
 
     [Get("/SemiProducts/{id}")]
-    Task<Response<SemiProductDto>> GetById(long id);
+    Task<Response<SemiProductResponse>> GetById(long id);
 
     [Delete("/SemiProducts/{id}")]
     Task<Response<bool>> Delete(long id);

@@ -1,6 +1,6 @@
 ﻿namespace Forex.ClientService.Models.SemiProducts;
 
-public class SemiProductDto
+public sealed record SemiProductResponse
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;

@@ -10,4 +10,5 @@ public record UserDto
     public Role Role { get; set; }
     public string Address { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public AccountDto Account { get; set; } = default!;
 }

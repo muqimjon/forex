@@ -1,19 +1,29 @@
 ﻿namespace Forex.Application.Commons.Extensions;
 
 using Forex.Application.Commons.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+
 
 public static class FilteringExtensions
 {
     public static IQueryable<T> AsFilterable<T>(this IQueryable<T> query, FilteringRequest request)
+    where T : class
     {
+        query = ApplyPropertyIncludes(query, request);
+
         var param = Expression.Parameter(typeof(T), "x");
         var props = typeof(T).GetProperties();
 
         foreach (var entry in request.Filters ?? [])
         {
+            var key = entry.Key;
+
+            if (entry.Value.All(v => v.StartsWith("include", StringComparison.OrdinalIgnoreCase)))
+                continue;
+
             var prop = props.FirstOrDefault(p =>
-                string.Equals(p.Name, entry.Key, StringComparison.OrdinalIgnoreCase));
+                string.Equals(p.Name, key, StringComparison.OrdinalIgnoreCase));
             if (prop is null) continue;
 
             var member = Expression.Property(param, prop.Name);
@@ -116,12 +126,15 @@ public static class FilteringExtensions
         // String operations
         if (targetType == typeof(string))
         {
+            var memberToLower = Expression.Call(member, nameof(string.ToLower), Type.EmptyTypes);
+            var constantToLower = Expression.Call(constant, nameof(string.ToLower), Type.EmptyTypes);
+
             return op switch
             {
-                "contains" => Expression.Call(member, nameof(string.Contains), Type.EmptyTypes, constant),
-                "starts" => Expression.Call(member, nameof(string.StartsWith), Type.EmptyTypes, constant),
-                "ends" => Expression.Call(member, nameof(string.EndsWith), Type.EmptyTypes, constant),
-                "equals" => Expression.Call(member, nameof(string.Equals), Type.EmptyTypes, constant, Expression.Constant(StringComparison.OrdinalIgnoreCase)),
+                "contains" => Expression.Call(memberToLower, nameof(string.Contains), Type.EmptyTypes, constantToLower),
+                "starts" => Expression.Call(memberToLower, nameof(string.StartsWith), Type.EmptyTypes, constantToLower),
+                "ends" => Expression.Call(memberToLower, nameof(string.EndsWith), Type.EmptyTypes, constantToLower),
+                "equals" => Expression.Call(memberToLower, nameof(string.Equals), Type.EmptyTypes, constantToLower, Expression.Constant(StringComparison.OrdinalIgnoreCase)),
                 _ => null
             };
         }
@@ -189,6 +202,43 @@ public static class FilteringExtensions
         }
 
         return searchExpr;
+    }
+
+    #endregion
+
+    #region Include
+
+    private static IQueryable<T> ApplyPropertyIncludes<T>(IQueryable<T> query, FilteringRequest request)
+    where T : class
+    {
+        var props = typeof(T).GetProperties();
+
+        foreach (var entry in request.Filters ?? [])
+        {
+            var key = entry.Key;
+            var prop = props.FirstOrDefault(p =>
+                string.Equals(p.Name, key, StringComparison.OrdinalIgnoreCase));
+            if (prop is null) continue;
+
+            var propName = prop.Name;
+
+            foreach (var value in entry.Value)
+            {
+                if (value.Equals("include", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Include(propName);
+                }
+                else if (value.StartsWith("include:", StringComparison.OrdinalIgnoreCase))
+                {
+                    var path = value["include:".Length..].Trim();
+
+                    var fullPath = $"{propName}.{path}";
+                    query = query.Include(fullPath);
+                }
+            }
+        }
+
+        return query;
     }
 
     #endregion

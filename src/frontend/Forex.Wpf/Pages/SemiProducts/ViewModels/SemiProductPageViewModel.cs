@@ -4,7 +4,8 @@ using AutoMapper;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
-using Forex.ClientService.Models.Manufactory;
+using Forex.ClientService.Models.Invoices;
+using Forex.ClientService.Models.Manufactories;
 using Forex.ClientService.Models.SemiProducts;
 using Forex.ClientService.Models.Users;
 using Forex.ClientService.Services;
@@ -19,8 +20,8 @@ public class SemiProductPageViewModel : ViewModelBase
     private readonly IMapper mapper = App.Mapper;
     private SemiProductItemViewModel? selectedItem;
 
-    public ObservableCollection<UserDto> Suppliers { get; } = [];
-    public ObservableCollection<SemiProductDto> SemiProducts { get; } = [];
+    public ObservableCollection<UserResponse> Suppliers { get; } = [];
+    public ObservableCollection<SemiProductResponse> SemiProducts { get; } = [];
 
     public SemiProductPageViewModel()
     {
@@ -46,7 +47,7 @@ public class SemiProductPageViewModel : ViewModelBase
     public ICommand DeleteCommand { get; }
     public ICommand EditCommand { get; }
     public ICommand SubmitCommand { get; }
-    public ObservableCollection<ManufactoryDto> Manufactories { get; } = [];
+    public ObservableCollection<ManufactoryResponse> Manufactories { get; } = [];
 
     public async Task LoadManufactoriesAsync()
     {
@@ -70,7 +71,7 @@ public class SemiProductPageViewModel : ViewModelBase
         {
             Filters = new Dictionary<string, List<string>>
             {
-                ["Role"] = ["Supplier"]
+                ["Role"] = ["taminotchi"]
             }
         };
 
@@ -154,7 +155,7 @@ public class SemiProductPageViewModel : ViewModelBase
 
     private async Task SubmitAsync()
     {
-        var command = mapper.Map<SemiProductIntakeCommand>(Intake);
+        var command = mapper.Map<InvoiceRequest>(Intake);
         using var form = MultipartBuilder.BuildIntake(command);
 
         var response = await client.SemiProduct
@@ -173,8 +174,8 @@ public class SemiProductPageViewModel : ViewModelBase
         }
     }
 
-    private ManufactoryDto? selectedManufactory;
-    public ManufactoryDto? SelectedManufactory
+    private ManufactoryResponse? selectedManufactory;
+    public ManufactoryResponse? SelectedManufactory
     {
         get => selectedManufactory;
         set
@@ -191,8 +192,8 @@ public class SemiProductPageViewModel : ViewModelBase
         }
     }
 
-    private UserDto? selectedSupplier;
-    public UserDto? SelectedSupplier
+    private UserResponse? selectedSupplier;
+    public UserResponse? SelectedSupplier
     {
         get => selectedSupplier;
         set

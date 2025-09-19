@@ -1,6 +1,6 @@
 ﻿namespace Forex.ClientService.Models.SemiProducts;
 
-public class SemiProductItemCommand
+public sealed record SemiProductItemRequest
 {
     public long? SemiProductId { get; set; }
     public string? Name { get; set; }

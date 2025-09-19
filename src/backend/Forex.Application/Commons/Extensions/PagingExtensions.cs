@@ -10,7 +10,7 @@ public static class PagingExtensions
         this IQueryable<T> query,
         FilteringRequest request,
         IPagingMetadataWriter? writer = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default) where T : class
     {
         var filtered = query.AsFilterable(request);
         var total = await filtered.CountAsync(cancellationToken);

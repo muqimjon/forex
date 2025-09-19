@@ -7,19 +7,19 @@ using Refit;
 public interface IApiUser
 {
     [Get("/Users")]
-    Task<Response<List<UserDto>>> GetAll();
+    Task<Response<List<UserResponse>>> GetAll();
 
     [Post("/Users/filter")]
-    Task<Response<List<UserDto>>> Filter(FilteringRequest request);
+    Task<Response<List<UserResponse>>> Filter(FilteringRequest request);
 
     [Get("/Users/{id}")]
-    Task<Response<UserDto>> GetById(long id);
+    Task<Response<UserResponse>> GetById(long id);
 
     [Post("/Users")]
-    Task<Response<long>> Create([Body] CreateUserRequest request);
+    Task<Response<long>> Create([Body] UserRequest request);
 
     [Put("/Users")]
-    Task<Response<bool>> Update([Body] UpdateUserRequest request);
+    Task<Response<bool>> Update([Body] UserRequest request);
 
     [Delete("/Users/{id}")]
     Task<Response<bool>> Delete(long id);

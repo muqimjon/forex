@@ -11,7 +11,7 @@ public class UserMappingProfile : Profile
     public UserMappingProfile()
     {
         CreateMap<User, UserDto>();
-
+        CreateMap<Account, AccountDto>();
         CreateMap<CreateUserCommand, User>()
             .ForMember(dest => dest.NormalizedName,
                 opt => opt.MapFrom(src => src.Name.ToNormalized()))
