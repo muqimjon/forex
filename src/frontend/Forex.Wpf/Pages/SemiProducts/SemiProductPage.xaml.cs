@@ -58,4 +58,20 @@ public partial class SemiProductPage : Page
         else
             Main.NavigateTo(new HomePage());
     }
+
+    private void FcbName_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is SemiProductPageViewModel vm)
+        {
+            vm.ErrorMessage = "yechimi topildi mana yechimi";
+        }
+    }
+
+    private async void CbSender_DropDownOpened(object sender, EventArgs e)
+    {
+        if (DataContext is SemiProductPageViewModel vm)
+        {
+            await vm.LoadSuppliersAsync();
+        }
+    }
 }

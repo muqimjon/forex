@@ -6,17 +6,17 @@ using Refit;
 
 public interface IApiSemiProduct
 {
-    [Get("/SemiProducts")]
+    [Get("/semi-products")]
     Task<Response<List<SemiProductResponse>>> GetAll();
 
-    [Get("/SemiProducts/{id}")]
+    [Get("/semi-products/{id}")]
     Task<Response<SemiProductResponse>> GetById(long id);
 
-    [Delete("/SemiProducts/{id}")]
+    [Delete("/semi-products/{id}")]
     Task<Response<bool>> Delete(long id);
 
     [Multipart]
-    [Post("/SemiProducts")]
+    [Post("/semi-products")]
     Task<Response<long>> Create([AliasAs("ManufactoryId")] int manufactoryId,
                                 [AliasAs("Name")] string name,
                                 [AliasAs("Code")] int code,
@@ -24,7 +24,7 @@ public interface IApiSemiProduct
                                 [AliasAs("Photo")] StreamPart photo);
 
     [Multipart]
-    [Put("/SemiProducts/{id}")]
+    [Put("/semi-products/{id}")]
     Task<Response<long>> Update(long id,
                                 [AliasAs("ManufactoryId")] int manufactoryId,
                                 [AliasAs("Name")] string name,
@@ -32,6 +32,6 @@ public interface IApiSemiProduct
                                 [AliasAs("Measure")] string measure,
                                 [AliasAs("Photo")] StreamPart photo);
 
-    [Post("/SemiProducts/intake")]
+    [Post("/semi-products/intake")]
     Task<Response<bool>> CreateIntake([Body] MultipartFormDataContent content);
 }

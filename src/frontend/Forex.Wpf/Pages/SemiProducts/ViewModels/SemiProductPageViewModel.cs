@@ -20,9 +20,6 @@ public class SemiProductPageViewModel : ViewModelBase
     private readonly IMapper mapper = App.Mapper;
     private SemiProductItemViewModel? selectedItem;
 
-    public ObservableCollection<UserResponse> Suppliers { get; } = [];
-    public ObservableCollection<SemiProductResponse> SemiProducts { get; } = [];
-
     public SemiProductPageViewModel()
     {
         Intake = new SemiProductIntakeViewModel();
@@ -63,32 +60,6 @@ public class SemiProductPageViewModel : ViewModelBase
         }
         else
             ErrorMessage = response.Message ?? "Manufakturalar yuklanmadi";
-    }
-
-    public async Task LoadSuppliersAsync()
-    {
-        var request = new FilteringRequest
-        {
-            Filters = new Dictionary<string, List<string>>
-            {
-                ["Role"] = ["taminotchi"]
-            }
-        };
-
-        var response = await client.Users
-            .Filter(request)
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess && response.Data is not null)
-        {
-            Suppliers.Clear();
-            foreach (var user in response.Data)
-                Suppliers.Add(user);
-        }
-        else
-        {
-            ErrorMessage = response.Message ?? "Ta'minotchilar yuklanmadi";
-        }
     }
 
     private void SaveItem()
@@ -174,24 +145,9 @@ public class SemiProductPageViewModel : ViewModelBase
         }
     }
 
-    private ManufactoryResponse? selectedManufactory;
-    public ManufactoryResponse? SelectedManufactory
-    {
-        get => selectedManufactory;
-        set
-        {
-            if (SetProperty(ref selectedManufactory, value))
-            {
-                SemiProducts.Clear();
-                if (value?.SemiProducts is not null)
-                {
-                    foreach (var residue in value.SemiProducts)
-                        SemiProducts.Add(residue.SemiProduct);
-                }
-            }
-        }
-    }
+    #region Suppliers
 
+    public ObservableCollection<UserResponse> Suppliers { get; } = [];
     private UserResponse? selectedSupplier;
     public UserResponse? SelectedSupplier
     {
@@ -201,9 +157,80 @@ public class SemiProductPageViewModel : ViewModelBase
             if (SetProperty(ref selectedSupplier, value) && value is not null)
             {
                 Intake.SenderId = value.Id;
+                selectedSupplier!.Id = value.Id;
+                selectedSupplier.Phone = value.Phone;
+                selectedSupplier.Email = value.Email;
+                selectedSupplier.Address = value.Address;
             }
         }
     }
+
+    public async Task LoadSuppliersAsync()
+    {
+        var request = new FilteringRequest
+        {
+            Filters = new Dictionary<string, List<string>>
+            {
+                ["Role"] = ["taminotchi"]
+            }
+        };
+
+        var response = await client.Users
+            .Filter(request)
+            .Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess && response.Data is not null)
+        {
+            Suppliers.Clear();
+            foreach (var user in response.Data)
+                Suppliers.Add(user);
+        }
+        else
+        {
+            ErrorMessage = response.Message ?? "Ta’minotchilar yuklanmadi";
+        }
+    }
+
+    #endregion
+
+    #region Semi product
+
+    public ObservableCollection<SemiProductResponse> SemiProducts { get; } = [];
+
+    private SemiProductResponse? selectedSemiProduct;
+    public SemiProductResponse? SelectedSemiProduct
+    {
+        get => selectedSemiProduct;
+        set
+        {
+            if (SetProperty(ref selectedSemiProduct, value) && value is not null)
+            {
+                CurrentItem.Name = value.Name;
+                CurrentItem.Code = value.Code;
+                CurrentItem.Measure = value.Measure;
+            }
+        }
+    }
+
+    public ICommand LoadSemiProductsCommand => new RelayCommand(async () => await EnsureSemiProductsAsync());
+
+    private async Task EnsureSemiProductsAsync()
+    {
+        var response = await client.SemiProduct
+            .GetAll()
+            .Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess && response.Data is not null)
+        {
+            SemiProducts.Clear();
+            foreach (var m in response.Data)
+                SemiProducts.Add(m);
+        }
+        else
+            ErrorMessage = response.Message ?? "Manufakturalar yuklanmadi";
+    }
+
+    #endregion
 
     private bool isEditing;
     public bool IsEditing

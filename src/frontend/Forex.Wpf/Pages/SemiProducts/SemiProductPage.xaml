@@ -7,6 +7,8 @@
       xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
       xmlns:conv="clr-namespace:Forex.Wpf.Common.Converters"
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:viewmodels="clr-namespace:Forex.Wpf.Pages.SemiProducts.ViewModels"
+      d:DataContext="{d:DesignInstance Type=viewmodels:SemiProductPageViewModel}"
       mc:Ignorable="d"
       d:DesignHeight="580"
       d:DesignWidth="810"
@@ -30,122 +32,97 @@
         <!-- 1) HEADER -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="370"
-                                  MaxWidth="500" />
+                <ColumnDefinition MinWidth="450"
+                                  MaxWidth="600" />
                 <ColumnDefinition Width="*"
                                   MinWidth="10" />
-                <ColumnDefinition MinWidth="350"
+                <ColumnDefinition MinWidth="280"
                                   MaxWidth="500" />
             </Grid.ColumnDefinitions>
 
             <!-- HEADER LEFT -->
-            <Grid Grid.Row="0">
-
+            <Grid Grid.Column="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
+                    <!-- Chap: Sana + Supplier -->
+                    <ColumnDefinition Width="20" />
+                    <!-- space -->
                     <ColumnDefinition Width="*" />
+                    <!-- O‘ng: Tashkilot + Narxlar -->
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
 
-                    <RowDefinition Height="Auto" />
+                <!-- CHAP ICHKI USTUN -->
+                <StackPanel Grid.Column="0">
                     <!-- Sana -->
-                    <RowDefinition Height="Auto" />
-                    <!-- Yuboruvchi -->
-                    <RowDefinition Height="Auto" />
+                    <TextBlock Text="Sana:" />
+                    <DatePicker SelectedDate="{Binding Intake.Date, Mode=TwoWay}" />
+
+                    <!-- Ta'minotchi -->
+                    <TextBlock Text="Ta'minotchi:"/>
+                    <ComboBox ItemsSource="{Binding Suppliers}"
+                              x:Name="cbSender"
+                              SelectedItem="{Binding SelectedSupplier, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              IsEditable="True"
+                              DropDownOpened="CbSender_DropDownOpened"
+                              HorizontalContentAlignment="Right" />
+
+                    <!-- Telefon -->
+                    <TextBlock Text="Telefon:" />
+                    <TextBox Text="{Binding SelectedSupplier.Phone}"
+                             HorizontalContentAlignment="Right"
+                             IsReadOnly="True" />
+
+                    <!-- Email -->
+                    <TextBlock Text="Email:" />
+                    <TextBox Text="{Binding SelectedSupplier.Email}"
+                             HorizontalContentAlignment="Right"
+                             IsReadOnly="True" />
+
+                    <!-- Manzil -->
+                    <TextBlock Text="Manzil:" />
+                    <TextBox Text="{Binding SelectedSupplier.Address}"
+                             HorizontalContentAlignment="Right"
+                             IsReadOnly="True" />
+                </StackPanel>
+
+                <!-- O‘NG ICHKI USTUN -->
+                <StackPanel Grid.Column="2"
+                            Margin="10 0 0 0">
                     <!-- Tashkilot -->
-                    <RowDefinition Height="Auto" />
-                    <!-- Kontinerlar soni -->
-                    <RowDefinition Height="Auto" />
-                    <!-- Dona kontiner uchun to'lov -->
-                    <RowDefinition Height="Auto" />
-                    <!-- Yo'l xarajatlari -->
-                    <RowDefinition Height="Auto" />
+                    <TextBlock Text="Tashkilot:" />
+                    <ComboBox ItemsSource="{Binding Manufactories}"
+                              x:Name="cbManufactory"
+                              SelectedItem="{Binding SelectedManufactory, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              IsEditable="True" />
+
+                    <!-- Kontiner soni -->
+                    <TextBlock Text="Kontiner soni:"/>
+                    <TextBox x:Name="txContainerCount"
+                             HorizontalContentAlignment="Right"
+                             Text="{Binding Intake.ContainerCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!-- Har bir container uchun to‘lov -->
+                    <TextBlock Text="To‘lov (1 kontiner):"/>
+                    <TextBox x:Name="txTransferFeePerContainer"
+                             HorizontalContentAlignment="Right"
+                             Text="{Binding Intake.TransferFeePerContainer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!-- Yetkazib berish xarajatlari -->
+                    <TextBlock Text="Yetkazib berish xarajatlari:" />
+                    <TextBox x:Name="txDeliveryPrice"
+                             HorizontalContentAlignment="Right"
+                             Text="{Binding Intake.DeliveryPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    
                     <!-- Izoh -->
-                </Grid.RowDefinitions>
-
-                <!-- Sana -->
-                <TextBlock Text="Sana:"
-                           Grid.Row="0"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="0 2" />
-                <DatePicker x:Name="dpDate"
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            SelectedDate="{Binding Intake.Date, Mode=TwoWay}" />
-
-                <!-- Yuboruvchi -->
-                <TextBlock Text="Yuboruvchi:"
-                           Grid.Row="1"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="0 2" />
-                <ComboBox x:Name="cbSender"
-                          Grid.Row="1"
-                          Grid.Column="1"
-                          ItemsSource="{Binding Suppliers}"
-                          SelectedItem="{Binding SelectedSupplier, Mode=TwoWay}"
-                          DisplayMemberPath="Name"
-                          IsEditable="True" />
-
-                <!-- Tashkilot -->
-                <TextBlock Text="Tashkilot:"
-                           Grid.Row="2"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="0 2" />
-                <ComboBox x:Name="cbManufactory"
-                          Grid.Row="2"
-                          Grid.Column="1"
-                          ItemsSource="{Binding Manufactories}"
-                          SelectedItem="{Binding SelectedManufactory, Mode=TwoWay}"
-                          DisplayMemberPath="Name"
-                          IsEditable="True" />
-
-                <!-- Kontiner soni -->
-                <TextBlock Text="Kontiner soni:"
-                           Grid.Row="3"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="0 2" />
-                <TextBox x:Name="txContainerCount"
-                         Grid.Row="3"
-                         Grid.Column="1"
-                         Text="{Binding Intake.ContainerCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                <!-- Transfer fee per container -->
-                <TextBlock Text="Har bir container uchun to'lov:"
-                           Grid.Row="4"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="0 2" />
-                <TextBox x:Name="txTransferFeePerContainer"
-                         Grid.Row="4"
-                         Grid.Column="1"
-                         Text="{Binding Intake.TransferFeePerContainer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                <!-- Delivery price -->
-                <TextBlock Text="Yetkazib berish xarajatlari:"
-                           Grid.Row="5"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="0 2" />
-                <TextBox x:Name="txDeliveryPrice"
-                         Grid.Row="5"
-                         Grid.Column="1"
-                         Text="{Binding Intake.DeliveryPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                <!-- Izoh -->
-                <TextBlock Text="Izoh:"
-                           Grid.Row="6"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="0 2" />
-                <TextBox x:Name="txNote"
-                         Grid.Row="6"
-                         Grid.Column="1"
-                         Text="{Binding Intake.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Izoh:"/>
+                    <TextBox x:Name="txNote"
+                             Text="{Binding Intake.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
             </Grid>
+
+
 
             <!-- HEADER RIGHT -->
             <Grid Grid.Column="2">
@@ -169,11 +146,8 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <!-- Header: Invoice -->
                             <RowDefinition Height="*" />
-                            <!-- Hisob kitoblar -->
                             <RowDefinition Height="Auto" />
-                            <!-- Jami summa -->
                         </Grid.RowDefinitions>
 
                         <Label HorizontalAlignment="Center"
@@ -183,61 +157,55 @@
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
-                                <!-- Mahsulot jonli hisob kitoblari -->
                                 <ColumnDefinition Width="5" />
-                                <!-- Chok -->
                                 <ColumnDefinition />
-                                <!-- Umumiy chiqimlar -->
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
-                                <!-- Transfer fee -->
                                 <RowDefinition />
-                                <!-- Delivery price -->
                                 <RowDefinition />
-                                <!-- Cost price -->
                             </Grid.RowDefinitions>
 
-                            <!-- 1 -->
+                            <!-- Transfer fee -->
                             <StackPanel Orientation="Horizontal"
                                         Grid.Row="0">
                                 <Label Content="Ta'minotchi haqi:" />
-                                <Label Content="3 000" />
+                                <Label Content="{Binding TotalTransferFee, StringFormat=N0}" />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal"
                                         Grid.Row="0"
                                         Grid.Column="2">
-                                <Label Content="Ta'minotchi haqi:" />
-                                <Label Content="3 000" />
+                                <Label Content="Konteyner soni:" />
+                                <Label Content="{Binding ContainerCount}" />
                             </StackPanel>
 
-                            <!-- 2 -->
+                            <!-- Delivery price -->
                             <StackPanel Orientation="Horizontal"
                                         Grid.Row="1">
-                                <Label Content="Ta'minotchi haqi:" />
-                                <Label Content="3 000" />
+                                <Label Content="Yo'l xarajatlari:" />
+                                <Label Content="{Binding DeliveryPrice, StringFormat=N0}" />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal"
                                         Grid.Row="1"
                                         Grid.Column="2">
-                                <Label Content="Yo'l harajatlari:" />
-                                <Label Content="5 000" />
+                                <Label Content="To'lov (1 konteyner):" />
+                                <Label Content="{Binding TransferFeePerContainer, StringFormat=N0}" />
                             </StackPanel>
 
-                            <!-- 3 -->
+                            <!-- Cost price -->
                             <StackPanel Orientation="Horizontal"
                                         Grid.Row="2">
                                 <Label Content="Mahsulot soni:" />
-                                <Label Content="7250" />
+                                <Label Content="{Binding Items.Count}" />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal"
                                         Grid.Row="2"
                                         Grid.Column="2">
                                 <Label Content="Mahsulot tannarxi:" />
-                                <Label Content="5 000" />
+                                <Label Content="{Binding TotalCost, StringFormat=N0}" />
                             </StackPanel>
                         </Grid>
 
@@ -247,19 +215,17 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
-                                    <!-- Nomi -->
                                     <ColumnDefinition />
-                                    <!-- Qiymati -->
                                 </Grid.ColumnDefinitions>
-                                <Label  Content="Ja'mi summa:" />
+                                <Label Content="Ja'mi summa:" />
                                 <Label Grid.Column="1"
-                                       Content="25 000" />
+                                       Content="{Binding TotalCost, StringFormat=N0}" />
                             </Grid>
                         </Border>
                     </Grid>
-
                 </Border>
             </Grid>
+
 
 
         </Grid>
@@ -291,8 +257,13 @@
             <!-- ENTRY ROW -->
             <controls:FloatingComboBox x:Name="fcbName"
                                        Grid.Column="0"
-                                       Label="Nomi"
+                                       ItemsSource="{Binding SemiProducts}"
+                                       DisplayMemberPath="Name"
+                                       SelectedItem="{Binding SelectedSemiProduct, Mode=TwoWay}"
+                                       DropDownOpenedCommand="{Binding LoadSemiProductsCommand}"
+                                       Label="Name"
                                        Text="{Binding CurrentItem.Name, UpdateSourceTrigger=PropertyChanged}"
+                                       IsTabStop="True"
                                        Margin="2 0" />
             <controls:FloatingInput x:Name="fibCode"
                                     Grid.Column="1"

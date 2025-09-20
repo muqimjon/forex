@@ -5,5 +5,5 @@ public enum Role
     User,
     Taminotchi,
     Mijoz,
-    Hodim
+    Hodim,
 }

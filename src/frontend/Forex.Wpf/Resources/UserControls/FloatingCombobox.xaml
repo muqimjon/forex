@@ -13,18 +13,22 @@
         <TextBlock Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
                    Style="{StaticResource FloatingLabelStyle}"
                    IsHitTestVisible="False"
+                   Tag="{Binding ElementName=comboBox}"
                    Panel.ZIndex="1" />
 
         <!-- Inner ComboBox bound to the UserControl dependency properties -->
         <ComboBox x:Name="comboBox"
-                  Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                  SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-                  DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                  IsEditable="True"
-                  Padding="4"
-                  Height="30"
-                  BorderThickness="1"
-                  BorderBrush="Gray" />
+              Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+              ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+              DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              SelectedValuePath="{Binding SelectedValuePath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              SelectedValue="{Binding SelectedValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+              IsEditable="True"
+              Padding="4"
+              Height="30"
+              BorderThickness="1"
+              BorderBrush="Gray"
+              DropDownOpened="ComboBox_DropDownOpened" />
     </Grid>
 </UserControl>

@@ -6,21 +6,21 @@ using Refit;
 
 public interface IApiUser
 {
-    [Get("/Users")]
+    [Get("/users")]
     Task<Response<List<UserResponse>>> GetAll();
 
-    [Post("/Users/filter")]
+    [Post("/users/filter")]
     Task<Response<List<UserResponse>>> Filter(FilteringRequest request);
 
-    [Get("/Users/{id}")]
+    [Get("/users/{id}")]
     Task<Response<UserResponse>> GetById(long id);
 
-    [Post("/Users")]
+    [Post("/users")]
     Task<Response<long>> Create([Body] UserRequest request);
 
-    [Put("/Users")]
+    [Put("/users")]
     Task<Response<bool>> Update([Body] UserRequest request);
 
-    [Delete("/Users/{id}")]
+    [Delete("/users/{id}")]
     Task<Response<bool>> Delete(long id);
 }

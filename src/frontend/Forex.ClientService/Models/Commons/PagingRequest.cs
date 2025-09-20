@@ -1,4 +1,5 @@
 ﻿namespace Forex.ClientService.Models.Commons;
+
 using System.ComponentModel.DataAnnotations;
 
 public record PagingRequest : SortingRequest
@@ -9,5 +10,5 @@ public record PagingRequest : SortingRequest
 
     [Required]
     /// <summary>Har sahifada nechta element</summary>
-    public int PageSize { get; set; } = 100;
+    public int PageSize { get; set; }
 }

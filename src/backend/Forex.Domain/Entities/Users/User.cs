@@ -9,7 +9,7 @@ using Forex.Domain.Enums;
 public class User : Auditable
 {
     public string Name { get; set; } = string.Empty;
-    public string NormalizedName { get; set; } = string.Empty;
+    public string? NormalizedName { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string? Email { get; set; }
     public string? NormalizedEmail { get; set; }
