@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="Forex.Wpf.Pages.SemiProducts.UserControls.EditableGridControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Forex.Wpf.Pages.SemiProducts.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="Aqua">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- Header with + button -->
+            <RowDefinition Height="*" />
+            <!-- DataGrid -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0"
+                   Margin="0 0 0 4">
+            <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       FontWeight="Bold"
+                       FontSize="14"
+                       VerticalAlignment="Center"
+                       Margin="4 0" />
+            <Button Content="➕"
+                    Command="{Binding AddCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    HorizontalAlignment="Right"
+                    DockPanel.Dock="Right"
+                    Padding="4"
+                    Margin="4 0" />
+        </DockPanel>
+
+        <!-- Editable DataGrid -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  IsReadOnly="False"
+                  Margin="0"
+                  HeadersVisibility="Column"
+                  RowHeaderWidth="0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nomi"
+                                    Binding="{Binding Name, Mode=TwoWay}" />
+                <DataGridTextColumn Header="Kodi"
+                                    Binding="{Binding Code, Mode=TwoWay}" />
+                <DataGridTextColumn Header="O'lchov"
+                                    Binding="{Binding Measure, Mode=TwoWay}" />
+                <DataGridTextColumn Header="Miqdori"
+                                    Binding="{Binding Quantity, Mode=TwoWay}" />
+                <DataGridTextColumn Header="Narxi"
+                                    Binding="{Binding CostPrice, Mode=TwoWay}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

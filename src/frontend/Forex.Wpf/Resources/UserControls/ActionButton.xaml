@@ -25,7 +25,7 @@
                Placement="Center"
                PlacementTarget="{Binding ElementName=DotsButton}"
                AllowsTransparency="True"
-               StaysOpen="True"
+               StaysOpen="False"
                PopupAnimation="Fade"
                HorizontalOffset="-15">
 
