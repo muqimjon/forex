@@ -4,13 +4,17 @@ using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.SemiProductEntries.DTOs;
+using Forex.Application.Features.Users.DTOs;
 using Forex.Domain.Entities.Manufactories;
 using Forex.Domain.Entities.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
 
 public record CreateSemiProductIntakeCommand(
-    long SenderId,
+    Invoice Invoice,
+    UserDto Supplier,
+    long ViaMiddlemanId,
     long ManufactoryId,
     DateTime EntryDate,
     decimal TransferFeePerContainer,
@@ -26,63 +30,76 @@ public class CreateSemiProductIntakeCommandHandler(
 {
     public async Task<long> Handle(CreateSemiProductIntakeCommand request, CancellationToken ct)
     {
-        var sender = await context.Users
-            .Include(u => u.Account)
-            .FirstOrDefaultAsync(u => u.Id == request.SenderId, ct)
-            ?? throw new NotFoundException(nameof(User), nameof(request.SenderId), request.SenderId);
-
-        var manufactory = await context.Manufactories
-            .FirstOrDefaultAsync(m => m.Id == request.ManufactoryId, ct)
-            ?? throw new NotFoundException(nameof(Manufactory), nameof(request.ManufactoryId), request.ManufactoryId);
-
-        var totalContainerCount = request.Containers.Sum(c => c.Count);
-        var invoiceTransferFeeTotal = request.Items.Sum(i => i.TransferFee);
-
-        if (invoiceTransferFeeTotal == 0 && request.TransferFeePerContainer > 0)
-            invoiceTransferFeeTotal = request.TransferFeePerContainer * totalContainerCount;
-
-        var invoice = new Invoice
+        if (request.Invoice.ViaMiddleman)
         {
-            EntryDate = request.EntryDate,
-            CostPrice = request.Items.Sum(i => i.CostPrice),
-            CostDelivery = request.Items.Sum(i => i.CostDelivery),
-            TransferFee = invoiceTransferFeeTotal
-        };
-
-        await context.BeginTransactionAsync(ct);
-
-        context.Invoices.Add(invoice);
-
-        foreach (var c in request.Containers.Where(c => c.Count > 0))
-        {
-            context.ContainerEntries.Add(new ContainerEntry
+            var user = new User();
+            if (request.Supplier.Id <= 0)
             {
-                SenderId = sender.Id,
-                InvoceId = invoice.Id,
-                Count = c.Count,
-                Price = c.Price
-            });
+                user = mapper.Map<User>(request.Supplier);
+                await context.Users.AddAsync(user);
+                await context.SaveAsync(ct);
+            }
+            else
+            {
+                user = await context.Users
+                    .Include(u => u.Account)
+                    .FirstOrDefaultAsync(u => u.Id == request.Supplier.Id, ct);
+            }
+
+
+            var manufactory = await context.Manufactories
+                .FirstOrDefaultAsync(m => m.Id == request.ManufactoryId, ct)
+                ?? throw new NotFoundException(nameof(Manufactory), nameof(request.ManufactoryId), request.ManufactoryId);
+
+            var totalContainerCount = request.Containers.Sum(c => c.Count);
+            var invoiceTransferFeeTotal = request.Items.Sum(i => i.TransferFee);
+
+            if (invoiceTransferFeeTotal == 0 && request.TransferFeePerContainer > 0)
+                invoiceTransferFeeTotal = request.TransferFeePerContainer * totalContainerCount;
+
+            var invoice = new Invoice
+            {
+                EntryDate = request.EntryDate,
+                CostPrice = request.Items.Sum(i => i.CostPrice),
+                CostDelivery = request.Items.Sum(i => i.CostDelivery),
+                TransferFee = invoiceTransferFeeTotal
+            };
+
+            await context.BeginTransactionAsync(ct);
+
+            context.Invoices.Add(invoice);
+
+            foreach (var c in request.Containers.Where(c => c.Count > 0))
+            {
+                context.ContainerEntries.Add(new ContainerEntry
+                {
+                    SenderId = user.Id,
+                    InvoceId = invoice.Id,
+                    Count = c.Count,
+                    Price = c.Price
+                });
+            }
+
+            if (request.TransferFeePerContainer > 0)
+                user.Account.Balance += request.TransferFeePerContainer * totalContainerCount;
+
+            foreach (var item in request.Items)
+            {
+                var semiProductId = await EnsureSemiProductAsync(item, ct);
+
+                var entry = mapper.Map<SemiProductEntry>(item);
+                entry.SemiProductId = semiProductId;
+                entry.InvoceId = invoice.Id;
+                entry.ManufactoryId = manufactory.Id;
+
+                context.SemiProductEntries.Add(entry);
+
+                await UpsertResidueAsync(semiProductId, manufactory.Id, item.Quantity, ct);
+            }
+
+            await context.CommitTransactionAsync(ct);
+            return invoice.Id;
         }
-
-        if (request.TransferFeePerContainer > 0)
-            sender.Account.Balance += request.TransferFeePerContainer * totalContainerCount;
-
-        foreach (var item in request.Items)
-        {
-            var semiProductId = await EnsureSemiProductAsync(item, ct);
-
-            var entry = mapper.Map<SemiProductEntry>(item);
-            entry.SemiProductId = semiProductId;
-            entry.InvoceId = invoice.Id;
-            entry.ManufactoryId = manufactory.Id;
-
-            context.SemiProductEntries.Add(entry);
-
-            await UpsertResidueAsync(semiProductId, manufactory.Id, item.Quantity, ct);
-        }
-
-        await context.CommitTransactionAsync(ct);
-        return invoice.Id;
     }
 
     private async Task<long> EnsureSemiProductAsync(ItemDto item, CancellationToken ct)

@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Features.Invoices.DTOs;
 
 using Forex.Application.Features.SemiProductEntries.DTOs;
+using Forex.Domain.Entities.Manufactories;
 
 public sealed record InvoiceDto
 {
@@ -10,6 +11,5 @@ public sealed record InvoiceDto
     public decimal CostDelivery { get; set; }
     public decimal TransferFee { get; set; }
 
-    public ICollection<ContainerDto> ContainerEntries { get; set; } = default!;
-    public ICollection<SemiProductEntryDto> SemiProductEntries { get; set; } = default!;
+    public ICollection<SemiProduct> SemiProducts { get; set; } = default!;
 }
