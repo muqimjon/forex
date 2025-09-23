@@ -1,16 +1,54 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <SolidColorBrush x:Key="PrimaryBackground" Color="#E0F2FE"/>
-    <SolidColorBrush x:Key="SecondaryBackground" Color="#0FB27D"/>
-    <SolidColorBrush x:Key="SelectedBackground" Color="Snow"/>
-    <SolidColorBrush x:Key="OtherBackground" Color="#E5ED8B"/>
 
+    <!-- Backgrounds -->
+    <SolidColorBrush x:Key="PrimaryBackground" Color="#E0F2FE"/> <!-- Oq -->
+    <SolidColorBrush x:Key="SecondaryBackground" Color="#F5F5F5"/> <!-- Juda och kulrang -->
+    <SolidColorBrush x:Key="SelectedBackground" Color="#E3F2FD"/> <!-- Pastel ko‘k (tanlangan element) -->
+    <SolidColorBrush x:Key="OtherBackground" Color="#FFFDE7"/> <!-- Pastel sariq -->
+    
+    <!-- Borders -->
+    <SolidColorBrush x:Key="PrimaryBorderColor" Color="#E0E0E0"/> <!-- Och kulrang -->
+    <SolidColorBrush x:Key="SecondaryBorderColor" Color="#BDBDBD"/> <!-- Biroz to‘qroq kulrang -->
+    <SolidColorBrush x:Key="SelectedBorderColor" Color="#2196F3"/> <!-- Ko‘k aksent -->
 
-    <SolidColorBrush x:Key="PrimaryBorderColor" Color="#E0F2FE"/>
-    <SolidColorBrush x:Key="SecondaryBorderColor" Color="#0FB27D"/>
-    <SolidColorBrush x:Key="SelectedBorderColor" Color="Black"/>
+    <!-- Text -->
+    <SolidColorBrush x:Key="PrimaryTextColor" Color="#212121"/> <!-- Asosiy qora matn -->
+    <SolidColorBrush x:Key="SecondaryTextColor" Color="#616161"/> <!-- Ikkilamchi kulrang matn -->
+    <SolidColorBrush x:Key="DisabledTextColor" Color="#9E9E9E"/> <!-- O‘chirilgan matn -->
+    <SolidColorBrush x:Key="MainMenuTextColor" Color="White" /> <!-- Oppoq -->
 
+    <!-- Accent Colors -->
+    <SolidColorBrush x:Key="AccentColor" Color="#2196F3"/> <!-- Ko‘k (asosiy aksent) -->
+    <SolidColorBrush x:Key="AccentLightColor" Color="#BBDEFB"/> <!-- Ko‘kning ochroq varianti -->
+    <SolidColorBrush x:Key="AccentDarkColor" Color="#1976D2"/> <!-- Ko‘kning to‘qroq varianti -->
 
-    <SolidColorBrush x:Key="PrimaryTextColor" Color="White" />
-    <SolidColorBrush x:Key="SecondaryTextColor" Color="Black" />    
+    <!-- Status Colors -->
+    <SolidColorBrush x:Key="SuccessColor" Color="#2DAA39"/> <!-- Yashil -->
+    <SolidColorBrush x:Key="WarningColor" Color="#FFC107"/> <!-- Sariq -->
+    <SolidColorBrush x:Key="ErrorColor" Color="#F44336"/>   <!-- Qizil -->
+    
+    <!-- Button Colors -->
+    <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#2196F3"/>
+    <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White"/>
+
+    <SolidColorBrush x:Key="SecondaryButtonBackground" Color="#EEEEEE"/>
+    <SolidColorBrush x:Key="SecondaryButtonForeground" Color="#212121"/>
+
+    <SolidColorBrush x:Key="DangerButtonBackground" Color="#F44336"/>
+    <SolidColorBrush x:Key="DangerButtonForeground" Color="White"/>
+
+    <SolidColorBrush x:Key="DisabledButtonBackground" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="DisabledButtonForeground" Color="#9E9E9E"/>
+    
+    <!-- Back Button -->
+    <SolidColorBrush x:Key="BackButtonBackground" Color="#EEEEEE"/>
+    <SolidColorBrush x:Key="BackButtonForeground" Color="#212121"/>
+    <SolidColorBrush x:Key="BackButtonBorder" Color="#BDBDBD"/>
+    
+    <!-- Success Button -->
+    <SolidColorBrush x:Key="SuccessButtonBackground" Color="#28a745"/>
+    <SolidColorBrush x:Key="SuccessButtonForeground" Color="White"/>
+    <SolidColorBrush x:Key="SuccessButtonBorder" Color="#28a745"/>
+
 </ResourceDictionary>

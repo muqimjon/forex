@@ -19,10 +19,8 @@ public class GetAllInvoicesQueryHandler(
     => mapper.Map<List<InvoiceDto>>(await context.Invoices
         .Include(i => i.ContainerEntries)
             .ThenInclude(ce => ce.Sender)
-        .Include(i => i.SemiProductEntries)
-            .ThenInclude(spe => spe.SemiProduct)
-        .Include(i => i.SemiProductEntries)
-            .ThenInclude(spe => spe.Manufactory)
+        .Include(i => i.SemiProducts)
+        .Include(i => i.SemiProducts)
         .AsQueryable()
         .ToListAsync(cancellationToken));
 }

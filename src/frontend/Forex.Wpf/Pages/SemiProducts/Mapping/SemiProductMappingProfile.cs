@@ -9,7 +9,7 @@ public class SemiProductMappingProfile : Profile
 {
     public SemiProductMappingProfile()
     {
-        CreateMap<SemiProductItemViewModel, SemiProductItemRequest>();
-        CreateMap<ContainerViewModel, ContainerRequest>();
+        CreateMap<SemiProductViewModel, SemiProductRequest>();
+        CreateMap<ContainerEntryViewModel, ContainerRequest>();
     }
 }

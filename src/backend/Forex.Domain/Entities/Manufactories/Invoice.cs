@@ -10,5 +10,5 @@ public class Invoice : Auditable
     public decimal TransferFee { get; set; }
 
     public ICollection<ContainerEntry> ContainerEntries { get; set; } = default!;
-    public ICollection<SemiProductEntry> SemiProductEntries { get; set; } = default!;
+    public ICollection<SemiProduct> SemiProducts { get; set; } = default!;
 }

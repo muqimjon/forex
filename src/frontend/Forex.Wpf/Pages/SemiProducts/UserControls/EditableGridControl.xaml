@@ -4,54 +4,90 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Forex.Wpf.Pages.SemiProducts.UserControls"
+             xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="Aqua">
+    <Grid Background="AliceBlue">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <!-- Header with + button -->
+            <!-- Header -->
+            <RowDefinition Height="4" />
+            <!---->
             <RowDefinition Height="*" />
             <!-- DataGrid -->
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <DockPanel Grid.Row="0"
-                   Margin="0 0 0 4">
-            <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       FontWeight="Bold"
-                       FontSize="14"
-                       VerticalAlignment="Center"
-                       Margin="4 0" />
-            <Button Content="➕"
-                    Command="{Binding AddCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    HorizontalAlignment="Right"
-                    DockPanel.Dock="Right"
-                    Padding="4"
-                    Margin="4 0" />
-        </DockPanel>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Editable DataGrid -->
-        <DataGrid Grid.Row="1"
+            <TextBlock Grid.Column="0"
+                       Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       FontWeight="Bold"
+                       FontSize="14" />
+
+            <Button Grid.Column="1"
+                    Content="➕"
+                    Command="{Binding AddCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Padding="4"
+                    Width="30" />
+        </Grid>
+
+
+        <!-- DataGrid -->
+        <DataGrid Grid.Row="2"
                   ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
                   AutoGenerateColumns="False"
+                  HeadersVisibility="Column"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
-                  IsReadOnly="False"
-                  Margin="0"
-                  HeadersVisibility="Column"
-                  RowHeaderWidth="0">
+                  RowHeaderWidth="0"
+                  SelectionMode="Single">
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Nomi"
-                                    Binding="{Binding Name, Mode=TwoWay}" />
+                <!-- Nomi -->
+                <DataGridTemplateColumn Header="Nomi">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <!-- Har doim ko‘rinadigan label -->
+                                <TextBlock Text="{Binding Name}"
+                                           VerticalAlignment="Center" />
+
+                                <!-- Edit mode: faqat IsEditing true bo‘lsa -->
+                                <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
+                                         VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+
+                <!-- Kodi -->
                 <DataGridTextColumn Header="Kodi"
                                     Binding="{Binding Code, Mode=TwoWay}" />
-                <DataGridTextColumn Header="O'lchov"
+                <DataGridTextColumn Header="O‘lchov"
                                     Binding="{Binding Measure, Mode=TwoWay}" />
-                <DataGridTextColumn Header="Miqdori"
+                <DataGridTextColumn Header="Miqdor"
                                     Binding="{Binding Quantity, Mode=TwoWay}" />
                 <DataGridTextColumn Header="Narxi"
                                     Binding="{Binding CostPrice, Mode=TwoWay}" />
+
+                <!-- Amal -->
+                <DataGridTemplateColumn Header="Amal">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <controls:ActionButton EditCommand="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   DeleteCommand="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
+
         </DataGrid>
     </Grid>
 </UserControl>

@@ -1,241 +1,152 @@
 ﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
 
-using AutoMapper;
-using Forex.ClientService;
-using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.Commons;
-using Forex.ClientService.Models.Invoices;
-using Forex.ClientService.Models.Manufactories;
-using Forex.ClientService.Models.SemiProducts;
-using Forex.ClientService.Models.Users;
-using Forex.ClientService.Services;
-using Forex.Wpf.Common.Commands;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Forex.Wpf.Pages.Common;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 
-public class SemiProductPageViewModel : ViewModelBase
+public partial class SemiProductPageViewModel : ViewModelBase
 {
-    private readonly ForexClient client = App.Client;
-    private readonly IMapper mapper = App.Mapper;
-    private SemiProductItemViewModel? selectedItem;
+    [ObservableProperty] private InvoiceViewModel invoice = new();
+    [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
+    [ObservableProperty] private ObservableCollection<SemiProductViewModel> semiProducts = [];
 
-    public SemiProductPageViewModel()
+    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = [];
+    [ObservableProperty] private UserViewModel? selectedSupplier;
+
+    [ObservableProperty] private ObservableCollection<string> productNames = [];
+    [ObservableProperty] private ObservableCollection<int> productCodes = [];
+    [ObservableProperty] private ObservableCollection<string> semiProductNames = [];
+
+    [ObservableProperty] private ProductViewModel? selectedProduct;
+
+
+    #region Seeding...
+
+    public void Seeding()
     {
-        Intake = new SemiProductIntakeViewModel();
-        CurrentItem = new SemiProductItemViewModel();
+        // 🧑 Fake suppliers
+        Suppliers = [
+            new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent" },
+        new() { Id = 2, Name = "Supplier B", Phone = "998907654321", Address = "Samarqand" }
+    ];
 
-        SaveCommand = new RelayCommand(SaveItem);
-        DeleteCommand = new RelayCommand<SemiProductItemViewModel?>(RemoveItem);
-        EditCommand = new RelayCommand<SemiProductItemViewModel?>(EditItem);
-        SubmitCommand = new RelayCommand(async () => await SubmitAsync());
+        // 📦 Fake product names & codes
+        ProductNames = ["Un", "Shakar", "Yog‘", "Guruch", "Tuz"];
+        ProductCodes = [1001, 1002, 1003, 1004, 1005];
+
+        // ⚙️ Fake semi product names
+        SemiProductNames = ["Xamir", "Sous", "Pishloq", "Go‘sht bo‘lagi", "Qaymoq"];
+
+        // 🛠️ Seed Products (5 ta)
+        Products =
+        [
+            new() { Name = "Un", Code = 1001, Quantity = 10, CostPrice = 5000 },
+        new() { Name = "Shakar", Code = 1002, Quantity = 15, CostPrice = 6000 },
+        new() { Name = "Yog‘", Code = 1003, Quantity = 5, CostPrice = 12000 },
+        new() { Name = "Guruch", Code = 1004, Quantity = 20, CostPrice = 8000 },
+        new() { Name = "Tuz", Code = 1005, Quantity = 7, CostPrice = 2000 },
+    ];
+
+        // 🛠️ Seed SemiProducts (5 ta)
+        SemiProducts =
+        [
+            new() { Name = "Xamir", Quantity = 3, CostPrice = 2000 },
+        new() { Name = "Sous", Quantity = 5, CostPrice = 1500 },
+        new() { Name = "Pishloq", Quantity = 2, CostPrice = 5000 },
+        new() { Name = "Go‘sht bo‘lagi", Quantity = 4, CostPrice = 7000 },
+        new() { Name = "Qaymoq", Quantity = 6, CostPrice = 3000 },
+    ];
     }
 
-    public SemiProductIntakeViewModel Intake { get; }
-
-    private SemiProductItemViewModel? currentItem;
-    public SemiProductItemViewModel CurrentItem
+    public ObservableCollection<ProductViewModel> SeedingProducts()
     {
-        get => currentItem!;
-        set => SetProperty(ref currentItem, value);
+        return new ObservableCollection<ProductViewModel>
+    {
+        new() { Name="Un", Code=1001, Quantity=10, CostPrice=5000 },
+        new() { Name="Shakar", Code=1002, Quantity=15, CostPrice=6000 },
+        new() { Name="Yog‘", Code=1003, Quantity=5, CostPrice=12000 },
+        new() { Name="Guruch", Code=1004, Quantity=20, CostPrice=8000 },
+        new() { Name="Tuz", Code=1005, Quantity=7, CostPrice=2000 }
+    };
     }
 
-    public ICommand SaveCommand { get; }
-    public ICommand DeleteCommand { get; }
-    public ICommand EditCommand { get; }
-    public ICommand SubmitCommand { get; }
-    public ObservableCollection<ManufactoryResponse> Manufactories { get; } = [];
 
-    public async Task LoadManufactoriesAsync()
+    #endregion
+
+    #region Commands
+
+    // ➕ Product qo‘shish
+    [RelayCommand]
+    private void AddProduct()
     {
-        var response = await client.Manufactory
-            .GetAll()
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess && response.Data is not null)
+        Products.Add(new ProductViewModel
         {
-            Manufactories.Clear();
-            foreach (var m in response.Data)
-                Manufactories.Add(m);
-        }
-        else
-            ErrorMessage = response.Message ?? "Manufakturalar yuklanmadi";
+            Name = ProductNames.First(),
+            Code = ProductCodes.First(),
+            Quantity = 1,
+            CostPrice = 10000
+        });
     }
 
-    private void SaveItem()
+    // ➕ Yarim tayyor mahsulot qo‘shish
+    [RelayCommand]
+    private void AddSemiProduct()
     {
-        if (string.IsNullOrWhiteSpace(CurrentItem.Name) || CurrentItem.Quantity <= 0)
+        var targetList = SelectedProduct?.SemiProducts ?? SemiProducts;
+
+        targetList.Add(new SemiProductViewModel
+        {
+            Name = SemiProductNames.First(),
+            Quantity = 1,
+            CostPrice = 2000
+        });
+    }
+
+    // ✏️ Mahsulotni tahrirlash
+    [RelayCommand]
+    private void EditProduct(ProductViewModel? product)
+    {
+        if (product is null) return;
+        InfoMessage = $"{product.Name} tahrirlanmoqda...";
+    }
+
+    // ✅ Saqlash / Yuborish
+    [RelayCommand]
+    private void Submit()
+    {
+        if (Products.Count == 0)
+        {
+            ErrorMessage = "Hech qanday mahsulot kiritilmadi.";
             return;
-
-        if (IsEditing && selectedItem is not null)
-        {
-            selectedItem.Name = CurrentItem.Name;
-            selectedItem.Code = CurrentItem.Code;
-            selectedItem.Measure = CurrentItem.Measure;
-            selectedItem.Quantity = CurrentItem.Quantity;
-            selectedItem.CostPrice = CurrentItem.CostPrice;
-            selectedItem.CostDelivery = CurrentItem.CostDelivery;
-            selectedItem.TransferFee = CurrentItem.TransferFee;
-            selectedItem.PhotoPath = CurrentItem.PhotoPath;
-        }
-        else
-        {
-            Intake.Items.Add(new SemiProductItemViewModel
-            {
-                Name = CurrentItem.Name,
-                Code = CurrentItem.Code,
-                Measure = CurrentItem.Measure,
-                Quantity = CurrentItem.Quantity,
-                CostPrice = CurrentItem.CostPrice,
-                CostDelivery = CurrentItem.CostDelivery,
-                TransferFee = CurrentItem.TransferFee,
-                PhotoPath = CurrentItem.PhotoPath
-            });
         }
 
-        CurrentItem = new SemiProductItemViewModel();
-        IsEditing = false;
-        selectedItem = null;
+        SuccessMessage = "Kirim muvaffaqiyatli yuborildi!";
+        // TODO: Backend API chaqirish
     }
 
-    private void RemoveItem(SemiProductItemViewModel? item)
+    [RelayCommand]
+    private void EditSemiProduct(SemiProductViewModel item)
     {
-        if (item is null) return;
-        Intake.Items.Remove(item);
+        // Boshqa qatordagi edit-mode’ni o‘chir
+        foreach (var row in SemiProducts)
+            row.IsEditing = false;
+
+        // Shu qatorni tahrirga och
+        if (item != null)
+            item.IsEditing = true;
     }
 
-    private void EditItem(SemiProductItemViewModel? item)
+    [RelayCommand]
+    private void RemoveSemiProduct(SemiProductViewModel item)
     {
-        if (item is null) return;
-
-        selectedItem = item;
-        IsEditing = true;
-
-        CurrentItem = new SemiProductItemViewModel
-        {
-            Name = item.Name,
-            Code = item.Code,
-            Measure = item.Measure,
-            Quantity = item.Quantity,
-            CostPrice = item.CostPrice,
-            CostDelivery = item.CostDelivery,
-            TransferFee = item.TransferFee,
-            PhotoPath = item.PhotoPath
-        };
-    }
-
-    private async Task SubmitAsync()
-    {
-        var command = mapper.Map<InvoiceRequest>(Intake);
-        using var form = MultipartBuilder.BuildIntake(command);
-
-        var response = await client.SemiProduct
-            .CreateIntake(form)
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.StatusCode == 200)
-        {
-            Intake.Items.Clear();
-            Intake.Containers.Clear();
-            SuccessMessage = "Muvaffaqiyatli yuborildi";
-        }
-        else
-        {
-            ErrorMessage = response.Message;
-        }
-    }
-
-    #region Suppliers
-
-    public ObservableCollection<UserResponse> Suppliers { get; } = [];
-    private UserResponse? selectedSupplier;
-    public UserResponse? SelectedSupplier
-    {
-        get => selectedSupplier;
-        set
-        {
-            if (SetProperty(ref selectedSupplier, value) && value is not null)
-            {
-                Intake.SenderId = value.Id;
-                selectedSupplier!.Id = value.Id;
-                selectedSupplier.Phone = value.Phone;
-                selectedSupplier.Email = value.Email;
-                selectedSupplier.Address = value.Address;
-            }
-        }
-    }
-
-    public async Task LoadSuppliersAsync()
-    {
-        var request = new FilteringRequest
-        {
-            Filters = new Dictionary<string, List<string>>
-            {
-                ["Role"] = ["taminotchi"]
-            }
-        };
-
-        var response = await client.Users
-            .Filter(request)
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess && response.Data is not null)
-        {
-            Suppliers.Clear();
-            foreach (var user in response.Data)
-                Suppliers.Add(user);
-        }
-        else
-        {
-            ErrorMessage = response.Message ?? "Ta’minotchilar yuklanmadi";
-        }
+        SemiProducts.Remove(item);
     }
 
     #endregion
 
-    #region Semi product
 
-    public ObservableCollection<SemiProductResponse> SemiProducts { get; } = [];
-
-    private SemiProductResponse? selectedSemiProduct;
-    public SemiProductResponse? SelectedSemiProduct
-    {
-        get => selectedSemiProduct;
-        set
-        {
-            if (SetProperty(ref selectedSemiProduct, value) && value is not null)
-            {
-                CurrentItem.Name = value.Name;
-                CurrentItem.Code = value.Code;
-                CurrentItem.Measure = value.Measure;
-            }
-        }
-    }
-
-    public ICommand LoadSemiProductsCommand => new RelayCommand(async () => await EnsureSemiProductsAsync());
-
-    private async Task EnsureSemiProductsAsync()
-    {
-        var response = await client.SemiProduct
-            .GetAll()
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess && response.Data is not null)
-        {
-            SemiProducts.Clear();
-            foreach (var m in response.Data)
-                SemiProducts.Add(m);
-        }
-        else
-            ErrorMessage = response.Message ?? "Manufakturalar yuklanmadi";
-    }
-
-    #endregion
-
-    private bool isEditing;
-    public bool IsEditing
-    {
-        get => isEditing;
-        set => SetProperty(ref isEditing, value);
-    }
+    // 🔄 SemiProductlarni tanlash
+    public ObservableCollection<SemiProductViewModel> CurrentSemiProducts =>
+        SelectedProduct?.SemiProducts ?? SemiProducts;
 }

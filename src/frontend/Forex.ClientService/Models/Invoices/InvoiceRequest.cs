@@ -11,5 +11,5 @@ public sealed record InvoiceRequest
     public decimal TransferFeePerContainer { get; set; }
 
     public List<ContainerRequest> Containers { get; set; } = [];
-    public List<SemiProductItemRequest> Items { get; set; } = [];
+    public List<SemiProductRequest> Items { get; set; } = [];
 }

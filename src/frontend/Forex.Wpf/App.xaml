@@ -7,30 +7,29 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- begin::Custom Theme -->
-                <ResourceDictionary Source="/Resources/Themes/LightTheme.xaml"/>
+                <ResourceDictionary Source="/Resources/Themes/LightTheme.xaml" />
                 <!-- end::Custom Theme -->
 
                 <!-- begin::Material Design -->
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Blue.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Lime.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.Lime.xaml" />
                 <!-- end::Material Design -->
 
                 <!-- begin::Custom styles -->
-                <ResourceDictionary Source="/Resources/Styles/FloatingLable.xaml"/>
-                <ResourceDictionary Source="/Resources/Styles/ContextMenuButtonStyle.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/FloatingLable.xaml" />
+                <ResourceDictionary Source="/Resources/Styles/ContextMenuButtonStyle.xaml" />
                 <!-- end::Custom styles -->
-                
+
                 <!-- begin::Converters -->
                 <ResourceDictionary Source="Resources/Converters.xaml" />
                 <!-- end::Converters -->
-            </ResourceDictionary.MergedDictionaries>
 
-            <!-- Global font style -->
-            <Style TargetType="Control">
-                <Setter Property="FontSize" Value="{DynamicResource GlobalFontSize}"/>
-            </Style>
+                <!-- Sizning resurs faylingiz -->
+                <ResourceDictionary Source="/Resources/Styles/ScrollBarStyles.xaml" />
+                <!-- boshqa ranglar yoki style fayllarini ham shu yerga qo‘shishingiz mumkin -->
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

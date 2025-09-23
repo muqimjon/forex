@@ -6,7 +6,6 @@ using Forex.Wpf.Pages.SemiProducts.ViewModels;
 using Forex.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 
 /// <summary>
 /// Interaction logic for SemiProductPage.xaml
@@ -18,37 +17,20 @@ public partial class SemiProductPage : Page
     public SemiProductPage()
     {
         InitializeComponent();
-        DataContext = new SemiProductPageViewModel();
+
+        var vm = new SemiProductPageViewModel();
+        vm.Seeding();
+        DataContext = vm;
 
         FocusNavigator.AttachEnterNavigation([
-            cbSender,
-            cbManufactory,
-            txContainerCount,
-            txTransferFeePerContainer,
-            txDeliveryPrice,
-            txNote,
-            fcbName.comboBox,
-            fibCode.inputBox,
-            fcbMeasure.comboBox,
-            fibQuantity.inputBox,
-            fibCost.inputBox,
-            fibDelivery.inputBox,
-            fibTransfer.inputBox,
-            ffiPhoto.btnBrowse,
-            btnAdd,
         ]);
     }
 
-    private async void Page_Loaded(object sender, RoutedEventArgs e)
+    private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         if (Application.Current.MainWindow is Window mainWindow)
             WindowResizer.AnimateToSize(mainWindow, 810, 580);
 
-        if (DataContext is SemiProductPageViewModel vm)
-        {
-            await vm.LoadManufactoriesAsync();
-            await vm.LoadSuppliersAsync();
-        }
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -57,21 +39,5 @@ public partial class SemiProductPage : Page
             NavigationService.GoBack();
         else
             Main.NavigateTo(new HomePage());
-    }
-
-    private void FcbName_GotFocus(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is SemiProductPageViewModel vm)
-        {
-            vm.ErrorMessage = "yechimi topildi mana yechimi";
-        }
-    }
-
-    private async void CbSender_DropDownOpened(object sender, EventArgs e)
-    {
-        if (DataContext is SemiProductPageViewModel vm)
-        {
-            await vm.LoadSuppliersAsync();
-        }
     }
 }
