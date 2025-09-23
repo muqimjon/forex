@@ -7,7 +7,7 @@ public class CreateSemiProductIntakeCommandValidator : AbstractValidator<CreateS
 {
     public CreateSemiProductIntakeCommandValidator()
     {
-        RuleFor(x => x.SenderId).GreaterThan(0);
+        RuleFor(x => x.Supplier.Id).GreaterThan(0);
         RuleFor(x => x.ManufactoryId).GreaterThan(0);
         RuleFor(x => x.EntryDate).LessThanOrEqualTo(DateTime.UtcNow);
         RuleFor(x => x.Containers).NotEmpty().WithMessage("At least one container is required.");

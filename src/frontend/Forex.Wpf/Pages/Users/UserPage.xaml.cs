@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -30,6 +31,7 @@ public partial class UserPage : Page
         txtSearch.TextChanged += TxtSearch_TextChanged;
         btnSave.Click += BtnSave_Click;
         btnBack.Click += BtnBack_Click;
+        txtPhone.GotFocus += txtPhone_GotFocus;
 
         LoadUsers();
         UpdateRoleList();
@@ -141,7 +143,6 @@ public partial class UserPage : Page
             var response = await client.Users.Create(request);
             if (response.Data > 0)
             {
-                MessageBox.Show("Foydalanuvchi muvaffaqiyatli qo‘shildi.");
                 ClearForm();
                 LoadUsers();
             }
@@ -198,4 +199,62 @@ public partial class UserPage : Page
         tb.SelectionStart = tb.Text!.Length;
     }
 
+    private void txtPhone_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        FormatPhoneNumber(sender as TextBox);
+    }
+    private void txtPhone_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox tb)
+        {
+            if (string.IsNullOrWhiteSpace(tb.Text) || !tb.Text.Replace("+", "").StartsWith("998"))
+            {
+                tb.Text = "+998 ";
+            }
+
+            // Fokus paytida matn tanlanib qolmasligi uchun:
+            tb.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                tb.SelectionStart = tb.Text.Length;   // kursorni oxiriga qo‘yish
+                tb.SelectionLength = 0;               // tanlovni olib tashlash
+            }), System.Windows.Threading.DispatcherPriority.Input);
+        }
+    }
+
+    private void FormatPhoneNumber(TextBox textBox)
+    {
+        if (textBox == null) return;
+        string text = textBox.Text?.Trim() ?? string.Empty;
+        string digits = Regex.Replace(text, @"[^\d]", "");
+        textBox.TextChanged -= txtPhone_TextChanged;
+        try
+        {
+           
+            string formatted = "+998 ";
+            if (digits.Length > 3)
+            {
+                formatted += digits.Substring(3, Math.Min(2, digits.Length - 3));
+            }
+            if (digits.Length > 5)
+            {
+                formatted += " " + digits.Substring(5, Math.Min(3, digits.Length - 5));
+            }
+            if (digits.Length > 8)
+            {
+                formatted += " " + digits.Substring(8, Math.Min(2, digits.Length - 8));
+            }
+            if (digits.Length > 10)
+            {
+                formatted += " " + digits.Substring(10, Math.Min(2, digits.Length - 10));
+            }
+            textBox.Text = formatted.TrimEnd();
+            textBox.SelectionStart = textBox.Text.Length;
+        }
+        finally
+        {
+            textBox.TextChanged += txtPhone_TextChanged;
+        }
+    }
+
 }
+
