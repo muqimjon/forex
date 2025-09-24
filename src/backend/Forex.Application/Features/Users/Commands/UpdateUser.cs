@@ -3,7 +3,9 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
+using Forex.Application.Features.Users.DTOs;
 using Forex.Domain.Entities;
+using Forex.Domain.Entities.Payments;
 using Forex.Domain.Entities.Users;
 using Forex.Domain.Enums;
 using MediatR;
@@ -19,8 +21,7 @@ public record UpdateUserCommand(
     Role Role,
     string Address,
     string Description,
-    decimal Balance,
-    long CurrencyId)
+    List<CurrencyBalanceDto> CurrencyBalances)
     : IRequest<bool>;
 
 
@@ -38,24 +39,35 @@ public class UpdateUserCommandHandler(
 
         mapper.Map(request, user);
 
-        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == request.CurrencyId);
+        var currencies = await context.Currencies.ToListAsync(cancellationToken);
+        var currencyIds = currencies.Select(c => c.Id).ToHashSet();
 
-        if (account is null)
+        foreach (var dto in request.CurrencyBalances)
         {
-            account = new UserAccount
+            if (!currencyIds.Contains(dto.CurrencyId))
+                throw new NotFoundException(nameof(Currency), nameof(dto.CurrencyId), dto.CurrencyId);
+
+            var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == dto.CurrencyId);
+
+            if (account is null)
             {
-                User = user,
-                CurrencyId = request.CurrencyId,
-                OpeningBalance = request.Balance,
-                Balance = request.Balance
-            };
+                account = new UserAccount
+                {
+                    User = user,
+                    CurrencyId = dto.CurrencyId,
+                    OpeningBalance = dto.Balance,
+                    Balance = dto.Balance,
+                    Discount = dto.Discount
+                };
 
-            context.UserAccounts.Add(account);
-        }
-        else
-        {
-            account.OpeningBalance = request.Balance;
-            account.Balance = request.Balance;
+                context.UserAccounts.Add(account);
+            }
+            else
+            {
+                account.OpeningBalance = dto.Balance;
+                account.Balance = dto.Balance;
+                account.Discount = dto.Discount;
+            }
         }
 
         return await context.SaveAsync(cancellationToken);

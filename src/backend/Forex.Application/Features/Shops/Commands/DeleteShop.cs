@@ -10,17 +10,34 @@ using System.Threading.Tasks;
 
 public record DeleteShopCommand(long Id) : IRequest<bool>;
 
-public class DeleteShopCommandHandler(
-    IAppDbContext context)
+public class DeleteShopCommandHandler(IAppDbContext context)
     : IRequestHandler<DeleteShopCommand, bool>
 {
     public async Task<bool> Handle(DeleteShopCommand request, CancellationToken cancellationToken)
     {
-        var product = await context.Shops
-            .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken)
+        var shop = await context.Shops
+            .Include(s => s.ShopCashes)
+                .ThenInclude(a => a.Currency)
+            .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(Shop), nameof(request.Id), request.Id);
 
-        product.IsDeleted = true;
+        var nonZeroAccounts = shop.ShopCashes
+            .Where(a => Math.Round(a.Balance, 2) != 0m || Math.Round(a.Discount, 2) != 0m)
+            .ToList();
+
+        if (nonZeroAccounts.Count != 0)
+        {
+            var details = nonZeroAccounts
+                .Select(a => $"{a.Currency.Name}: Balance = {a.Balance}, Discount = {a.Discount}")
+                .ToList();
+
+            throw new ForbiddenException($"Kassada mablag' mavjud:\n{string.Join("\n", details)}");
+        }
+
+        shop.IsDeleted = true;
+        foreach (var account in shop.ShopCashes)
+            account.IsDeleted = true;
+
         return await context.SaveAsync(cancellationToken);
     }
 }
