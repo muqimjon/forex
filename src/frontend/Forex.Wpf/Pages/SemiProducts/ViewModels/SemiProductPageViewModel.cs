@@ -8,64 +8,97 @@ using System.Collections.ObjectModel;
 public partial class SemiProductPageViewModel : ViewModelBase
 {
     [ObservableProperty] private InvoiceViewModel invoice = new();
-    [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
-    [ObservableProperty] private ObservableCollection<SemiProductViewModel> semiProducts = [];
 
     [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = [];
     [ObservableProperty] private UserViewModel? selectedSupplier;
 
-    [ObservableProperty] private ObservableCollection<string> productNames = [];
-    [ObservableProperty] private ObservableCollection<int> productCodes = [];
-    [ObservableProperty] private ObservableCollection<string> semiProductNames = [];
+    private ProductViewModel? selectedProduct;
+    [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
+    [ObservableProperty] private ObservableCollection<ProductViewModel> productTrpes = [];
+    [ObservableProperty] private ObservableCollection<SemiProductViewModel> semiProducts = [];
 
-    [ObservableProperty] private ProductViewModel? selectedProduct;
+    [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> items = [];
+    [ObservableProperty] private ObservableCollection<SemiProductViewModel> filteredSemiProducts = [];
 
+    public ProductViewModel SelectedProduct
+    {
+        get => selectedProduct;
+        set
+        {
+            if (selectedProduct != value)
+            {
+                selectedProduct = value;
+                OnPropertyChanged();
+                UpdateSemiProductsForSelectedProduct();
+            }
+        }
+    }
+
+    private void UpdateSemiProductsForSelectedProduct()
+    {
+        FilteredSemiProducts.Clear();
+
+        if (SelectedProduct is null)
+        {
+            foreach (var semi in SemiProducts)
+                FilteredSemiProducts.Add(semi);
+            return;
+        }
+
+        var linkedSemiProducts = SelectedProduct.Items
+            .Where(i => i.SemiProduct is not null)
+            .Select(i => i.SemiProduct!)
+            .Distinct();
+
+        foreach (var semi in linkedSemiProducts)
+            FilteredSemiProducts.Add(semi);
+    }
 
     #region Seeding...
 
     public void Seeding()
     {
-        // 🧑 Fake suppliers
-        Suppliers = [
-            new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent" },
-        new() { Id = 2, Name = "Supplier B", Phone = "998907654321", Address = "Samarqand" }
-    ];
+        Suppliers = new ObservableCollection<UserViewModel>
+    {
+        new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent", Email = "a@supplier.uz", Description = "Mahalliy yetkazuvchi" },
+        new() { Id = 2, Name = "Supplier B", Phone = "998907654321", Address = "Samarqand", Email = "b@supplier.uz", Description = "Viloyat yetkazuvchi" }
+    };
 
-        // 📦 Fake product names & codes
-        ProductNames = ["Un", "Shakar", "Yog‘", "Guruch", "Tuz"];
-        ProductCodes = [1001, 1002, 1003, 1004, 1005];
+        Products = new ObservableCollection<ProductViewModel>
+    {
+        new() { Name = "Un", Code = 1001, Quantity = 800, Type = "24 - 29", Measure = new() { Name = "Dona" } },
+        new() { Name = "Shakar", Code = 1002, Quantity = 600, Type = "24 - 29", Measure = new() { Name = "Dona" } },
+        new() { Name = "Yog‘", Code = 1003, Quantity = 200, Type = "24 - 29", Measure = new() { Name = "Dona" } },
+        new() { Name = "Guruch", Code = 1004, Quantity = 150, Type = "30-35", Measure = new() { Name = "Dona" } },
+        new() { Name = "Tuz", Code = 1005, Quantity = 500, Type = "24 - 29", Measure = new() { Name = "Dona" } },
+        new() { Name = "Makaron", Code = 1006, Quantity = 180, Type = "24 - 29", Measure = new() { Name = "Dona" } }
+    };
 
-        // ⚙️ Fake semi product names
-        SemiProductNames = ["Xamir", "Sous", "Pishloq", "Go‘sht bo‘lagi", "Qaymoq"];
+        SemiProducts = new ObservableCollection<SemiProductViewModel>
+    {
+        new() { Name = "Xamir", Quantity = 3, CostPrice = 2000, Measure = new() { Name = "Dona" }, Code = 1003, TotalQuantity = 6542 },
+        new() { Name = "Sous", Quantity = 5, CostPrice = 1500, Measure = new() { Name = "Dona" }, Code = 1004, TotalQuantity = 80020 },
+        new() { Name = "Pishloq", Quantity = 2, CostPrice = 5000, Measure = new() { Name = "Dona" }, Code = 1005, TotalQuantity = 2400 },
+        new() { Name = "Go‘sht bo‘lagi", Quantity = 4, CostPrice = 7000, Measure = new() { Name = "Dona" }, Code = 1006, TotalQuantity = 5648 },
+        new() { Name = "Qaymoq", Quantity = 6, CostPrice = 3000, Measure = new() { Name = "Dona" }, Code = 1006, TotalQuantity = 5648 },
+        new() { Name = "Tuxumli qatlam", Quantity = 8, CostPrice = 3500, Measure = new() { Name = "Dona" }, Code = 1006, TotalQuantity = 5648 }
+    };
 
-        // 🛠️ Seed Products (5 ta)
-        Products =
-        [
-            new() { Name = "Un", Code = 1001, Quantity = 10, CostPrice = 5000 },
-        new() { Name = "Shakar", Code = 1002, Quantity = 15, CostPrice = 6000 },
-        new() { Name = "Yog‘", Code = 1003, Quantity = 5, CostPrice = 12000 },
-        new() { Name = "Guruch", Code = 1004, Quantity = 20, CostPrice = 8000 },
-        new() { Name = "Tuz", Code = 1005, Quantity = 7, CostPrice = 2000 },
-    ];
-
-        // 🛠️ Seed SemiProducts (5 ta)
-        SemiProducts =
-        [
-            new() { Name = "Xamir", Quantity = 3, CostPrice = 2000 },
-        new() { Name = "Sous", Quantity = 5, CostPrice = 1500 },
-        new() { Name = "Pishloq", Quantity = 2, CostPrice = 5000 },
-        new() { Name = "Go‘sht bo‘lagi", Quantity = 4, CostPrice = 7000 },
-        new() { Name = "Qaymoq", Quantity = 6, CostPrice = 3000 },
-    ];
+        Invoice = new InvoiceViewModel
+        {
+            EntryDate = DateTime.Today,
+            Number = "INV-2025-001",
+            CostPrice = 120000,
+            CostDelivery = 15000,
+            TransferFee = 5000,
+            CurrencyId = 1,
+            TotalSum = 140000,
+            ViaMiddleman = true,
+            Supplier = Suppliers[0],
+            Sender = Suppliers[1],
+            Manufactory = new ManufactoryViewModel { Id = 1, Name = "Farg‘ona Non Sexi" }
+        };
     }
-
-    public static ObservableCollection<ProductViewModel> SeedingProducts() => [
-        new() { Name="Un", Code=1001, Quantity=10, CostPrice=5000 },
-        new() { Name="Shakar", Code=1002, Quantity=15, CostPrice=6000 },
-        new() { Name="Yog‘", Code=1003, Quantity=5, CostPrice=12000 },
-        new() { Name="Guruch", Code=1004, Quantity=20, CostPrice=8000 },
-        new() { Name="Tuz", Code=1005, Quantity=7, CostPrice=2000 }
-    ];
 
 
     #endregion
@@ -86,6 +119,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private void EditProduct(ProductViewModel? item)
     {
         foreach (var row in Products)
+            row.IsEditing = false;
+
+        foreach (var row in SemiProducts)
             row.IsEditing = false;
 
         if (item is not null)
@@ -115,9 +151,16 @@ public partial class SemiProductPageViewModel : ViewModelBase
     [RelayCommand]
     private void AddSemiProduct()
     {
-        var targetList = SelectedProduct?.SemiProducts ?? SemiProducts;
+        var newSemi = new SemiProductViewModel();
 
-        targetList.Add(new());
+        if (SelectedProduct is not null)
+        {
+            var pti = new ProductTypeItemViewModel { SemiProduct = newSemi };
+            SelectedProduct.Items.Add(pti);
+        }
+
+        SemiProducts.Add(newSemi);
+        UpdateSemiProductsForSelectedProduct();
     }
 
     // ✏️ Yarim tayyor mahsulotni tahrirlash
@@ -125,6 +168,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private void EditSemiProduct(SemiProductViewModel item)
     {
         foreach (var row in SemiProducts)
+            row.IsEditing = false;
+
+        foreach (var row in Products)
             row.IsEditing = false;
 
         if (item is not null)
@@ -144,7 +190,17 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private void RemoveSemiProduct(SemiProductViewModel item)
     {
         SemiProducts.Remove(item);
+
+        foreach (var product in Products)
+        {
+            var toRemove = product.Items.Where(i => i.SemiProduct == item).ToList();
+            foreach (var i in toRemove)
+                product.Items.Remove(i);
+        }
+
+        UpdateSemiProductsForSelectedProduct();
     }
+
 
     #endregion SemiProduct Commands
 
@@ -163,9 +219,4 @@ public partial class SemiProductPageViewModel : ViewModelBase
     }
 
     #endregion
-
-
-    // 🔄 SemiProductlarni tanlash
-    public ObservableCollection<SemiProductViewModel> CurrentSemiProducts =>
-        SelectedProduct?.SemiProducts ?? SemiProducts;
 }

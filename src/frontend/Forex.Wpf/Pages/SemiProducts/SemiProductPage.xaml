@@ -65,140 +65,194 @@
                                       Direction="250" />
                 </Border.Effect>
                 <StackPanel Orientation="Vertical">
-                    <Label Content="Invoice"
-                           Foreground="{StaticResource PrimaryTextColor}"
-                           FontSize="15"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center" />
+                    <StackPanel DataContext="{Binding Invoice}">
+                        
+                        <Label Content="Invoice"
+                               Foreground="{StaticResource PrimaryTextColor}"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
 
-                    <!-- Kirim sanasi -->
-                    <DockPanel>
-                        <Label Content="Sana:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding Invoice.Date}"
-                                   DockPanel.Dock="Right"
+                        <!-- Kirim sanasi -->
+                        <DockPanel>
+                            <Label Content="Sana:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <TextBlock Text="{Binding EntryDate}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
 
-                    <!-- Cost price -->
-                    <DockPanel>
-                        <Label Content="Tan narxi:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding Invoice.CostPrice}"
-                                   DockPanel.Dock="Right"
+                        <!-- Tan narxi -->
+                        <DockPanel>
+                            <Label Content="Tan narxi:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <TextBlock Text="{Binding CostPrice}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
 
-                    <DockPanel>
-                        <Label Content="Yetkazish xizmati:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding Invoice.CostDelivery}"
-                                   DockPanel.Dock="Right"
+                        <!-- Yetkazish xizmati -->
+                        <DockPanel>
+                            <Label Content="Yetkazish xizmati:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <TextBlock Text="{Binding CostDelivery}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
 
-                    <DockPanel>
-                        <Label Content="Yuboruvchi xizmati:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding Invoice.TransferFee}"
-                                   DockPanel.Dock="Right"
+                        <!-- Yuboruvchi xizmati -->
+                        <DockPanel>
+                            <Label Content="Yuboruvchi xizmati:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <TextBlock Text="{Binding TransferFee}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
 
-                    <Separator />
-
-                    <!-- Kirim qilinayotgan zavod -->
-
-                    <Label Content="Qabul qiluvchi"
-                           HorizontalAlignment="Center"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource PrimaryTextColor}" />
-
-                    <ComboBox Text="{Binding Invoice.Date}"
-                              DockPanel.Dock="Right"
-                              Margin="20 0"
-                              Foreground="{StaticResource PrimaryTextColor}" />
+                        <!-- Qabul qiluvchi -->
+                        <DockPanel>
+                            <Label Content="Qabul qiluvchi:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <ComboBox ItemsSource="{Binding DataContext.Manufactories, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedValue="{Binding ManufactoryId, Mode=TwoWay}"
+                                      SelectedValuePath="Id"
+                                      DisplayMemberPath="Name"
+                                      DockPanel.Dock="Right"
+                                      Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+                        
+                    </StackPanel>
 
                     <Separator Margin="0 10 0 0" />
 
+                    
+                    
                     <!-- Ta'minotchi ma'lumotlari -->
-                    <Label Content="Ta'minotchi ma'lumotlari"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource PrimaryTextColor}" />
+                    <StackPanel DataContext="{Binding Invoice.Supplier}">
 
-                    <DockPanel>
-                        <Label Content="Nomi:"
-                               DockPanel.Dock="Left"
+                        <Label Content="Ta'minotchi"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
                                Foreground="{StaticResource PrimaryTextColor}" />
-                        <ComboBox Text="{Binding Invoice.Date}"
-                                  DockPanel.Dock="Right"
-                                  Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
 
-                    <DockPanel>
-                        <Label Content="Telefon:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding Supplier.Phone}"
-                                   DockPanel.Dock="Right"
+                        <DockPanel>
+                            <Label Content="Nomi:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <ComboBox ItemsSource="{Binding DataContext.Suppliers, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Name, Mode=TwoWay}"
+                                      DisplayMemberPath="Name"
+                                      DockPanel.Dock="Right"
+                                      Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
 
-                    <DockPanel>
-                        <Label Content="Email:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding Supplier.Email}"
-                                   DockPanel.Dock="Right"
+                        <DockPanel>
+                            <Label Content="Telefon:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <TextBlock Text="{Binding Phone}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
 
-                    <DockPanel>
-                        <Label Content="Manzil:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding Supplier.Address}"
-                                   DockPanel.Dock="Right"
+                        <DockPanel>
+                            <Label Content="Email:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <TextBlock Text="{Binding Email}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
 
-                    <DockPanel>
-                        <Label Content="O'rtakash orqalimi:"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <ToggleButton />
-                    </DockPanel>
+                        <DockPanel>
+                            <Label Content="Manzil:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <TextBlock Text="{Binding Address}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Label Content="O'rtakash orqalimi:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <ToggleButton IsChecked="{Binding ViaMiddleman, Mode=TwoWay}" />
+                        </DockPanel>
+                    </StackPanel>
 
                     <Separator />
 
                     <!-- O'rtakash uchun hisob kitob -->
-                    <Label Content="Kontiner hisobi"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource PrimaryTextColor}" />
-
-                    <DockPanel>
-                        <Label Content="Kontinerlar soni:"
-                               DockPanel.Dock="Left"
+                    <StackPanel DataContext="{Binding Invoice.Sender}"
+                                Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Label Content="Yuboruvchi"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
                                Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding ConteinerCount}"
-                                   DockPanel.Dock="Right"
-                                   Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
 
-                    <DockPanel>
-                        <Label Content="To'lov (donasi uchun):"
-                               DockPanel.Dock="Left"
-                               Foreground="{StaticResource PrimaryTextColor}" />
-                        <TextBlock Text="{Binding ConteinerCount}"
-                                   DockPanel.Dock="Right"
+                        <DockPanel>
+                            <Label Content="Nomi:"
+                                   DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                    </DockPanel>
+                            <ComboBox ItemsSource="{Binding DataContext.Senders, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedItem="{Binding Name, Mode=TwoWay}"
+                                      DisplayMemberPath="Name"
+                                      DockPanel.Dock="Right"
+                                      Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Label Content="Telefon:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <TextBlock Text="{Binding Phone}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Label Content="Email:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <TextBlock Text="{Binding Email}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Label Content="Manzil:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <TextBlock Text="{Binding Address}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Label Content="Kontinerlar soni:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <TextBlock Text="{Binding ConteinerCount}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+
+                        <DockPanel>
+                            <Label Content="To'lov (donasi uchun):"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <TextBlock Text="{Binding PricePerUnit}"
+                                       DockPanel.Dock="Right"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                        </DockPanel>
+                    </StackPanel>
+
 
                 </StackPanel>
             </Border>
@@ -245,7 +299,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="40" />
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
@@ -262,25 +316,23 @@
                                     Foreground="{StaticResource PrimaryTextColor}"
                                     Command="{Binding AddProductCommand}"
                                     Padding="4"
-                                    Width="30"
                                     BorderThickness="0" />
 
                         </Grid>
 
                         <!-- Products -->
                         <DataGrid Grid.Row="3"
-                                    RowHeight="36"
-                                    AutoGenerateColumns="False"
-                                    CanUserAddRows="False"
-                                    Foreground="{StaticResource PrimaryTextColor}"
-                                    HeadersVisibility="Column"
-                                    RowHeaderWidth="0"
-                                    IsReadOnly="True"
-                                    ItemsSource="{Binding Products}">
+                                  RowHeight="36"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  Foreground="{StaticResource PrimaryTextColor}"
+                                  HeadersVisibility="Column"
+                                  RowHeaderWidth="0"
+                                  IsReadOnly="True"
+                                  SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
+                                  ItemsSource="{Binding Products}">
+                            
 
-                            <DataGrid.Resources>
-                                <converters:InverseBoolToBoolConverter x:Key="InverseBoolToBoolConverter" />
-                            </DataGrid.Resources>
 
                             <DataGrid.Columns>
 
@@ -300,13 +352,13 @@
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Image Source="{Binding PreviewImage}"
-                                                    Width="30"
-                                                    Height="30"
-                                                    Stretch="UniformToFill"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center"
-                                                    SnapsToDevicePixels="True" />
+                                            <Image Source="{Binding Image}"
+                                                   Width="30"
+                                                   Height="30"
+                                                   Stretch="UniformToFill"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   SnapsToDevicePixels="True" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -339,25 +391,41 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- Measure -->
-                                <DataGridTemplateColumn Header="O‘lchov" Width="*">
+                                <!-- Turi -->
+                                <DataGridTemplateColumn Header="Turi"
+                                                        Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Measure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                        BorderThickness="0"
-                                                        Background="Transparent"
-                                                        Padding="0"
-                                                        VerticalAlignment="Center" />
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- Count -->
-                                <DataGridTemplateColumn Header="Soni" Width="*">
+                                <!-- Measure -->
+                                <DataGridTemplateColumn Header="O‘lchov"
+                                                        Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding Measure.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- keldi -->
+                                <DataGridTemplateColumn Header="Keldi" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                         BorderThickness="0"
                                                         Background="Transparent"
@@ -395,7 +463,6 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-
                     </Grid>
                 </Border>
                 
@@ -425,7 +492,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="40" />
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
@@ -442,23 +509,24 @@
                                     Foreground="{StaticResource PrimaryTextColor}"
                                     Command="{Binding AddSemiProductCommand}"
                                     Padding="4"
-                                    Width="30"
                                     BorderThickness="0" />
 
                         </Grid>
 
-                        <!-- Products -->
+                        <!-- Yarim tayyor mahsulotlar -->
                         <DataGrid Grid.Row="3"
+                                  RowHeight="36"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
-                                  HeadersVisibility="Column"
                                   Foreground="{StaticResource PrimaryTextColor}"
+                                  HeadersVisibility="Column"
                                   RowHeaderWidth="0"
                                   IsReadOnly="True"
-                                  ItemsSource="{Binding SemiProducts}">
+                                  ItemsSource="{Binding FilteredSemiProducts}">
 
                             <DataGrid.Columns>
 
+                                <!-- Image preview -->
                                 <DataGridTemplateColumn Width="Auto">
                                     <DataGridTemplateColumn.CellStyle>
                                         <Style TargetType="DataGridCell">
@@ -474,11 +542,10 @@
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Image Source="{Binding PreviewImage}"
+                                            <Image Source="{Binding Image}"
                                                    Width="30"
                                                    Height="30"
                                                    Stretch="UniformToFill"
-                                                   Margin="4"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Center"
                                                    SnapsToDevicePixels="True" />
@@ -486,13 +553,78 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTextColumn Header="Nomi" Binding="{Binding Name}" Width="*" />
-                                <DataGridTextColumn Header="Kod" Binding="{Binding Code}" Width="*" />
-                                <DataGridTextColumn Header="O‘lchov" Binding="{Binding Measure}" Width="*" />
-                                <DataGridTextColumn Header="Soni" Binding="{Binding Count}" Width="*" />
-                                <DataGridTextColumn Header="Jami" Binding="{Binding Total}" Width="*" />
+                                <!-- Yarim tayyor mahsulot nomi -->
+                                <DataGridTemplateColumn Header="Nomi"
+                                                        Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                                <!-- Actions tugmasi -->
+                                <!-- Kod -->
+                                <DataGridTemplateColumn Header="Kod" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- O‘lchov -->
+                                <DataGridTemplateColumn Header="O‘lchov" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Measure.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Miqdori -->
+                                <DataGridTemplateColumn Header="Miqdori" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Jami -->
+                                <DataGridTemplateColumn Header="Keldi" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding TotalQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Actions -->
                                 <DataGridTemplateColumn Width="Auto">
                                     <DataGridTemplateColumn.CellStyle>
                                         <Style TargetType="DataGridCell">
@@ -508,14 +640,18 @@
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <controls:ActionButton EditCommand="{Binding DataContext.EditSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                                   DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                                   CommandParameter="{Binding}" />
+                                            <controls:ActionButton 
+                                                EditCommand="{Binding DataContext.EditSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                SaveCommand="{Binding DataContext.SaveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
+
                             </DataGrid.Columns>
                         </DataGrid>
+
                     </Grid>
                 </Border>
 
@@ -526,6 +662,7 @@
                         Background="{StaticResource SuccessButtonBackground}"
                         Foreground="{StaticResource SuccessButtonForeground}"
                         BorderBrush="{StaticResource SuccessButtonBorder}"
+                        Command="{Binding SubmitCommand}"
                         Content="Yuborish"
                         md:ElevationAssist.Elevation="Dp24" />
 

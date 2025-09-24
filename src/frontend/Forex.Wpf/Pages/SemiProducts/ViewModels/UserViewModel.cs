@@ -8,5 +8,7 @@ public partial class UserViewModel : ViewModelBase
     [ObservableProperty] private long id;
     [ObservableProperty] private string name = string.Empty;
     [ObservableProperty] private string phone = string.Empty;
+    [ObservableProperty] private string email = string.Empty;
     [ObservableProperty] private string address = string.Empty;
+    [ObservableProperty] private string description = string.Empty;
 }

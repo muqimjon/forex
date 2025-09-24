@@ -58,7 +58,6 @@ public partial class ActionButton : UserControl
         stackTranslate.BeginAnimation(TranslateTransform.XProperty, moveAnim);
 
         ActionPopup.IsOpen = true;
-        DotsButton.Visibility = Visibility.Hidden;
     }
 
     private void ClosePopup_Click(object sender, RoutedEventArgs e)

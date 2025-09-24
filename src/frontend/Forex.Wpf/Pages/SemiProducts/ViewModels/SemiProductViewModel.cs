@@ -2,18 +2,20 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.Wpf.Pages.Common;
+using System.Windows.Media;
 
 public partial class SemiProductViewModel : ViewModelBase
 {
-    [ObservableProperty] private long id;
-    [ObservableProperty] private string name = string.Empty;
+    [ObservableProperty] private string? name;
     [ObservableProperty] private int code;
-    [ObservableProperty] private string measure = string.Empty;
-    [ObservableProperty] private string? photoPath;
-
-    [ObservableProperty] private decimal quantity;
+    [ObservableProperty] private UnitMeasuerViewModel measure = default!;
+    [ObservableProperty] private int quantity;
     [ObservableProperty] private decimal costPrice;
-    [ObservableProperty] private decimal costDelivery;
-    [ObservableProperty] private decimal transferFee;
+    [ObservableProperty] private ImageSource? image;
+    [ObservableProperty] private int totalQuantity;
+
+    // UI-only
     [ObservableProperty] private bool isEditing;
+    [ObservableProperty] private bool isSelected;
 }
+
