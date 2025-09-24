@@ -10,9 +10,9 @@ public class AuthMappingProfile : Profile
     public AuthMappingProfile()
     {
         CreateMap<RegisterCommand, User>()
-            .ForMember(dest => dest.NormalizedName,
+            .ForMember(dest => dest.SearchName,
                 opt => opt.MapFrom(src => src.Name.ToNormalized()))
-            .ForMember(dest => dest.NormalizedEmail,
+            .ForMember(dest => dest.SearchEmail,
                 opt => opt.MapFrom(src => src.Email!.ToNormalized()));
     }
 }

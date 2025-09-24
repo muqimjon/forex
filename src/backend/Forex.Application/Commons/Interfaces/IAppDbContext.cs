@@ -1,5 +1,6 @@
 ﻿namespace Forex.Application.Commons.Interfaces;
 
+using Forex.Domain.Entities;
 using Forex.Domain.Entities.Manufactories;
 using Forex.Domain.Entities.Payments;
 using Forex.Domain.Entities.Sales;
@@ -11,15 +12,16 @@ using Microsoft.EntityFrameworkCore.Storage;
 public interface IAppDbContext
 {
     DbSet<User> Users { get; }
-    DbSet<Account> Accounts { get; }
-    DbSet<ShopCash> ShopCashes { get; }
-    DbSet<ContainerEntry> ContainerEntries { get; }
+    DbSet<Account> Accounts { get; set; }
+    DbSet<UserAccount> UserAccounts { get; set; }
+    DbSet<ShopCashAccount> ShopCashAccounts { get; set; }
     DbSet<Currency> Currencies { get; }
     DbSet<Invoice> Invoices { get; }
     DbSet<Manufactory> Manufactories { get; }
     DbSet<Product> Products { get; }
+    DbSet<ProductType> ProductTypes { get; }
     DbSet<ProductEntry> ProductEntries { get; }
-    DbSet<ProductItem> ProductItems { get; }
+    DbSet<ProductTypeItem> ProductItems { get; }
     DbSet<SemiProductResidue> SemiProductResidues { get; }
     DbSet<ProductResidue> ResidueShops { get; }
     DbSet<Sale> Sales { get; }

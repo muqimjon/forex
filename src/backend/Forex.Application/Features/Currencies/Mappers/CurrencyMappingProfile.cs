@@ -11,11 +11,11 @@ public class CurrencyMappingProfile : Profile
     public CurrencyMappingProfile()
     {
         CreateMap<CreateCurrencyCommand, Currency>()
-            .ForMember(dest => dest.NormalizedName,
+            .ForMember(dest => dest.SearchName,
             opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<UpdateCurrencyCommand, Currency>()
-            .ForMember(dest => dest.NormalizedName,
+            .ForMember(dest => dest.SearchName,
             opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<Currency, CurrencyDto>();

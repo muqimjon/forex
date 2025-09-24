@@ -1,6 +1,7 @@
 ﻿namespace Forex.Infrastructure.Persistence;
 
 using Forex.Application.Commons.Interfaces;
+using Forex.Domain.Entities;
 using Forex.Domain.Entities.Manufactories;
 using Forex.Domain.Entities.Payments;
 using Forex.Domain.Entities.Sales;
@@ -14,14 +15,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Account> Accounts { get; set; }
-    public DbSet<ShopCash> ShopCashes { get; set; }
-    public DbSet<ContainerEntry> ContainerEntries { get; set; }
+    public DbSet<UserAccount> UserAccounts { get; set; }
+    public DbSet<ShopCashAccount> ShopCashAccounts { get; set; }
     public DbSet<Currency> Currencies { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Manufactory> Manufactories { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<ProductType> ProductTypes { get; set; }
     public DbSet<ProductEntry> ProductEntries { get; set; }
-    public DbSet<ProductItem> ProductItems { get; set; }
+    public DbSet<ProductTypeItem> ProductItems { get; set; }
     public DbSet<SemiProductResidue> SemiProductResidues { get; set; }
     public DbSet<ProductResidue> ResidueShops { get; set; }
     public DbSet<Sale> Sales { get; set; }
@@ -91,6 +93,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Account>()
+            .ToTable("Accounts")
+            .HasDiscriminator<string>("AccountType")
+            .HasValue<UserAccount>("User")
+            .HasValue<ShopCashAccount>("ShopCash");
 
         modelBuilder.Ignore<System.Transactions.Transaction>();
     }

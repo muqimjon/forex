@@ -11,11 +11,11 @@ public class ManufactoryMappingProfile : Profile
     public ManufactoryMappingProfile()
     {
         CreateMap<CreateManufactoryCommand, Manufactory>()
-            .ForMember(dest => dest.NormalizedName,
+            .ForMember(dest => dest.SearchName,
             opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<UpdateManufactoryCommand, Manufactory>()
-            .ForMember(dest => dest.NormalizedName,
+            .ForMember(dest => dest.SearchName,
             opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<Manufactory, ManufactoryDto>();

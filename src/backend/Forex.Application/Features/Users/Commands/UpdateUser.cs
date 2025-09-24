@@ -3,6 +3,7 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
+using Forex.Domain.Entities;
 using Forex.Domain.Entities.Users;
 using Forex.Domain.Enums;
 using MediatR;
@@ -17,9 +18,11 @@ public record UpdateUserCommand(
     string? Email,
     Role Role,
     string Address,
+    string Description,
     decimal Balance,
-    string Description)
+    long CurrencyId)
     : IRequest<bool>;
+
 
 public class UpdateUserCommandHandler(
     IAppDbContext context,
@@ -29,13 +32,31 @@ public class UpdateUserCommandHandler(
     public async Task<bool> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         var user = await context.Users
-            .Include(u => u.Account)
+            .Include(u => u.Accounts)
             .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(User), nameof(request.Id), request.Id);
 
         mapper.Map(request, user);
-        user.Account.BeginSumm = request.Balance;
-        user.Account.Balance = request.Balance;
+
+        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == request.CurrencyId);
+
+        if (account is null)
+        {
+            account = new UserAccount
+            {
+                User = user,
+                CurrencyId = request.CurrencyId,
+                OpeningBalance = request.Balance,
+                Balance = request.Balance
+            };
+
+            context.UserAccounts.Add(account);
+        }
+        else
+        {
+            account.OpeningBalance = request.Balance;
+            account.Balance = request.Balance;
+        }
 
         return await context.SaveAsync(cancellationToken);
     }

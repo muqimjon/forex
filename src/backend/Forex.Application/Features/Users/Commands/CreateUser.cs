@@ -34,9 +34,9 @@ public class CreateUserCommandHandler(
 
         var user = mapper.Map<User>(request);
         context.Users.Add(user);
-        context.Accounts.Add(new()
+        context.UserAccounts.Add(new()
         {
-            BeginSumm = request.Balance,
+            OpeningBalance = request.Balance,
             Balance = request.Balance,
             User = user,
         });

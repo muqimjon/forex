@@ -1,25 +1,20 @@
 ﻿namespace Forex.Application.Features.SemiProductEntries.Commands;
 
 using AutoMapper;
-using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.SemiProductEntries.DTOs;
-using Forex.Application.Features.Users.DTOs;
+using Forex.Domain.Entities;
 using Forex.Domain.Entities.Manufactories;
+using Forex.Domain.Entities.Shops;
 using Forex.Domain.Entities.Users;
+using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Headers;
 
 public record CreateSemiProductIntakeCommand(
-    Invoice Invoice,
-    UserDto Supplier,
-    long ViaMiddlemanId,
-    long ManufactoryId,
-    DateTime EntryDate,
-    decimal TransferFeePerContainer,
-    IEnumerable<ContainerDto> Containers,
-    IEnumerable<ItemDto> Items
+    InvoiceCommand Invoice,
+    IEnumerable<SemiProductCommand> SemiProducts,
+    IEnumerable<ProductCommand> Products
 ) : IRequest<long>;
 
 public class CreateSemiProductIntakeCommandHandler(
@@ -30,138 +25,226 @@ public class CreateSemiProductIntakeCommandHandler(
 {
     public async Task<long> Handle(CreateSemiProductIntakeCommand request, CancellationToken ct)
     {
-        if (request.Invoice.ViaMiddleman)
+        await context.BeginTransactionAsync(ct);
+
+        try
         {
-            var user = new User();
-            if (request.Supplier.Id <= 0)
-            {
-                user = mapper.Map<User>(request.Supplier);
-                await context.Users.AddAsync(user);
-                await context.SaveAsync(ct);
-            }
-            else
-            {
-                user = await context.Users
-                    .Include(u => u.Account)
-                    .FirstOrDefaultAsync(u => u.Id == request.Supplier.Id, ct);
-            }
+            await HandleMiddlemanTransferAsync(request.Invoice, ct);
+            await EnsureSupplierExistsAsync(request.Invoice, ct);
 
-
-            var manufactory = await context.Manufactories
-                .FirstOrDefaultAsync(m => m.Id == request.ManufactoryId, ct)
-                ?? throw new NotFoundException(nameof(Manufactory), nameof(request.ManufactoryId), request.ManufactoryId);
-
-            var totalContainerCount = request.Containers.Sum(c => c.Count);
-            var invoiceTransferFeeTotal = request.Items.Sum(i => i.TransferFee);
-
-            if (invoiceTransferFeeTotal == 0 && request.TransferFeePerContainer > 0)
-                invoiceTransferFeeTotal = request.TransferFeePerContainer * totalContainerCount;
-
-            var invoice = new Invoice
-            {
-                EntryDate = request.EntryDate,
-                CostPrice = request.Items.Sum(i => i.CostPrice),
-                CostDelivery = request.Items.Sum(i => i.CostDelivery),
-                TransferFee = invoiceTransferFeeTotal
-            };
-
-            await context.BeginTransactionAsync(ct);
-
+            var invoice = mapper.Map<Invoice>(request.Invoice);
             context.Invoices.Add(invoice);
 
-            foreach (var c in request.Containers.Where(c => c.Count > 0))
-            {
-                context.ContainerEntries.Add(new ContainerEntry
-                {
-                    SenderId = user.Id,
-                    InvoceId = invoice.Id,
-                    Count = c.Count,
-                    Price = c.Price
-                });
-            }
-
-            if (request.TransferFeePerContainer > 0)
-                user.Account.Balance += request.TransferFeePerContainer * totalContainerCount;
-
-            foreach (var item in request.Items)
-            {
-                var semiProductId = await EnsureSemiProductAsync(item, ct);
-
-                var entry = mapper.Map<SemiProductEntry>(item);
-                entry.SemiProductId = semiProductId;
-                entry.InvoceId = invoice.Id;
-                entry.ManufactoryId = manufactory.Id;
-
-                context.SemiProductEntries.Add(entry);
-
-                await UpsertResidueAsync(semiProductId, manufactory.Id, item.Quantity, ct);
-            }
+            var semiProducts = await AddOrUpdateSemiProductsAsync(request.SemiProducts, invoice, ct);
+            await AddOrUpdateProductsAsync(request.Products, semiProducts, ct);
 
             await context.CommitTransactionAsync(ct);
             return invoice.Id;
         }
+        catch
+        {
+            await context.RollbackTransactionAsync(ct);
+            throw;
+        }
     }
 
-    private async Task<long> EnsureSemiProductAsync(ItemDto item, CancellationToken ct)
+    private async Task HandleMiddlemanTransferAsync(InvoiceCommand invoice, CancellationToken ct)
     {
-        if (item.SemiProductId is long id && id > 0)
+        if (!invoice.ViaMiddleman) return;
+
+        var sender = await context.Users
+            .Include(u => u.Accounts)
+            .FirstOrDefaultAsync(u => u.Id == invoice.Sender!.Id, ct);
+
+        if (sender is null) return;
+
+        var account = sender.Accounts.FirstOrDefault(a => a.Id == invoice.CurrencyId);
+        if (account is null)
         {
-            var exists = await context.SemiProducts.AnyAsync(sp => sp.Id == id, ct);
-            if (!exists) throw new NotFoundException(nameof(SemiProduct), nameof(id), id);
-            return id;
-        }
-
-        if (item.Code is int code)
-        {
-            var found = await context.SemiProducts.FirstOrDefaultAsync(sp => sp.Code == code, ct);
-            if (found is not null) return found.Id;
-        }
-
-        if (!string.IsNullOrWhiteSpace(item.Name))
-        {
-            var normalized = item.Name.Trim().ToUpperInvariant();
-            var found = await context.SemiProducts.FirstOrDefaultAsync(sp =>
-                sp.NormalizedName == normalized &&
-                (string.IsNullOrEmpty(item.Measure) || sp.Measure == item.Measure), ct);
-
-            if (found is not null) return found.Id;
-        }
-
-        var semi = mapper.Map<SemiProduct>(item);
-
-        if (item.Photo is not null)
-        {
-            var fileName = $"{Guid.NewGuid():N}{item.Extension}";
-            semi.PhotoPath = await fileStorage.UploadAsync(
-                item.Photo,
-                fileName,
-                item.ContentType ?? "application/octet-stream",
-                ct);
-        }
-
-        context.SemiProducts.Add(semi);
-        await context.SaveAsync(ct);
-
-        return semi.Id;
-    }
-
-    private async Task UpsertResidueAsync(long semiProductId, long manufactoryId, decimal quantity, CancellationToken ct)
-    {
-        var residue = await context.SemiProductResidues
-            .FirstOrDefaultAsync(r => r.SemiProductId == semiProductId && r.ManufactoryId == manufactoryId, ct);
-
-        if (residue is null)
-        {
-            context.SemiProductResidues.Add(new SemiProductResidue
+            account = new UserAccount
             {
-                SemiProductId = semiProductId,
-                ManufactoryId = manufactoryId,
-                Quantity = quantity
+                OpeningBalance = (decimal)invoice.TransferFee!,
+                User = sender
+            };
+            context.Accounts.Add(account);
+        }
+
+        account.Balance += (decimal)invoice.TransferFee!;
+    }
+
+    private async Task EnsureSupplierExistsAsync(InvoiceCommand invoice, CancellationToken ct)
+    {
+        var user = await context.Users
+            .Include(u => u.Accounts)
+            .FirstOrDefaultAsync(u => u.Id == invoice.Supplier.Id, ct);
+
+        if (user is null)
+        {
+            user = mapper.Map<User>(invoice.Supplier);
+            user.Role = Role.Taminotchi;
+
+            user.Accounts.Add(new UserAccount
+            {
+                Balance = (decimal)invoice.TransferFee!,
+                OpeningBalance = (decimal)invoice.TransferFee!
             });
+
+            context.Users.Add(user);
         }
         else
         {
-            residue.Quantity += quantity;
+            var account = user.Accounts.FirstOrDefault(a => a.Id == invoice.CurrencyId);
+            if (account is null)
+            {
+                account = new UserAccount
+                {
+                    OpeningBalance = (decimal)invoice.TransferFee!,
+                    User = user
+                };
+                context.Accounts.Add(account);
+            }
+
+            account.Balance += (decimal)invoice.TransferFee!;
+        }
+    }
+
+    private async Task<IEnumerable<SemiProduct>> AddOrUpdateSemiProductsAsync(IEnumerable<SemiProductCommand> commands, Invoice invoice, CancellationToken ct)
+    {
+        var manufactory = await context.Manufactories
+            .Include(m => m.SemiProductResidues)
+            .Include(m => m.SemiProductEntries)
+            .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct);
+
+        var codes = commands.Select(x => x.Code).ToList();
+        var existingSemiProducts = await context.SemiProducts
+            .Where(sp => codes.Contains(sp.Code))
+            .ToListAsync(ct);
+
+        var result = new List<SemiProduct>();
+        const decimal deliveryPercent = 0.6m;
+        const decimal transferPercent = 0.4m;
+
+        foreach (var cmd in commands)
+        {
+            var semi = existingSemiProducts.FirstOrDefault(sp => sp.Code == cmd.Code);
+
+            if (semi is null)
+            {
+                semi = mapper.Map<SemiProduct>(cmd);
+
+                if (cmd.File is not null)
+                    semi.PhotoPath = await fileStorage.UploadAsync(cmd.File, ct);
+
+                context.SemiProducts.Add(semi);
+            }
+
+            context.SemiProductEntries.Add(new SemiProductEntry
+            {
+                SemiProduct = semi,
+                Quantity = cmd.Quantity,
+                Manufactory = manufactory!,
+                Invoce = invoice,
+                CostPrice = cmd.CostPrice,
+                CostDelivery = cmd.CostPrice * deliveryPercent,
+                TransferFee = cmd.CostPrice * transferPercent
+            });
+
+            var residue = manufactory!.SemiProductResidues.FirstOrDefault(r => r.SemiProductId == semi.Id);
+            if (residue is null)
+            {
+                context.SemiProductResidues.Add(new SemiProductResidue
+                {
+                    SemiProduct = semi,
+                    Manufactory = manufactory,
+                    Quantity = cmd.Quantity
+                });
+            }
+            else
+            {
+                residue.Quantity += cmd.Quantity;
+            }
+
+            result.Add(semi);
+        }
+
+        return result;
+    }
+
+    private async Task AddOrUpdateProductsAsync(IEnumerable<ProductCommand> commands, IEnumerable<SemiProduct> semiProducts, CancellationToken ct)
+    {
+        var codes = commands.Select(p => p.Code).ToList();
+        var existingProducts = await context.Products
+            .Include(p => p.ProductTypes)
+                .ThenInclude(pt => pt.Items)
+            .Where(p => codes.Contains(p.Code))
+            .ToListAsync(ct);
+
+        foreach (var cmd in commands)
+        {
+            var product = existingProducts.FirstOrDefault(p => p.Code == cmd.Code);
+
+            if (product is null)
+            {
+                product = mapper.Map<Product>(cmd);
+
+                if (cmd.File is not null)
+                    product.PhotoPath = await fileStorage.UploadAsync(cmd.File, ct);
+
+                foreach (var type in product.ProductTypes)
+                    foreach (var item in type.Items)
+                        item.SemiProduct = semiProducts.First(sp => sp.Code == item.SemiProductCode);
+
+                context.Products.Add(product);
+            }
+            else
+            {
+                product.Name = cmd.Name;
+                product.MeasureId = cmd.MeasureId;
+
+                if (cmd.File is not null)
+                {
+                    if (!string.IsNullOrEmpty(product.PhotoPath))
+                        await fileStorage.DeleteAsync(product.PhotoPath, ct);
+
+                    using var stream = cmd.File.OpenReadStream();
+                    product.PhotoPath = await fileStorage.UploadAsync(stream, cmd.File.FileName, cmd.File.ContentType, ct);
+                }
+
+                foreach (var typeCmd in cmd.Types)
+                {
+                    var existingType = product.ProductTypes.FirstOrDefault(t => t.Type == typeCmd.Type);
+
+                    if (existingType is null)
+                    {
+                        var newType = new ProductType
+                        {
+                            Type = typeCmd.Type,
+                            Items = [.. typeCmd.Items.Select(i => new ProductTypeItem
+                            {
+                                SemiProductCode = i.SemiProductCode,
+                                Quantity = i.Quantity,
+                                SemiProduct = semiProducts.First(sp => sp.Code == i.SemiProductCode)
+                            })]
+                        };
+
+                        product.ProductTypes.Add(newType);
+                    }
+                    else
+                    {
+                        existingType.Items.Clear();
+
+                        foreach (var itemCmd in typeCmd.Items)
+                        {
+                            existingType.Items.Add(new ProductTypeItem
+                            {
+                                SemiProductCode = itemCmd.SemiProductCode,
+                                Quantity = itemCmd.Quantity,
+                                SemiProduct = semiProducts.First(sp => sp.Code == itemCmd.SemiProductCode)
+                            });
+                        }
+                    }
+                }
+            }
         }
     }
 }

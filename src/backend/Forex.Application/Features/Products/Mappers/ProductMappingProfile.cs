@@ -11,11 +11,11 @@ public class ProductMappingProfile : Profile
     public ProductMappingProfile()
     {
         CreateMap<CreateProductCommand, Product>()
-            .ForMember(dest => dest.NormalizedName,
+            .ForMember(dest => dest.SearchName,
                 opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<UpdateProductCommand, Product>()
-            .ForMember(dest => dest.NormalizedName,
+            .ForMember(dest => dest.SearchName,
                 opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<Product, ProductDto>();

@@ -229,7 +229,7 @@ public partial class UserPage : Page
         textBox.TextChanged -= txtPhone_TextChanged;
         try
         {
-           
+
             string formatted = "+998 ";
             if (digits.Length > 3)
             {

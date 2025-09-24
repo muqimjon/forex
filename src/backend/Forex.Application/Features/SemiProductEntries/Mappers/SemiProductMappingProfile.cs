@@ -3,18 +3,34 @@
 using AutoMapper;
 using Forex.Application.Features.SemiProductEntries.DTOs;
 using Forex.Domain.Entities.Manufactories;
+using Forex.Domain.Entities.Shops;
+using Forex.Domain.Entities.Users;
 
 public class SemiProductMappingProfile : Profile
 {
     public SemiProductMappingProfile()
     {
-        CreateMap<ItemDto, SemiProduct>()
-            .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name!.Trim().ToUpperInvariant()));
+        // Invoice
+        CreateMap<InvoiceCommand, Invoice>();
 
-        CreateMap<ItemDto, SemiProductEntry>()
-            .ForMember(dest => dest.SemiProductId, opt => opt.Ignore())
-            .ForMember(dest => dest.InvoceId, opt => opt.Ignore())
-            .ForMember(dest => dest.ManufactoryId, opt => opt.Ignore());
+        // SemiProduct
+        CreateMap<SemiProductCommand, SemiProduct>()
+            .ForMember(dest => dest.PhotoPath, opt => opt.Ignore()); // Fayl yuklanadi, mapping emas
+
+        // Product
+        CreateMap<ProductCommand, Product>()
+            .ForMember(dest => dest.PhotoPath, opt => opt.Ignore()) // Fayl yuklanadi
+            .ForMember(dest => dest.ProductTypes, opt => opt.MapFrom(src => src.Types));
+
+        // ProductType
+        CreateMap<ProductTypeCommand, ProductType>()
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+
+        // ProductTypeItem
+        CreateMap<ProductTypeItemCommand, ProductTypeItem>()
+            .ForMember(dest => dest.SemiProduct, opt => opt.Ignore()); // Code orqali bog‘lanadi
+
+        // Supplier / Sender
+        CreateMap<UserCommand, User>();
     }
 }

@@ -3,12 +3,13 @@
 using Forex.Domain.Commons;
 using Forex.Domain.Entities.Manufactories;
 
-public class ProductItem : Auditable
+public class ProductTypeItem : Auditable
 {
-    public long ProductId { get; set; }
+    public long ProductTypeId { get; set; }
     public long SemiProductId { get; set; }
     public decimal Quantity { get; set; }
+    public int SemiProductCode { get; set; }
 
-    public Product Product { get; set; } = default!;
+    public ProductType ProductPype { get; set; } = default!;
     public SemiProduct SemiProduct { get; set; } = default!;
 }

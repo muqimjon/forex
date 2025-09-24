@@ -3,11 +3,18 @@
 using Forex.Application.Commons.Interfaces;
 using global::Minio;
 using global::Minio.DataModel.Args;
+using Microsoft.AspNetCore.Http;
 
 public class MinioFileStorageService(IMinioClient client, MinioOptions options) : IFileStorageService
 {
     private readonly string bucketName = options.BucketName;
     private readonly string publicPolicy = BucketPolicyBuilder.BuildPublicReadPolicy(options.BucketName);
+
+    public async Task<string> UploadAsync(IFormFile file, CancellationToken cancellationToken = default)
+    {
+        using var stream = file.OpenReadStream();
+        return await UploadAsync(stream, file.FileName, file.ContentType, cancellationToken);
+    }
 
     public async Task<string> UploadAsync(Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default)
     {

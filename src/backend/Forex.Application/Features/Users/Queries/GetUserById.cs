@@ -19,7 +19,7 @@ public class GetUserByIdQueryHandler(
 {
     public async Task<UserDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         => mapper.Map<UserDto>(await context.Users
-            .Include(user => user.Account)
+            .Include(user => user.Accounts)
             .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken))
         ?? throw new NotFoundException(nameof(User), nameof(request.Id), request.Id);
 }

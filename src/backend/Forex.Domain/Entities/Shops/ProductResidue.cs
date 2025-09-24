@@ -8,6 +8,6 @@ public class ProductResidue : Auditable
     public long ShopId { get; set; }
     public decimal Quantity { get; set; }
 
-    public Product Product { get; set; } = default!;
+    public ProductType ProductType { get; set; } = default!;
     public Shop Shop { get; set; } = default!;
 }

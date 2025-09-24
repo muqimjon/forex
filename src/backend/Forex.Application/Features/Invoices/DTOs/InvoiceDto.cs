@@ -1,6 +1,5 @@
 ﻿namespace Forex.Application.Features.Invoices.DTOs;
 
-using Forex.Application.Features.SemiProductEntries.DTOs;
 using Forex.Domain.Entities.Manufactories;
 
 public sealed record InvoiceDto
