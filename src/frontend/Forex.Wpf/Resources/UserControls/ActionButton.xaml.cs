@@ -1,9 +1,10 @@
 ﻿namespace Forex.Wpf.Resources.UserControls;
 
-using Forex.Wpf.Common.Services;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 public partial class ActionButton : UserControl
@@ -15,32 +16,62 @@ public partial class ActionButton : UserControl
         Loaded += (_, _) =>
         {
             if (Application.Current.MainWindow is Window wnd)
-            {
-                wnd.Deactivated += OnWindowDeactivated;
-            }
+                wnd.Deactivated += (_, _) => ClosePopup();
         };
 
-        Unloaded += (_, _) =>
-        {
-            if (Application.Current.MainWindow is Window wnd)
-            {
-                wnd.Deactivated -= OnWindowDeactivated;
-            }
-        };
-
-        ActionPopup.Closed += (_, _) => DotsButton.Visibility = Visibility.Visible;
+        ActionPopup.Closed += (_, _) => ActionPopup.IsOpen = false;
     }
 
-    private void OnWindowDeactivated(object? sender, EventArgs e)
+    #region Open/Close Popup Animations
+
+    private void DotsButton_Click(object sender, RoutedEventArgs e)
     {
-        if (ActionPopup.IsOpen)
-        {
-            ActionPopup.IsOpen = false;
-            DotsButton.Visibility = Visibility.Visible;
-        }
+        AnimatePopup();
     }
+
+    private void ClosePopup()
+    {
+        ActionPopup.IsOpen = false;
+        DotsButton.Visibility = Visibility.Visible;
+    }
+
+    private void AnimatePopup()
+    {
+        var scaleAnim = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(250),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        var moveAnim = new DoubleAnimation
+        {
+            From = 20,
+            To = 0,
+            Duration = TimeSpan.FromMilliseconds(250),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        stackScale.BeginAnimation(ScaleTransform.ScaleXProperty, scaleAnim);
+        stackScale.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnim);
+        stackTranslate.BeginAnimation(TranslateTransform.XProperty, moveAnim);
+
+        ActionPopup.IsOpen = true;
+        DotsButton.Visibility = Visibility.Hidden;
+    }
+
+    private void ClosePopup_Click(object sender, RoutedEventArgs e)
+    {
+        ClosePopup();
+    }
+
+    #endregion Open/Close Popup Animations
 
     #region DependencyProperties
+
+    public static readonly DependencyProperty SaveCommandProperty =
+    DependencyProperty.Register(nameof(SaveCommand), typeof(ICommand), typeof(ActionButton));
 
     public static readonly DependencyProperty EditCommandProperty =
         DependencyProperty.Register(nameof(EditCommand), typeof(ICommand), typeof(ActionButton));
@@ -63,6 +94,12 @@ public partial class ActionButton : UserControl
         set => SetValue(DeleteCommandProperty, value);
     }
 
+    public ICommand SaveCommand
+    {
+        get => (ICommand)GetValue(SaveCommandProperty);
+        set => SetValue(SaveCommandProperty, value);
+    }
+
     public object CommandParameter
     {
         get => GetValue(CommandParameterProperty);
@@ -70,56 +107,4 @@ public partial class ActionButton : UserControl
     }
 
     #endregion
-
-    private void DotsButton_Click(object sender, RoutedEventArgs e)
-    {
-        ActionPopup.IsOpen = true;
-        DotsButton.Visibility = Visibility.Hidden;
-
-        // Scale animatsiya
-        var scaleAnim = new DoubleAnimation
-        {
-            From = 0,
-            To = 1,
-            Duration = TimeSpan.FromMilliseconds(250),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-        };
-
-        stackScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, scaleAnim);
-        stackScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, scaleAnim);
-
-        // Translate animatsiya
-        var moveAnim = new DoubleAnimation
-        {
-            From = 20,
-            To = 0,
-            Duration = TimeSpan.FromMilliseconds(250),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-        };
-
-        stackTranslate.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, moveAnim);
-    }
-
-    private void BtnEdit_Click(object sender, RoutedEventArgs e)
-    {
-        NotificationService.Show("Ishlamoqda", Common.Enums.NotificationType.Warning);
-        var cmd = EditCommand;
-        var param = CommandParameter ?? DataContext; // fallback DataContext
-        if (cmd != null && cmd.CanExecute(param))
-            cmd.Execute(param);
-
-        ActionPopup.IsOpen = false;
-    }
-
-    private void BtnDelete_Click(object sender, RoutedEventArgs e)
-    {
-        NotificationService.Show("Ishlamoqda", Common.Enums.NotificationType.Warning);
-        var cmd = DeleteCommand;
-        var param = CommandParameter ?? DataContext; // fallback DataContext
-        if (cmd != null && cmd.CanExecute(param))
-            cmd.Execute(param);
-
-        ActionPopup.IsOpen = false;
-    }
-
 }

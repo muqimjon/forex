@@ -59,35 +59,57 @@ public partial class SemiProductPageViewModel : ViewModelBase
     ];
     }
 
-    public ObservableCollection<ProductViewModel> SeedingProducts()
-    {
-        return new ObservableCollection<ProductViewModel>
-    {
+    public static ObservableCollection<ProductViewModel> SeedingProducts() => [
         new() { Name="Un", Code=1001, Quantity=10, CostPrice=5000 },
         new() { Name="Shakar", Code=1002, Quantity=15, CostPrice=6000 },
         new() { Name="Yog‘", Code=1003, Quantity=5, CostPrice=12000 },
         new() { Name="Guruch", Code=1004, Quantity=20, CostPrice=8000 },
         new() { Name="Tuz", Code=1005, Quantity=7, CostPrice=2000 }
-    };
-    }
+    ];
 
 
     #endregion
 
     #region Commands
 
+    #region Product Commands
+
     // ➕ Product qo‘shish
     [RelayCommand]
     private void AddProduct()
     {
-        Products.Add(new ProductViewModel
-        {
-            Name = ProductNames.First(),
-            Code = ProductCodes.First(),
-            Quantity = 1,
-            CostPrice = 10000
-        });
+        Products.Add(new());
     }
+
+    // ✏️ Mahsulotni tahrirlash
+    [RelayCommand]
+    private void EditProduct(ProductViewModel? item)
+    {
+        foreach (var row in Products)
+            row.IsEditing = false;
+
+        if (item is not null)
+            item.IsEditing = true;
+    }
+
+    // ✅ Mahsulotni saqlash
+    [RelayCommand]
+    private void SaveProduct(ProductViewModel? item)
+    {
+        if (item is not null)
+            item.IsEditing = false;
+    }
+
+    // ❌ Yarim tayyor mahsulotni o‘chirish
+    [RelayCommand]
+    private void RemoveProduct(ProductViewModel item)
+    {
+        Products.Remove(item);
+    }
+
+    #endregion Product Commands
+
+    #region SemiProduct Commands
 
     // ➕ Yarim tayyor mahsulot qo‘shish
     [RelayCommand]
@@ -95,21 +117,36 @@ public partial class SemiProductPageViewModel : ViewModelBase
     {
         var targetList = SelectedProduct?.SemiProducts ?? SemiProducts;
 
-        targetList.Add(new SemiProductViewModel
-        {
-            Name = SemiProductNames.First(),
-            Quantity = 1,
-            CostPrice = 2000
-        });
+        targetList.Add(new());
     }
 
-    // ✏️ Mahsulotni tahrirlash
+    // ✏️ Yarim tayyor mahsulotni tahrirlash
     [RelayCommand]
-    private void EditProduct(ProductViewModel? product)
+    private void EditSemiProduct(SemiProductViewModel item)
     {
-        if (product is null) return;
-        InfoMessage = $"{product.Name} tahrirlanmoqda...";
+        foreach (var row in SemiProducts)
+            row.IsEditing = false;
+
+        if (item is not null)
+            item.IsEditing = true;
     }
+
+    // ✅ Yarim tayyor mahsulotni saqlash
+    [RelayCommand]
+    private void SaveSemiProduct(SemiProductViewModel item)
+    {
+        if (item is not null)
+            item.IsEditing = false;
+    }
+
+    // ❌ Yarim tayyor mahsulotni o‘chirish
+    [RelayCommand]
+    private void RemoveSemiProduct(SemiProductViewModel item)
+    {
+        SemiProducts.Remove(item);
+    }
+
+    #endregion SemiProduct Commands
 
     // ✅ Saqlash / Yuborish
     [RelayCommand]
@@ -123,24 +160,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
         SuccessMessage = "Kirim muvaffaqiyatli yuborildi!";
         // TODO: Backend API chaqirish
-    }
-
-    [RelayCommand]
-    private void EditSemiProduct(SemiProductViewModel item)
-    {
-        // Boshqa qatordagi edit-mode’ni o‘chir
-        foreach (var row in SemiProducts)
-            row.IsEditing = false;
-
-        // Shu qatorni tahrirga och
-        if (item != null)
-            item.IsEditing = true;
-    }
-
-    [RelayCommand]
-    private void RemoveSemiProduct(SemiProductViewModel item)
-    {
-        SemiProducts.Remove(item);
     }
 
     #endregion

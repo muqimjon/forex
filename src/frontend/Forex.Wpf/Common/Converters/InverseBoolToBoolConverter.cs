@@ -3,10 +3,15 @@
 using System.Globalization;
 using System.Windows.Data;
 
-public class InverseBoolConverter : IValueConverter
+public class InverseBoolToBoolConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => value is not bool b || !b;
+    {
+        if (value is bool b)
+            return !b;
+
+        return true;
+    }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotImplementedException();

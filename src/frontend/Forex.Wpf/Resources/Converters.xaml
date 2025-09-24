@@ -5,6 +5,7 @@
     <conv:BoolToTextConverter x:Key="BoolToTextConverter" />
     <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     <conv:StringIsNotEmptyConverter x:Key="StringIsNotEmptyConverter" />
-    <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+    <conv:InverseBoolToBoolConverter x:Key="InverseBoolToBoolConverter" />
+    <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
 
 </ResourceDictionary>

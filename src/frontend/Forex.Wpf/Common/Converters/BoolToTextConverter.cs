@@ -18,10 +18,10 @@ public class BoolToTextConverter : IValueConverter
         var falseText = parts.Length > 1 ? parts[1] : string.Empty;
 
         var invert = false;
-        if (trueText.StartsWith("!"))
+        if (trueText.StartsWith('!'))
         {
             invert = true;
-            trueText = trueText.Substring(1);
+            trueText = trueText[1..];
         }
 
         var b = value is bool bv && bv;
