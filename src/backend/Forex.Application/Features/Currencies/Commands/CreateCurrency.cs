@@ -12,8 +12,10 @@ using System.Threading.Tasks;
 
 public record CreateCurrencyCommand(
     string Name,
-    string Symbol)
+    string Symbol,
+    bool IsDefault)
     : IRequest<long>;
+
 
 public class CreateCurrencyCommandHandler(
     IAppDbContext context,
@@ -23,16 +25,25 @@ public class CreateCurrencyCommandHandler(
     public async Task<long> Handle(CreateCurrencyCommand request, CancellationToken cancellationToken)
     {
         var isExist = await context.Currencies
-            .AnyAsync(c => c.Name == request.Name &&
-                        c.Symbol == request.Symbol, cancellationToken);
+            .AnyAsync(c => c.Name == request.Name && c.Symbol == request.Symbol, cancellationToken);
 
         if (isExist)
-            throw new AlreadyExistException(nameof(Shop), nameof(request.Name), request.Name);
+            throw new AlreadyExistException(nameof(Currency), nameof(request.Name), request.Name);
 
-        var Currency = mapper.Map<Currency>(request);
-        context.Currencies.Add(Currency);
+        var currency = mapper.Map<Currency>(request);
+        context.Currencies.Add(currency);
+
+        if (request.IsDefault)
+        {
+            var others = await context.Currencies
+                .Where(c => c.IsDefault)
+                .ToListAsync(cancellationToken);
+
+            foreach (var other in others)
+                other.IsDefault = false;
+        }
 
         await context.SaveAsync(cancellationToken);
-        return Currency.Id;
+        return currency.Id;
     }
 }
