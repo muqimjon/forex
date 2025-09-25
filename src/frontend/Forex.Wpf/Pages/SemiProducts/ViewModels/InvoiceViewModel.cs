@@ -9,15 +9,17 @@ public partial class InvoiceViewModel : ViewModelBase
     [ObservableProperty] private string? number;
     [ObservableProperty] private decimal costPrice;
     [ObservableProperty] private decimal costDelivery;
-    [ObservableProperty] private decimal? transferFee;
+    [ObservableProperty] private int containerCount;
+    [ObservableProperty] private decimal pricePerUnitContainer;
+    [ObservableProperty] private decimal transferFee;
     [ObservableProperty] private decimal totalSum;
     [ObservableProperty] private long currencyId;
-    [ObservableProperty] private ManufactoryViewModel manufactory;
+    [ObservableProperty] private ManufactoryViewModel manufactory = default!;
 
     [ObservableProperty] private UserViewModel supplier = new();
     [ObservableProperty] private bool viaMiddleman;
     [ObservableProperty] private UserViewModel? sender;
 
-    public decimal TotalCost => costPrice + costDelivery + (transferFee ?? 0);
+    public decimal TotalCost => CostPrice + CostDelivery + TransferFee;
 }
 

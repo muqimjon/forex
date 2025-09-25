@@ -40,4 +40,20 @@ public partial class SemiProductPage : Page
         else
             Main.NavigateTo(new HomePage());
     }
+
+    private void DataGrid_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not SemiProductPageViewModel vm) return;
+
+        vm.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(vm.ShowQuantityColumn))
+            {
+                QuantityColumn.Visibility = vm.ShowQuantityColumn
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        };
+    }
+
 }

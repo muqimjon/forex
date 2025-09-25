@@ -177,20 +177,20 @@
                                        DockPanel.Dock="Right"
                                        Foreground="{StaticResource PrimaryTextColor}" />
                         </DockPanel>
-
-                        <DockPanel>
-                            <Label Content="O'rtakash orqalimi:"
-                                   DockPanel.Dock="Left"
-                                   Foreground="{StaticResource PrimaryTextColor}" />
-                            <ToggleButton IsChecked="{Binding ViaMiddleman, Mode=TwoWay}" />
-                        </DockPanel>
                     </StackPanel>
+
+                    <DockPanel>
+                        <Label Content="O'rtakash orqalimi:"
+                               DockPanel.Dock="Left"
+                               Foreground="{StaticResource PrimaryTextColor}" />
+                        <ToggleButton IsChecked="{Binding Invoice.ViaMiddleman, Mode=TwoWay}" />
+                    </DockPanel>
 
                     <Separator />
 
                     <!-- O'rtakash uchun hisob kitob -->
-                    <StackPanel DataContext="{Binding Invoice.Sender}"
-                                Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel DataContext="{Binding Invoice}"
+                                Visibility="{Binding ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Label Content="Yuboruvchi"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"
@@ -201,7 +201,7 @@
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
                             <ComboBox ItemsSource="{Binding DataContext.Senders, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      SelectedItem="{Binding Name, Mode=TwoWay}"
+                                      SelectedItem="{Binding Sender, Mode=TwoWay}"
                                       DisplayMemberPath="Name"
                                       DockPanel.Dock="Right"
                                       Foreground="{StaticResource PrimaryTextColor}" />
@@ -211,7 +211,7 @@
                             <Label Content="Telefon:"
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                            <TextBlock Text="{Binding Phone}"
+                            <TextBlock Text="{Binding Sender.Phone}"
                                        DockPanel.Dock="Right"
                                        Foreground="{StaticResource PrimaryTextColor}" />
                         </DockPanel>
@@ -220,7 +220,7 @@
                             <Label Content="Email:"
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                            <TextBlock Text="{Binding Email}"
+                            <TextBlock Text="{Binding Sender.Email}"
                                        DockPanel.Dock="Right"
                                        Foreground="{StaticResource PrimaryTextColor}" />
                         </DockPanel>
@@ -229,7 +229,7 @@
                             <Label Content="Manzil:"
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                            <TextBlock Text="{Binding Address}"
+                            <TextBlock Text="{Binding Sender.Address}"
                                        DockPanel.Dock="Right"
                                        Foreground="{StaticResource PrimaryTextColor}" />
                         </DockPanel>
@@ -238,7 +238,7 @@
                             <Label Content="Kontinerlar soni:"
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                            <TextBlock Text="{Binding ConteinerCount}"
+                            <TextBlock Text="{Binding ContainerCount}"
                                        DockPanel.Dock="Right"
                                        Foreground="{StaticResource PrimaryTextColor}" />
                         </DockPanel>
@@ -247,7 +247,7 @@
                             <Label Content="To'lov (donasi uchun):"
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                            <TextBlock Text="{Binding PricePerUnit}"
+                            <TextBlock Text="{Binding PricePerUnitContainer}"
                                        DockPanel.Dock="Right"
                                        Foreground="{StaticResource PrimaryTextColor}" />
                         </DockPanel>
@@ -476,7 +476,7 @@
                                           Opacity="0.2"
                                           BlurRadius="50"
                                           ShadowDepth="15"
-                                          Direction="220" />
+                                          Direction="280" />
                     </Border.Effect>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -492,6 +492,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="40" />
                             </Grid.ColumnDefinitions>
 
@@ -504,6 +505,18 @@
                                        FontSize="14" />
 
                             <Button Grid.Column="1"
+                                Content="Barchasini ko'rsatish"
+                                    VerticalAlignment="Center"
+                                    Height="28"
+                                    Background="{DynamicResource BackButtonBackground}"
+                                    Foreground="{StaticResource BackButtonForeground}"
+                                    BorderBrush="{StaticResource BackButtonBorder}"
+                                    Command="{Binding ShowAllSemiProductsCommand}"
+                                    BorderThickness="0.5"
+                                    Padding="4" 
+                                    Margin="10 0"/>
+
+                            <Button Grid.Column="2"
                                     Content="➕"
                                     Background="Transparent"
                                     Foreground="{StaticResource PrimaryTextColor}"
@@ -522,6 +535,7 @@
                                   HeadersVisibility="Column"
                                   RowHeaderWidth="0"
                                   IsReadOnly="True"
+                                  Loaded="DataGrid_Loaded"
                                   ItemsSource="{Binding FilteredSemiProducts}">
 
                             <DataGrid.Columns>
@@ -597,10 +611,13 @@
                                 </DataGridTemplateColumn>
 
                                 <!-- Miqdori -->
-                                <DataGridTemplateColumn Header="Miqdori" Width="*">
+                                <DataGridTemplateColumn Header="Miqdori"
+                                                        Width="*"
+                                                        Visibility="Hidden"
+                                                        x:Name="QuantityColumn">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding LinkedQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      BorderThickness="0"
                                                      Background="Transparent"
