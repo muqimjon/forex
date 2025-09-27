@@ -8,30 +8,33 @@ using System.Collections.ObjectModel;
 public partial class SemiProductPageViewModel : ViewModelBase
 {
     [ObservableProperty] private InvoiceViewModel invoice = new();
-
-    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = [];
     [ObservableProperty] private UserViewModel? selectedSupplier;
+    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = [];
 
-    private ProductViewModel? selectedProduct;
+
+    private List<UnitMeasuerViewModel> AvailableMeasures = [];
+    private List<ManufactoryViewModel> Manufactories = [];
+
+
     [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
-    [ObservableProperty] private ObservableCollection<ProductViewModel> productTypeItem = [];
-    [ObservableProperty] private ObservableCollection<SemiProductViewModel> semiProducts = [];
-
-    [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> items = [];
-    [ObservableProperty] private ObservableCollection<SemiProductViewModel> filteredSemiProducts = [];
+    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
 
 
     [ObservableProperty] private bool showQuantityColumn;
+    [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> items = [];
+    [ObservableProperty] private ObservableCollection<SemiProductViewModel> semiProducts = [];
+    [ObservableProperty] private ObservableCollection<SemiProductViewModel> filteredSemiProducts = [];
 
 
-    public ProductViewModel SelectedProduct
+    private ProductTypeViewModel? selectedProductType;
+    public ProductTypeViewModel SelectedProductType
     {
-        get => selectedProduct;
+        get => selectedProductType!;
         set
         {
-            if (selectedProduct != value)
+            if (selectedProductType != value)
             {
-                selectedProduct = value;
+                selectedProductType = value;
                 OnPropertyChanged();
                 ShowQuantityColumn = true;
                 UpdateSemiProductsForSelectedProduct();
@@ -39,11 +42,11 @@ public partial class SemiProductPageViewModel : ViewModelBase
         }
     }
 
-    private void UpdateSemiProductsForSelectedProduct()
+    public void UpdateSemiProductsForSelectedProduct()
     {
         FilteredSemiProducts.Clear();
 
-        if (SelectedProduct is null)
+        if (SelectedProductType is null)
         {
             foreach (var semi in SemiProducts)
             {
@@ -56,7 +59,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             return;
         }
 
-        foreach (var item in SelectedProduct!.Items)
+        foreach (var item in SelectedProductType.Items)
         {
 
             if (item.SemiProduct is not null)
@@ -72,32 +75,78 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     public void Seeding()
     {
+        // 📦 O‘lchov birliklari
+        AvailableMeasures =
+        [
+            new() { Id = 1, Name = "Dona", Description = "Soni bilan o‘lchanadi" },
+        new() { Id = 2, Name = "Kg", Description = "Og‘irlik birligi" },
+        new() { Id = 3, Name = "Litr", Description = "Hajm birligi" }
+        ];
+
+        // 🏭 Ishlab chiqaruvchilar
+        Manufactories =
+        [
+            new() { Id = 1, Name = "Farg‘ona Non Sexi" },
+        new() { Id = 2, Name = "Qo‘qon Ichimlik Zavodi" }
+        ];
+
+        // 👥 Yetkazuvchilar
         Suppliers =
-    [
-        new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent", Email = "a@supplier.uz", Description = "Mahalliy yetkazuvchi" },
+        [
+            new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent", Email = "a@supplier.uz", Description = "Mahalliy yetkazuvchi" },
         new() { Id = 2, Name = "Supplier B", Phone = "998907654321", Address = "Samarqand", Email = "b@supplier.uz", Description = "Viloyat yetkazuvchi" }
-    ];
+        ];
 
-        Products =
-    [
-        new() { Name = "Un", Code = 1001, Quantity = 800, Type = "24 - 29", Measure = new() { Name = "Dona" } },
-        new() { Name = "Shakar", Code = 1002, Quantity = 600, Type = "24 - 29", Measure = new() { Name = "Dona" } },
-        new() { Name = "Yog‘", Code = 1003, Quantity = 200, Type = "24 - 29", Measure = new() { Name = "Dona" } },
-        new() { Name = "Guruch", Code = 1004, Quantity = 150, Type = "30-35", Measure = new() { Name = "Dona" } },
-        new() { Name = "Tuz", Code = 1005, Quantity = 500, Type = "24 - 29", Measure = new() { Name = "Dona" } },
-        new() { Name = "Makaron", Code = 1006, Quantity = 180, Type = "24 - 29", Measure = new() { Name = "Dona" } }
-    ];
-
+        // 🧩 Yarim tayyor mahsulotlar
         SemiProducts =
-    [
-        new() { Name = "Xamir", LinkedQuantity = 3, CostPrice = 2000, Measure = new() { Name = "Dona" }, Code = 1003, TotalQuantity = 6542 },
-        new() { Name = "Sous", LinkedQuantity = 5, CostPrice = 1500, Measure = new() { Name = "Dona" }, Code = 1004, TotalQuantity = 80020 },
-        new() { Name = "Pishloq", LinkedQuantity = 2, CostPrice = 5000, Measure = new() { Name = "Dona" }, Code = 1005, TotalQuantity = 2400 },
-        new() { Name = "Go‘sht bo‘lagi", LinkedQuantity = 4, CostPrice = 7000, Measure = new() { Name = "Dona" }, Code = 1006, TotalQuantity = 5648 },
-        new() { Name = "Qaymoq", LinkedQuantity = 6, CostPrice = 3000, Measure = new() { Name = "Dona" }, Code = 1006, TotalQuantity = 5648 },
-        new() { Name = "Tuxumli qatlam", LinkedQuantity = 8, CostPrice = 3500, Measure = new() { Name = "Dona" }, Code = 1006, TotalQuantity = 5648 }
-    ];
+        [
+            new() { Name = "Xamir", LinkedQuantity = 3, CostPrice = 2000, Measure = AvailableMeasures[0], Code = 2001, TotalQuantity = 6542 },
+        new() { Name = "Sous", LinkedQuantity = 5, CostPrice = 1500, Measure = AvailableMeasures[0], Code = 2002, TotalQuantity = 80020 },
+        new() { Name = "Pishloq", LinkedQuantity = 2, CostPrice = 5000, Measure = AvailableMeasures[0], Code = 2003, TotalQuantity = 2400 },
+        new() { Name = "Go‘sht bo‘lagi", LinkedQuantity = 4, CostPrice = 7000, Measure = AvailableMeasures[0], Code = 2004, TotalQuantity = 5648 },
+        new() { Name = "Qaymoq", LinkedQuantity = 6, CostPrice = 3000, Measure = AvailableMeasures[0], Code = 2005, TotalQuantity = 5648 },
+        new() { Name = "Tuxumli qatlam", LinkedQuantity = 8, CostPrice = 3500, Measure = AvailableMeasures[0], Code = 2006, TotalQuantity = 5648 }
+        ];
 
+        // 🧱 Mahsulot turlari (ProductType)
+        ProductTypes =
+        [
+            new()
+        {
+            Type = "Oddiy Pizza",
+            Quantity = 10,
+            Items =
+            [
+                new() { SemiProduct = SemiProducts[0], Quantity = 2 }, // Xamir
+                new() { SemiProduct = SemiProducts[1], Quantity = 1 }, // Sous
+                new() { SemiProduct = SemiProducts[2], Quantity = 1 }  // Pishloq
+            ]
+        },
+        new()
+        {
+            Type = "Burger Max",
+            Quantity = 5,
+            Items =
+            [
+                new() { SemiProduct = SemiProducts[3], Quantity = 2 }, // Go‘sht bo‘lagi
+                new() { SemiProduct = SemiProducts[4], Quantity = 1 }  // Qaymoq
+            ]
+        }
+        ];
+
+        // 🧾 Mahsulotlar
+        Products =
+        [
+            new() { Code = 1001, Name = "Pizza", Measure = AvailableMeasures[0], Types = [ProductTypes[0]] },
+        new() { Code = 1002, Name = "Burger", Measure = AvailableMeasures[0], Types = [ProductTypes[1]] },
+        new() { Code = 1003, Name = "Ichimlik", Measure = AvailableMeasures[2], Types = [] }
+        ];
+
+        // 🔗 Bog‘lash: ProductType → Product
+        ProductTypes[0].Product = Products[0];
+        ProductTypes[1].Product = Products[1];
+
+        // 📦 Invoice
         Invoice = new InvoiceViewModel
         {
             EntryDate = DateTime.Today,
@@ -110,10 +159,12 @@ public partial class SemiProductPageViewModel : ViewModelBase
             ViaMiddleman = false,
             Supplier = Suppliers[0],
             Sender = Suppliers[1],
-            Manufactory = new ManufactoryViewModel { Id = 1, Name = "Farg‘ona Non Sexi" }
+            Manufactory = Manufactories[0]
         };
-    }
 
+        // 🔄 Filterlash (agar kerak bo‘lsa)
+        UpdateSemiProductsForSelectedProduct();
+    }
 
     #endregion
 
@@ -125,16 +176,16 @@ public partial class SemiProductPageViewModel : ViewModelBase
     [RelayCommand]
     private void AddProduct()
     {
-        ProductViewModel product = new();
-        Products.Add(product);
-        EditProduct(product);
+        ProductTypeViewModel type = new() { Product = new() };
+        ProductTypes.Add(type);
+        EditProduct(type);
     }
 
     // ✏️ Mahsulotni tahrirlash
     [RelayCommand]
-    private void EditProduct(ProductViewModel? item)
+    private void EditProduct(ProductTypeViewModel? item)
     {
-        foreach (var row in Products)
+        foreach (var row in ProductTypes)
             row.IsEditing = false;
 
         foreach (var row in SemiProducts)
@@ -146,19 +197,18 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     // ✅ Mahsulotni saqlash
     [RelayCommand]
-    private void SaveProduct(ProductViewModel? item)
+    private void SaveProduct(ProductTypeViewModel? item)
     {
         if (item is not null)
             item.IsEditing = false;
     }
 
-    // ❌ Yarim tayyor mahsulotni o‘chirish
+    // ❌ M ahsulotni o‘chirish
     [RelayCommand]
-    private void RemoveProduct(ProductViewModel item)
+    private void RemoveProduct(ProductTypeViewModel item)
     {
-        Products.Remove(item);
+        ProductTypes.Remove(item);
     }
-
     #endregion Product Commands
 
     #region SemiProduct Commands
@@ -169,10 +219,10 @@ public partial class SemiProductPageViewModel : ViewModelBase
     {
         var newSemi = new SemiProductViewModel();
 
-        if (SelectedProduct is not null)
+        if (SelectedProductType is not null)
         {
             var pti = new ProductTypeItemViewModel { SemiProduct = newSemi };
-            SelectedProduct.Items.Add(pti);
+            SelectedProductType.Items.Add(pti);
         }
         EditSemiProduct(newSemi);
         SemiProducts.Add(newSemi);
@@ -186,7 +236,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         foreach (var row in SemiProducts)
             row.IsEditing = false;
 
-        foreach (var row in Products)
+        foreach (var row in ProductTypes)
             row.IsEditing = false;
 
         if (item is not null)
@@ -207,11 +257,11 @@ public partial class SemiProductPageViewModel : ViewModelBase
     {
         SemiProducts.Remove(item);
 
-        foreach (var product in Products)
+        foreach (var types in ProductTypes)
         {
-            var toRemove = product.Items.Where(i => i.SemiProduct == item).ToList();
+            var toRemove = types.Items.Where(i => i.SemiProduct == item).ToList();
             foreach (var i in toRemove)
-                product.Items.Remove(i);
+                types.Items.Remove(i);
         }
 
         UpdateSemiProductsForSelectedProduct();
@@ -220,7 +270,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
     [RelayCommand]
     private void ShowAllSemiProducts()
     {
-        SelectedProduct = default!;
+        SelectedProductType = default!;
         UpdateSemiProductsForSelectedProduct();
     }
 

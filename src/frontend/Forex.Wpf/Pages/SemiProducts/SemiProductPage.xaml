@@ -13,6 +13,36 @@
       d:DesignWidth="810"
       Title="Kirim qilish">
 
+    <Page.Resources>
+        <!-- Umumiy DataGridCell style -->
+        <Style x:Key="TransparentCellStyle" TargetType="DataGridCell">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+
+        <!-- TextBox style -->
+        <Style x:Key="InlineTextBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!-- ComboBox style -->
+        <Style x:Key="InlineComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </Page.Resources>
+    
     <Grid Margin="15">
 
         <Grid.RowDefinitions>
@@ -180,7 +210,7 @@
                     </StackPanel>
 
                     <DockPanel>
-                        <Label Content="O'rtakash orqalimi:"
+                        <Label Content="Yuboruvchi orqalimi:"
                                DockPanel.Dock="Left"
                                Foreground="{StaticResource PrimaryTextColor}" />
                         <ToggleButton IsChecked="{Binding Invoice.ViaMiddleman, Mode=TwoWay}" />
@@ -329,50 +359,30 @@
                                   HeadersVisibility="Column"
                                   RowHeaderWidth="0"
                                   IsReadOnly="True"
-                                  SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
-                                  ItemsSource="{Binding Products}">
+                                  SelectedItem="{Binding SelectedProductType, Mode=TwoWay}"
+                                  ItemsSource="{Binding ProductTypes}">
                             
-
-
                             <DataGrid.Columns>
 
                                 <!-- Image preview -->
                                 <DataGridTemplateColumn Width="Auto">
                                     <DataGridTemplateColumn.CellStyle>
-                                        <Style TargetType="DataGridCell">
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="Margin" Value="0" />
-                                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Setter Property="BorderBrush" Value="Transparent" />
-                                        </Style>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Image Source="{Binding Image}"
-                                                   Width="30"
-                                                   Height="30"
-                                                   Stretch="UniformToFill"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"
-                                                   SnapsToDevicePixels="True" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-
-                                <!-- Name -->
-                                <DataGridTemplateColumn Header="Nomi" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                        IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                        BorderThickness="0"
-                                                        Background="Transparent"
-                                                        Padding="0"
-                                                        VerticalAlignment="Center" />
+                                            <Button Command="{Binding Product.SelectImageCommand}"
+                                                    IsHitTestVisible="{Binding IsEditing}"
+                                                    Focusable="{Binding IsEditing}"
+                                                    Width="30"
+                                                    Height="30"
+                                                    BorderThickness="0"
+                                                    ToolTip="Rasmni o‘zgartirish">
+                                                <Button.Background>
+                                                    <ImageBrush ImageSource="{Binding Product.Image}"
+                                                                Stretch="UniformToFill" />
+                                                </Button.Background>
+                                            </Button>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -381,19 +391,36 @@
                                 <DataGridTemplateColumn Header="Kod" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                        IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                        BorderThickness="0"
-                                                        Background="Transparent"
-                                                        Padding="0"
-                                                        VerticalAlignment="Center" />
+                                            <ComboBox ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding Product, Mode=TwoWay}"
+                                                      DisplayMemberPath="Code"
+                                                      IsEnabled="{Binding IsEditing}"
+                                                      IsEditable="True"
+                                                      Background="Transparent"
+                                                      BorderThickness="0"
+                                                      Padding="0"
+                                                      VerticalAlignment="Center"
+                                                      LostFocus="ComboBox_LostFocus" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Name -->
+                                <DataGridTemplateColumn Header="Nomi" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Product.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <!-- Turi -->
-                                <DataGridTemplateColumn Header="Turi"
-                                                        Width="*">
+                                <DataGridTemplateColumn Header="Turi" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -407,22 +434,24 @@
                                 </DataGridTemplateColumn>
 
                                 <!-- Measure -->
-                                <DataGridTemplateColumn Header="O‘lchov"
-                                                        Width="*">
+                                <DataGridTemplateColumn Header="O‘lchov" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Measure.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"
-                                                     Padding="0"
-                                                     VerticalAlignment="Center" />
+                                            <ComboBox ItemsSource="{Binding DataContext.AvailableMeasures, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding Product.Measure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      DisplayMemberPath="Name"
+                                                      IsEnabled="{Binding IsEditing}"
+                                                      Background="Transparent"
+                                                      BorderThickness="0"
+                                                      Padding="0"
+                                                      VerticalAlignment="Center" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
+
                                 <!-- keldi -->
-                                <DataGridTemplateColumn Header="Keldi" Width="*">
+                                <DataGridTemplateColumn Header="Jami miqdori" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -438,16 +467,7 @@
                                 <!-- Actions -->
                                 <DataGridTemplateColumn Width="Auto">
                                     <DataGridTemplateColumn.CellStyle>
-                                        <Style TargetType="DataGridCell">
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="Margin" Value="0" />
-                                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Setter Property="BorderBrush" Value="Transparent" />
-                                        </Style>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -508,11 +528,12 @@
                                 Content="Barchasini ko'rsatish"
                                     VerticalAlignment="Center"
                                     Height="28"
-                                    Background="{DynamicResource BackButtonBackground}"
+                                    Background="{DynamicResource PrimaryBackground}"
                                     Foreground="{StaticResource BackButtonForeground}"
                                     BorderBrush="{StaticResource BackButtonBorder}"
                                     Command="{Binding ShowAllSemiProductsCommand}"
-                                    BorderThickness="0.5"
+                                    BorderThickness="0"
+                                    
                                     Padding="4" 
                                     Margin="10 0"/>
 
@@ -543,26 +564,34 @@
                                 <!-- Image preview -->
                                 <DataGridTemplateColumn Width="Auto">
                                     <DataGridTemplateColumn.CellStyle>
-                                        <Style TargetType="DataGridCell">
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="Margin" Value="0" />
-                                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Setter Property="BorderBrush" Value="Transparent" />
-                                        </Style>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Image Source="{Binding Image}"
-                                                   Width="30"
-                                                   Height="30"
-                                                   Stretch="UniformToFill"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"
-                                                   SnapsToDevicePixels="True" />
+                                            <Button Command="{Binding SelectImageCommand}"
+                                                    IsHitTestVisible="{Binding IsEditing}"
+                                                    Focusable="{Binding IsEditing}"
+                                                    Width="30"
+                                                    Height="30"
+                                                    BorderThickness="0"
+                                                    ToolTip="Rasmni o‘zgartirish">
+                                                <Button.Background>
+                                                    <ImageBrush ImageSource="{Binding Image}"
+                                                                Stretch="UniformToFill" />
+                                                </Button.Background>
+                                            </Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Kod -->
+                                <DataGridTemplateColumn Header="Kod"
+                                                        Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -574,44 +603,25 @@
                                         <DataTemplate>
                                             <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"
-                                                     Padding="0"
-                                                     VerticalAlignment="Center" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-
-                                <!-- Kod -->
-                                <DataGridTemplateColumn Header="Kod" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox Text="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"
-                                                     Padding="0"
-                                                     VerticalAlignment="Center" />
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <!-- O‘lchov -->
-                                <DataGridTemplateColumn Header="O‘lchov" Width="*">
+                                <DataGridTemplateColumn Header="O‘lchov"
+                                                        Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding Measure.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"
-                                                     Padding="0"
-                                                     VerticalAlignment="Center" />
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <!-- Miqdori -->
-                                <DataGridTemplateColumn Header="Miqdori"
+                                <DataGridTemplateColumn Header="Miqdor 1 dona mahsulot uchun"
                                                         Width="*"
                                                         Visibility="Hidden"
                                                         x:Name="QuantityColumn">
@@ -619,24 +629,19 @@
                                         <DataTemplate>
                                             <TextBox Text="{Binding LinkedQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"
-                                                     Padding="0"
-                                                     VerticalAlignment="Center" />
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <!-- Jami -->
-                                <DataGridTemplateColumn Header="Keldi" Width="*">
+                                <DataGridTemplateColumn Header="Jami miqdori"
+                                                        Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding TotalQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"
-                                                     Padding="0"
-                                                     VerticalAlignment="Center" />
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -644,30 +649,21 @@
                                 <!-- Actions -->
                                 <DataGridTemplateColumn Width="Auto">
                                     <DataGridTemplateColumn.CellStyle>
-                                        <Style TargetType="DataGridCell">
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="Margin" Value="0" />
-                                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Setter Property="BorderBrush" Value="Transparent" />
-                                        </Style>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <controls:ActionButton 
-                                                EditCommand="{Binding DataContext.EditSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                SaveCommand="{Binding DataContext.SaveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                CommandParameter="{Binding}" />
+                                            <controls:ActionButton EditCommand="{Binding DataContext.EditSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   SaveCommand="{Binding DataContext.SaveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   CommandParameter="{Binding}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                             </DataGrid.Columns>
                         </DataGrid>
+
 
                     </Grid>
                 </Border>

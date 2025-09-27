@@ -56,4 +56,33 @@ public partial class SemiProductPage : Page
         };
     }
 
+    private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is ComboBox combo)
+        {
+            string? text = combo.Text?.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            var vm = (SemiProductPageViewModel)DataContext;
+            if (combo.DataContext is not ProductTypeViewModel row)
+                return;
+
+            var existing = vm.Products.FirstOrDefault(p => p.Code.ToString() == text);
+
+            if (existing is not null)
+                row.Product = existing;
+            else
+            {
+                if (int.TryParse(text, out int newCode))
+                {
+                    var newProduct = new ProductViewModel { Code = newCode };
+                    vm.Products.Add(newProduct);
+                    row.Product = newProduct;
+                }
+            }
+
+            combo.SelectedItem = row.Product;
+        }
+    }
 }
