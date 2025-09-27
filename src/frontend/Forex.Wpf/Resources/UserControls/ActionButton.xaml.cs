@@ -29,6 +29,19 @@ public partial class ActionButton : UserControl
         AnimatePopup();
     }
 
+    private void EditButton_Click(object sender, RoutedEventArgs e)
+    {
+        IsEditing = true;
+        ClosePopup();
+    }
+
+    private void SaveButton_Click(object sender, RoutedEventArgs e)
+    {
+        IsEditing = false;
+        ClosePopup();
+    }
+
+
     private void ClosePopup()
     {
         ActionPopup.IsOpen = false;
@@ -78,6 +91,10 @@ public partial class ActionButton : UserControl
     public static readonly DependencyProperty DeleteCommandProperty =
         DependencyProperty.Register(nameof(DeleteCommand), typeof(ICommand), typeof(ActionButton));
 
+    public static readonly DependencyProperty IsEditingProperty =
+    DependencyProperty.Register(nameof(IsEditing), typeof(bool), typeof(ActionButton),
+        new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
     public static readonly DependencyProperty CommandParameterProperty =
         DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(ActionButton));
 
@@ -97,6 +114,12 @@ public partial class ActionButton : UserControl
     {
         get => (ICommand)GetValue(SaveCommandProperty);
         set => SetValue(SaveCommandProperty, value);
+    }
+
+    public bool IsEditing
+    {
+        get => (bool)GetValue(IsEditingProperty);
+        set => SetValue(IsEditingProperty, value);
     }
 
     public object CommandParameter

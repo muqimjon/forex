@@ -379,8 +379,7 @@
                                                     BorderThickness="0"
                                                     ToolTip="Rasmni o‘zgartirish">
                                                 <Button.Background>
-                                                    <ImageBrush ImageSource="{Binding Product.Image}"
-                                                                Stretch="UniformToFill" />
+                                                    <ImageBrush ImageSource="{Binding Product.Image}" Stretch="UniformToFill" />
                                                 </Button.Background>
                                             </Button>
                                         </DataTemplate>
@@ -475,7 +474,8 @@
                                                 EditCommand="{Binding DataContext.EditProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                 DeleteCommand="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                 SaveCommand="{Binding DataContext.SaveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                                   CommandParameter="{Binding}" />
+                                                                   CommandParameter="{Binding}"
+                                                                   IsEditing="{Binding IsEditing, Mode=TwoWay}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -656,6 +656,7 @@
                                             <controls:ActionButton EditCommand="{Binding DataContext.EditSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                                    DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                                    SaveCommand="{Binding DataContext.SaveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   IsEditing="{Binding IsEditing, Mode=TwoWay}"
                                                                    CommandParameter="{Binding}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

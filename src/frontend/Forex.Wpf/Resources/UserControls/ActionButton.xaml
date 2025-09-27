@@ -44,22 +44,22 @@
                             Content="✏️"
                             Focusable="False"
                             IsTabStop="False"
-                            Click="ClosePopup_Click"
+                            Click="EditButton_Click"
                             Style="{StaticResource ContextMenuButtonStyle}"
                             Command="{Binding EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             CommandParameter="{Binding}"
-                            Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                            Visibility="{Binding IsEditing, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
 
                     <!-- Save -->
                     <Button x:Name="SaveButton"
                             Content="💾"
                             Focusable="False"
                             IsTabStop="False"
-                            Click="ClosePopup_Click"
+                            Click="SaveButton_Click"
                             Style="{StaticResource ContextMenuButtonStyle}"
                             Command="{Binding SaveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             CommandParameter="{Binding}"
-                            Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            Visibility="{Binding IsEditing, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <!-- Delete -->
                     <Button Content="🗑️"
