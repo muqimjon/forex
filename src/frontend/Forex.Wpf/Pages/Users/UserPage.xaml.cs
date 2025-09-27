@@ -32,7 +32,7 @@ public partial class UserPage : Page
         btnSave.Click += BtnSave_Click;
         btnBack.Click += BtnBack_Click;
         txtPhone.GotFocus += txtPhone_GotFocus;
-
+        LoadValyutaType();
         LoadUsers();
         UpdateRoleList();
         FocusNavigator.AttachEnterNavigation(
@@ -49,6 +49,24 @@ public partial class UserPage : Page
         ]);
     }
 
+    private async void LoadValyutaType()
+    {
+        try
+        {
+            var valyutaTypes = await client.Currency.GetAll();
+            cbxValutaType.ItemsSource = valyutaTypes.Data?.ToList();
+
+            // Faqat symbol ko‘rinsin
+            cbxValutaType.DisplayMemberPath = "Symbol";
+
+            // SelectedValue sifatida Id ishlatiladi
+            cbxValutaType.SelectedValuePath = "Id";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Valyuta turlarini yuklashda xatolik:\n" + ex.Message);
+        }
+    }
     private async void LoadUsers()
     {
         try
@@ -77,21 +95,28 @@ public partial class UserPage : Page
         string query = txtSearch.Text.Trim().ToLower();
         string selectedRole = cbRole.SelectedItem?.ToString() ?? "";
 
-        var filtered = rawUsers.Where(u =>
-            (string.IsNullOrWhiteSpace(selectedRole) || u.Role.ToString() == selectedRole) &&
-            (
-                string.IsNullOrWhiteSpace(query) ||
+        var filtered = rawUsers.AsEnumerable();
+
+        // 🔹 Role bo‘yicha filter
+        if (!string.IsNullOrWhiteSpace(selectedRole) && selectedRole != "User")
+        {
+            filtered = filtered.Where(u => u.Role.ToString() == selectedRole);
+        }
+        // Agar User bo‘lsa → hech qanday filter ishlamaydi (hammasi chiqadi)
+
+        // 🔹 Search bo‘yicha filter
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            filtered = filtered.Where(u =>
                 (u.Name?.Contains(query, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
                 (u.Phone?.Contains(query, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
                 (u.Address?.Contains(query, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                (u.Description?.Contains(query, StringComparison.CurrentCultureIgnoreCase) ?? false)
-            )
-        ).ToList();
+                (u.Description?.Contains(query, StringComparison.CurrentCultureIgnoreCase) ?? false));
+        }
 
         filteredUsers = new ObservableCollection<UserResponse>(filtered);
         dgUsers.ItemsSource = filteredUsers;
     }
-
     private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
     {
         ApplyFilters();
@@ -103,6 +128,7 @@ public partial class UserPage : Page
 
         if (cbRole.SelectedItem is not string role || string.IsNullOrWhiteSpace(role))
         {
+            brValutaType.Visibility = Visibility.Collapsed;
             brDiscount.Visibility = Visibility.Collapsed;
             brAccount.Visibility = Visibility.Collapsed;
             btnSave.Visibility = Visibility.Collapsed;
@@ -112,6 +138,13 @@ public partial class UserPage : Page
         brDiscount.Visibility = role == "Mijoz" ? Visibility.Visible : Visibility.Collapsed;
         brAccount.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
         btnSave.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
+
+        brValutaType.Visibility =
+        (role == "Mijoz" || role == "Taminotchi" || role == "Hodim")
+        ? Visibility.Visible
+        : Visibility.Collapsed;
+
+
     }
 
     private void CbRole_GotFocus(object sender, RoutedEventArgs e)
@@ -130,6 +163,8 @@ public partial class UserPage : Page
                 return;
             }
 
+
+
             var request = new UserRequest
             {
                 Name = txtName.Text.Trim(),
@@ -137,7 +172,15 @@ public partial class UserPage : Page
                 Address = txtAddress.Text.Trim(),
                 Description = txtDescription.Text.Trim(),
                 Role = role,
-                Balance = decimal.TryParse(tbAccount.Text, out var balance) ? balance : 0
+                CurrencyBalances = new List<CurrencyBalanceRequest>
+                {
+                    new CurrencyBalanceRequest
+                    {
+                        CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
+                        Balance = decimal.TryParse(tbAccount.Text, out var bal) ? bal : 0,
+                        Discount = decimal.TryParse(tbDiscount.Text, out var disc) ? disc : 0
+                    }
+                }
             };
 
             var response = await client.Users.Create(request);
@@ -256,5 +299,32 @@ public partial class UserPage : Page
         }
     }
 
+    private void btnEdit_Click(object sender, RoutedEventArgs e)
+    {
+        long userId;
+        if (dgUsers.SelectedItem is not UserResponse user) return;
+        userId = user.Id;
+        LoadingUser(userId);
+
+    }
+
+    private async void LoadingUser(long userId)
+    {
+        var exitUser = await client.Users.GetById(userId);
+        var user = exitUser.Data;
+        cbRole.SelectedItem = user.Role.ToString();
+        txtName.Text = user.Name;
+        txtPhone.Text = user.Phone;
+        txtAddress.Text = user.Address;
+        txtDescription.Text = user.Description;
+
+
+        if (user.Accounts != null)
+        {
+        }
+
+        btnSave.Visibility = Visibility.Collapsed;
+        btnUpdate.Visibility = Visibility.Visible;
+    }
 }
 
