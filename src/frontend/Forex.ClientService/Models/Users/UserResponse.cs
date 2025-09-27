@@ -11,5 +11,5 @@ public sealed record UserResponse
     public Role Role { get; set; }
     public string Address { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public Account Account { get; set; } = default!;
+    public List<Account> Accounts { get; set; } = default!;
 }
