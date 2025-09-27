@@ -1,10 +1,12 @@
 ﻿namespace Forex.Wpf.Pages.Users;
 
+using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Models.Users;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
+using Forex.Wpf.Pages.SemiProducts.ViewModels;
 using Forex.Wpf.Windows;
 using System;
 using System.Collections.Generic;
@@ -325,6 +327,29 @@ public partial class UserPage : Page
 
         btnSave.Visibility = Visibility.Collapsed;
         btnUpdate.Visibility = Visibility.Visible;
+    }
+
+    [RelayCommand]
+    private async void EditUser(UserResponse response)
+    {
+        LoadingUser(response.Id);
+    }
+
+    [RelayCommand]
+    private async void RemoveUser(UserResponse response)
+    {
+        var vm = new SemiProductViewModel();
+        vm.ErrorMessage = string.Empty;
+        vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o‘chirmoqchimisiz?";
+    }
+
+    [RelayCommand]
+    private void SaveUser(UserResponse response)
+    {
+        response.IsEditing = false;
+        var vm = new SemiProductViewModel();
+        vm.SuccessMessage = string.Empty;
+        vm.SuccessMessage = $"B{response.Name}ni ma'lumotlari saqlandi";
     }
 }
 

@@ -3,10 +3,35 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
       mc:Ignorable="d" 
       d:DesignHeight="580" d:DesignWidth="810"
       Title="UserPage">
+
+
+    <Page.Resources>
+        <!-- Umumiy DataGridCell style -->
+        <Style x:Key="TransparentCellStyle"
+               TargetType="DataGridCell">
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="Margin"
+                    Value="0" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="FocusVisualStyle"
+                    Value="{x:Null}" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="BorderBrush"
+                    Value="Transparent" />
+        </Style>
+    </Page.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -126,7 +151,7 @@
                   Margin="0"
                   BorderThickness="1"
                   BorderBrush="Gray"
-                  ItemsSource="{Binding}">
+                  ItemsSource="{Binding filteredUsers}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Nomi" Binding="{Binding Name}" Width="*"/>
                 <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" Width="*"/>
@@ -134,24 +159,18 @@
                 <DataGridTextColumn Header="Izoh" Binding="{Binding Description}" Width="*"/>
                 <DataGridTextColumn Header="Rol" Binding="{Binding Role}" Width="*"/>
 
-                <DataGridTemplateColumn Header="Amallar" Width="150">
+
+                <!-- Actions -->
+                <DataGridTemplateColumn Width="Auto">
+                    <DataGridTemplateColumn.CellStyle>
+                        <StaticResource ResourceKey="TransparentCellStyle" />
+                    </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button x:Name="btnEdit" Content="✏️"
-                                        Background="DodgerBlue"
-                                        Foreground="White"
-                                        Padding="0"
-                                        Width="60"
-                                        Height="25"
-                                        Click="btnEdit_Click"/>
-                                <Button Content="🗑️"
-                                        Background="Crimson"
-                                        Foreground="White"
-                                        Padding="0"
-                                        Width="60"
-                                        Height="25"/>
-                            </StackPanel>
+                            <controls:ActionButton EditCommand="{Binding EditUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                   DeleteCommand="{Binding RemoveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                   SaveCommand="{Binding SaveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                   CommandParameter="{Binding}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

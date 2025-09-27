@@ -12,4 +12,6 @@ public sealed record UserResponse
     public string Address { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<Account> Accounts { get; set; } = default!;
+
+    public bool IsEditing { get; set; }
 }
