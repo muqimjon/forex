@@ -9,4 +9,6 @@ public class ForexClient(string baseUrl)
     public IApiUser Users { get; } = ApiServiceFactory.Create<IApiUser>(baseUrl);
     public IApiSemiProduct SemiProduct { get; } = ApiServiceFactory.Create<IApiSemiProduct>(baseUrl);
     public IApiManufactory Manufactory { get; } = ApiServiceFactory.Create<IApiManufactory>(baseUrl);
+    public IApiCurrency Currency { get; } = ApiServiceFactory.Create<IApiCurrency>(baseUrl);
+
 }
