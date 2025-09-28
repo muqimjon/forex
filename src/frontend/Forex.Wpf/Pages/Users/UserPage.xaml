@@ -41,9 +41,9 @@
         </Grid.RowDefinitions>
 
         <!-- 🔎 Qidiruv -->
-        <Border Width="250" Grid.Row="0" BorderBrush="{DynamicResource SelectedBorderColor}" BorderThickness="1" Padding="0" Margin="0 5" HorizontalAlignment="Left" CornerRadius="5" Background="{DynamicResource SelectedBackground}">
+        <Border Width="240" Grid.Row="0" BorderBrush="{DynamicResource SelectedBorderColor}" BorderThickness="1" Padding="0" Margin="0 5" HorizontalAlignment="Left" CornerRadius="5" Background="{DynamicResource SelectedBackground}">
             <TextBox x:Name="txtSearch"
-                   Width="240"
+                   Width="230"
                    FontSize="16"
                    Margin="5,5,5,5"
                    Padding="0"
@@ -81,8 +81,8 @@
                 <TextBox x:Name="txtName" FontSize="16" BorderThickness="0" Width="112" md:HintAssist.Hint="Nomi" Padding="5" />
             </Border>
 
-            <Border BorderThickness="1" BorderBrush="{DynamicResource SelectedBorderColor}" Margin="1 0 1 2" Width="115" Background="{DynamicResource SelectedBackground}" CornerRadius="4">
-                <TextBox x:Name="txtPhone" FontSize="16" Width="110" BorderThickness="0" md:HintAssist.Hint="Telefon" Padding="5" TextChanged="txtPhone_TextChanged"/>
+            <Border BorderThickness="1" BorderBrush="{DynamicResource SelectedBorderColor}" Margin="1 0 1 2" Width="142" Background="{DynamicResource SelectedBackground}" CornerRadius="4">
+                <TextBox x:Name="txtPhone" FontSize="16" Width="140" BorderThickness="0" md:HintAssist.Hint="Telefon" Padding="5 5 2 5" TextChanged="txtPhone_TextChanged"/>
             </Border>
 
             <Border BorderThickness="1" BorderBrush="{DynamicResource SelectedBorderColor}" Margin="1 0 1 2" Width="200" Background="{DynamicResource SelectedBackground}" CornerRadius="4">
