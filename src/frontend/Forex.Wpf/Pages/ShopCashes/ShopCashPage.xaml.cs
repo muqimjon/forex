@@ -22,4 +22,13 @@ public partial class ShopCashPage : Page
         else
             Main.NavigateTo(new HomePage());
     }
+
+    private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (decimal.TryParse(tbSum.Text, out decimal value))
+        {
+            tbSum.Text = value.ToString("N2"); // 2 xona kasr format
+        }
+    }
+
 }

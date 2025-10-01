@@ -70,7 +70,7 @@ public partial class UserPage : Page
             // Row tanlanmagan → Save rejimi
             btnSave.Visibility = Visibility.Visible;
             btnUpdate.Visibility = Visibility.Collapsed;
-            
+
             txtName.Text = "";
             txtPhone.Text = null;
             txtAddress.Text = "";
