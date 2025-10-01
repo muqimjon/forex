@@ -1,8 +1,11 @@
 ﻿namespace Forex.Wpf.Pages.ShopCashes;
+
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 /// <summary>
 /// Interaction logic for ShopCashPage.xaml
@@ -13,6 +16,21 @@ public partial class ShopCashPage : Page
     public ShopCashPage()
     {
         InitializeComponent();
+        FocusNavigator.AttachEnterNavigation(
+        [
+            cbxIncome,
+            cbxValyutaType,
+            tbSum,
+            tbDescription,
+            btnRegister
+        ]);
+
+        FocusNavigator.AttachEnterNavigation(
+        [
+            startDate.dateTextBox,
+            endDate.dateTextBox,
+            btnShow
+        ]);
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

@@ -14,8 +14,8 @@
                 Content="🔙 Orqaga"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                Margin="0,0,0,12"
-                Padding="8,4"
+                Margin="0 0 0 12"
+                Padding="8 4"
                 md:ButtonAssist.CornerRadius="4"
                 Background="{DynamicResource OtherBackground}"
                 Click="BtnBack_Click"/>

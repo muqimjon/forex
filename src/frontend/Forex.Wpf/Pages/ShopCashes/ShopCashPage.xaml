@@ -44,8 +44,8 @@
                      Margin="0,0,20,0" 
                      UniformCornerRadius="4" 
                      Foreground="{DynamicResource PrimaryTextColor}">
-                <StackPanel >
-                    <TextBlock Text="UZS (SO'M)" 
+                <StackPanel>
+                    <TextBlock Text="UZS (so'm)" 
                                FontSize="18" 
                                FontWeight="Bold" 
                                Margin="5" 
@@ -74,7 +74,7 @@
                      UniformCornerRadius="4" 
                      Foreground="{DynamicResource PrimaryTextColor}">
                 <StackPanel >
-                    <TextBlock Text="USD (DOLLAR)" 
+                    <TextBlock Text="USD (dollar)" 
                                FontSize="18" 
                                FontWeight="Bold" 
                                Margin="5" 
@@ -141,7 +141,8 @@
                             BorderThickness="1" 
                             Margin="0,0,10,5"
                             BorderBrush="{DynamicResource PrimaryHueLightBrush}">
-                        <ComboBox FontSize="16"
+                        <ComboBox x:Name="cbxValyutaType" 
+                                  FontSize="16"
                                   BorderThickness="0"
                                   Background="Transparent"
                                   md:HintAssist.Hint="Valyuta"
@@ -177,14 +178,16 @@
                             BorderThickness="0" 
                             Margin="0,1,10,7"
                             BorderBrush="{DynamicResource PrimaryHueLightBrush}">
-                        <TextBox md:HintAssist.Hint="Izoh"
+                        <TextBox x:Name="tbDescription" 
+                                 md:HintAssist.Hint="Izoh"
                                  Background="Transparent"
                                  BorderThickness="0"
                                  FontSize="16"
                                  Padding="5"/>
                     </Border>
 
-                    <Button Grid.Column="4" 
+                    <Button x:Name="btnRegister" 
+                            Grid.Column="4" 
                             Content="Qayd etish"
                             Background="{DynamicResource OtherBackground}"
                             Margin="5 -2 5 3"
@@ -212,14 +215,15 @@
 
                 <controls:UserCalendar x:Name="endDate"
                                        VerticalAlignment="Center" 
-                                       
                                        Width="150"
                                        Hint="Tugash sana"
                                        HorizontalAlignment="Left"
                                        FontSize="16"
                                        Margin="5 0"/>
 
-                <Button Content="Ko'rsatish" Command="{Binding FilterHistoryCommand}"
+                <Button x:Name="btnShow" 
+                        Content="Ko'rsatish" 
+                        Command="{Binding FilterHistoryCommand}"
                         Background="{DynamicResource OtherBackground}"
                         Margin="3"
                         md:ButtonAssist.CornerRadius="4"/>
@@ -247,6 +251,5 @@
                 </DataGrid>
             </ScrollViewer>
         </Grid>
-
     </Grid>
 </Page>
