@@ -15,5 +15,5 @@ public class AuthController : BaseController
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
-        => Ok(new Response { Data = await Mediator.Send(command) });
+        => Ok(new Response { Data = await Mediator.Send(command) }); 
 }

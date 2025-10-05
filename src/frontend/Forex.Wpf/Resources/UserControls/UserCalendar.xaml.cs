@@ -152,4 +152,5 @@ public partial class UserCalendar : UserControl
     private static bool IsValidDateInput(string input) => _dateInputRegex.IsMatch(input);
 
     private static bool IsValidDateFormat(string input) => _dateFormatRegex.IsMatch(input);
+
 }

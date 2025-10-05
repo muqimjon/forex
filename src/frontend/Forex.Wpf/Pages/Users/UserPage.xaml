@@ -59,8 +59,7 @@
                 Content="🔙 Orqaga"
                 ToolTip="Orqaga"
                 Grid.Row="0"
-                HorizontalAlignment="Right"
-                />
+                HorizontalAlignment="Right"/>
 
         <!-- ➕ Qo‘shish formasi -->
         <WrapPanel Grid.Row="1" Orientation="Horizontal">

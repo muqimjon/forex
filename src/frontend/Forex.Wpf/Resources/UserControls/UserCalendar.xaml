@@ -6,41 +6,44 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Forex.Wpf.Resources.UserControls"
              mc:Ignorable="d" >
-    <Grid>
+    <Grid Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="30" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0">
-            <Border Background="{DynamicResource SecondaryBackground}"
-                    CornerRadius="4 0 0 4">
-                <!-- Hint uchun Binding: Hint property -->
-                <TextBox x:Name="dateTextBox"
-                         BorderThickness="0"
-                         VerticalAlignment="Stretch"
-                         HorizontalAlignment="Stretch"
-                         HorizontalContentAlignment="Right"
-                         Margin="0 0 5 0"
-                         md:HintAssist.Hint="{Binding Hint, RelativeSource={RelativeSource AncestorType=local:UserCalendar}}" />
-            </Border>
-        </Grid>
+        <!-- TextBox taraf -->
+        <Border Background="Transparent"
+                CornerRadius="4,0,0,4">
+            <!-- faqat chap radius -->
+            <TextBox x:Name="dateTextBox"
+                     BorderThickness="0"
+                     VerticalAlignment="Stretch"
+                     HorizontalAlignment="Stretch"
+                     HorizontalContentAlignment="Right"
+                     Margin="0 0 5 0"
+                     md:HintAssist.Hint="{Binding Hint, RelativeSource={RelativeSource AncestorType=local:UserCalendar}}" />
+        </Border>
 
-        <Grid Grid.Column="1">
+        <!-- Button taraf -->
+        <Border Grid.Column="1"
+                Background="Transparent"
+                CornerRadius="0,4,4,0">
+            <!-- faqat o‘ng radius -->
             <Button Content="📅"
-                    Background="{DynamicResource SecondaryBackground}"
-                    VerticalAlignment="Stretch"
+                    Background="Transparent"
                     BorderThickness="0"
-                    md:ButtonAssist.CornerRadius="0 4 4 0"
+                    md:ButtonAssist.CornerRadius="0"
                     Padding="0"
-                    HorizontalAlignment="Left"
-                    Margin="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
                     Click="OpenCalendar_Click"
                     IsTabStop="False"/>
-        </Grid>
+        </Border>
 
+        <!-- Calendar popup -->
         <Popup x:Name="calendarPopup" PlacementTarget="{Binding ElementName=dateTextBox}" StaysOpen="False">
-            <Border BorderBrush="Aqua" BorderThickness="1">
+            <Border BorderBrush="Aqua" BorderThickness="1" CornerRadius="4">
                 <Calendar x:Name="calendar" SelectedDatesChanged="Calendar_SelectedDatesChanged"/>
             </Border>
         </Popup>

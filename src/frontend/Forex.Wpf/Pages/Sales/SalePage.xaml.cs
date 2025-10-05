@@ -13,6 +13,8 @@ public partial class SalePage : Page
     public SalePage()
     {
         InitializeComponent();
+        btnBack.Click += BtnBack_Click;
+        supplyDate.SelectedDate = DateTime.Now;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -21,5 +23,10 @@ public partial class SalePage : Page
             NavigationService.GoBack();
         else
             Main.NavigateTo(new HomePage());
+    }
+
+    private void AddButton_Click(object sender, RoutedEventArgs e)
+    {
+
     }
 }

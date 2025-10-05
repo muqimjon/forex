@@ -110,32 +110,66 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-
-                    <!-- Amaliyot turi -->
-                    <Border Grid.Column="0" 
+                    
+                    <Border Grid.Column="0" CornerRadius="4" Margin="5 0 5 5 " Background="{DynamicResource SecondaryBackground}">
+                        <controls:UserCalendar x:Name="OperationDate"
+                                           SelectedDate=""
+                                           VerticalAlignment="Center" 
+                                           Hint="sana"
+                                           Width="120"
+                                           Height="40"
+                                           HorizontalAlignment="Left"
+                                           FontSize="16"
+                                           Margin="5 0"/>
+                    </Border>
+                    <!-- Mijoz tanlash  -->
+                    <Border Grid.Column="1" 
                             Background="{DynamicResource SecondaryBackground}"
                             CornerRadius="4" 
                             Margin="5,0,10,5"
                             BorderBrush="{DynamicResource PrimaryHueLightBrush}">
-                        <ComboBox x:Name="cbxIncome" 
+                        <ComboBox x:Name="cbxUser" 
                                   FontSize="16"
-                                  md:HintAssist.Hint="Amaliyot turi"
+                                  IsEditable="true"
+                                  md:HintAssist.Hint="User tanlash"
                                   BorderThickness="0"
                                   Background="Transparent"
                                   Padding="5 4"
                                   Width="150"
                                   SelectedValue="{Binding NewTransactionType}">
+                            <ComboBoxItem Content="Ovoza Plyus" IsSelected="True"/>
+                            <ComboBoxItem Content="Avazbek"/>
+                        </ComboBox>
+                    </Border>
+                    
+                    <!-- Amaliyot turi -->
+                    <Border Grid.Column="2" 
+                      Background="{DynamicResource SecondaryBackground}"
+                      CornerRadius="4" 
+                      Margin="5,0,10,5"
+                      BorderBrush="{DynamicResource PrimaryHueLightBrush}">
+                        <ComboBox x:Name="cbxIncome" 
+                            FontSize="16"
+                            md:HintAssist.Hint="Amaliyot turi"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Padding="5 4"
+                            Width="150"
+                            SelectedValue="{Binding NewTransactionType}">
                             <ComboBoxItem Content="Kirim" IsSelected="True"/>
                             <ComboBoxItem Content="Chiqim"/>
                         </ComboBox>
                     </Border>
 
+
                     <!-- Valyuta -->
-                    <Border Grid.Column="1" 
+                    <Border Grid.Column="3" 
                             Background="{DynamicResource SecondaryBackground }"
                             CornerRadius="4" 
                             BorderThickness="1" 
@@ -155,7 +189,7 @@
                     </Border>
 
                     <!-- Summa -->
-                    <Border Grid.Column="2" 
+                    <Border Grid.Column="4" 
                             Background="{DynamicResource SecondaryBackground}"
                             CornerRadius="4" 
                             BorderThickness="0" 
@@ -172,7 +206,7 @@
                     </Border>
 
                     <!-- Izoh -->
-                    <Border Grid.Column="3"
+                    <Border Grid.Column="5"
                             Background="{DynamicResource SecondaryBackground}"
                             CornerRadius="4" 
                             BorderThickness="0" 
@@ -187,8 +221,8 @@
                     </Border>
 
                     <Button x:Name="btnRegister" 
-                            Grid.Column="4" 
-                            Content="Qayd etish"
+                            Grid.Column="6" 
+                            Content="Saqlash"
                             Background="{DynamicResource OtherBackground}"
                             Margin="5 -2 5 3"
                             Command="{Binding RecordTransactionCommand}"
@@ -204,6 +238,7 @@
                            FontWeight="Medium"
                            VerticalAlignment="Center" 
                            Margin="5,0,20,0"/>
+                <Border CornerRadius="4" Margin="2 5" Background="{DynamicResource SecondaryBackground}">
                 <controls:UserCalendar x:Name="startDate"
                                        SelectedDate="{Binding OperationDate}"
                                        VerticalAlignment="Center" 
@@ -212,15 +247,17 @@
                                        HorizontalAlignment="Left"
                                        FontSize="16"
                                        Margin="5 0"/>
+                </Border>
+                <Border CornerRadius="4" Margin="2 5" Background="{DynamicResource SecondaryBackground}">
 
-                <controls:UserCalendar x:Name="endDate"
+                    <controls:UserCalendar x:Name="endDate"
                                        VerticalAlignment="Center" 
                                        Width="150"
                                        Hint="Tugash sana"
                                        HorizontalAlignment="Left"
                                        FontSize="16"
                                        Margin="5 0"/>
-
+                </Border>
                 <Button x:Name="btnShow" 
                         Content="Ko'rsatish" 
                         Command="{Binding FilterHistoryCommand}"
