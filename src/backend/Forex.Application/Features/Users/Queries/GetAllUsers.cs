@@ -14,5 +14,7 @@ public class GetAllUsersQueryHandler(
     : IRequestHandler<GetAllUsersQuery, IReadOnlyCollection<UserDto>>
 {
     public async Task<IReadOnlyCollection<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
-        => mapper.Map<IReadOnlyCollection<UserDto>>(await context.Users.AsNoTracking().ToListAsync(cancellationToken));
+        => mapper.Map<IReadOnlyCollection<UserDto>>(await context.Users.AsNoTracking()
+            .Where(u => !u.IsDeleted)
+            .ToListAsync(cancellationToken));
 }

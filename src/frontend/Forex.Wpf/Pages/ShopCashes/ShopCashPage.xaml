@@ -3,22 +3,290 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.ShopCashes"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="ShopCashPage">
+      d:DesignHeight="700" d:DesignWidth="1000"
+      Title="Kassa boshqaruvi">
 
-    <Grid Margin="24">
-        <Button x:Name="btnBack"
-                Content="🔙 Orqaga"
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0"
+               Margin="5"
+               Content="🏦 Kassa amaliyotlari"
+               FontSize="20"
+               FontWeight="Bold"
+               Foreground="{StaticResource SecondaryTextColor}" />
+        <Button x:Name="btnBack" 
+                Grid.Column="2"
+                Grid.Row="0"
                 HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,0,0,12"
-                Padding="8,4"
-                md:ButtonAssist.CornerRadius="4"
-                Background="{DynamicResource OtherBackground}"
+                Content="🔙 Orqaga" 
+                VerticalAlignment="Top" 
+                Padding="8,4" 
+                md:ButtonAssist.CornerRadius="4" 
+                Background="{DynamicResource OtherBackground}" 
                 Click="BtnBack_Click"/>
-        
+
+        <StackPanel Grid.Row="1" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Stretch" 
+                    Margin="0,0,0,20">
+            <md:Card Width="300" 
+                     Height="90" 
+                     Margin="0,0,20,0" 
+                     UniformCornerRadius="4" 
+                     Foreground="{DynamicResource PrimaryTextColor}">
+                <StackPanel>
+                    <TextBlock Text="UZS (so'm)" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Margin="5" 
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Left">
+                        <TextBlock Text="Qoldiq:" 
+                                   FontSize="16"
+                                   FontWeight="Bold" 
+                                   Foreground="{DynamicResource PrimaryTextColor}" 
+                                   Margin="10,5,10,0"/>
+                        <TextBlock x:Name="tbcUzsBalance" 
+                                   Text="0.00"
+                                   FontSize="16"
+                                   FontWeight="Bold" 
+                                   Foreground="{DynamicResource PrimaryTextColor}" 
+                                   Margin="15,5,10,0" />
+                    </StackPanel>
+                </StackPanel>
+            </md:Card>
+
+            <md:Card Width="300" 
+                     Height="90" 
+                     Margin="0,0,20,0" 
+                     UniformCornerRadius="4" 
+                     Foreground="{DynamicResource PrimaryTextColor}">
+                <StackPanel >
+                    <TextBlock Text="USD (dollar)" 
+                               FontSize="18" 
+                               FontWeight="Bold" 
+                               Margin="5" 
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource PrimaryTextColor}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <TextBlock Text="Qoldiq:" 
+                                   FontSize="16"
+                                   FontWeight="Bold" 
+                                   Foreground="{DynamicResource PrimaryTextColor}" 
+                                   Margin="10,5,10,0"/>
+                        <TextBlock x:Name="tbcUsdBalance" 
+                                   Text="0.00"
+                                   FontSize="16"
+                                   FontWeight="Bold" 
+                                   Foreground="{DynamicResource PrimaryTextColor}" 
+                                   Margin="15,5,10,0" />
+                    </StackPanel>
+                </StackPanel>
+            </md:Card>
+        </StackPanel>
+
+        <md:Card Grid.Row="2" 
+                 UniformCornerRadius="4" 
+                 Margin="0,0,0,20">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Kassa kirim, chiqim amaliyoti" 
+                           FontWeight="Medium"
+                           FontSize="20"
+                           Margin="5,0,0,15"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Border Grid.Column="0" CornerRadius="4" Margin="5 0 5 5 " Background="{DynamicResource SecondaryBackground}">
+                        <controls:UserCalendar x:Name="OperationDate"
+                                           SelectedDate=""
+                                           VerticalAlignment="Center" 
+                                           Hint="sana"
+                                           Width="120"
+                                           Height="40"
+                                           HorizontalAlignment="Left"
+                                           FontSize="16"
+                                           Margin="5 0"/>
+                    </Border>
+                    <!-- Mijoz tanlash  -->
+                    <Border Grid.Column="1" 
+                            Background="{DynamicResource SecondaryBackground}"
+                            CornerRadius="4" 
+                            Margin="5,0,10,5"
+                            BorderBrush="{DynamicResource PrimaryHueLightBrush}">
+                        <ComboBox x:Name="cbxUser" 
+                                  FontSize="16"
+                                  IsEditable="true"
+                                  md:HintAssist.Hint="User tanlash"
+                                  BorderThickness="0"
+                                  Background="Transparent"
+                                  Padding="5 4"
+                                  Width="150"
+                                  SelectedValue="{Binding NewTransactionType}">
+                            <ComboBoxItem Content="Ovoza Plyus" IsSelected="True"/>
+                            <ComboBoxItem Content="Avazbek"/>
+                        </ComboBox>
+                    </Border>
+                    
+                    <!-- Amaliyot turi -->
+                    <Border Grid.Column="2" 
+                      Background="{DynamicResource SecondaryBackground}"
+                      CornerRadius="4" 
+                      Margin="5,0,10,5"
+                      BorderBrush="{DynamicResource PrimaryHueLightBrush}">
+                        <ComboBox x:Name="cbxIncome" 
+                            FontSize="16"
+                            md:HintAssist.Hint="Amaliyot turi"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Padding="5 4"
+                            Width="150"
+                            SelectedValue="{Binding NewTransactionType}">
+                            <ComboBoxItem Content="Kirim" IsSelected="True"/>
+                            <ComboBoxItem Content="Chiqim"/>
+                        </ComboBox>
+                    </Border>
+
+
+                    <!-- Valyuta -->
+                    <Border Grid.Column="3" 
+                            Background="{DynamicResource SecondaryBackground }"
+                            CornerRadius="4" 
+                            BorderThickness="1" 
+                            Margin="0,0,10,5"
+                            BorderBrush="{DynamicResource PrimaryHueLightBrush}">
+                        <ComboBox x:Name="cbxValyutaType" 
+                                  FontSize="16"
+                                  BorderThickness="0"
+                                  Background="Transparent"
+                                  md:HintAssist.Hint="Valyuta"
+                                  Width="100"
+                                  Padding="5 4"
+                                  SelectedValue="{Binding NewTransactionCurrency}">
+                            <ComboBoxItem Content="UZS"/>
+                            <ComboBoxItem Content="USD"/>
+                        </ComboBox>
+                    </Border>
+
+                    <!-- Summa -->
+                    <Border Grid.Column="4" 
+                            Background="{DynamicResource SecondaryBackground}"
+                            CornerRadius="4" 
+                            BorderThickness="0" 
+                            Margin="0,1,10,7"
+                            BorderBrush="{DynamicResource PrimaryHueLightBrush}">
+                        <TextBox x:Name="tbSum" 
+                                 md:HintAssist.Hint="Summa"
+                                 BorderThickness="0"
+                                 FontSize="16"
+                                 Padding="5"
+                                 TextAlignment="Right"
+                                 LostFocus="TextBox_LostFocus"
+                                 Width="170"/>
+                    </Border>
+
+                    <!-- Izoh -->
+                    <Border Grid.Column="5"
+                            Background="{DynamicResource SecondaryBackground}"
+                            CornerRadius="4" 
+                            BorderThickness="0" 
+                            Margin="0,1,10,7"
+                            BorderBrush="{DynamicResource PrimaryHueLightBrush}">
+                        <TextBox x:Name="tbDescription" 
+                                 md:HintAssist.Hint="Izoh"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 FontSize="16"
+                                 Padding="5"/>
+                    </Border>
+
+                    <Button x:Name="btnRegister" 
+                            Grid.Column="6" 
+                            Content="Saqlash"
+                            Background="{DynamicResource OtherBackground}"
+                            Margin="5 -2 5 3"
+                            Command="{Binding RecordTransactionCommand}"
+                            md:ButtonAssist.CornerRadius="4"/>
+                </Grid>
+            </StackPanel>
+        </md:Card>
+
+        <md:Card Grid.Row="3" UniformCornerRadius="4" Margin="0,1,0,10">
+            <StackPanel Orientation="Horizontal" Margin="5"  HorizontalAlignment="Left">
+                <TextBlock Text="Kassa amaliyotlar tarixi" 
+                           FontSize="20"
+                           FontWeight="Medium"
+                           VerticalAlignment="Center" 
+                           Margin="5,0,20,0"/>
+                <Border CornerRadius="4" Margin="2 5" Background="{DynamicResource SecondaryBackground}">
+                <controls:UserCalendar x:Name="startDate"
+                                       SelectedDate="{Binding OperationDate}"
+                                       VerticalAlignment="Center" 
+                                       Hint="Boshlanish sana"
+                                       Width="150"
+                                       HorizontalAlignment="Left"
+                                       FontSize="16"
+                                       Margin="5 0"/>
+                </Border>
+                <Border CornerRadius="4" Margin="2 5" Background="{DynamicResource SecondaryBackground}">
+
+                    <controls:UserCalendar x:Name="endDate"
+                                       VerticalAlignment="Center" 
+                                       Width="150"
+                                       Hint="Tugash sana"
+                                       HorizontalAlignment="Left"
+                                       FontSize="16"
+                                       Margin="5 0"/>
+                </Border>
+                <Button x:Name="btnShow" 
+                        Content="Ko'rsatish" 
+                        Command="{Binding FilterHistoryCommand}"
+                        Background="{DynamicResource OtherBackground}"
+                        Margin="3"
+                        md:ButtonAssist.CornerRadius="4"/>
+            </StackPanel>
+        </md:Card>
+
+        <Grid Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                <DataGrid ItemsSource="{Binding FilteredTransactions}" 
+                          IsReadOnly="True" 
+                          AutoGenerateColumns="False" 
+                          CanUserAddRows="False" >
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Sana" Binding="{Binding Date, StringFormat='dd.MM.yyyy HH:mm'}" Width="Auto"/>
+                        <DataGridTextColumn Header="Turi" Binding="{Binding Type}" Width="Auto"/>
+                        <DataGridTextColumn Header="Summa" Binding="{Binding Amount, StringFormat='N2'}" Width="*"/>
+                        <DataGridTextColumn Header="Valyuta" Binding="{Binding Currency}" Width="Auto"/>
+                        <DataGridTextColumn Header="Izoh" Binding="{Binding Note}" Width="2*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Page>

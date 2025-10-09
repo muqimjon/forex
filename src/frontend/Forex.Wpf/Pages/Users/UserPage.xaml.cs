@@ -34,6 +34,12 @@ public partial class UserPage : Page
         btnSave.Click += BtnSave_Click;
         btnBack.Click += BtnBack_Click;
         txtPhone.GotFocus += txtPhone_GotFocus;
+        btnUpdate.Click += BtnUpdate_Click;
+        tbAccount.LostFocus += TbNumeric_LostFocus;
+        tbDiscount.LostFocus += TbNumeric_LostFocus;
+        tbAccount.GotFocus += TextBox_GotFocus_SelectAll;
+        tbDiscount.GotFocus += TextBox_GotFocus_SelectAll;
+        dgUsers.SelectionChanged += dgUsers_SelectionChanged;
         LoadValyutaType();
         LoadUsers();
         UpdateRoleList();
@@ -45,11 +51,114 @@ public partial class UserPage : Page
             txtPhone,
             txtAddress,
             txtDescription,
+            cbxValutaType,
             tbDiscount,
             tbAccount,
             btnSave
         ]);
     }
+
+    private void dgUsers_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (dgUsers.SelectedItem is UserResponse)
+        {
+            // Row tanlangan → Update rejimi
+            btnSave.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            // Row tanlanmagan → Save rejimi
+            btnSave.Visibility = Visibility.Visible;
+            btnUpdate.Visibility = Visibility.Collapsed;
+
+            txtName.Text = "";
+            txtPhone.Text = null;
+            txtAddress.Text = "";
+            txtDescription.Text = "";
+            tbDiscount.Text = "";
+            tbAccount.Text = "";
+        }
+    }
+
+
+    private void TextBox_GotFocus_SelectAll(object sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox tb)
+        {
+            tb.Dispatcher.BeginInvoke(new Action(() => tb.SelectAll()));
+        }
+    }
+
+    private void TbNumeric_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox tb && decimal.TryParse(tb.Text, out var value))
+        {
+            tb.Text = value.ToString("N2"); // formatlash
+        }
+    }
+
+    private async void BtnUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        btnUpdate.IsEnabled = false;
+        try
+        {
+            if (dgUsers.SelectedItem is not UserResponse user)
+                return;
+
+            // Foydalanuvchi yangilash uchun request tuzamiz
+            var updateUser = new UserRequest
+            {
+                Id = user.Id,
+                Name = txtName.Text.Trim(),
+                Phone = txtPhone.Text.Trim(),
+                Address = txtAddress.Text.Trim(),
+                Description = txtDescription.Text.Trim(),
+                Role = Enum.TryParse<Role>(cbRole.SelectedItem?.ToString(), out var role) ? role : user.Role,
+                CurrencyBalances = new List<CurrencyBalanceRequest>()
+            };
+            decimal accountBalance = 0m;
+            decimal discount = 0m;
+
+            // Agar account fieldlari mavjud bo‘lsa
+            if (decimal.TryParse(tbAccount.Text, out accountBalance) &&
+                decimal.TryParse(tbDiscount.Text, out discount))
+            {
+                updateUser.CurrencyBalances.Add(new CurrencyBalanceRequest
+                {
+                    CurrencyId = (long)cbxValutaType.SelectedValue,
+                    Balance = accountBalance,
+                    Discount = discount
+                });
+            }
+
+
+            // Update chaqirish
+            var response = await client.Users.Update(updateUser);
+
+            if (response.IsSuccess)
+            {
+                LoadUsers(); // qaytadan listni yangilash
+            }
+            else
+            {
+                var vm = new SemiProductViewModel();
+                vm.ErrorMessage = string.Empty;
+                vm.ErrorMessage = $"Foydalanuvchining ma'lumotlarini o'zgartirmoqchimisiz?";
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Yangilashda xatolik:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            btnUpdate.IsEnabled = true;
+            btnSave.Visibility = Visibility.Visible;
+            btnUpdate.Visibility = Visibility.Collapsed;
+            ClearForm();
+        }
+    }
+
 
     private async void LoadValyutaType()
     {
@@ -320,9 +429,18 @@ public partial class UserPage : Page
         txtAddress.Text = user.Address;
         txtDescription.Text = user.Description;
 
-
-        if (user.Accounts != null)
+        if (user.Accounts != null && user.Accounts.Count > 0)
         {
+            var account = user.Accounts[0];
+            cbxValutaType.SelectedValue = account.CurrencyId;
+            tbAccount.Text = account.Balance.ToString("N2");
+            tbDiscount.Text = account.Discount.ToString("N2");
+        }
+        else
+        {
+            cbxValutaType.SelectedIndex = 0;
+            tbAccount.Text = "0";
+            tbDiscount.Text = "0";
         }
 
         btnSave.Visibility = Visibility.Collapsed;
@@ -330,17 +448,22 @@ public partial class UserPage : Page
     }
 
     [RelayCommand]
-    private async void EditUser(UserResponse response)
+    private void EditUser(UserResponse response)
     {
+        var vm = new SemiProductViewModel();
+        vm.ErrorMessage = string.Empty;
+        vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o'zgartirmoqchimisiz?";
+
         LoadingUser(response.Id);
     }
 
     [RelayCommand]
-    private async void RemoveUser(UserResponse response)
+    private void RemoveUser(UserResponse response)
     {
         var vm = new SemiProductViewModel();
         vm.ErrorMessage = string.Empty;
         vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o‘chirmoqchimisiz?";
+        DeleteUser(response.Id);
     }
 
     [RelayCommand]
@@ -350,6 +473,28 @@ public partial class UserPage : Page
         var vm = new SemiProductViewModel();
         vm.SuccessMessage = string.Empty;
         vm.SuccessMessage = $"B{response.Name}ni ma'lumotlari saqlandi";
+    }
+    private async void DeleteUser(long userId)
+    {
+        try
+        {
+            var vm = new SemiProductViewModel();
+            vm.SuccessMessage = string.Empty;
+            var response = await client.Users.Delete(userId);
+            if (response.IsSuccess)
+            {
+                LoadUsers();
+                vm.SuccessMessage = $"Foydalanuvchini o'chirish muvaffaqiyatli bajarildi.";
+            }
+            else
+            {
+                vm.ErrorMessage = $"Foydalanuvchini o'chirishda xatolik.";
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Xatolik: " + ex.Message);
+        }
     }
 }
 

@@ -1,4 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.ShopCashes;
+
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Windows;
 using System.Windows;
@@ -13,6 +15,24 @@ public partial class ShopCashPage : Page
     public ShopCashPage()
     {
         InitializeComponent();
+        FocusNavigator.AttachEnterNavigation(
+        [
+            OperationDate,
+            cbxUser,
+            cbxIncome,
+            cbxValyutaType,
+            tbSum,
+            tbDescription,
+            btnRegister
+        ]);
+
+        FocusNavigator.AttachEnterNavigation(
+        [
+            startDate.dateTextBox,
+            endDate.dateTextBox,
+            btnShow
+        ]);
+        OperationDate.SelectedDate = DateTime.Now;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -22,4 +42,13 @@ public partial class ShopCashPage : Page
         else
             Main.NavigateTo(new HomePage());
     }
+
+    private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (decimal.TryParse(tbSum.Text, out decimal value))
+        {
+            tbSum.Text = value.ToString("N2"); // 2 xona kasr format
+        }
+    }
+
 }

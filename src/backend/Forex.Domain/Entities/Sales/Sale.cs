@@ -10,8 +10,7 @@ public class Sale : Auditable
     public decimal CostPrice { get; set; }
     public decimal BenifitPrice { get; set; }
     public int TotalCount { get; set; }
-    public decimal TotalSum { get; set; }
-    public DateTime DueDate { get; set; }
+    public decimal TotalAmount { get; set; }
     public string? Note { get; set; }
 
     public User User { get; set; } = default!;

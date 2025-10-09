@@ -30,10 +30,10 @@ public class CreateUserCommandHandler(
     public async Task<long> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var isExist = await context.Users
-            .AnyAsync(user => user.Phone == request.Phone, cancellationToken);
+            .AnyAsync(user => user.Name == request.Name.Trim(), cancellationToken);
 
         if (isExist)
-            throw new AlreadyExistException(nameof(User), nameof(request.Phone), request.Phone);
+            throw new AlreadyExistException(nameof(User), nameof(request.Name), request.Name);
 
         var user = mapper.Map<User>(request);
         context.Users.Add(user);
