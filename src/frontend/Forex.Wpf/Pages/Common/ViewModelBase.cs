@@ -35,12 +35,14 @@ public abstract partial class ViewModelBase : ObservableObject
     partial void OnSuccessMessageChanged(string value)
         => ShowNotification(value, NotificationType.Success);
 
-    private static void ShowNotification(string message, NotificationType type)
+    private void ShowNotification(string message, NotificationType type)
     {
         if (string.IsNullOrWhiteSpace(message)) return;
 
         int duration = Math.Clamp(3 + message.Length / 20, 3, 10);
 
         NotificationService.Show(message, type, durationSeconds: duration);
+
+        ErrorMessage = WarningMessage = InfoMessage = SuccessMessage = string.Empty;
     }
 }

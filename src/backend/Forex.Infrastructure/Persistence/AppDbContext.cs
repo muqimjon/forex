@@ -32,6 +32,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<SemiProductEntry> SemiProductEntries { get; set; }
     public DbSet<Shop> Shops { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<ProductResidue> ProductResidues { get; set; }
 
     private IDbContextTransaction? currentTransaction;
 

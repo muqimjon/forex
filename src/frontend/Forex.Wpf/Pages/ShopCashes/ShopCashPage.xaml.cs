@@ -5,7 +5,6 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Linq;
 
 /// <summary>
 /// Interaction logic for ShopCashPage.xaml
