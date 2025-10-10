@@ -338,18 +338,12 @@ public partial class UserPage : Page
     [RelayCommand]
     private async void RemoveUser(UserResponse response)
     {
-        var vm = new SemiProductViewModel();
-        vm.ErrorMessage = string.Empty;
-        vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o‘chirmoqchimisiz?";
     }
 
     [RelayCommand]
     private void SaveUser(UserResponse response)
     {
         response.IsEditing = false;
-        var vm = new SemiProductViewModel();
-        vm.SuccessMessage = string.Empty;
-        vm.SuccessMessage = $"B{response.Name}ni ma'lumotlari saqlandi";
     }
 }
 

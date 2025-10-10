@@ -13,24 +13,22 @@ using System.Windows.Controls;
 public partial class SemiProductPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
+    private readonly SemiProductPageViewModel vm;
+    private int code;
 
     public SemiProductPage()
     {
         InitializeComponent();
 
-        var vm = new SemiProductPageViewModel();
+        vm = new SemiProductPageViewModel();
         vm.Seeding();
         DataContext = vm;
-
-        FocusNavigator.AttachEnterNavigation([
-        ]);
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         if (Application.Current.MainWindow is Window mainWindow)
             WindowResizer.AnimateToSize(mainWindow, 810, 580);
-
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -64,25 +62,51 @@ public partial class SemiProductPage : Page
             if (string.IsNullOrWhiteSpace(text))
                 return;
 
-            var vm = (SemiProductPageViewModel)DataContext;
-            if (combo.DataContext is not ProductTypeViewModel row)
+            if (!int.TryParse(text, out int newCode) || newCode == code)
                 return;
 
-            var existing = vm.Products.FirstOrDefault(p => p.Code.ToString() == text);
+            code = newCode;
 
-            if (existing is not null)
-                row.Product = existing;
-            else
+            if (combo.DataContext is ProductTypeViewModel product)
             {
-                if (int.TryParse(text, out int newCode))
+                var existing = vm.Products.FirstOrDefault(p => p.Code == newCode);
+
+                if (existing is not null)
+                    product.Product = existing;
+                else
                 {
-                    var newProduct = new ProductViewModel { Code = newCode };
-                    vm.Products.Add(newProduct);
-                    row.Product = newProduct;
+                        var newProduct = new ProductViewModel { Code = newCode };
+                        vm.Products.Add(newProduct);
+                        product.Product = newProduct;
+                }
+
+                combo.SelectedItem = product.Product;
+            }
+            else if (combo.DataContext is SemiProductViewModel semiProduct)
+            {
+                var existing = vm.SemiProducts.FirstOrDefault(x => x.Code == newCode);
+
+                if (existing is not null)
+                {
+                    if (semiProduct.LinkedItem is not null)
+                    {
+                       semiProduct.LinkedItem.SemiProduct = existing;
+                        existing.IsEditing = true;
+                    }
+
+                    // Agar eski semiProduct bo‘sh bo‘lsa, uni olib tashlash
+                    if (string.IsNullOrWhiteSpace(semiProduct.Name))
+                    {
+                        vm.SemiProducts.Remove(semiProduct);
+                    }
+
+                    vm.UpdateSemiProductsForSelectedProduct();
+                }
+                else
+                {
+                    semiProduct.Code = newCode;
                 }
             }
-
-            combo.SelectedItem = row.Product;
         }
     }
 }

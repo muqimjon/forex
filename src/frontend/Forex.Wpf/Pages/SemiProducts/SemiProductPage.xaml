@@ -149,8 +149,7 @@
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
                             <ComboBox ItemsSource="{Binding DataContext.Manufactories, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      SelectedValue="{Binding ManufactoryId, Mode=TwoWay}"
-                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding ., Mode=TwoWay}"
                                       DisplayMemberPath="Name"
                                       DockPanel.Dock="Right"
                                       Foreground="{StaticResource PrimaryTextColor}" />
@@ -585,20 +584,26 @@
                                 </DataGridTemplateColumn>
 
                                 <!-- Kod -->
-                                <DataGridTemplateColumn Header="Kod"
-                                                        Width="*">
+                                <DataGridTemplateColumn Header="Kod" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Style="{StaticResource InlineTextBoxStyle}" />
+                                            <ComboBox ItemsSource="{Binding DataContext.SemiProducts, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding ., Mode=TwoWay}"
+                                                      DisplayMemberPath="Code"
+                                                      IsEditable="True"
+                                                      IsEnabled="{Binding IsEditing}"
+                                                      Background="Transparent"
+                                                      BorderThickness="0"
+                                                      Padding="0"
+                                                      VerticalAlignment="Center"
+                                                      LostFocus="ComboBox_LostFocus" />
+
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <!-- Yarim tayyor mahsulot nomi -->
-                                <DataGridTemplateColumn Header="Nomi"
-                                                        Width="*">
+                                <DataGridTemplateColumn Header="Nomi" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -627,7 +632,7 @@
                                                         x:Name="QuantityColumn">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding LinkedQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding LinkedItem.Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>

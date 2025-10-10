@@ -9,11 +9,23 @@ public partial class SemiProductPageViewModel : ViewModelBase
 {
     [ObservableProperty] private InvoiceViewModel invoice = new();
     [ObservableProperty] private UserViewModel? selectedSupplier;
-    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = [];
+    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = [
+            new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent", Email = "a@supplier.uz", Description = "Mahalliy yetkazuvchi" },
+        new() { Id = 2, Name = "Supplier B", Phone = "998907654321", Address = "Samarqand", Email = "b@supplier.uz", Description = "Viloyat yetkazuvchi" }
+        ];
 
+    public ObservableCollection<UnitMeasuerViewModel> AvailableMeasures { get; } =
+        [
+            new() { Id = 1, Name = "Dona", Description = "Soni bilan o‘lchanadi" },
+            new() { Id = 2, Name = "Kg", Description = "Og‘irlik birligi" },
+            new() { Id = 3, Name = "Litr", Description = "Hajm birligi" }
+        ];
 
-    private List<UnitMeasuerViewModel> AvailableMeasures = [];
-    private List<ManufactoryViewModel> Manufactories = [];
+    public List<ManufactoryViewModel> Manufactories =
+        [
+            new() { Id = 1, Name = "Farg‘ona Non Sexi" },
+        new() { Id = 2, Name = "Qo‘qon Ichimlik Zavodi" }
+        ];
 
 
     [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
@@ -49,11 +61,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         if (SelectedProductType is null)
         {
             foreach (var semi in SemiProducts)
-            {
-                semi.LinkedItem = default!;
-                semi.LinkedQuantity = default;
                 FilteredSemiProducts.Add(semi);
-            }
 
             ShowQuantityColumn = false;
             return;
@@ -61,10 +69,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
         foreach (var item in SelectedProductType.Items)
         {
-
             if (item.SemiProduct is not null)
             {
-                item.SemiProduct.LinkedQuantity = item.Quantity;
                 item.SemiProduct.LinkedItem = item;
                 FilteredSemiProducts.Add(item.SemiProduct);
             }
@@ -75,37 +81,15 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     public void Seeding()
     {
-        // 📦 O‘lchov birliklari
-        AvailableMeasures =
-        [
-            new() { Id = 1, Name = "Dona", Description = "Soni bilan o‘lchanadi" },
-        new() { Id = 2, Name = "Kg", Description = "Og‘irlik birligi" },
-        new() { Id = 3, Name = "Litr", Description = "Hajm birligi" }
-        ];
-
-        // 🏭 Ishlab chiqaruvchilar
-        Manufactories =
-        [
-            new() { Id = 1, Name = "Farg‘ona Non Sexi" },
-        new() { Id = 2, Name = "Qo‘qon Ichimlik Zavodi" }
-        ];
-
-        // 👥 Yetkazuvchilar
-        Suppliers =
-        [
-            new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent", Email = "a@supplier.uz", Description = "Mahalliy yetkazuvchi" },
-        new() { Id = 2, Name = "Supplier B", Phone = "998907654321", Address = "Samarqand", Email = "b@supplier.uz", Description = "Viloyat yetkazuvchi" }
-        ];
-
         // 🧩 Yarim tayyor mahsulotlar
         SemiProducts =
         [
-            new() { Name = "Xamir", LinkedQuantity = 3, CostPrice = 2000, Measure = AvailableMeasures[0], Code = 2001, TotalQuantity = 6542 },
-        new() { Name = "Sous", LinkedQuantity = 5, CostPrice = 1500, Measure = AvailableMeasures[0], Code = 2002, TotalQuantity = 80020 },
-        new() { Name = "Pishloq", LinkedQuantity = 2, CostPrice = 5000, Measure = AvailableMeasures[0], Code = 2003, TotalQuantity = 2400 },
-        new() { Name = "Go‘sht bo‘lagi", LinkedQuantity = 4, CostPrice = 7000, Measure = AvailableMeasures[0], Code = 2004, TotalQuantity = 5648 },
-        new() { Name = "Qaymoq", LinkedQuantity = 6, CostPrice = 3000, Measure = AvailableMeasures[0], Code = 2005, TotalQuantity = 5648 },
-        new() { Name = "Tuxumli qatlam", LinkedQuantity = 8, CostPrice = 3500, Measure = AvailableMeasures[0], Code = 2006, TotalQuantity = 5648 }
+            new() { Name = "Xamir", CostPrice = 2000, Measure = AvailableMeasures[0], Code = 2001, TotalQuantity = 6542 },
+        new() { Name = "Sous", CostPrice = 1500, Measure = AvailableMeasures[0], Code = 2002, TotalQuantity = 80020 },
+        new() { Name = "Pishloq", CostPrice = 5000, Measure = AvailableMeasures[0], Code = 2003, TotalQuantity = 2400 },
+        new() { Name = "Go‘sht bo‘lagi", CostPrice = 7000, Measure = AvailableMeasures[0], Code = 2004, TotalQuantity = 5648 },
+        new() { Name = "Qaymoq", CostPrice = 3000, Measure = AvailableMeasures[0], Code = 2005, TotalQuantity = 5648 },
+        new() { Name = "Tuxumli qatlam", CostPrice = 3500, Measure = AvailableMeasures[0], Code = 2006, TotalQuantity = 5648 }
         ];
 
         // 🧱 Mahsulot turlari (ProductType)
@@ -222,11 +206,11 @@ public partial class SemiProductPageViewModel : ViewModelBase
         if (SelectedProductType is not null)
         {
             var pti = new ProductTypeItemViewModel { SemiProduct = newSemi };
+            newSemi.LinkedItem = pti;
             SelectedProductType.Items.Add(pti);
         }
         EditSemiProduct(newSemi);
-        SemiProducts.Add(newSemi);
-        UpdateSemiProductsForSelectedProduct();
+        FilteredSemiProducts.Add(newSemi);
     }
 
     // ✏️ Yarim tayyor mahsulotni tahrirlash

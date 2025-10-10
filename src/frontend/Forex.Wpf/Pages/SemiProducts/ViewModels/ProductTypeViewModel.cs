@@ -20,16 +20,6 @@ public partial class ProductTypeViewModel : ViewModelBase
 
     partial void OnProductChanged(ProductViewModel value)
     {
-        var vm = (SemiProductPageViewModel)App.Current.MainWindow.DataContext;
-
-        if (previousProduct is not null &&
-            previousProduct.Code != 0 &&
-            vm.Products.Contains(previousProduct) &&
-            previousProduct.Types.Count == 0)
-        {
-            vm.Products.Remove(previousProduct);
-        }
-
         if (value is not null && !value.Types.Contains(this))
         {
             value.Types.Add(this);
