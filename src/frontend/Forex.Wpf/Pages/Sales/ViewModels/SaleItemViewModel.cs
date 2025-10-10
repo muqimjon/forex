@@ -8,8 +8,8 @@ public partial class SaleItemViewModel : ViewModelBase
     [ObservableProperty] private string? productCode = string.Empty;
     [ObservableProperty] private string? productName = string.Empty;
     [ObservableProperty] private string? type = string.Empty;
-    [ObservableProperty] private int? typeCount;
-    [ObservableProperty] private int? quantity;
+    [ObservableProperty] private int? typeCount;  // razmerlardan nechadan sotilayotgani 1 razmerda 6 ta ayoq kiyim bor
+    [ObservableProperty] private int? count;   // jami necha dona sotilayotgani typeCount * countOfType yoki typeCount * 6
     [ObservableProperty] private decimal? price;
     [ObservableProperty] private decimal? totalAmount;
 
@@ -34,16 +34,15 @@ public partial class SaleItemViewModel : ViewModelBase
         => RecalculateTotalAmount();
 
 
-
     private void RecalculateQuantity()
     {
-        Quantity = (CountOfType ?? 0) * (TypeCount ?? 0);
+        Count = (CountOfType ?? 0) * (TypeCount ?? 0);
         RecalculateTotalAmount();
     }
 
     private void RecalculateTotalAmount()
     {
-        if (Quantity > 0 && Price > 0)
-            TotalAmount = (Quantity ?? 0) * (Price ?? 0);
+        if (Count > 0 && Price > 0)
+            TotalAmount = (Count ?? 0) * (Price ?? 0);
     }
 }

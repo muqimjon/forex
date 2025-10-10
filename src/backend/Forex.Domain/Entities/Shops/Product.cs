@@ -6,7 +6,7 @@ public class Product : Auditable
 {
     public string Name { get; set; } = string.Empty;
     public string? SearchName { get; set; } = string.Empty;
-    public int Code { get; set; }
+    public int Code { get; set; }  // mahsulot kodi 101 misol uchun
     public long MeasureId { get; set; }
     public string? PhotoPath { get; set; } = string.Empty;
 
