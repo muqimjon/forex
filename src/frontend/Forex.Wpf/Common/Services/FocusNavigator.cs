@@ -20,16 +20,62 @@ public static class FocusNavigator
                 if (e.Key != Key.Enter && e.Key != Key.Tab)
                     return;
 
-                int idx = focusOrder.IndexOf(control);
                 bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
 
-                if (shift && idx > 0)
-                    FocusElement(focusOrder[idx - 1]);
-                else if (!shift && idx < focusOrder.Count - 1)
-                    FocusElement(focusOrder[idx + 1]);
+                // Hozirgi elementning indexini aniqlash
+                int idx = focusOrder.IndexOf(control);
 
-                e.Handled = true;
+                UIElement? nextElement = null;
+
+                if (shift)
+                {
+                    // Orqaga yurish → faqat Visible elementni topish
+                    for (int i = idx - 1; i >= 0; i--)
+                    {
+                        if (IsElementFocusable(focusOrder[i]))
+                        {
+                            nextElement = focusOrder[i];
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // Oldinga yurish → faqat Visible elementni topish
+                    for (int i = idx + 1; i < focusOrder.Count; i++)
+                    {
+                        if (IsElementFocusable(focusOrder[i]))
+                        {
+                            nextElement = focusOrder[i];
+                            break;
+                        }
+                    }
+                }
+
+                if (nextElement is not null)
+                {
+                    FocusElement(nextElement);
+                    e.Handled = true;
+                }
             };
+        }
+    }
+
+    private static bool IsElementFocusable(UIElement element)
+    {
+        if (element.Visibility != Visibility.Visible || !element.IsEnabled)
+            return false;
+
+        switch (element)
+        {
+            case TextBox tb:
+                return tb.IsVisible && tb.IsEnabled && tb.IsTabStop;
+            case ComboBox cb:
+                return cb.IsVisible && cb.IsEnabled && cb.IsTabStop;
+            case Button btn:
+                return btn.IsVisible && btn.IsEnabled && btn.IsTabStop;
+            default:
+                return element.IsVisible && element.IsEnabled;
         }
     }
 
@@ -50,8 +96,9 @@ public static class FocusNavigator
                 innerTextBox.SelectAll();
             }
         }
-
-        // Agar boshqa custom control bo‘lsa, davom etishimiz mumkin...
     }
+
+
+
 
 }

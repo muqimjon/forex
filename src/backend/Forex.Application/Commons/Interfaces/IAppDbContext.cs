@@ -19,6 +19,7 @@ public interface IAppDbContext
     DbSet<Invoice> Invoices { get; }
     DbSet<Manufactory> Manufactories { get; }
     DbSet<Product> Products { get; }
+    DbSet<ProductResidue> ProductResidues { get; }
     DbSet<ProductType> ProductTypes { get; }
     DbSet<ProductEntry> ProductEntries { get; }
     DbSet<ProductTypeItem> ProductItems { get; }
