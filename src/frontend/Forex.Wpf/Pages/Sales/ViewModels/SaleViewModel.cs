@@ -57,11 +57,31 @@ public partial class SaleViewModel(ForexClient _client) : ViewModelBase
         }
     }
 
+    public async Task LoadProductsAsync()
+    {
+        try
+        {
+            var response = await _client.Users.GetAll();
+            if (response.IsSuccess && response.Data != null)
+            {
+                Customers = new ObservableCollection<UserResponse>(response.Data);
+            }
+            else
+            {
+                WarningMessage = "Foydalanuvchilarni yuklashda xatolik.";
+            }
+        }
+        catch (Exception ex)
+        {
+            WarningMessage = $"Server bilan aloqa yo'q: {ex.Message}";
+        }
+    }
+
     // ➕ Mahsulot qo‘shish
     [RelayCommand]
     private void Add()
     {
-        if (CurrentSaleItem == null || CurrentSaleItem.Quantity <= 0)
+        if (CurrentSaleItem == null || CurrentSaleItem.Count <= 0)
         {
             WarningMessage = "Mahsulot tanlanmagan yoki miqdor noto‘g‘ri!";
             return;
