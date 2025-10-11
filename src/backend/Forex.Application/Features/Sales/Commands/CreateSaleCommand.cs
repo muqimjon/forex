@@ -4,6 +4,7 @@ using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Sales.DTOs;
+using Forex.Domain.Entities;
 using Forex.Domain.Entities.Sales;
 using Forex.Domain.Entities.Shops;
 using Forex.Domain.Entities.Users;
@@ -18,8 +19,8 @@ using System.Threading.Tasks;
 public record CreateSaleCommand(
     DateTime Date,
     long UserId,
-    int TotalCount,
-    decimal TotalAmount,
+    int TotalCount,  // jami necha dona sotildi
+    decimal TotalAmount, // jami summa
     string? Note,
     List<SaleItemCreateDto> SaleItems
 
@@ -40,14 +41,27 @@ public class CreateSaleCommandHandler(
                 .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken)
                 ?? throw new NotFoundException(nameof(User), nameof(request.UserId), request.UserId);
 
+            var userAccount = user.Accounts.FirstOrDefault();
+            if (userAccount is null)
+                throw new NotFoundException(nameof(UserAccount), nameof(user.Id), user.Id);
+
+            userAccount.Balance -= request.TotalAmount;
+
+
+            var productTypeIds = request.SaleItems.Select(i => i.ProductTypeId).ToList();
+
             var productResidues = await context.ProductResidues
                 .Include(p => p.ProductEntries)
-                .Where(p => request.SaleItems.Select(i => i.ProductTypeId).Contains(p.Id))
+                .Where(p => productTypeIds.Contains(p.ProductTypeId))
                 .ToListAsync(cancellationToken);
 
-            decimal costPrice = 0;
 
-            List<SaleItem> saleItems = new List<SaleItem>();
+            // 🔹 Avval Sale yaratiladi
+            var sale = mapper.Map<Sale>(request);
+            context.Sales.Add(sale);
+            await context.SaveAsync(cancellationToken); // shu joyda sale.Id hosil bo‘ladi
+
+            List<SaleItem> saleItems = new();
 
             foreach (var item in request.SaleItems)
             {
@@ -55,18 +69,25 @@ public class CreateSaleCommandHandler(
                     ?? throw new NotFoundException(nameof(ProductResidue), nameof(item.ProductTypeId), item.ProductTypeId);
 
                 residue.TypeCount -= item.TypeCount;
+
                 var saleItem = mapper.Map<SaleItem>(item);
-                saleItem.CostPrice = residue.ProductEntries.Last().CostPrice;
+                var lastEntry = residue.ProductEntries.LastOrDefault()
+                        ?? throw new NotFoundException(nameof(residue.ProductTypeId), nameof(residue.ProductTypeId), residue.ProductTypeId);
+
+                var costPrice = lastEntry.CostPrice;
+
+                saleItem.CostPrice = costPrice * item.Count;
+                saleItem.Benifit = (item.Price - costPrice) * item.Count;
+                saleItem.SaleId = sale.Id; // 👈 shu joyda bog‘ladik
+
+                saleItems.Add(saleItem);
             }
 
-            var sale = mapper.Map<Sale>(request);
-            sale.CostPrice = costPrice;
-            sale.BenifitPrice = 0;
+            // umumiy summalar hisoblanadi
+            sale.CostPrice = saleItems.Sum(a => a.CostPrice);
+            sale.BenifitPrice = saleItems.Sum(s => s.Benifit);
 
-
-
-            context.Sales.Add(sale);
-
+            context.SaleItems.AddRange(saleItems);
 
             await context.CommitTransactionAsync(cancellationToken);
             return sale.Id;
@@ -74,8 +95,8 @@ public class CreateSaleCommandHandler(
         catch
         {
             await context.RollbackTransactionAsync(cancellationToken);
+            throw;
 
         }
-        return 0;
     }
 }

@@ -295,10 +295,10 @@
                        IsHitTestVisible="False" Panel.ZIndex="1"/>
             <Border Grid.Column="4" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
                 <TextBox x:Name="tbxQuantity"
-                         Text="{Binding CurrentSaleItem.Quantity}"
+                         Text="{Binding CurrentSaleItem.Count}"
                          FontSize="14"
                          IsReadOnly="True"
-                         BorderThickness="0"/>
+                         BorderThickness="0" Height="30" VerticalAlignment="Bottom"/>
             </Border>
 
             <!-- Narxi -->
