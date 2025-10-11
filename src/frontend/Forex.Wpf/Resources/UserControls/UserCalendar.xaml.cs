@@ -1,9 +1,9 @@
-﻿using System.Text.RegularExpressions;
+﻿namespace Forex.Wpf.Resources.UserControls;
+
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
-namespace Forex.Wpf.Resources.UserControls;
 
 /// <summary>
 /// Interaction logic for UserCalendar.xaml
@@ -45,7 +45,7 @@ public partial class UserCalendar : UserControl
         {
             userCalendar.dateTextBox.Text = newDate.ToString("dd.MM.yyyy");
         }
-        UserCalendar userCal = d as UserCalendar;
+        UserCalendar userCal = (d as UserCalendar)!;
         userCal.dateTextBox.Focus();
         userCal.dateTextBox.SelectAll();
     }

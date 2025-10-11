@@ -75,9 +75,9 @@ public partial class SemiProductPage : Page
                     product.Product = existing;
                 else
                 {
-                        var newProduct = new ProductViewModel { Code = newCode };
-                        vm.Products.Add(newProduct);
-                        product.Product = newProduct;
+                    var newProduct = new ProductViewModel { Code = newCode };
+                    vm.Products.Add(newProduct);
+                    product.Product = newProduct;
                 }
 
                 combo.SelectedItem = product.Product;
@@ -90,7 +90,7 @@ public partial class SemiProductPage : Page
                 {
                     if (semiProduct.LinkedItem is not null)
                     {
-                       semiProduct.LinkedItem.SemiProduct = existing;
+                        semiProduct.LinkedItem.SemiProduct = existing;
                         existing.IsEditing = true;
                     }
 

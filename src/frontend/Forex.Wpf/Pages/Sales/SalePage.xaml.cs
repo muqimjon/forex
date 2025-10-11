@@ -13,17 +13,15 @@ public partial class SalePage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
 
-    private SaleViewModel vm;
     public SalePage()
     {
         InitializeComponent();
 
-        vm = new SaleViewModel(App.Client); // ✅ shart
+        var vm = new SaleViewModel(App.Client); // ✅ shart
         DataContext = vm;
-        vm.LoadUsersAsync();
+        _ = vm.LoadUsersAsync();
         btnBack.Click += BtnBack_Click;
         supplyDate.SelectedDate = DateTime.Now;
-
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -33,11 +31,4 @@ public partial class SalePage : Page
         else
             Main.NavigateTo(new HomePage());
     }
-
-    private void AddButton_Click(object sender, RoutedEventArgs e)
-    {
-
-    }
-
-
 }

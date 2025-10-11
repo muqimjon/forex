@@ -9,7 +9,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
 {
     [ObservableProperty] private InvoiceViewModel invoice = new();
     [ObservableProperty] private UserViewModel? selectedSupplier;
-    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = [
+    [ObservableProperty]
+    private ObservableCollection<UserViewModel> suppliers = [
             new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent", Email = "a@supplier.uz", Description = "Mahalliy yetkazuvchi" },
         new() { Id = 2, Name = "Supplier B", Phone = "998907654321", Address = "Samarqand", Email = "b@supplier.uz", Description = "Viloyat yetkazuvchi" }
         ];

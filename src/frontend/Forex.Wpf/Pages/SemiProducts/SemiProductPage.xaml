@@ -485,7 +485,6 @@
                     </Grid>
                 </Border>
                 
-                
                 <!-- SEMI PRODUCT DATA GRID -->
                 <Border CornerRadius="4"
                         Background="AliceBlue"

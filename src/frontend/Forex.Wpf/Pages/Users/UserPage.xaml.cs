@@ -33,13 +33,13 @@ public partial class UserPage : Page
         txtSearch.TextChanged += TxtSearch_TextChanged;
         btnSave.Click += BtnSave_Click;
         btnBack.Click += BtnBack_Click;
-        txtPhone.GotFocus += txtPhone_GotFocus;
+        txtPhone.GotFocus += TxtPhone_GotFocus;
         btnUpdate.Click += BtnUpdate_Click;
         tbAccount.LostFocus += TbNumeric_LostFocus;
         tbDiscount.LostFocus += TbNumeric_LostFocus;
         tbAccount.GotFocus += TextBox_GotFocus_SelectAll;
         tbDiscount.GotFocus += TextBox_GotFocus_SelectAll;
-        dgUsers.SelectionChanged += dgUsers_SelectionChanged;
+        dgUsers.SelectionChanged += DgUsers_SelectionChanged;
         LoadValyutaType();
         LoadUsers();
         UpdateRoleList();
@@ -58,7 +58,7 @@ public partial class UserPage : Page
         ]);
     }
 
-    private void dgUsers_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void DgUsers_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (dgUsers.SelectedItem is UserResponse)
         {
@@ -114,14 +114,12 @@ public partial class UserPage : Page
                 Address = txtAddress.Text.Trim(),
                 Description = txtDescription.Text.Trim(),
                 Role = Enum.TryParse<Role>(cbRole.SelectedItem?.ToString(), out var role) ? role : user.Role,
-                CurrencyBalances = new List<CurrencyBalanceRequest>()
+                CurrencyBalances = []
             };
-            decimal accountBalance = 0m;
-            decimal discount = 0m;
 
             // Agar account fieldlari mavjud bo‘lsa
-            if (decimal.TryParse(tbAccount.Text, out accountBalance) &&
-                decimal.TryParse(tbDiscount.Text, out discount))
+            if (decimal.TryParse(tbAccount.Text, out decimal accountBalance) &&
+                decimal.TryParse(tbDiscount.Text, out decimal discount))
             {
                 updateUser.CurrencyBalances.Add(new CurrencyBalanceRequest
                 {
@@ -141,8 +139,10 @@ public partial class UserPage : Page
             }
             else
             {
-                var vm = new SemiProductViewModel();
-                vm.ErrorMessage = string.Empty;
+                var vm = new SemiProductViewModel
+                {
+                    ErrorMessage = string.Empty
+                };
                 vm.ErrorMessage = $"Foydalanuvchining ma'lumotlarini o'zgartirmoqchimisiz?";
             }
         }
@@ -283,15 +283,15 @@ public partial class UserPage : Page
                 Address = txtAddress.Text.Trim(),
                 Description = txtDescription.Text.Trim(),
                 Role = role,
-                CurrencyBalances = new List<CurrencyBalanceRequest>
-                {
+                CurrencyBalances =
+                [
                     new CurrencyBalanceRequest
                     {
                         CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
                         Balance = decimal.TryParse(tbAccount.Text, out var bal) ? bal : 0,
                         Discount = decimal.TryParse(tbDiscount.Text, out var disc) ? disc : 0
                     }
-                }
+                ]
             };
 
             var response = await client.Users.Create(request);
@@ -353,11 +353,11 @@ public partial class UserPage : Page
         tb.SelectionStart = tb.Text!.Length;
     }
 
-    private void txtPhone_TextChanged(object sender, TextChangedEventArgs e)
+    private void TxtPhone_TextChanged(object sender, TextChangedEventArgs e)
     {
-        FormatPhoneNumber(sender as TextBox);
+        FormatPhoneNumber((sender as TextBox)!);
     }
-    private void txtPhone_GotFocus(object sender, RoutedEventArgs e)
+    private void TxtPhone_GotFocus(object sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb)
         {
@@ -379,8 +379,8 @@ public partial class UserPage : Page
     {
         if (textBox == null) return;
         string text = textBox.Text?.Trim() ?? string.Empty;
-        string digits = Regex.Replace(text, @"[^\d]", "");
-        textBox.TextChanged -= txtPhone_TextChanged;
+        string digits = Digits().Replace(text, "");
+        textBox.TextChanged -= TxtPhone_TextChanged;
         try
         {
 
@@ -391,26 +391,26 @@ public partial class UserPage : Page
             }
             if (digits.Length > 5)
             {
-                formatted += " " + digits.Substring(5, Math.Min(3, digits.Length - 5));
+                formatted += string.Concat(" ", digits.AsSpan(5, Math.Min(3, digits.Length - 5)));
             }
             if (digits.Length > 8)
             {
-                formatted += " " + digits.Substring(8, Math.Min(2, digits.Length - 8));
+                formatted += string.Concat(" ", digits.AsSpan(8, Math.Min(2, digits.Length - 8)));
             }
             if (digits.Length > 10)
             {
-                formatted += " " + digits.Substring(10, Math.Min(2, digits.Length - 10));
+                formatted += string.Concat(" ", digits.AsSpan(10, Math.Min(2, digits.Length - 10)));
             }
             textBox.Text = formatted.TrimEnd();
             textBox.SelectionStart = textBox.Text.Length;
         }
         finally
         {
-            textBox.TextChanged += txtPhone_TextChanged;
+            textBox.TextChanged += TxtPhone_TextChanged;
         }
     }
 
-    private void btnEdit_Click(object sender, RoutedEventArgs e)
+    private void BtnEdit_Click(object sender, RoutedEventArgs e)
     {
         long userId;
         if (dgUsers.SelectedItem is not UserResponse user) return;
@@ -423,7 +423,7 @@ public partial class UserPage : Page
     {
         var exitUser = await client.Users.GetById(userId);
         var user = exitUser.Data;
-        cbRole.SelectedItem = user.Role.ToString();
+        cbRole.SelectedItem = user!.Role.ToString();
         txtName.Text = user.Name;
         txtPhone.Text = user.Phone;
         txtAddress.Text = user.Address;
@@ -450,47 +450,26 @@ public partial class UserPage : Page
     [RelayCommand]
     private void EditUser(UserResponse response)
     {
-        var vm = new SemiProductViewModel();
-        vm.ErrorMessage = string.Empty;
+        var vm = new SemiProductViewModel { ErrorMessage = string.Empty };
         vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o'zgartirmoqchimisiz?";
 
         LoadingUser(response.Id);
     }
 
     [RelayCommand]
-    private void RemoveUser(UserResponse response)
+    private static void RemoveUser(UserResponse response)
     {
-        var vm = new SemiProductViewModel();
-        vm.ErrorMessage = string.Empty;
+        var vm = new SemiProductViewModel { ErrorMessage = string.Empty };
         vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o‘chirmoqchimisiz?";
     }
 
     [RelayCommand]
-    private void SaveUser(UserResponse response)
+    private static void SaveUser(UserResponse response)
     {
         response.IsEditing = false;
     }
-    private async void DeleteUser(long userId)
-    {
-        try
-        {
-            var vm = new SemiProductViewModel();
-            vm.SuccessMessage = string.Empty;
-            var response = await client.Users.Delete(userId);
-            if (response.IsSuccess)
-            {
-                LoadUsers();
-                vm.SuccessMessage = $"Foydalanuvchini o'chirish muvaffaqiyatli bajarildi.";
-            }
-            else
-            {
-                vm.ErrorMessage = $"Foydalanuvchini o'chirishda xatolik.";
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Xatolik: " + ex.Message);
-        }
-    }
+
+    [GeneratedRegex(@"[^\d]")]
+    private static partial Regex Digits();
 }
 

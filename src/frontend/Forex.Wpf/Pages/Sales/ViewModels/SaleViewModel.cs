@@ -1,4 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
@@ -8,16 +9,14 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-public partial class SaleViewModel(ForexClient _client) : ViewModelBase
+public partial class SaleViewModel(ForexClient client) : ViewModelBase
 {
-
-
     // 🗓 Sana
     [ObservableProperty] private DateTime operationDate = DateTime.Now;
 
     // 👤 Mijoz
     [ObservableProperty] private UserResponse? selectedCustomer;
-    [ObservableProperty] private ObservableCollection<UserResponse> customers = new();
+    [ObservableProperty] private ObservableCollection<UserResponse> customers = [];
 
     // 💵 Hisoblar
     [ObservableProperty] private decimal? totalAmount;
@@ -33,7 +32,7 @@ public partial class SaleViewModel(ForexClient _client) : ViewModelBase
     [ObservableProperty] private SaleItemViewModel currentSaleItem = new();
 
     // 🧮 Ro‘yxat (DataGrid uchun)
-    [ObservableProperty] private ObservableCollection<SaleItemViewModel> saleItems = new();
+    [ObservableProperty] private ObservableCollection<SaleItemViewModel> saleItems = [];
 
 
     // 🔄 Backend’dan foydalanuvchilarni olish
@@ -41,7 +40,7 @@ public partial class SaleViewModel(ForexClient _client) : ViewModelBase
     {
         try
         {
-            var response = await _client.Users.GetAll();
+            var response = await client.Users.GetAll();
             if (response.IsSuccess && response.Data != null)
             {
                 Customers = new ObservableCollection<UserResponse>(response.Data);
@@ -61,10 +60,10 @@ public partial class SaleViewModel(ForexClient _client) : ViewModelBase
     {
         try
         {
-            var response = await _client.Users.GetAll();
-            if (response.IsSuccess && response.Data != null)
+            var response = await client.Users.GetAll();
+            if (response.IsSuccess)
             {
-                Customers = new ObservableCollection<UserResponse>(response.Data);
+                Customers = new ObservableCollection<UserResponse>(response.Data!);
             }
             else
             {
@@ -123,5 +122,4 @@ public partial class SaleViewModel(ForexClient _client) : ViewModelBase
     }
 
     #endregion CalculateTotalAmount
-
 }
