@@ -5,6 +5,7 @@ using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 /// <summary>
 /// Interaction logic for SalePage.xaml
@@ -12,18 +13,16 @@ using System.Windows.Controls;
 public partial class SalePage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-
     private SaleViewModel vm;
     public SalePage()
     {
         InitializeComponent();
-
         vm = new SaleViewModel(App.Client); // ✅ shart
         DataContext = vm;
         vm.LoadUsersAsync();
         btnBack.Click += BtnBack_Click;
+        vm.RequestNewCustomer += Vm_RequestNewCustomer;
         supplyDate.SelectedDate = DateTime.Now;
-
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -34,10 +33,42 @@ public partial class SalePage : Page
             Main.NavigateTo(new HomePage());
     }
 
-    private void AddButton_Click(object sender, RoutedEventArgs e)
+    private async void Vm_RequestNewCustomer(object? sender, string name)
     {
+        var result = MessageBox.Show(
+            $"“{name}” nomli mijoz topilmadi.\nYangi mijoz qo‘shmoqchimisiz?",
+            "Yangi mijoz",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
 
+        if (result == MessageBoxResult.Yes)
+        {
+            var userWindow = new UserWindow();
+            userWindow.Owner = Application.Current.MainWindow;
+            bool? dialogResult = userWindow.ShowDialog();
+
+            if (dialogResult == true && sender is SaleViewModel vm)
+            {
+                await vm.LoadUsersAsync();
+                vm.SelectedCustomer = vm.Customers
+                    .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 
-
+    private void ComboBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && DataContext is SaleViewModel vm)
+        {
+            string text = ((ComboBox)sender).Text?.Trim() ?? "";
+            vm.CheckCustomerNameCommand.Execute(text);
+        }
+    }
+    private void ComboBox_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is ComboBox comboBox)
+        {
+            comboBox.IsDropDownOpen = true;
+        }
+    }
 }
