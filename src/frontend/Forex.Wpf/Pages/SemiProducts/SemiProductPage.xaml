@@ -407,7 +407,7 @@
                                 <DataGridTemplateColumn Header="Nomi" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Product.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding Product.Name, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      BorderThickness="0"
                                                      Background="Transparent"
@@ -421,7 +421,7 @@
                                 <DataGridTemplateColumn Header="Turi" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      BorderThickness="0"
                                                      Background="Transparent"
@@ -436,7 +436,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ComboBox ItemsSource="{Binding DataContext.AvailableMeasures, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                      SelectedItem="{Binding Product.Measure, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      SelectedItem="{Binding Product.Measure, UpdateSourceTrigger=PropertyChanged}"
                                                       DisplayMemberPath="Name"
                                                       IsEnabled="{Binding IsEditing}"
                                                       Background="Transparent"
@@ -452,7 +452,7 @@
                                 <DataGridTemplateColumn Header="Jami miqdori" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                         BorderThickness="0"
                                                         Background="Transparent"
@@ -605,7 +605,7 @@
                                 <DataGridTemplateColumn Header="Nomi" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
@@ -617,7 +617,7 @@
                                                         Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Measure.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding Measure.Name, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
@@ -631,7 +631,7 @@
                                                         x:Name="QuantityColumn">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding LinkedItem.Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding LinkedItem.Quantity, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
@@ -643,7 +643,7 @@
                                                         Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding TotalQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding TotalQuantity, UpdateSourceTrigger=PropertyChanged}"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                                                      Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
