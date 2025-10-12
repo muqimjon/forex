@@ -10,5 +10,5 @@ public class ProductResidue : Auditable
 
     public ProductType ProductType { get; set; } = default!;
     public Shop Shop { get; set; } = default!;
-    public ICollection<ProductEntry> ProductEntries { get; set; }
+    public ICollection<ProductEntry> ProductEntries { get; set; } = default!;
 }

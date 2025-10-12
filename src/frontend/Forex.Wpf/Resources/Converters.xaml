@@ -8,5 +8,6 @@
     <conv:StringIsNotEmptyConverter x:Key="StringIsNotEmptyConverter" />
     <conv:InverseBoolToBoolConverter x:Key="InverseBoolToBoolConverter" />
     <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+    <conv:IntToStringConverter x:Key="IntToStringConverter" />
 
 </ResourceDictionary>

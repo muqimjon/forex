@@ -14,7 +14,7 @@ public partial class SaleItemViewModel : ViewModelBase
     [ObservableProperty] private decimal? totalAmount;
 
     [ObservableProperty] private int? countOfType = 1;
-    private int? residueOfType = 20;
+    private readonly int? residueOfType = 20;
 
     partial void OnCountOfTypeChanged(int? value)
         => RecalculateQuantity();

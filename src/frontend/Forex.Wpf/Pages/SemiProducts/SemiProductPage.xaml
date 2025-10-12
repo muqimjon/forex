@@ -160,17 +160,14 @@
 
                         <!--  Qabul qiluvchi  -->
                         <DockPanel>
-                            <Label
-                                Content="Qabul qiluvchi:"
-                                DockPanel.Dock="Left"
-                                Foreground="{StaticResource PrimaryTextColor}" />
-                            <ComboBox
-                                DisplayMemberPath="Name"
-                                DockPanel.Dock="Right"
-                                Foreground="{StaticResource PrimaryTextColor}"
-                                ItemsSource="{Binding DataContext.Manufactories, RelativeSource={RelativeSource AncestorType=Window}}"
-                                SelectedValue="{Binding ManufactoryId, Mode=TwoWay}"
-                                SelectedValuePath="Id" />
+                            <Label Content="Qabul qiluvchi:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <ComboBox ItemsSource="{Binding DataContext.Manufactories, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      SelectedValue="{Binding ., Mode=TwoWay}"
+                                      DisplayMemberPath="Name"
+                                      DockPanel.Dock="Right"
+                                      Foreground="{StaticResource PrimaryTextColor}" />
                         </DockPanel>
 
                     </StackPanel>
@@ -533,13 +530,11 @@
 
                     </Grid>
                 </Border>
-
-
-                <!--  SEMI PRODUCT DATA GRID  -->
-                <Border
-                    Grid.Row="2"
-                    Background="AliceBlue"
-                    CornerRadius="4">
+                
+                <!-- SEMI PRODUCT DATA GRID -->
+                <Border CornerRadius="4"
+                        Background="AliceBlue"
+                        Grid.Row="2">
                     <Border.Effect>
                         <DropShadowEffect
                             BlurRadius="50"
@@ -637,20 +632,27 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!--  Kod  -->
-                                <DataGridTemplateColumn Width="*" Header="Kod">
+                                <!-- Kod -->
+                                <DataGridTemplateColumn Header="Kod" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox
-                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                Style="{StaticResource InlineTextBoxStyle}"
-                                                Text="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <ComboBox ItemsSource="{Binding DataContext.SemiProducts, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding ., Mode=TwoWay}"
+                                                      DisplayMemberPath="Code"
+                                                      IsEditable="True"
+                                                      IsEnabled="{Binding IsEditing}"
+                                                      Background="Transparent"
+                                                      BorderThickness="0"
+                                                      Padding="0"
+                                                      VerticalAlignment="Center"
+                                                      LostFocus="ComboBox_LostFocus" />
+
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!--  Yarim tayyor mahsulot nomi  -->
-                                <DataGridTemplateColumn Width="*" Header="Nomi">
+                                <!-- Yarim tayyor mahsulot nomi -->
+                                <DataGridTemplateColumn Header="Nomi" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox
@@ -681,10 +683,9 @@
                                     Visibility="Hidden">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox
-                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                Style="{StaticResource InlineTextBoxStyle}"
-                                                Text="{Binding LinkedQuantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox Text="{Binding LinkedItem.Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>

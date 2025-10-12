@@ -19,7 +19,7 @@ public partial class SalePage : Page
         InitializeComponent();
         vm = new SaleViewModel(App.Client); // ✅ shart
         DataContext = vm;
-        vm.LoadUsersAsync();
+        _ = vm.LoadUsersAsync();
         btnBack.Click += BtnBack_Click;
         vm.RequestNewCustomer += Vm_RequestNewCustomer;
         supplyDate.SelectedDate = DateTime.Now;

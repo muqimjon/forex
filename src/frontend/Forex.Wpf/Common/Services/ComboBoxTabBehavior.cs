@@ -223,7 +223,7 @@ public static class ComboBoxTabBehavior
 
     private static bool TryGetEditableTextBox(ComboBox comboBox, out TextBox textBox)
     {
-        textBox = comboBox.Template.FindName("PART_EditableTextBox", comboBox) as TextBox;
+        textBox = (comboBox.Template.FindName("PART_EditableTextBox", comboBox) as TextBox)!;
         return textBox != null;
     }
 
@@ -241,8 +241,7 @@ public static class ComboBoxTabBehavior
     private static void MoveFocusPrevious(ComboBox comboBox)
     {
         var focused = Keyboard.FocusedElement as UIElement ?? comboBox;
-        if (focused != null)
-            focused.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
+        focused?.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
     }
 
     //private static bool GetKeyType(KeyEventArgs e)

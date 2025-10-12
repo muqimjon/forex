@@ -17,7 +17,6 @@ public partial class ProductViewModel : ViewModelBase
 
     [ObservableProperty] private ObservableCollection<ProductTypeViewModel> types = [];
 
-
     [RelayCommand]
     private void SelectImage()
     {
