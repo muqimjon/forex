@@ -11,7 +11,6 @@ public static class MigrationExtensions
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         dbContext.Database.Migrate();
-
         return app;
     }
 }

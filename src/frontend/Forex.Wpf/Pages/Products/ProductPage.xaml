@@ -1,24 +1,331 @@
 ﻿<Page x:Class="Forex.Wpf.Pages.Products.ProductPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:local="clr-namespace:Forex.Wpf.Pages.Products"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="ProductsPage">
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+      mc:Ignorable="d"
+      d:DesignHeight="580" d:DesignWidth="810"
+      Title="ProductsPage"
+      Loaded="Page_Loaded"
+      >
 
-    <Grid Margin="24">
-        <Button x:Name="btnBack"
-                Content="🔙 Orqaga"
+    <Page.Resources>
+        <!-- DataGrid cell style -->
+        <Style x:Key="TransparentCellStyle" TargetType="DataGridCell">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+
+        <Style x:Key="InlineTextBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="InlineComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Page Header -->
+        <DockPanel LastChildFill="False">
+            <Label Content="Mahsulotlar kirim oynasi"
+                   FontSize="18"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource SecondaryTextColor}" />
+
+            <Button x:Name="btnBack"
+                    Padding="8,0"
+                    md:ButtonAssist.CornerRadius="4"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="{DynamicResource BackButtonBackground}"
+                    BorderBrush="{StaticResource BackButtonBorder}"
+                    Click="BtnBack_Click"
+                    Content="🔙 Orqaga"
+                    DockPanel.Dock="Right"
+                    Foreground="{StaticResource BackButtonForeground}" />
+        </DockPanel>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.5*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*" MinWidth="200" MaxWidth="400"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT PANEL: Mahsulotlar va yarim tayyor mahsulotlar -->
+            <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,0,0">
+                <!-- Product DataGrid -->
+                <Border Background="AliceBlue" CornerRadius="4" Margin="0,0,0,10">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="50" Direction="270" Opacity="0.2" ShadowDepth="15" Color="Black"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="4"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Hodimlar"
+                                       Grid.Column="0"
+                                       Margin="10,0"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryTextColor}"/>
+                            <Button Grid.Column="1"
+                                    Padding="4"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{Binding AddEmployeeCommand}"
+                                    Content="➕"
+                                    Foreground="{StaticResource PrimaryTextColor}"/>
+                        </Grid>
+
+                        <DataGrid x:Name="dgEmployees" Grid.Row="2"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column"
+                                  IsReadOnly="False"
+                                  Height="220"
+                                  RowHeaderWidth="0"
+                                  RowHeight="36"
+                                  ItemsSource="{Binding Users}">
+
+                            <DataGrid.Columns>
+
+                                <!-- 🔽 Hodim nomi: ComboBox -->
+                                <DataGridTemplateColumn Header="Hodim" MinWidth="200">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox
+                                                ItemsSource="{Binding DataContext.Employees, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                SelectedItem="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                DisplayMemberPath="Name"
+                                                BorderThickness="1"
+                                                Padding="5 0"
+                                                Height="25"
+                                                FontSize="14"
+                                                IsEditable="True"
+                                                IsEnabled="{Binding IsEditing}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" IsReadOnly="True" Width="200" />
+                                <DataGridTextColumn Header="Manzil" Binding="{Binding Address}" IsReadOnly="True" Width="250" />
+                                <DataGridTextColumn Header="Balans" Binding="{Binding Balance,StringFormat={}{0:N2}}" IsReadOnly="True" Width="150" />
+
+                                <!-- 🔹 Actions -->
+                                <DataGridTemplateColumn Width="auto" >
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <controls:ActionButton
+                                                HorizontalContentAlignment="Right"
+                                                CommandParameter="{Binding}"
+                                                DeleteCommand="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                EditCommand="{Binding DataContext.EditUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                IsEditing="{Binding IsEditing, Mode=TwoWay}"
+                                                SaveCommand="{Binding DataContext.SaveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </Border>
+
+                <!-- Semi Product DataGrid -->
+                <Border Background="AliceBlue" CornerRadius="4">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="50" Direction="280" Opacity="0.2" ShadowDepth="15" Color="Black"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="4"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Mahsulotlar"
+                                       Grid.Column="0"
+                                       Margin="10,0"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryTextColor}"/>
+                            <Button Grid.Column="1"
+                                    Height="28"
+                                    Margin="10,0"
+                                    Padding="4"
+                                    Background="{DynamicResource PrimaryBackground}"
+                                    BorderBrush="{StaticResource BackButtonBorder}"
+                                    BorderThickness="0"
+                                    Command="{Binding ShowAllSemiProductsCommand}"
+                                    Content="Barchasini ko'rsatish"
+                                    Foreground="{StaticResource BackButtonForeground}"/>
+                            <Button Grid.Column="2"
+                                    Padding="4"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{Binding AddProductCommand}"
+                                    Content="➕"
+                                    Foreground="{StaticResource PrimaryTextColor}"/>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column"
+                                  IsReadOnly="True"
+                                  RowHeaderWidth="0"
+                                  RowHeight="36"
+                                  Height="250"
+                                  ItemsSource="{Binding Products}">
+
+                            <DataGrid.Columns>
+
+                                <!-- Image preview -->
+                                <DataGridTemplateColumn Header="Rasm" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Source="{Binding PhotoPath}" Width="80" Height="80"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Kod ComboBox -->
+                                <DataGridTemplateColumn Header="Kod" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding SelectedCode, Mode=TwoWay}"
+                                                      DisplayMemberPath="Code"
+                                                      Width="90"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <!-- Nomi ComboBox -->
+                                <DataGridTemplateColumn Header="Nomi" Width="200">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
+                                                      DisplayMemberPath="Name"
+                                                      Width="180"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <!-- Razmer ComboBox -->
+                                <DataGridTemplateColumn Header="O'lcham" Width="150">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding Types}"
+                                                      SelectedItem="{Binding SelectedType, Mode=TwoWay}"
+                                                      DisplayMemberPath="Type"
+                                                      Width="130"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Razmerdagi miqdor -->
+                                <DataGridTextColumn Header="Soni" Binding="{Binding CountOfType}" Width="100" />
+                                <DataGridTextColumn Header="Razmerlar soni" Binding="{Binding TypeCount}" Width="120" />
+                                <DataGridTextColumn Header="Jami soni" Binding="{Binding TotalCount}" Width="120" />
+                                <DataGridTextColumn Header="Dona haqi" Binding="{Binding PerPairRate}" Width="100"/>
+                                <DataGridTextColumn Header="Jami summa" Binding="{Binding TotalAmount}" Width="150" />
+
+                                <!-- Actions -->
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <controls:ActionButton
+                                                CommandParameter="{Binding}"
+                                                DeleteCommand="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                EditCommand="{Binding DataContext.EditProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                IsEditing="{Binding IsEditing, Mode=TwoWay}"
+                                                SaveCommand="{Binding DataContext.SaveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- RIGHT PANEL: Invoice va Supplier ma'lumotlari -->
+            <Border Grid.Column="2"
+                    Padding="10"
+                    Background="AliceBlue"
+                    CornerRadius="4">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="50" Direction="250" Opacity="0.3" ShadowDepth="15" Color="Black"/>
+                </Border.Effect>
+
+                <StackPanel Orientation="Vertical" DataContext="{Binding Invoice}">
+                    <Label Content="Tayyor mahsulot"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource PrimaryTextColor}"/>
+                    <!-- Invoice details (Sana, Tan narxi, CostDelivery va boshqalar) -->
+                    <!-- ComboBox, TextBlock va ToggleButtonlarni SemiProductPagega moslab qo'shish -->
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Submit Button -->
+        <Button Grid.Row="4"
                 HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,0,0,12"
-                Padding="8,4"
-                md:ButtonAssist.CornerRadius="4"
-                Background="{DynamicResource OtherBackground}"
-                Click="BtnBack_Click"/>
-
+                md:ElevationAssist.Elevation="Dp24"
+                Background="{StaticResource SuccessButtonBackground}"
+                BorderBrush="{StaticResource SuccessButtonBorder}"
+                Command="{Binding SubmitCommand}"
+                Content="Yuborish"
+                Foreground="{StaticResource SuccessButtonForeground}"/>
     </Grid>
 </Page>
