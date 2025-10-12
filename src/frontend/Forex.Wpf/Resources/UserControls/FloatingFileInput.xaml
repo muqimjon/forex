@@ -1,43 +1,46 @@
-﻿<UserControl x:Class="Forex.Wpf.Resources.UserControls.FloatingFileInput"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Forex.Wpf.Resources.UserControls"
-             Height="30"
-             mc:Ignorable="d" 
-             d:DesignHeight="32" d:DesignWidth="100">
+﻿<UserControl
+    x:Class="Forex.Wpf.Resources.UserControls.FloatingFileInput"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Forex.Wpf.Resources.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Height="30"
+    d:DesignHeight="32"
+    d:DesignWidth="100"
+    mc:Ignorable="d">
 
     <Grid>
-        <!-- Floating label -->
-        <TextBlock Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                   Style="{StaticResource FloatingLabelStyle}"
-                   Tag="{Binding ElementName=fileNameBox}"
-                   IsHitTestVisible="False"/>
+        <!--  Floating label  -->
+        <TextBlock
+            IsHitTestVisible="False"
+            Style="{StaticResource FloatingLabelStyle}"
+            Tag="{Binding ElementName=fileNameBox}"
+            Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
-        <!-- Display selected file name -->
-        <TextBox x:Name="fileNameBox"
-                 Text="{Binding FileName, RelativeSource={RelativeSource AncestorType=UserControl}, 
-                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}"
-                 IsReadOnly="True"
-                 Style="{x:Null}"
-                 VerticalContentAlignment="Center"
-                 Background="{DynamicResource InputBackground}"
-                 BorderThickness="1"
-                 BorderBrush="Gray"/>
+        <!--  Display selected file name  -->
+        <TextBox
+            x:Name="fileNameBox"
+            VerticalContentAlignment="Center"
+            Background="{DynamicResource InputBackground}"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            IsReadOnly="True"
+            Style="{x:Null}"
+            Text="{Binding FileName, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}" />
 
 
-        <!-- Hidden file picker trigger -->
-        <Button x:Name="btnBrowse"
-                Content="📁"
-                HorizontalAlignment="Right"
-                Padding="6 0"
-                Click="BtnBrowse_Click"
-                Foreground="Black"
-                BorderThickness="0"
-                Background="Transparent"
-                ToolTip="Fayl tanlash"/>
+        <!--  Hidden file picker trigger  -->
+        <Button
+            x:Name="btnBrowse"
+            Padding="6,0"
+            HorizontalAlignment="Right"
+            Background="Transparent"
+            BorderThickness="0"
+            Click="BtnBrowse_Click"
+            Content="📁"
+            Foreground="Black"
+            ToolTip="Fayl tanlash" />
 
     </Grid>
 </UserControl>

@@ -1,6 +1,9 @@
 ﻿namespace Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.Home;
+using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.Windows;
+using System.Net.WebSockets;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -10,10 +13,13 @@ using System.Windows.Controls;
 public partial class ProductPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
+    private ProductPageViewModel vm;
 
     public ProductPage()
     {
         InitializeComponent();
+        vm = new ProductPageViewModel(App.Client);
+        DataContext = vm;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -22,5 +28,10 @@ public partial class ProductPage : Page
             NavigationService.GoBack();
         else
             Main.NavigateTo(new HomePage());
+    }
+
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+       await vm.InitializeAsync();
     }
 }

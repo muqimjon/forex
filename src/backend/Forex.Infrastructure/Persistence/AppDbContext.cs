@@ -1,13 +1,13 @@
 ﻿namespace Forex.Infrastructure.Persistence;
 
-using Forex.Application.Commons.Interfaces;
-using Forex.Domain.Entities;
-using Forex.Domain.Entities.Manufactories;
-using Forex.Domain.Entities.Payments;
-using Forex.Domain.Entities.Sales;
-using Forex.Domain.Entities.Shops;
-using Forex.Domain.Entities.Users;
-using Forex.Infrastructure.Persistence.Interceptors;
+using global::Forex.Application.Commons.Interfaces;
+using global::Forex.Domain.Entities;
+using global::Forex.Domain.Entities.Manufactories;
+using global::Forex.Domain.Entities.Payments;
+using global::Forex.Domain.Entities.Sales;
+using global::Forex.Domain.Entities.Shops;
+using global::Forex.Domain.Entities.Users;
+using global::Forex.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
