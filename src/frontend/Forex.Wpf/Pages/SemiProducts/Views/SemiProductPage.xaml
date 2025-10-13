@@ -1,0 +1,692 @@
+﻿<Page x:Class="Forex.Wpf.Pages.SemiProducts.Views.SemiProductPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Forex.Wpf.Pages.SemiProducts.Views"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+      Title="Kirim qilish"
+      d:DesignHeight="580"
+      d:DesignWidth="810"
+      Loaded="Page_Loaded"
+      mc:Ignorable="d">
+
+    <Page.Resources>
+        <!--  Umumiy DataGridCell style  -->
+        <Style x:Key="TransparentCellStyle"
+               TargetType="DataGridCell">
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="Margin"
+                    Value="0" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="FocusVisualStyle"
+                    Value="{x:Null}" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="BorderBrush"
+                    Value="Transparent" />
+        </Style>
+
+        <!--  TextBox style  -->
+        <Style x:Key="InlineTextBoxStyle"
+               TargetType="TextBox">
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
+
+        <!--  ComboBox style  -->
+        <Style x:Key="InlineComboBoxStyle"
+               TargetType="ComboBox">
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="15">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel LastChildFill="False">
+
+            <Label Content="Yarim tayyor mahsulotlarni kirim qilish"
+                   FontSize="18"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource SecondaryTextColor}" />
+
+            <Button x:Name="btnBack"
+                    Padding="8,0"
+                    md:ButtonAssist.CornerRadius="4"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="{DynamicResource BackButtonBackground}"
+                    BorderBrush="{StaticResource BackButtonBorder}"
+                    Click="BtnBack_Click"
+                    Content="🔙 Orqaga"
+                    DockPanel.Dock="Right"
+                    Foreground="{StaticResource BackButtonForeground}" />
+        </DockPanel>
+        <!--  MAIN CONTENT  -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="200"
+                                  MaxWidth="400" />
+                <!--  Aside qismi (chap tarafi)  -->
+                <ColumnDefinition Width="10" />
+                <!--    -->
+                <ColumnDefinition Width="2.5*" />
+                <!--  Content oyna (mahsulot va yarim tayyor)  -->
+            </Grid.ColumnDefinitions>
+
+            <!--  LEFT PANEL (Invoice + Supplier info)  -->
+            <Border Panel.ZIndex="1"
+                    Background="AliceBlue"
+                    CornerRadius="4">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="50"
+                                      Direction="250"
+                                      Opacity="0.3"
+                                      ShadowDepth="15"
+                                      Color="Black" />
+                </Border.Effect>
+                <ScrollViewer Margin="10 0 0 0">
+                    <StackPanel Orientation="Vertical"
+                                DataContext="{Binding Invoice}">
+                        <StackPanel>
+
+                            <Label HorizontalAlignment="Center"
+                                   Content="Invoice"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+
+                            <!--  Kirim sanasi  -->
+                            <DockPanel>
+                                <Label Content="Sana:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding EntryDate}" />
+                            </DockPanel>
+
+                            <!--  Tan narxi  -->
+                            <DockPanel>
+                                <Label Content="Tan narxi:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding CostPrice, StringFormat={}{0:N2}}" />
+                            </DockPanel>
+
+                            <!--  Yetkazish xizmati  -->
+                            <DockPanel>
+                                <Label Content="Yetkazish xizmati:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding CostDelivery, StringFormat={}{0:N2}}" />
+                            </DockPanel>
+
+                            <!--  Yuboruvchi xizmati  -->
+                            <DockPanel Visibility="{Binding ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Label Content="Vositachi xizmati:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding TransferFee, StringFormat={}{0:N2}}" />
+                            </DockPanel>
+
+                            <!--  Qabul qiluvchi  -->
+                            <DockPanel>
+                                <Label Content="Qabul qiluvchi:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <ComboBox ItemsSource="{Binding DataContext.Manufactories, RelativeSource={RelativeSource AncestorType=Window}}"
+                                          SelectedValue="{Binding Manufactory}"
+                                          DisplayMemberPath="Name"
+                                          DockPanel.Dock="Right"
+                                          Foreground="{StaticResource PrimaryTextColor}" />
+                            </DockPanel>
+
+                        </StackPanel>
+
+                        <Separator Margin="0,10,0,0" />
+
+
+
+                        <!--  Ta'minotchi ma'lumotlari  -->
+                        <StackPanel>
+
+                            <Label HorizontalAlignment="Center"
+                                   Content="Ta'minotchi"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+
+                            <DockPanel>
+                                <Label Content="Nomi:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <ComboBox DisplayMemberPath="Name"
+                                          DockPanel.Dock="Right"
+                                          Foreground="{StaticResource PrimaryTextColor}"
+                                          ItemsSource="{Binding DataContext.Suppliers, RelativeSource={RelativeSource AncestorType=Window}}"
+                                          SelectedItem="{Binding Supplier}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="Telefon:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding Supplier.Phone}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="Email:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding Supplier.Email}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="Manzil:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding Supplier.Address}" />
+                            </DockPanel>
+                        </StackPanel>
+
+                        <DockPanel>
+                            <Label Content="Vositachi orqalimi:"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <ToggleButton IsChecked="{Binding ViaMiddleman}" />
+                        </DockPanel>
+
+                        <Separator />
+
+                        <!--  O'rtakash uchun hisob kitob  -->
+                        <StackPanel Visibility="{Binding ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Label HorizontalAlignment="Center"
+                                   Content="Vositachi"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+
+                            <DockPanel>
+                                <Label Content="Nomi:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <ComboBox DisplayMemberPath="Name"
+                                          DockPanel.Dock="Right"
+                                          Foreground="{StaticResource PrimaryTextColor}"
+                                          ItemsSource="{Binding DataContext.Senders, RelativeSource={RelativeSource AncestorType=Window}}"
+                                          SelectedItem="{Binding Supplier.Sender}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="Telefon:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding Sender.Phone}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="Email:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding Sender.Email}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="Manzil:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding Sender.Address}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="Kontinerlar soni:"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding ContainerCount}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label Content="To'lov (donasi uchun):"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{StaticResource PrimaryTextColor}" />
+                                <TextBlock DockPanel.Dock="Right"
+                                           Foreground="{StaticResource PrimaryTextColor}"
+                                           Text="{Binding PricePerUnitContainer}" />
+                            </DockPanel>
+                        </StackPanel>
+
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+
+            <!--  RIGHT (Content)  -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <!--  Mahsulotlar  -->
+                    <RowDefinition Height="10"
+                                   MaxHeight="50" />
+                    <!--    -->
+                    <RowDefinition Height="*" />
+                    <!--  Yarim tayyor mahsulotrar  -->
+                    <RowDefinition Height="10" />
+                    <!--    -->
+                    <RowDefinition Height="Auto" />
+                    <!--  Yuborish tugmasi  -->
+                </Grid.RowDefinitions>
+
+
+                <!--  PRODUCT DATA GRID  -->
+                <Border Background="AliceBlue"
+                        CornerRadius="4">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="50"
+                                          Direction="270"
+                                          Opacity="0.2"
+                                          ShadowDepth="15"
+                                          Color="Black" />
+                    </Border.Effect>
+                    <Grid>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <!--  Header  -->
+                            <RowDefinition Height="4" />
+                            <!--    -->
+                            <RowDefinition Height="*" />
+                            <!--  DataGrid  -->
+                        </Grid.RowDefinitions>
+
+                        <!--  Header with Title + Add button  -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="40" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Margin="10,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryTextColor}"
+                                       Text="Maxsulotlar" />
+
+                            <Button Grid.Column="1"
+                                    Padding="4"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{Binding AddProductCommand}"
+                                    Content="➕"
+                                    Foreground="{StaticResource PrimaryTextColor}" />
+
+                        </Grid>
+
+                        <!--  Products  -->
+                        <DataGrid Grid.Row="3"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  Foreground="{StaticResource PrimaryTextColor}"
+                                  HeadersVisibility="Column"
+                                  IsReadOnly="True"
+                                  ItemsSource="{Binding ProductTypes}"
+                                  RowHeaderWidth="0"
+                                  RowHeight="36"
+                                  SelectedItem="{Binding SelectedProductType}">
+
+                            <DataGrid.Columns>
+
+                                <!--  Image preview  -->
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <Style BasedOn="{StaticResource TransparentCellStyle}"
+                                               TargetType="DataGridCell" />
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Width="30"
+                                                    Height="30"
+                                                    Margin="10 0 0 0"
+                                                    BorderThickness="0"
+                                                    Command="{Binding Product.SelectImageCommand}"
+                                                    Focusable="{Binding IsEditing}"
+                                                    IsHitTestVisible="{Binding IsEditing}"
+                                                    ToolTip="Rasmni o‘zgartirish">
+                                                <Button.Background>
+                                                    <ImageBrush ImageSource="{Binding Product.Image, Converter={StaticResource ImageFallbackConverter}}"
+                                                                Stretch="UniformToFill" />
+                                                </Button.Background>
+                                            </Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+
+                                </DataGridTemplateColumn>
+
+                                <!--  Code  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="Kod">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox Padding="0"
+                                                      VerticalAlignment="Center"
+                                                      Background="Transparent"
+                                                      BorderThickness="0"
+                                                      DisplayMemberPath="Code"
+                                                      IsEditable="True"
+                                                      IsEnabled="{Binding IsEditing}"
+                                                      ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      LostFocus="ComboBox_LostFocus"
+                                                      SelectedItem="{Binding Product}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  Name  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="Nomi">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Product.Name, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  Turi  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="O'lcham (размер)">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  To'plamdagi son  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="To'plamdagi mahsulot soni">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Count, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     Padding="0"
+                                                     VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  Actions  -->
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <controls:ActionButton CommandParameter="{Binding}"
+                                                                   DeleteCommand="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   EditCommand="{Binding DataContext.EditProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   IsEditing="{Binding IsEditing}"
+                                                                   SaveCommand="{Binding DataContext.SaveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </Border>
+
+                <!-- SEMI PRODUCT DATA GRID -->
+                <Border CornerRadius="4"
+                        Background="AliceBlue"
+                        Grid.Row="2">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="50"
+                                          Direction="280"
+                                          Opacity="0.2"
+                                          ShadowDepth="15"
+                                          Color="Black" />
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <!--  Header  -->
+                            <RowDefinition Height="4" />
+                            <!--    -->
+                            <RowDefinition Height="*" />
+                            <!--  DataGrid  -->
+                        </Grid.RowDefinitions>
+
+                        <!--  Header with Title + Add button  -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="40" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Margin="10,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryTextColor}"
+                                       Text="Yarim tayyor maxsulotlar" />
+
+                            <Button Grid.Column="1"
+                                    Height="28"
+                                    Margin="10,0"
+                                    Padding="4"
+                                    VerticalAlignment="Center"
+                                    Background="{DynamicResource PrimaryBackground}"
+                                    BorderBrush="{StaticResource BackButtonBorder}"
+                                    BorderThickness="0"
+                                    Command="{Binding ShowAllSemiProductsCommand}"
+                                    Content="Barchasini ko'rsatish"
+                                    Foreground="{StaticResource BackButtonForeground}" />
+
+                            <Button Grid.Column="2"
+                                    Padding="4"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{Binding AddSemiProductCommand}"
+                                    Content="➕"
+                                    Foreground="{StaticResource PrimaryTextColor}" />
+
+                        </Grid>
+
+                        <!--  Yarim tayyor mahsulotlar  -->
+                        <DataGrid Grid.Row="3"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  Foreground="{StaticResource PrimaryTextColor}"
+                                  HeadersVisibility="Column"
+                                  IsReadOnly="True"
+                                  ItemsSource="{Binding FilteredSemiProducts}"
+                                  RowHeaderWidth="0"
+                                  RowHeight="36">
+
+                            <DataGrid.Columns>
+
+                                <!--  Image preview  -->
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Width="30"
+                                                    Margin="10 0 0 0"
+                                                    Height="30"
+                                                    BorderThickness="0"
+                                                    Command="{Binding SelectImageCommand}"
+                                                    Focusable="{Binding IsEditing}"
+                                                    IsHitTestVisible="{Binding IsEditing}"
+                                                    ToolTip="Rasmni o‘zgartirish">
+                                                <Button.Background>
+                                                    <ImageBrush ImageSource="{Binding Image, Converter={StaticResource ImageFallbackConverter}}"
+                                                                Stretch="UniformToFill" />
+                                                </Button.Background>
+                                            </Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Yarim tayyor mahsulot nomi -->
+                                <DataGridTemplateColumn Header="Nomi"
+                                                        Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  Jami  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="Jami miqdori">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  O‘lchov birligi  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="O‘lchov birligi">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Measure.Name, UpdateSourceTrigger=PropertyChanged}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  Narxi  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="Narxi">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding CostPrice, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  Jami narxi  -->
+                                <DataGridTemplateColumn Width="*"
+                                                        Header="Jami summa">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding TotalAmount, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}"
+                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                     Style="{StaticResource InlineTextBoxStyle}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!--  Actions  -->
+                                <DataGridTemplateColumn Width="Auto">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <StaticResource ResourceKey="TransparentCellStyle" />
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <controls:ActionButton CommandParameter="{Binding}"
+                                                                   DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   EditCommand="{Binding DataContext.EditSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                   IsEditing="{Binding IsEditing}"
+                                                                   SaveCommand="{Binding DataContext.SaveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+
+                    </Grid>
+                </Border>
+
+                <!--  SUBMIT BUTTON  -->
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Grid.Row="4">
+                    <Button Margin=" 0 0 10 0"
+                            md:ElevationAssist.Elevation="Dp24"
+                            Background="{StaticResource SuccessButtonBackground}"
+                            BorderBrush="{StaticResource SuccessButtonBorder}"
+                            Command="{Binding ShowReportInPopupCommand}"
+                            Content="Checklistni ko'rish"
+                            Foreground="{StaticResource SuccessButtonForeground}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

@@ -3,12 +3,17 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.Wpf.Pages.Common;
+using Forex.Wpf.Pages.SemiProducts.Views;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
 
 public partial class SemiProductPageViewModel : ViewModelBase
 {
     [ObservableProperty] private InvoiceViewModel invoice = new();
-    [ObservableProperty] private UserViewModel? selectedSupplier;
+    [ObservableProperty] private ManufactoryViewModel? selectedManufactory;
+    [ObservableProperty] private string selectedProductInfo = "Barcha yarim tayyor mahsulotlar";
+
     [ObservableProperty]
     private ObservableCollection<UserViewModel> suppliers = [
             new() { Id = 1, Name = "Supplier A", Phone = "998901234567", Address = "Toshkent", Email = "a@supplier.uz", Description = "Mahalliy yetkazuvchi" },
@@ -33,8 +38,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
 
 
-    [ObservableProperty] private bool showQuantityColumn;
-    [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> items = [];
+
+    [ObservableProperty] private decimal totalAmount;
     [ObservableProperty] private ObservableCollection<SemiProductViewModel> semiProducts = [];
     [ObservableProperty] private ObservableCollection<SemiProductViewModel> filteredSemiProducts = [];
 
@@ -49,7 +54,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
             {
                 selectedProductType = value;
                 OnPropertyChanged();
-                ShowQuantityColumn = true;
                 UpdateSemiProductsForSelectedProduct();
             }
         }
@@ -64,7 +68,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
             foreach (var semi in SemiProducts)
                 FilteredSemiProducts.Add(semi);
 
-            ShowQuantityColumn = false;
             return;
         }
 
@@ -85,12 +88,12 @@ public partial class SemiProductPageViewModel : ViewModelBase
         // 🧩 Yarim tayyor mahsulotlar
         SemiProducts =
         [
-            new() { Name = "Xamir", CostPrice = 2000, Measure = AvailableMeasures[0], Code = 2001, TotalQuantity = 6542 },
-        new() { Name = "Sous", CostPrice = 1500, Measure = AvailableMeasures[0], Code = 2002, TotalQuantity = 80020 },
-        new() { Name = "Pishloq", CostPrice = 5000, Measure = AvailableMeasures[0], Code = 2003, TotalQuantity = 2400 },
-        new() { Name = "Go‘sht bo‘lagi", CostPrice = 7000, Measure = AvailableMeasures[0], Code = 2004, TotalQuantity = 5648 },
-        new() { Name = "Qaymoq", CostPrice = 3000, Measure = AvailableMeasures[0], Code = 2005, TotalQuantity = 5648 },
-        new() { Name = "Tuxumli qatlam", CostPrice = 3500, Measure = AvailableMeasures[0], Code = 2006, TotalQuantity = 5648 }
+            new() { Name = "Tufli padoji", CostPrice = 2000, Measure = AvailableMeasures[0], Quantity = 6542 },
+            new() { Name = "qora guli", CostPrice = 1500, Measure = AvailableMeasures[0], Quantity = 80020 },
+            new() { Name = "sariq guli", CostPrice = 5000, Measure = AvailableMeasures[0], Quantity = 2400 },
+            new() { Name = "qishki padoj", CostPrice = 7000, Measure = AvailableMeasures[0], Quantity = 5648 },
+            new() { Name = "yozgi tapichka usti", CostPrice = 3000, Measure = AvailableMeasures[0], Quantity = 5648 },
+            new() { Name = "kuzgi tapichka usti", CostPrice = 3500, Measure = AvailableMeasures[0], Quantity = 5648 }
         ];
 
         // 🧱 Mahsulot turlari (ProductType)
@@ -98,23 +101,26 @@ public partial class SemiProductPageViewModel : ViewModelBase
         [
             new()
         {
-            Type = "Oddiy Pizza",
-            Quantity = 10,
+            Type = "24-29",
             Items =
             [
-                new() { SemiProduct = SemiProducts[0], Quantity = 2 }, // Xamir
-                new() { SemiProduct = SemiProducts[1], Quantity = 1 }, // Sous
-                new() { SemiProduct = SemiProducts[2], Quantity = 1 }  // Pishloq
+                new() { SemiProduct = SemiProducts[0], Quantity = 2 }
             ]
         },
         new()
         {
-            Type = "Burger Max",
-            Quantity = 5,
+            Type = "30-35",
             Items =
             [
-                new() { SemiProduct = SemiProducts[3], Quantity = 2 }, // Go‘sht bo‘lagi
-                new() { SemiProduct = SemiProducts[4], Quantity = 1 }  // Qaymoq
+                new() { SemiProduct = SemiProducts[3], Quantity = 2 }
+            ]
+        },
+        new()
+        {
+            Type = "22-27",
+            Items =
+            [
+                new() { SemiProduct = SemiProducts[3], Quantity = 2 }
             ]
         }
         ];
@@ -122,14 +128,15 @@ public partial class SemiProductPageViewModel : ViewModelBase
         // 🧾 Mahsulotlar
         Products =
         [
-            new() { Code = 1001, Name = "Pizza", Measure = AvailableMeasures[0], Types = [ProductTypes[0]] },
-        new() { Code = 1002, Name = "Burger", Measure = AvailableMeasures[0], Types = [ProductTypes[1]] },
-        new() { Code = 1003, Name = "Ichimlik", Measure = AvailableMeasures[2], Types = [] }
+            new() { Code = 1001, Name = "Tufli", Measure = AvailableMeasures[0], Types = [ProductTypes[0], ProductTypes[1], ProductTypes[2]] },
+            new() { Code = 1002, Name = "X-tapichka", Measure = AvailableMeasures[0], Types = [ProductTypes[1], ProductTypes[2], ProductTypes[0]] },
+            new() { Code = 1003, Name = "Gulli tufli", Measure = AvailableMeasures[1], Types = [ProductTypes[0], ProductTypes[2]] }
         ];
 
         // 🔗 Bog‘lash: ProductType → Product
         ProductTypes[0].Product = Products[0];
         ProductTypes[1].Product = Products[1];
+        ProductTypes[2].Product = Products[2];
 
         // 📦 Invoice
         Invoice = new InvoiceViewModel
@@ -139,7 +146,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             CostPrice = 120000,
             CostDelivery = 15000,
             TransferFee = 5000,
-            CurrencyId = 1,
+            Currency = new CurrencyViewModel { Name = "So'm", Code = "UZS" },
             TotalSum = 140000,
             ViaMiddleman = false,
             Supplier = Suppliers[0],
@@ -157,7 +164,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     #region Product Commands
 
-    // ➕ Product qo‘shish
     [RelayCommand]
     private void AddProduct()
     {
@@ -166,7 +172,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
         EditProduct(type);
     }
 
-    // ✏️ Mahsulotni tahrirlash
     [RelayCommand]
     private void EditProduct(ProductTypeViewModel? item)
     {
@@ -180,7 +185,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
             item.IsEditing = true;
     }
 
-    // ✅ Mahsulotni saqlash
     [RelayCommand]
     private void SaveProduct(ProductTypeViewModel? item)
     {
@@ -188,17 +192,16 @@ public partial class SemiProductPageViewModel : ViewModelBase
             item.IsEditing = false;
     }
 
-    // ❌ M ahsulotni o‘chirish
     [RelayCommand]
     private void RemoveProduct(ProductTypeViewModel item)
     {
         ProductTypes.Remove(item);
     }
+
     #endregion Product Commands
 
     #region SemiProduct Commands
 
-    // ➕ Yarim tayyor mahsulot qo‘shish
     [RelayCommand]
     private void AddSemiProduct()
     {
@@ -206,15 +209,31 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
         if (SelectedProductType is not null)
         {
-            var pti = new ProductTypeItemViewModel { SemiProduct = newSemi };
+            var pti = new ProductTypeItemViewModel
+            {
+                SemiProduct = newSemi,
+                ParentType = SelectedProductType
+            };
             newSemi.LinkedItem = pti;
             SelectedProductType.Items.Add(pti);
         }
+
         EditSemiProduct(newSemi);
+        newSemi.PropertyChanged += SemiProduct_PropertyChanged;
         FilteredSemiProducts.Add(newSemi);
     }
 
-    // ✏️ Yarim tayyor mahsulotni tahrirlash
+    private void SemiProduct_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SemiProductViewModel.TotalAmount))
+            RecalculateTotalQuantity();
+    }
+
+    private void RecalculateTotalQuantity()
+    {
+        TotalAmount = FilteredSemiProducts.Sum(x => x.TotalAmount);
+    }
+
     [RelayCommand]
     private void EditSemiProduct(SemiProductViewModel item)
     {
@@ -228,7 +247,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
             item.IsEditing = true;
     }
 
-    // ✅ Yarim tayyor mahsulotni saqlash
     [RelayCommand]
     private void SaveSemiProduct(SemiProductViewModel item)
     {
@@ -236,7 +254,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
             item.IsEditing = false;
     }
 
-    // ❌ Yarim tayyor mahsulotni o‘chirish
     [RelayCommand]
     private void RemoveSemiProduct(SemiProductViewModel item)
     {
@@ -257,11 +274,11 @@ public partial class SemiProductPageViewModel : ViewModelBase
     {
         SelectedProductType = default!;
         UpdateSemiProductsForSelectedProduct();
+        SelectedProductInfo = "Barcha yarim tayyor mahsulotlar";
     }
 
     #endregion SemiProduct Commands
 
-    // ✅ Saqlash / Yuborish
     [RelayCommand]
     private void Submit()
     {
@@ -275,5 +292,33 @@ public partial class SemiProductPageViewModel : ViewModelBase
         // TODO: Backend API chaqirish
     }
 
+    private Window? semiProductsWindow;
+    [RelayCommand]
+    private void ShowReportInPopup()
+    {
+        if (semiProductsWindow is null)
+        {
+            semiProductsWindow = new Window
+            {
+                Title = "Yarim tayyor mahsulotlar ro‘yxati",
+                Content = new CheckSemiProductsPage(this)
+            };
+
+            semiProductsWindow.Closing += (s, e) =>
+            {
+                e.Cancel = true;
+                semiProductsWindow.Hide();
+            };
+        }
+
+        semiProductsWindow.Width = 1000;
+        semiProductsWindow.Height = 700;
+        semiProductsWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+        if (!semiProductsWindow.IsVisible)
+            semiProductsWindow.Show();
+        else
+            semiProductsWindow.Activate();
+    }
     #endregion
 }

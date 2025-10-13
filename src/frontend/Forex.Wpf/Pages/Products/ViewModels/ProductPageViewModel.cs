@@ -66,8 +66,8 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
     }
 
     [RelayCommand]
-    private void AddProduct() 
+    private void AddProduct()
     {
-        Products.Add(new ProductViewModel { } );
+        Products.Add(new ProductViewModel { });
     }
 }

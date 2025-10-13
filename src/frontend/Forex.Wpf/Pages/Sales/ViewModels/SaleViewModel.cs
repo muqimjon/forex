@@ -29,7 +29,7 @@ public partial class SaleViewModel(ForexClient client) : ViewModelBase
     [ObservableProperty] private decimal? lastBalance;
     [ObservableProperty] private string phone = string.Empty;
 
- 
+
 
     // 📦 Hozir kiritilayotgan mahsulot
     [ObservableProperty] private SaleItemViewModel currentSaleItem = new();

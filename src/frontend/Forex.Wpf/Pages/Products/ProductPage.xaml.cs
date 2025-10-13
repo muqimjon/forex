@@ -1,9 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.Home;
-using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.Windows;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -32,6 +29,6 @@ public partial class ProductPage : Page
 
     private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
-       await vm.InitializeAsync();
+        await vm.InitializeAsync();
     }
 }

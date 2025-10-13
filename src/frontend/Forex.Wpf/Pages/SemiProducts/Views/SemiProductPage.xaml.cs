@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Pages.SemiProducts;
+﻿namespace Forex.Wpf.Pages.SemiProducts.Views;
 
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
@@ -39,21 +39,6 @@ public partial class SemiProductPage : Page
             Main.NavigateTo(new HomePage());
     }
 
-    private void DataGrid_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is not SemiProductPageViewModel vm) return;
-
-        vm.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(vm.ShowQuantityColumn))
-            {
-                QuantityColumn.Visibility = vm.ShowQuantityColumn
-                    ? Visibility.Visible
-                    : Visibility.Collapsed;
-            }
-        };
-    }
-
     private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
     {
         if (sender is ComboBox combo)
@@ -82,31 +67,31 @@ public partial class SemiProductPage : Page
 
                 combo.SelectedItem = product.Product;
             }
-            else if (combo.DataContext is SemiProductViewModel semiProduct)
-            {
-                var existing = vm.SemiProducts.FirstOrDefault(x => x.Code == newCode);
+            //else if (combo.DataContext is SemiProductViewModel semiProduct)
+            //{
+            //    var existing = vm.SemiProducts.FirstOrDefault(x => x.Code == newCode);
 
-                if (existing is not null)
-                {
-                    if (semiProduct.LinkedItem is not null)
-                    {
-                        semiProduct.LinkedItem.SemiProduct = existing;
-                        existing.IsEditing = true;
-                    }
+            //    if (existing is not null)
+            //    {
+            //        if (semiProduct.LinkedItem is not null)
+            //        {
+            //            semiProduct.LinkedItem.SemiProduct = existing;
+            //            existing.IsEditing = true;
+            //        }
 
-                    // Agar eski semiProduct bo‘sh bo‘lsa, uni olib tashlash
-                    if (string.IsNullOrWhiteSpace(semiProduct.Name))
-                    {
-                        vm.SemiProducts.Remove(semiProduct);
-                    }
+            //        // Agar eski semiProduct bo‘sh bo‘lsa, uni olib tashlash
+            //        if (string.IsNullOrWhiteSpace(semiProduct.Name))
+            //        {
+            //            vm.SemiProducts.Remove(semiProduct);
+            //        }
 
-                    vm.UpdateSemiProductsForSelectedProduct();
-                }
-                else
-                {
-                    semiProduct.Code = newCode;
-                }
-            }
+            //        vm.UpdateSemiProductsForSelectedProduct();
+            //    }
+            //    else
+            //    {
+            //        semiProduct.Code = newCode;
+            //    }
+            //}
         }
     }
 }

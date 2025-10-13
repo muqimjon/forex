@@ -6,5 +6,5 @@ public enum Role
     Taminotchi,
     Mijoz,
     Hodim,
-    Yuboruvchi
+    Vositachi
 }

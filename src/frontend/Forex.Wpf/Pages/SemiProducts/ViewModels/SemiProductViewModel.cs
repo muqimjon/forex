@@ -7,14 +7,14 @@ using Microsoft.Win32;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-public partial class SemiProductViewModel() : ViewModelBase
+public partial class SemiProductViewModel : ViewModelBase
 {
     [ObservableProperty] private string? name;
-    [ObservableProperty] private int code;
     [ObservableProperty] private UnitMeasuerViewModel measure = default!;
-    [ObservableProperty] private decimal costPrice;
     [ObservableProperty] private ImageSource? image;
-    [ObservableProperty] private int totalQuantity;
+    [ObservableProperty] private int quantity;
+    [ObservableProperty] private decimal costPrice;
+    [ObservableProperty] private decimal totalAmount;
 
     // UI-only
     public ProductTypeItemViewModel? LinkedItem { get; set; }
@@ -40,6 +40,19 @@ public partial class SemiProductViewModel() : ViewModelBase
             bmp.EndInit();
             Image = bmp;
         }
+    }
+
+    partial void OnCostPriceChanged(decimal value) => CalculateTotalAmount();
+    partial void OnQuantityChanged(int value) => CalculateTotalAmount();
+
+    partial void OnTotalAmountChanged(decimal value)
+    {
+        CostPrice = Quantity != 0 ? value / Quantity : 0;
+    }
+
+    private void CalculateTotalAmount()
+    {
+        TotalAmount = CostPrice * Quantity;
     }
 }
 

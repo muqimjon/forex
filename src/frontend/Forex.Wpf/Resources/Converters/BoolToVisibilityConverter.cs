@@ -1,17 +1,14 @@
-﻿namespace Forex.Wpf.Common.Converters;
+﻿namespace Forex.Wpf.Resources.Converters;
 
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
-public class StringIsNotEmptyConverter : IValueConverter
+public class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return !string.IsNullOrWhiteSpace(value as string);
-    }
+        => (value is bool b && b) ? Visibility.Visible : Visibility.Collapsed;
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
+        => throw new NotImplementedException();
 }

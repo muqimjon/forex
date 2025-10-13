@@ -117,7 +117,7 @@
                     md:HintAssist.Hint="Telefon"
                     BorderThickness="0"
                     FontSize="16"
-                    TextChanged="txtPhone_TextChanged" />
+                    TextChanged="TxtPhone_TextChanged" />
             </Border>
 
             <Border
