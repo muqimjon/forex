@@ -5,9 +5,6 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record DeleteUserCommand(long Id) : IRequest<bool>;
 

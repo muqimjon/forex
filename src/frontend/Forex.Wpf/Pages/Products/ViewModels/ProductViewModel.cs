@@ -1,13 +1,13 @@
 ﻿namespace Forex.Wpf.Pages.Products.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Forex.ClientService.Models.Products;
-using System.Collections.ObjectModel;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
+using System.Collections.ObjectModel;
 
 public partial class ProductViewModel : ViewModelBase
 {
     [ObservableProperty] private string photoPath = string.Empty;
-    
+
     [ObservableProperty] private ProductResponse? selectedCode;
     [ObservableProperty] private ProductResponse? selectedProduct;
     [ObservableProperty] private ObservableCollection<ProductResponse> products = new();

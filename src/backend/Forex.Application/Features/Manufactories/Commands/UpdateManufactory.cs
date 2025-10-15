@@ -6,8 +6,6 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities.Manufactories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record UpdateManufactoryCommand(
     long Id,

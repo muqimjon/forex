@@ -7,8 +7,6 @@ using Forex.Application.Features.Users.DTOs;
 using Forex.Domain.Entities.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record GetUserByIdQuery(long Id) : IRequest<UserDto>;
 

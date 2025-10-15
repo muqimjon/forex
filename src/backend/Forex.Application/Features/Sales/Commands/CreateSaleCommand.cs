@@ -10,11 +10,6 @@ using Forex.Domain.Entities.Shops;
 using Forex.Domain.Entities.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record CreateSaleCommand(
     DateTime Date,

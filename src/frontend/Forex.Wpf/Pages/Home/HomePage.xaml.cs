@@ -5,7 +5,7 @@ using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.SaleHistories;
 using Forex.Wpf.Pages.Sales;
-using Forex.Wpf.Pages.SemiProducts;
+using Forex.Wpf.Pages.SemiProducts.Views;
 using Forex.Wpf.Pages.Settings;
 using Forex.Wpf.Pages.ShopCashes;
 using Forex.Wpf.Pages.Users;

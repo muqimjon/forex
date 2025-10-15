@@ -1,7 +1,7 @@
 ﻿namespace Forex.ClientService.Services;
 
 using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.Invoices;
+using Forex.ClientService.Models.Requests;
 
 public static class MultipartBuilder
 {

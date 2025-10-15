@@ -7,8 +7,6 @@ using Forex.Domain.Entities;
 using Forex.Domain.Entities.Shops;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record CreateShopCommand(
     string Name)

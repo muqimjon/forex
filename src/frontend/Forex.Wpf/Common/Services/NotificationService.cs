@@ -2,12 +2,10 @@
 
 using Forex.Wpf.Common.Enums;
 using Forex.Wpf.Common.Extensions;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Color = System.Windows.Media.Color;
 
 public static class NotificationService
 {
@@ -16,7 +14,7 @@ public static class NotificationService
         NotificationType type = NotificationType.Error,
         NotificationPosition position = NotificationPosition.BottomRight,
         int durationSeconds = 5,
-        double opacity = 0.7,
+        double opacity = 0.9,
         int maxLineLength = 40)
     {
         if (Application.Current.MainWindow is not Window mainWindow)

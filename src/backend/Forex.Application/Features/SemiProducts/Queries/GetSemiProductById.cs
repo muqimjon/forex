@@ -7,8 +7,6 @@ using Forex.Application.Features.SemiProducts.DTOs;
 using Forex.Domain.Entities.Manufactories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record GetSemiProductByIdQuery(long Id) : IRequest<SemiProductDto>;
 

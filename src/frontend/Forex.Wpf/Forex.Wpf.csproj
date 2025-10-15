@@ -9,7 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Assets\default.png" />
     <None Remove="Resources\Assets\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Assets\default.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Assets\default.png" />
     <Resource Include="Resources\Assets\logo.png" />
   </ItemGroup>
 

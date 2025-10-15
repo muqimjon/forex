@@ -1,24 +1,11 @@
-﻿using Forex.ClientService.Enums;
-using Forex.ClientService.Interfaces;
-using Forex.ClientService.Models.Users;
+﻿namespace Forex.Wpf.Windows;
+
+using Forex.ClientService.Enums;
+using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Services;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
-namespace Forex.Wpf.Windows;
 
 /// <summary>
 /// Interaction logic for UserWindow.xaml
@@ -48,7 +35,7 @@ public partial class UserWindow : Window
         try
         {
             var valyutaTypes = await App.Client.Currency.GetAll();
-            somId = valyutaTypes.Data.FirstOrDefault(v =>
+            somId = valyutaTypes.Data!.FirstOrDefault(v =>
                 v.Symbol.Equals("UZS", StringComparison.OrdinalIgnoreCase))?.Id ?? 0;
         }
         catch (Exception ex)
@@ -76,8 +63,8 @@ public partial class UserWindow : Window
                 balance = haq; // Haqdorlik — musbat
             }
 
-            
-            
+
+
             var userRequest = new UserRequest
             {
                 Name = txtName.Text,
@@ -85,15 +72,15 @@ public partial class UserWindow : Window
                 Address = txtAddress.Text,
                 Description = txtDescription.Text,
                 Role = Role.Mijoz,
-                CurrencyBalances = new List<CurrencyBalanceRequest>
-        {
+                CurrencyBalances =
+        [
             new CurrencyBalanceRequest
             {
                 CurrencyId = somId,
                 Balance = balance,
                 Discount = 0
             }
-        }
+        ]
             };
 
             // 🧩 Global client orqali ishlaymiz
@@ -112,11 +99,12 @@ public partial class UserWindow : Window
 
     }
 
-    private void txtPhone_TextChanged(object sender, TextChangedEventArgs e)
+    private void TxtPhone_TextChanged(object sender, TextChangedEventArgs e)
     {
-        FormatPhoneNumber(sender as TextBox);
+        FormatPhoneNumber((sender as TextBox)!);
     }
-    private void txtPhone_GotFocus(object sender, RoutedEventArgs e)
+
+    private void TxtPhone_GotFocus(object sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb)
         {
@@ -138,8 +126,8 @@ public partial class UserWindow : Window
     {
         if (textBox == null) return;
         string text = textBox.Text?.Trim() ?? string.Empty;
-        string digits = Regex.Replace(text, @"[^\d]", "");
-        textBox.TextChanged -= txtPhone_TextChanged;
+        string digits = Digits().Replace(text, "");
+        textBox.TextChanged -= TxtPhone_TextChanged;
         try
         {
 
@@ -150,24 +138,25 @@ public partial class UserWindow : Window
             }
             if (digits.Length > 5)
             {
-                formatted += " " + digits.Substring(5, Math.Min(3, digits.Length - 5));
+                formatted += string.Concat(" ", digits.AsSpan(5, Math.Min(3, digits.Length - 5)));
             }
             if (digits.Length > 8)
             {
-                formatted += " " + digits.Substring(8, Math.Min(2, digits.Length - 8));
+                formatted += string.Concat(" ", digits.AsSpan(8, Math.Min(2, digits.Length - 8)));
             }
             if (digits.Length > 10)
             {
-                formatted += " " + digits.Substring(10, Math.Min(2, digits.Length - 10));
+                formatted += string.Concat(" ", digits.AsSpan(10, Math.Min(2, digits.Length - 10)));
             }
             textBox.Text = formatted.TrimEnd();
             textBox.SelectionStart = textBox.Text.Length;
         }
         finally
         {
-            textBox.TextChanged += txtPhone_TextChanged;
+            textBox.TextChanged += TxtPhone_TextChanged;
         }
     }
 
-
+    [GeneratedRegex(@"[^\d]")]
+    private static partial Regex Digits();
 }

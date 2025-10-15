@@ -1,7 +1,8 @@
 ﻿namespace Forex.ClientService.Interfaces;
 
 using Forex.ClientService.Models.Commons;
-using Forex.ClientService.Models.Users;
+using Forex.ClientService.Models.Requests;
+using Forex.ClientService.Models.Responses;
 using Refit;
 
 public interface IApiUser

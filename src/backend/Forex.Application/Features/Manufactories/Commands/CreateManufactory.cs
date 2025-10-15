@@ -7,8 +7,6 @@ using Forex.Domain.Entities.Manufactories;
 using Forex.Domain.Entities.Shops;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record CreateManufactoryCommand(
     string Name)

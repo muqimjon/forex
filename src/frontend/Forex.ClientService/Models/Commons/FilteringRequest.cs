@@ -1,10 +1,11 @@
 ﻿namespace Forex.ClientService.Models.Commons;
 
-public record FilteringRequest : PagingRequest
+public record FilteringRequest
 {
-    /// <summary>Key-value filterlar: { "Role": "Supplier", "IsActive": true }</summary>
     public Dictionary<string, List<string>>? Filters { get; set; }
-
-    /// <summary>Global search (string fieldlar bo‘yicha)</summary>
     public string? Search { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public string? SortBy { get; set; }
+    public bool Descending { get; set; }
 }

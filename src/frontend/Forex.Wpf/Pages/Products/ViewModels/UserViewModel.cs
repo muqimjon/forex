@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Forex.ClientService.Models.Users;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using System.Collections.ObjectModel;
 

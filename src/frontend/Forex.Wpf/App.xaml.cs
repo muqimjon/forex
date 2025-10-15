@@ -2,7 +2,7 @@
 
 using AutoMapper;
 using Forex.ClientService;
-using Forex.Wpf.Pages.SemiProducts.Mapping;
+using Forex.Wpf.Common;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.Logging;
 using System.Windows;
@@ -28,7 +28,7 @@ public partial class App : Application
 
         var mapperConfig = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<SemiProductMappingProfile>();
+            cfg.AddProfile<MappingProfile>();
         }, loggerFactory);
 
         #endregion

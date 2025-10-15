@@ -6,13 +6,14 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities.Payments;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record UpdateCurrencyCommand(
     long Id,
     string Name,
     string Symbol,
+    string Code,
+    decimal ExchangeRate,
+    bool IsActive,
     bool IsDefault)
     : IRequest<bool>;
 

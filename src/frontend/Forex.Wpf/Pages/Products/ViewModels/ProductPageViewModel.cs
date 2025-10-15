@@ -2,8 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
-using Forex.ClientService.Models.Products;
-using Forex.ClientService.Models.Users;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.Pages.Products.ViewModels;
 using System.Collections.ObjectModel;
@@ -66,8 +65,8 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
     }
 
     [RelayCommand]
-    private void AddProduct() 
+    private void AddProduct()
     {
-        Products.Add(new ProductViewModel { } );
+        Products.Add(new ProductViewModel { });
     }
 }

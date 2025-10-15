@@ -6,6 +6,26 @@ using System.Text.Json;
 
 public static class ConversionHelper
 {
+    private static readonly string[] DateFormats = new[]
+    {
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd",
+        "yyyy/M/d HH:mm",
+        "yyyy/M/d",
+        "M/d/yyyy HH:mm",
+        "M/d/yyyy",
+        "d/M/yyyy HH:mm",
+        "d/M/yyyy",
+        "dd.MM.yyyy HH:mm",
+        "dd.MM.yyyy",
+        "yyyy-MM-ddTHH:mm:ss",
+        "yyyy-MM-ddTHH:mm:ssZ",
+        "yyyy-MM-ddTHH:mm:sszzz",
+        "MMM d, yyyy",
+        "MMMM d yyyy",
+        "d MMM yyyy"
+    };
+
     public static object? TryConvert(object value, Type targetType)
     {
         targetType = Nullable.GetUnderlyingType(targetType) ?? targetType;
@@ -16,7 +36,12 @@ public static class ConversionHelper
 
         var strValue = value?.ToString();
         if (string.IsNullOrWhiteSpace(strValue))
+        {
+            if (Nullable.GetUnderlyingType(targetType) != null)
+                return null;
+
             throw new AppException($"Bo‘sh yoki null qiymat '{targetType.Name}' turiga mos emas.");
+        }
 
         if (targetType == typeof(Guid))
             return Guid.TryParse(strValue, out var guid)
@@ -26,13 +51,16 @@ public static class ConversionHelper
         if (targetType == typeof(DateTime))
             return ParseFlexibleDate(strValue);
 
+        if (targetType == typeof(DateTimeOffset))
+            return ParseFlexibleDateTimeOffset(strValue);
+
         if (targetType.IsEnum)
             return Enum.TryParse(targetType, strValue, ignoreCase: true, out var enumVal)
                 ? enumVal
                 : throw new AppException($"'{strValue}' — '{targetType.Name}' enum qiymatiga mos emas.");
 
         if (value is IConvertible)
-            return Convert.ChangeType(value, targetType);
+            return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
 
         throw new AppException($"Qiymat '{value}' turga o‘zgartirib bo‘lmaydi: {targetType.Name}");
     }
@@ -47,39 +75,33 @@ public static class ConversionHelper
         _ => json.ToString()
     };
 
-    public static DateTime ParseFlexibleDate(string? input)
+    public static DateTime ParseFlexibleDate(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
             throw new AppException("Sana qiymati bo‘sh yoki null bo‘lishi mumkin emas.");
 
-        var dateFormats = new[]
-        {
-            "yyyy-MM-dd HH:mm:ss",
-            "yyyy-MM-dd",
-            "yyyy/M/d HH:mm",
-            "yyyy/M/d",
-            "M/d/yyyy HH:mm",
-            "M/d/yyyy",
-            "d/M/yyyy HH:mm",
-            "d/M/yyyy",
-            "dd.MM.yyyy HH:mm",
-            "dd.MM.yyyy",
-            "yyyy-MM-ddTHH:mm:ss",
-            "yyyy-MM-ddTHH:mm:ssZ",
-            "yyyy-MM-ddTHH:mm:sszzz",
-            "MMM d, yyyy",
-            "MMMM d yyyy",
-            "d MMM yyyy"
-        };
-
-        foreach (var format in dateFormats)
-            if (DateTime.TryParseExact(input, format, CultureInfo.InvariantCulture,
-                                       DateTimeStyles.None, out var parsed))
+        foreach (var format in DateFormats)
+            if (DateTime.TryParseExact(input, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
                 return parsed;
 
-        if (DateTime.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.None, out var fallback))
+        if (DateTime.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var fallback))
             return fallback;
 
         throw new AppException($"'{input}' — tanilgan sana formatlariga mos emas.");
+    }
+
+    public static DateTimeOffset ParseFlexibleDateTimeOffset(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            throw new AppException("Sana qiymati bo‘sh yoki null bo‘lishi mumkin emas.");
+
+        foreach (var format in DateFormats)
+            if (DateTimeOffset.TryParseExact(input, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
+                return parsed;
+
+        if (DateTimeOffset.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var fallback))
+            return fallback;
+
+        return new DateTimeOffset(ParseFlexibleDate(input));
     }
 }
