@@ -1,6 +1,4 @@
 ﻿namespace Forex.Application.Features.Sales.DTOs;
-using System;
-using System.Collections.Generic;
 
 public record SaleDto
 {

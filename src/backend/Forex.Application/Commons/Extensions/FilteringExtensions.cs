@@ -2,6 +2,7 @@
 
 using Forex.Application.Commons.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 
@@ -89,10 +90,20 @@ public static class QueryExtensions
                 .Select(v => v.Trim())
                 .Select(v => ConversionHelper.TryConvert(v, targetType))
                 .ToList();
+            var typedArray = Array.CreateInstance(targetType, listValues.Count);
+            for (int i = 0; i < listValues.Count; i++)
+                typedArray.SetValue(listValues[i], i);
 
-            var arrayExpr = Expression.Constant(listValues);
-            return Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new[] { targetType }, arrayExpr, member);
+            var arrayExpr = Expression.Constant(typedArray);
+
+            var containsMethod = typeof(Enumerable)
+                .GetMethods()
+                .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+                .MakeGenericMethod(targetType);
+
+            return Expression.Call(containsMethod, arrayExpr, member);
         }
+
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset))
         {

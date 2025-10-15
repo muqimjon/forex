@@ -6,8 +6,6 @@ using Forex.Domain.Entities;
 using Forex.Domain.Entities.Sales;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
 
 public record DeleteSaleCommand(long Id) : IRequest<bool>;
 

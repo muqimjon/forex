@@ -5,8 +5,6 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Currencies.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record GetCurrencyByIdQuery(long Id) : IRequest<CurrencyDto>;
 

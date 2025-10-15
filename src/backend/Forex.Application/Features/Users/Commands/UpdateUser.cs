@@ -10,8 +10,6 @@ using Forex.Domain.Entities.Users;
 using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record UpdateUserCommand(
     long Id,

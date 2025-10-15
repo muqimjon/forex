@@ -1,7 +1,7 @@
 ﻿namespace Forex.ClientService.Interfaces;
 
 using Forex.ClientService.Models.Commons;
-using Forex.ClientService.Models.SemiProducts;
+using Forex.ClientService.Models.Responses;
 using Refit;
 
 public interface IApiSemiProduct

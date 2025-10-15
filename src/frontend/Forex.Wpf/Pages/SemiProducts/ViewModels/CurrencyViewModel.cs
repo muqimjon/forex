@@ -10,4 +10,6 @@ public partial class CurrencyViewModel : ViewModelBase
     [ObservableProperty] private string code = string.Empty;
     [ObservableProperty] private string symbol = string.Empty;
     [ObservableProperty] private decimal exchangeRate;
+    [ObservableProperty] private bool isDefault;
+    [ObservableProperty] private bool isActive = true;
 }

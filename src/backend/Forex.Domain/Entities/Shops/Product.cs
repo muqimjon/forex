@@ -10,6 +10,6 @@ public class Product : Auditable
     public long MeasureId { get; set; }
     public string? PhotoPath { get; set; } = string.Empty;
 
-    public UnitMeasuer Measure { get; set; } = default!;
+    public UnitMeasure Measure { get; set; } = default!;
     public ICollection<ProductType> ProductTypes { get; set; } = default!;
 }

@@ -1,6 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.Products.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Forex.ClientService.Models.Products;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using System.Collections.ObjectModel;
 

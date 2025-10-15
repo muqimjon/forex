@@ -7,8 +7,6 @@ using Forex.Application.Features.Products.DTOs;
 using Forex.Domain.Entities.Shops;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record GetProductByIdQuery(long Id) : IRequest<ProductDto>;
 

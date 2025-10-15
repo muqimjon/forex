@@ -1,13 +1,13 @@
 ﻿namespace Forex.Infrastructure.Persistence;
 
-using global::Forex.Application.Commons.Interfaces;
-using global::Forex.Domain.Entities;
-using global::Forex.Domain.Entities.Manufactories;
-using global::Forex.Domain.Entities.Payments;
-using global::Forex.Domain.Entities.Sales;
-using global::Forex.Domain.Entities.Shops;
-using global::Forex.Domain.Entities.Users;
-using global::Forex.Infrastructure.Persistence.Interceptors;
+using Forex.Application.Commons.Interfaces;
+using Forex.Domain.Entities;
+using Forex.Domain.Entities.Manufactories;
+using Forex.Domain.Entities.Payments;
+using Forex.Domain.Entities.Sales;
+using Forex.Domain.Entities.Shops;
+using Forex.Domain.Entities.Users;
+using Forex.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -33,6 +33,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Shop> Shops { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<ProductResidue> ProductResidues { get; set; }
+    public DbSet<UnitMeasure> UnitMeasures { get; set; }
 
     private IDbContextTransaction? currentTransaction;
 

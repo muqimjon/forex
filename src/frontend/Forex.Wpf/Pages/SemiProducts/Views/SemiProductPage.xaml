@@ -26,6 +26,8 @@
                     Value="Center" />
             <Setter Property="Background"
                     Value="Transparent" />
+            <Setter Property="Foreground"
+                    Value="{StaticResource PrimaryTextColor}" />
             <Setter Property="FocusVisualStyle"
                     Value="{x:Null}" />
             <Setter Property="BorderThickness"
@@ -58,6 +60,63 @@
                     Value="0" />
             <Setter Property="VerticalAlignment"
                     Value="Center" />
+        </Style>
+
+        <!--== ASIDE ==-->
+        <Style x:Key="LabelValueStyle"
+               TargetType="ContentControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <DockPanel>
+                            <Label Content="{TemplateBinding Tag}"
+                                   DockPanel.Dock="Left"
+                                   Foreground="{StaticResource PrimaryTextColor}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0" />
+
+                            <TextBox x:Name="ValueBox"
+                                     Text="{Binding Content,
+                                            RelativeSource={RelativeSource TemplatedParent},
+                                            Mode=TwoWay,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                     DockPanel.Dock="Right"
+                                     Padding="2">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Background"
+                                            Value="Transparent" />
+                                    <Setter Property="BorderThickness"
+                                            Value="0,0,0,1" />
+                                    <Setter Property="BorderBrush"
+                                            Value="#888" />
+                                        <Setter Property="HorizontalContentAlignment"
+                                                Value="Center" />
+                                        <Setter Property="Foreground"
+                                            Value="{StaticResource PrimaryTextColor}" />
+                                    <Setter Property="FocusVisualStyle"
+                                            Value="{x:Null}" />
+
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver"
+                                                 Value="True">
+                                            <Setter Property="BorderBrush"
+                                                    Value="#02BF67" />
+                                        </Trigger>
+
+                                        <Trigger Property="IsFocused"
+                                                 Value="True">
+                                            <Setter Property="BorderBrush"
+                                                    Value="#02BF67" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Page.Resources>
 
@@ -124,58 +183,72 @@
 
                             <!--  Kirim sanasi  -->
                             <DockPanel>
-                                <Label Content="Sana:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding EntryDate}" />
+                                <Label DockPanel.Dock="Left"
+                                       Content="Sana:" />
+                                <DatePicker DockPanel.Dock="Right"
+                                            SelectedDate="{Binding EntryDate, Mode=TwoWay}"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Center" Height="20" Padding="0"/>
                             </DockPanel>
 
                             <!--  Tan narxi  -->
-                            <DockPanel>
-                                <Label Content="Tan narxi:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding CostPrice, StringFormat={}{0:N2}}" />
-                            </DockPanel>
+                                <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Tan narxi:"
+                                            IsHitTestVisible="False"
+                                            Content="{Binding CostPrice, Mode=TwoWay}"/>
 
-                            <!--  Yetkazish xizmati  -->
-                            <DockPanel>
-                                <Label Content="Yetkazish xizmati:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding CostDelivery, StringFormat={}{0:N2}}" />
-                            </DockPanel>
+
+                                <!--  Yetkazish xizmati  -->
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Yetkazish xizmati:"
+                                            Content="{Binding CostDelivery, Mode=TwoWay}"/>
 
                             <!--  Yuboruvchi xizmati  -->
-                            <DockPanel Visibility="{Binding ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <Label Content="Vositachi xizmati:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding TransferFee, StringFormat={}{0:N2}}" />
-                            </DockPanel>
+                            <ContentControl Visibility="{Binding ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            Style="{StaticResource LabelValueStyle}"
+                                            Tag="Vositachi xizmati:"
+                                            IsHitTestVisible="False"
+                                            Content="{Binding TransferFee, Mode=TwoWay}"/>
 
-                            <!--  Qabul qiluvchi  -->
+                            <!--  Jami summa  -->
+
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Jami:"
+                                            IsHitTestVisible="False"
+                                            Content="{Binding TotalAmountWithCurrency, Mode=TwoWay}" />
+
+                            <!-- Valyuta tur-->
                             <DockPanel>
-                                <Label Content="Qabul qiluvchi:"
-                                       DockPanel.Dock="Left"
+                                <Label Content="Valyuta turi:"
+                                       HorizontalAlignment="Center"
                                        Foreground="{StaticResource PrimaryTextColor}" />
-                                <ComboBox ItemsSource="{Binding DataContext.Manufactories, RelativeSource={RelativeSource AncestorType=Window}}"
-                                          SelectedValue="{Binding Manufactory}"
+                                <ComboBox ItemsSource="{Binding Currencies}"
+                                          SelectedValue="{Binding Currency}"
                                           DisplayMemberPath="Name"
                                           DockPanel.Dock="Right"
+                                          HorizontalContentAlignment="Center"
                                           Foreground="{StaticResource PrimaryTextColor}" />
                             </DockPanel>
 
                         </StackPanel>
 
+                        <Separator Margin="0,10,0,0" />
+
+                        <!--  Qabul qiluvchi  -->
+                        <StackPanel>
+                            <Label Content="Qabul qiluvchi:"
+                                   HorizontalAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryTextColor}" />
+                            <ComboBox ItemsSource="{Binding Manufactories}"
+                                      SelectedValue="{Binding Manufactory}"
+                                      DisplayMemberPath="Name"
+                                      DockPanel.Dock="Right"
+                                      HorizontalContentAlignment="Center"
+                                      Foreground="{StaticResource PrimaryTextColor}" />
+                        </StackPanel>
+                        
+                        
                         <Separator Margin="0,10,0,0" />
 
 
@@ -190,53 +263,42 @@
 
                             <DockPanel>
                                 <Label Content="Nomi:"
-                                       DockPanel.Dock="Left"
+                                       HorizontalAlignment="Center"
+                                       FontWeight="SemiBold"
                                        Foreground="{StaticResource PrimaryTextColor}" />
-                                <ComboBox DisplayMemberPath="Name"
+                                <ComboBox ItemsSource="{Binding Suppliers}"
+                                          SelectedValue="{Binding Supplier}"
+                                          DisplayMemberPath="Name"
+                                          IsEditable="True"
                                           DockPanel.Dock="Right"
-                                          Foreground="{StaticResource PrimaryTextColor}"
-                                          ItemsSource="{Binding DataContext.Suppliers, RelativeSource={RelativeSource AncestorType=Window}}"
-                                          SelectedItem="{Binding Supplier}" />
+                                          HorizontalContentAlignment="Center"
+                                          Foreground="{StaticResource PrimaryTextColor}" />
                             </DockPanel>
 
-                            <DockPanel>
-                                <Label Content="Telefon:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding Supplier.Phone}" />
-                            </DockPanel>
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Telefon:"
+                                            Content="{Binding Supplier.Phone, Mode=TwoWay}" />
 
-                            <DockPanel>
-                                <Label Content="Email:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding Supplier.Email}" />
-                            </DockPanel>
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Email:"
+                                            Content="{Binding Supplier.Email, Mode=TwoWay}" />
 
-                            <DockPanel>
-                                <Label Content="Manzil:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding Supplier.Address}" />
-                            </DockPanel>
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Manzil:"
+                                            Content="{Binding Supplier.Address, Mode=TwoWay}" />
+
                         </StackPanel>
 
                         <DockPanel>
                             <Label Content="Vositachi orqalimi:"
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}" />
-                            <ToggleButton IsChecked="{Binding ViaMiddleman}" />
+                            <ToggleButton IsChecked="{Binding ViaMiddleman, Mode=TwoWay}" />
                         </DockPanel>
 
                         <Separator />
 
-                        <!--  O'rtakash uchun hisob kitob  -->
+                        <!--  Vositachi malumotlari -->
                         <StackPanel Visibility="{Binding ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
                             <Label HorizontalAlignment="Center"
                                    Content="Vositachi"
@@ -245,59 +307,39 @@
 
                             <DockPanel>
                                 <Label Content="Nomi:"
-                                       DockPanel.Dock="Left"
+                                       HorizontalAlignment="Center"
+                                       FontWeight="SemiBold"
                                        Foreground="{StaticResource PrimaryTextColor}" />
-                                <ComboBox DisplayMemberPath="Name"
+                                <ComboBox ItemsSource="{Binding Agents}"
+                                          SelectedValue="{Binding Agent}"
+                                          DisplayMemberPath="Name"
                                           DockPanel.Dock="Right"
-                                          Foreground="{StaticResource PrimaryTextColor}"
-                                          ItemsSource="{Binding DataContext.Senders, RelativeSource={RelativeSource AncestorType=Window}}"
-                                          SelectedItem="{Binding Supplier.Sender}" />
+                                          IsEditable="True"
+                                          HorizontalContentAlignment="Center"
+                                          Foreground="{StaticResource PrimaryTextColor}" />
                             </DockPanel>
 
-                            <DockPanel>
-                                <Label Content="Telefon:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding Sender.Phone}" />
-                            </DockPanel>
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Telefon:"
+                                            Content="{Binding Agent.Phone, Mode=TwoWay}" />
 
-                            <DockPanel>
-                                <Label Content="Email:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding Sender.Email}" />
-                            </DockPanel>
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Email:"
+                                            Content="{Binding Agent.Email, Mode=TwoWay}" />
 
-                            <DockPanel>
-                                <Label Content="Manzil:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding Sender.Address}" />
-                            </DockPanel>
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Manzil:"
+                                            Content="{Binding Agent.Address, Mode=TwoWay}" />
 
-                            <DockPanel>
-                                <Label Content="Kontinerlar soni:"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding ContainerCount}" />
-                            </DockPanel>
 
-                            <DockPanel>
-                                <Label Content="To'lov (donasi uchun):"
-                                       DockPanel.Dock="Left"
-                                       Foreground="{StaticResource PrimaryTextColor}" />
-                                <TextBlock DockPanel.Dock="Right"
-                                           Foreground="{StaticResource PrimaryTextColor}"
-                                           Text="{Binding PricePerUnitContainer}" />
-                            </DockPanel>
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="Kontinerlar soni:"
+                                            Content="{Binding ContainerCount, Mode=TwoWay}" />
+                            
+                            <ContentControl Style="{StaticResource LabelValueStyle}"
+                                            Tag="To'lov (donasi uchun):"
+                                            Content="{Binding PricePerUnitContainer, Mode=TwoWay}" />
+
                         </StackPanel>
 
 
@@ -310,16 +352,11 @@
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
-                    <!--  Mahsulotlar  -->
                     <RowDefinition Height="10"
                                    MaxHeight="50" />
-                    <!--    -->
                     <RowDefinition Height="*" />
-                    <!--  Yarim tayyor mahsulotrar  -->
                     <RowDefinition Height="10" />
-                    <!--    -->
                     <RowDefinition Height="Auto" />
-                    <!--  Yuborish tugmasi  -->
                 </Grid.RowDefinitions>
 
 
@@ -337,11 +374,8 @@
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <!--  Header  -->
                             <RowDefinition Height="4" />
-                            <!--    -->
                             <RowDefinition Height="*" />
-                            <!--  DataGrid  -->
                         </Grid.RowDefinitions>
 
                         <!--  Header with Title + Add button  -->
@@ -368,7 +402,7 @@
                                     Foreground="{StaticResource PrimaryTextColor}" />
 
                         </Grid>
-
+                        
                         <!--  Products  -->
                         <DataGrid Grid.Row="3"
                                   AutoGenerateColumns="False"
@@ -377,11 +411,27 @@
                                   HeadersVisibility="Column"
                                   IsReadOnly="True"
                                   ItemsSource="{Binding ProductTypes}"
-                                  RowHeaderWidth="0"
-                                  RowHeight="36"
+                                  AlternationCount="1000"
                                   SelectedItem="{Binding SelectedProductType}">
 
                             <DataGrid.Columns>
+                                <!-- Tartib raqami -->
+                                <DataGridTemplateColumn Header="#"
+                                                        Width="Auto">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <Style BasedOn="{StaticResource TransparentCellStyle}"
+                                               TargetType="DataGridCell" />
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding 
+                                                RelativeSource={RelativeSource AncestorType=DataGridRow}, 
+                                                Path=(ItemsControl.AlternationIndex), 
+                                                Converter={StaticResource RowNumber}}"
+                                                       HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
                                 <!--  Image preview  -->
                                 <DataGridTemplateColumn Width="Auto">
@@ -393,7 +443,6 @@
                                         <DataTemplate>
                                             <Button Width="30"
                                                     Height="30"
-                                                    Margin="10 0 0 0"
                                                     BorderThickness="0"
                                                     Command="{Binding Product.SelectImageCommand}"
                                                     Focusable="{Binding IsEditing}"
@@ -420,10 +469,11 @@
                                                       BorderThickness="0"
                                                       DisplayMemberPath="Code"
                                                       IsEditable="True"
-                                                      IsEnabled="{Binding IsEditing}"
-                                                      ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                      LostFocus="ComboBox_LostFocus"
-                                                      SelectedItem="{Binding Product}" />
+                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                      ItemsSource="{Binding DataContext.ExistProducts, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding Product, Mode=TwoWay}"
+                                                      LostFocus="ComboBox_LostFocus" />
+
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -483,8 +533,7 @@
                                             <controls:ActionButton CommandParameter="{Binding}"
                                                                    DeleteCommand="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                                    EditCommand="{Binding DataContext.EditProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                                   IsEditing="{Binding IsEditing}"
-                                                                   SaveCommand="{Binding DataContext.SaveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                                                                   SaveCommand="{Binding DataContext.SaveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -530,13 +579,14 @@
                                        FontSize="14"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource PrimaryTextColor}"
-                                       Text="Yarim tayyor maxsulotlar" />
+                                       Text="{Binding SelectedProductInfo}" />
 
                             <Button Grid.Column="1"
                                     Height="28"
                                     Margin="10,0"
                                     Padding="4"
                                     VerticalAlignment="Center"
+                                    IsEnabled="{Binding SelectedProductType, Converter={StaticResource NullToBoolConverter}}"
                                     Background="{DynamicResource PrimaryBackground}"
                                     BorderBrush="{StaticResource BackButtonBorder}"
                                     BorderThickness="0"
@@ -561,11 +611,26 @@
                                   Foreground="{StaticResource PrimaryTextColor}"
                                   HeadersVisibility="Column"
                                   IsReadOnly="True"
+                                  AlternationCount="1000"
                                   ItemsSource="{Binding FilteredSemiProducts}"
-                                  RowHeaderWidth="0"
                                   RowHeight="36">
 
                             <DataGrid.Columns>
+                                
+                                <!-- Tartib raqami -->
+                                <DataGridTemplateColumn Header="#"
+                                                        Width="40">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Padding="0"
+                                                       Text="{Binding 
+                                                RelativeSource={RelativeSource AncestorType=DataGridRow}, 
+                                                Path=(ItemsControl.AlternationIndex), 
+                                                Converter={StaticResource RowNumber}}"
+                                                       HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
                                 <!--  Image preview  -->
                                 <DataGridTemplateColumn Width="Auto">
@@ -620,9 +685,15 @@
                                                         Header="O‘lchov birligi">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Measure.Name, UpdateSourceTrigger=PropertyChanged}"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Style="{StaticResource InlineTextBoxStyle}" />
+                                            <ComboBox Padding="0"
+                                                      VerticalAlignment="Center"
+                                                      Background="Transparent"
+                                                      BorderThickness="0"
+                                                      DisplayMemberPath="Name"
+                                                      IsEnabled="{Binding IsEditing}"
+                                                      ItemsSource="{Binding DataContext.AvailableMeasures, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding Measure}" />
+
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -661,8 +732,7 @@
                                             <controls:ActionButton CommandParameter="{Binding}"
                                                                    DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                                    EditCommand="{Binding DataContext.EditSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                                   IsEditing="{Binding IsEditing}"
-                                                                   SaveCommand="{Binding DataContext.SaveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                                                                   SaveCommand="{Binding DataContext.SaveSemiProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>

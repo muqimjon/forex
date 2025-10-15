@@ -14,14 +14,12 @@ public partial class SemiProductPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
     private readonly SemiProductPageViewModel vm;
-    private int code;
 
     public SemiProductPage()
     {
         InitializeComponent();
 
         vm = new SemiProductPageViewModel();
-        vm.Seeding();
         DataContext = vm;
     }
 
@@ -41,57 +39,26 @@ public partial class SemiProductPage : Page
 
     private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        if (sender is ComboBox combo)
+        if (sender is not ComboBox combo || combo.DataContext is not ProductTypeViewModel type)
+            return;
+
+        string? text = combo.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(text) || !int.TryParse(text, out int newCode))
+            return;
+
+        var existing = vm.Products.FirstOrDefault(p => p.Code == newCode);
+
+        if (existing is not null)
+            type.Product = existing;
+        else
         {
-            string? text = combo.Text?.Trim();
-            if (string.IsNullOrWhiteSpace(text))
-                return;
+            type.Product ??= new ProductViewModel();
 
-            if (!int.TryParse(text, out int newCode) || newCode == code)
-                return;
-
-            code = newCode;
-
-            if (combo.DataContext is ProductTypeViewModel product)
-            {
-                var existing = vm.Products.FirstOrDefault(p => p.Code == newCode);
-
-                if (existing is not null)
-                    product.Product = existing;
-                else
-                {
-                    var newProduct = new ProductViewModel { Code = newCode };
-                    vm.Products.Add(newProduct);
-                    product.Product = newProduct;
-                }
-
-                combo.SelectedItem = product.Product;
-            }
-            //else if (combo.DataContext is SemiProductViewModel semiProduct)
-            //{
-            //    var existing = vm.SemiProducts.FirstOrDefault(x => x.Code == newCode);
-
-            //    if (existing is not null)
-            //    {
-            //        if (semiProduct.LinkedItem is not null)
-            //        {
-            //            semiProduct.LinkedItem.SemiProduct = existing;
-            //            existing.IsEditing = true;
-            //        }
-
-            //        // Agar eski semiProduct bo‘sh bo‘lsa, uni olib tashlash
-            //        if (string.IsNullOrWhiteSpace(semiProduct.Name))
-            //        {
-            //            vm.SemiProducts.Remove(semiProduct);
-            //        }
-
-            //        vm.UpdateSemiProductsForSelectedProduct();
-            //    }
-            //    else
-            //    {
-            //        semiProduct.Code = newCode;
-            //    }
-            //}
+            type.Product.Code = newCode;
+            vm.Products.Add(type.Product);
+            vm.ExistProducts.Add(type.Product);
         }
+
+        combo.SelectedItem = type.Product;
     }
 }

@@ -5,8 +5,6 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Products.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record GetAllProductsQuery : IRequest<IReadOnlyCollection<ProductDto>>;
 

@@ -31,16 +31,15 @@ public partial class ActionButton : UserControl
 
     private void EditButton_Click(object sender, RoutedEventArgs e)
     {
-        IsEditing = true;
+        SetCurrentValue(IsEditingProperty, true); // bu modelga push qiladi
         ClosePopup();
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        IsEditing = false;
+        SetCurrentValue(IsEditingProperty, false);
         ClosePopup();
     }
-
 
     private void ClosePopup()
     {

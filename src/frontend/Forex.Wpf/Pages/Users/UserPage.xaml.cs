@@ -3,7 +3,8 @@
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
-using Forex.ClientService.Models.Users;
+using Forex.ClientService.Models.Requests;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.SemiProducts.ViewModels;
@@ -239,24 +240,15 @@ public partial class UserPage : Page
 
         if (cbRole.SelectedItem is not string role || string.IsNullOrWhiteSpace(role))
         {
-            brValutaType.Visibility = Visibility.Collapsed;
-            brDiscount.Visibility = Visibility.Collapsed;
-            brAccount.Visibility = Visibility.Collapsed;
-            btnSave.Visibility = Visibility.Collapsed;
+            brValutaType.Visibility = brDiscount.Visibility = brAccount.Visibility = btnSave.Visibility = Visibility.Collapsed;
             return;
         }
 
         brDiscount.Visibility = role == "Mijoz" ? Visibility.Visible : Visibility.Collapsed;
-        brAccount.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
-        btnSave.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
-
-        brValutaType.Visibility =
-        (role == "Mijoz" || role == "Taminotchi" || role == "Hodim")
-        ? Visibility.Visible
-        : Visibility.Collapsed;
-
-
+        brAccount.Visibility = btnSave.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
+        brValutaType.Visibility = role != "User" ? Visibility.Visible : Visibility.Collapsed;
     }
+
 
     private void CbRole_GotFocus(object sender, RoutedEventArgs e)
     {

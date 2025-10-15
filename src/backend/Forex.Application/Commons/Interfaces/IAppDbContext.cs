@@ -25,6 +25,7 @@ public interface IAppDbContext
     DbSet<ProductTypeItem> ProductItems { get; }
     DbSet<SemiProductResidue> SemiProductResidues { get; }
     DbSet<ProductResidue> ResidueShops { get; }
+    DbSet<UnitMeasure> UnitMeasures { get; }
     DbSet<Sale> Sales { get; }
     DbSet<SaleItem> SaleItems { get; }
     DbSet<SemiProduct> SemiProducts { get; }

@@ -1,7 +1,7 @@
 ﻿namespace Forex.Wpf.Windows;
 
 using Forex.ClientService.Enums;
-using Forex.ClientService.Models.Users;
+using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Services;
 using System.Text.RegularExpressions;
 using System.Windows;
