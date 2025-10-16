@@ -1,6 +1,5 @@
 ﻿namespace Forex.Application.Features.Products.ProductResidues.DTOs;
 
-using Forex.Application.Features.Products.ProductEntries.DTOs;
 using Forex.Application.Features.Products.ProductTypes.DTOs;
 
 public sealed record ProductResidueForShopDto
@@ -12,6 +11,4 @@ public sealed record ProductResidueForShopDto
     public ProductTypeDto ProductType { get; set; } = default!;
 
     public long ShopId { get; set; }
-
-    public ICollection<ProductEntryDto> ProductEntries { get; set; } = default!;
 }

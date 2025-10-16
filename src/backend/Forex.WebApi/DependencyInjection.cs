@@ -4,7 +4,6 @@ using Forex.Application;
 using Forex.Infrastructure;
 using Forex.WebApi.Conventions;
 using Forex.WebApi.Extensions;
-using Forex.WebApi.Middlewares;
 using Forex.WebApi.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;

@@ -19,5 +19,9 @@ public class ShopMappingProfile : Profile
                 opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<Shop, ShopDto>();
+        CreateMap<Shop, ShopForAccountDto>();
+        CreateMap<Shop, ShopForProductEntryDto>();
+        CreateMap<Shop, ShopForProductResidueDto>();
+        CreateMap<Shop, ShopForTransactionDto>();
     }
 }

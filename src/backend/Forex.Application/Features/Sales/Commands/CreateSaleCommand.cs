@@ -3,7 +3,7 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Sales.SaleItems.DTOs;
+using Forex.Application.Features.Sales.SaleItems.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.Sales;
@@ -16,7 +16,7 @@ public record CreateSaleCommand(
     int TotalCount,  // jami necha dona sotildi
     decimal TotalAmount, // jami summa
     string? Note,
-    List<SaleItemCreateDto> SaleItems
+    List<SaleItemCommand> SaleItems
 
     ) : IRequest<long>;
 

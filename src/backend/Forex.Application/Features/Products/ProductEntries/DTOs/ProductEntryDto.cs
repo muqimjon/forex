@@ -12,11 +12,11 @@ public sealed record ProductEntryDto
     public decimal CostPreparation { get; set; }  // tayyorlashga ketgan xarajat summasi
 
     public long ProductTypeId { get; set; }  // 
-    public ProductTypeDto ProductType { get; set; } = default!;  // razmeri 24-29, 30-35, 36-41
+    public ProductTypeForProductEntryDto ProductType { get; set; } = default!;  // razmeri 24-29, 30-35, 36-41
 
     public long ShopId { get; set; }
-    public ShopDto Shop { get; set; } = default!;
+    public ShopForProductEntryDto Shop { get; set; } = default!;
 
     public long EmployeeId { get; set; }
-    public UserDto Employee { get; set; } = default!;
+    public UserForProductEntryDto Employee { get; set; } = default!;
 }

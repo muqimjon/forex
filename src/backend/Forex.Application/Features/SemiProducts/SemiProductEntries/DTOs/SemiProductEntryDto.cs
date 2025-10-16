@@ -13,11 +13,11 @@ public sealed record SemiProductEntryDto
     public decimal TransferFee { get; set; }
 
     public long InvoiceId { get; set; }
-    public InvoiceDto Invoice { get; set; } = default!;
+    public InvoiceForSemiProductEntryDto Invoice { get; set; } = default!;
 
     public long SemiProductId { get; set; }
-    public SemiProductDto SemiProduct { get; set; } = default!;
+    public SemiProductForSemiProductEntryDto SemiProduct { get; set; } = default!;
 
     public long ManufactoryId { get; set; }
-    public ManufactoryDto Manufactory { get; set; } = default!;
+    public ManufactoryForSemiProductEntryDto Manufactory { get; set; } = default!;
 }

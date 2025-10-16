@@ -22,13 +22,13 @@ public sealed record InvoiceDto
     public CurrencyDto Currency { get; set; } = default!;
 
     public long ManufactoryId { get; set; }
-    public ManufactoryDto Manufactory { get; set; } = default!;
+    public ManufactoryForInvoiceDto Manufactory { get; set; } = default!;
 
     public long SupplierId { get; set; }
-    public UserDto Supplier { get; set; } = default!;
+    public UserForInvoiceDto Supplier { get; set; } = default!;
 
     public long? SenderId { get; set; }
-    public UserDto Sender { get; set; } = default!;
+    public UserForInvoiceDto Sender { get; set; } = default!;
 
-    public ICollection<SemiProductEntryDto> SemiProductEntries { get; set; } = default!;
+    public ICollection<SemiProductEntryForInvoiceDto> SemiProductEntries { get; set; } = default!;
 }

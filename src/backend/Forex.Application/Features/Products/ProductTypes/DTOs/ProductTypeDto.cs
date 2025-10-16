@@ -12,10 +12,10 @@ public sealed record ProductTypeDto
     public int Count { get; set; }     // 24-29 to'plamda nechtadan mahsulot borligi
 
     public long ProductId { get; set; }
-    public ProductDto Product { get; set; } = default!;
+    public ProductForProductTypeDto Product { get; set; } = default!;
 
-    public ProductResidueDto ProductResidue { get; set; } = default!;
+    public ProductResidueForProductTypeDto ProductResidue { get; set; } = default!;
 
-    public ICollection<ProductTypeItemDto> Items { get; set; } = default!;
-    public ICollection<ProductEntryDto> Entries { get; set; } = default!;
+    public ICollection<ProductTypeItemForProductTypeDto> Items { get; set; } = default!;
+    public ICollection<ProductEntryForProductTypeDto> Entries { get; set; } = default!;
 }

@@ -1,6 +1,6 @@
-﻿namespace Forex.Application.Features.Sales.SaleItems.DTOs;
+﻿namespace Forex.Application.Features.Sales.SaleItems.Commands;
 
-public class SaleItemCreateDto
+public class SaleItemCommand
 {
     public int TypeCount { get; set; }  // 1 ta razmer (6 ta ayoq kiyim) razmerlar soni sotildi
     public int Count { get; set; }    // (1 ta ayoq kiyim) 1 qatorda jami 50 ta ayoq kiyim sotildi

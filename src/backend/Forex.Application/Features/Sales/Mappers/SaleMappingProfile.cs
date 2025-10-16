@@ -10,6 +10,10 @@ public class SaleMappingProfile : Profile
     public SaleMappingProfile()
     {
         CreateMap<CreateSaleCommand, Sale>();
+        CreateMap<UpdateSaleCommand, Sale>();
+
         CreateMap<Sale, SaleDto>();
+        CreateMap<Sale, SaleForSaleItemDto>();
+        CreateMap<Sale, SaleForUserDto>();
     }
 }

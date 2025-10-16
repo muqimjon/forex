@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Features.Accounts.Mappers;
 
 using AutoMapper;
+using Forex.Application.Features.Accounts.Commands;
 using Forex.Application.Features.Accounts.DTOs;
 using Forex.Domain.Entities;
 

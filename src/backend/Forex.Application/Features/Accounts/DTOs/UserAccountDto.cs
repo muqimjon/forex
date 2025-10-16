@@ -11,7 +11,7 @@ public sealed record UserAccountDto
     public decimal Balance { get; set; }
 
     public long UserId { get; set; }
-    public UserDto User { get; set; } = default!;
+    public UserForAccountDto User { get; set; } = default!;
 
     public long CurrencyId { get; set; }
     public CurrencyDto Currency { get; set; } = default!;

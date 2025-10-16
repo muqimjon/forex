@@ -18,6 +18,9 @@ public class ProductMappingProfile : Profile
             .ForMember(dest => dest.NormalizedName,
                 opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
+        CreateMap<ProductCommand, Product>();
+
         CreateMap<Product, ProductDto>();
+        CreateMap<Product, ProductForProductTypeDto>();
     }
 }

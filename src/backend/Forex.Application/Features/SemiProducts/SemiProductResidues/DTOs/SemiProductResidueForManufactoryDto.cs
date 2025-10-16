@@ -10,5 +10,5 @@ public sealed class SemiProductResidueForManufactoryDto
     public long ManufactoryId { get; set; }
 
     public long SemiProductId { get; set; }
-    public SemiProductDto SemiProduct { get; set; } = default!;
+    public SemiProductForSemiProductResidueDto SemiProduct { get; set; } = default!;
 }

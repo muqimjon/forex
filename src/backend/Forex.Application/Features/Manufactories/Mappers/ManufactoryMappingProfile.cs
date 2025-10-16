@@ -21,6 +21,8 @@ public class ManufactoryMappingProfile : Profile
             opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<Manufactory, ManufactoryDto>();
+        CreateMap<Manufactory, ManufactoryForSemiProductEntryDto>();
+        CreateMap<Manufactory, ManufactoryForSemiProductResidueDto>();
         CreateMap<SemiProductResidue, SemiProductResidueDto>();
     }
 }

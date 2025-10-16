@@ -1,7 +1,12 @@
-﻿namespace Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
+﻿namespace Forex.Application.Features.Invoices.DTOs;
 
-public sealed record InvoiceCommand
+using Forex.Application.Features.Currencies.DTOs;
+using Forex.Application.Features.Manufactories.DTOs;
+using Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
+
+public sealed record InvoiceForUserDto
 {
+    public long Id { get; set; }
     public DateTime Date { get; set; }
     public string? Number { get; set; }
     public decimal CostPrice { get; set; }
@@ -13,7 +18,14 @@ public sealed record InvoiceCommand
     public decimal TotalAmount { get; set; }
 
     public long CurrencyId { get; set; }
+    public CurrencyDto Currency { get; set; } = default!;
+
     public long ManufactoryId { get; set; }
+    public ManufactoryForInvoiceDto Manufactory { get; set; } = default!;
+
     public long SupplierId { get; set; }
+
     public long? SenderId { get; set; }
+
+    public ICollection<SemiProductEntryForInvoiceDto> SemiProductEntries { get; set; } = default!;
 }

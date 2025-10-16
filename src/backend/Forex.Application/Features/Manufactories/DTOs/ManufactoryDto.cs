@@ -10,6 +10,6 @@ public sealed class ManufactoryDto
     public string Name { get; set; } = string.Empty;
 
     public ICollection<SemiProductResidueForManufactoryDto> SemiProductResidues { get; set; } = default!;
-    public ICollection<SemiProductEntryDto> SemiProductEntries { get; set; } = default!;
-    public ICollection<InvoiceDto> Invoices { get; set; } = default!;
+    public ICollection<SemiProductEntryForManufactoryDto> SemiProductEntries { get; set; } = default!;
+    public ICollection<InvoiceForManufactoryDto> Invoices { get; set; } = default!;
 }

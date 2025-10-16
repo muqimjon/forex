@@ -11,7 +11,7 @@ public class ShopAccountDto
     public decimal Balance { get; set; }
 
     public long ShopId { get; set; }
-    public ShopDto Shop { get; set; } = default!;
+    public ShopForAccountDto Shop { get; set; } = default!;
 
     public long CurrencyId { get; set; }
     public CurrencyDto Currency { get; set; } = default!;

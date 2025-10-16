@@ -1,4 +1,4 @@
-﻿namespace Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
+﻿namespace Forex.Application.Features.SemiProducts.SemiProducts.Commands;
 
 public sealed record SemiProductCommand
 {

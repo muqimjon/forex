@@ -288,7 +288,7 @@ public partial class UserPage : Page
                 ]
             };
 
-            var response = await client.Users.Create(request);
+            var response = await client.Users.Create(request).Handle();
             if (response.Data > 0)
             {
                 ClearForm();

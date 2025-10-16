@@ -15,10 +15,10 @@ public class TransactionDto
     public DateTime Date { get; set; }
 
     public long ShopId { get; set; }
-    public ShopDto Shop { get; set; } = default!;
+    public ShopForTransactionDto Shop { get; set; } = default!;
 
     public long UserId { get; set; }
-    public UserDto User { get; set; } = default!;
+    public UserForTransactionDto User { get; set; } = default!;
 
     public long CurrencyId { get; set; }
     public CurrencyDto Currency { get; set; } = default!;

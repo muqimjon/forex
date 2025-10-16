@@ -2,7 +2,7 @@
 
 using Forex.Application.Features.UnitMeasures.DTOs;
 
-public sealed record ProductForTypeDto
+public sealed record ProductForProductTypeDto
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;

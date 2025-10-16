@@ -3,7 +3,9 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
+using Forex.Application.Features.Invoices.Commands;
+using Forex.Application.Features.Products.Products.Commands;
+using Forex.Application.Features.SemiProducts.SemiProducts.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.SemiProducts;

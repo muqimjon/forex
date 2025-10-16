@@ -14,7 +14,7 @@ public sealed record SaleDto
     public string? Note { get; set; }
 
     public long UserId { get; set; }
-    public UserDto User { get; set; } = default!;
+    public UserForSaleDto User { get; set; } = default!;
 
-    public ICollection<SaleItemDto> SaleItems { get; set; } = default!;
+    public ICollection<SaleItemForSaleDto> SaleItems { get; set; } = default!;
 }

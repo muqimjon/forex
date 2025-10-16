@@ -9,5 +9,7 @@ public class ProductResidueMappingProfile : Profile
     public ProductResidueMappingProfile()
     {
         CreateMap<ProductResidue, ProductResidueDto>();
+        CreateMap<ProductResidue, ProductResidueForProductTypeDto>();
+        CreateMap<ProductResidue, ProductResidueForShopDto>();
     }
 }

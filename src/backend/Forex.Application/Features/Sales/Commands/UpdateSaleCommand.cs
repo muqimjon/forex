@@ -3,7 +3,7 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Sales.SaleItems.DTOs;
+using Forex.Application.Features.Sales.SaleItems.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.Sales;
@@ -17,7 +17,7 @@ public record UpdateSaleCommand(
     int TotalCount,
     decimal TotalAmount,
     string? Note,
-    List<SaleItemCreateDto> SaleItems
+    List<SaleItemCommand> SaleItems
 ) : IRequest<bool>;
 
 public class UpdateSaleCommandHandler(

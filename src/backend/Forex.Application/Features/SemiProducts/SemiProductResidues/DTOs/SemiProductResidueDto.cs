@@ -9,8 +9,8 @@ public sealed record SemiProductResidueDto
     public decimal Quantity { get; set; }
 
     public long ManufactoryId { get; set; }
-    public ManufactoryDto Manufactory { get; set; } = default!;
+    public ManufactoryForSemiProductResidueDto Manufactory { get; set; } = default!;
 
     public long SemiProductId { get; set; }
-    public SemiProductDto SemiProduct { get; set; } = default!;
+    public SemiProductForSemiProductResidueDto SemiProduct { get; set; } = default!;
 }

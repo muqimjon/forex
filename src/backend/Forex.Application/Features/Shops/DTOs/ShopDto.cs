@@ -10,8 +10,8 @@ public record ShopDto
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
-    public ICollection<ShopAccountDto> ShopAcounts { get; set; } = default!;
-    public ICollection<ProductEntryDto> ProductEntries { get; set; } = default!;
-    public ICollection<ProductResidueDto> ProductResidues { get; set; } = default!;
-    public ICollection<TransactionDto> Transactions { get; set; } = default!;
+    public ICollection<AccountForShopDto> ShopAcounts { get; set; } = default!;
+    public ICollection<ProductEntryForShopDto> ProductEntries { get; set; } = default!;
+    public ICollection<ProductResidueForShopDto> ProductResidues { get; set; } = default!;
+    public ICollection<TransactionForShopDto> Transactions { get; set; } = default!;
 }

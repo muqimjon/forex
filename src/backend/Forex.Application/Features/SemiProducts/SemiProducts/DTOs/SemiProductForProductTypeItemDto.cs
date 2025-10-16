@@ -1,9 +1,10 @@
 ﻿namespace Forex.Application.Features.SemiProducts.SemiProducts.DTOs;
 
+using Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
 using Forex.Application.Features.SemiProducts.SemiProductResidues.DTOs;
 using Forex.Application.Features.UnitMeasures.DTOs;
 
-public sealed record SemiProductForEntryDto
+public sealed record SemiProductForProductTypeItemDto
 {
     public long Id { get; init; }
     public string? Name { get; set; }
@@ -12,5 +13,6 @@ public sealed record SemiProductForEntryDto
     public long UnitMeasureId { get; set; }
     public UnitMeasureDto UnitMeasuer { get; set; } = default!;
 
-    public ICollection<SemiProductResidueDto> SemiProductResidues { get; set; } = default!;
+    public ICollection<SemiProductResidueForSemiProdutDto> SemiProductResidues { get; set; } = default!;
+    public ICollection<SemiProductEntryForSemiProductDto> SemiProductEntries { get; set; } = default!;
 }
