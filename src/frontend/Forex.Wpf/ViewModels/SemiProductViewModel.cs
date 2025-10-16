@@ -3,20 +3,26 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.Wpf.Pages.Common;
+using Forex.Wpf.ViewModels;
 using Microsoft.Win32;
-using System.Collections.ObjectModel;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-public partial class ProductViewModel : ViewModelBase
+public partial class SemiProductViewModel : ViewModelBase
 {
     public long Id { get; set; }
-    [ObservableProperty] private int? code = default!;
-    [ObservableProperty] private string name = string.Empty;
+    [ObservableProperty] private string? name;
     [ObservableProperty] private UnitMeasuerViewModel measure = default!;
     [ObservableProperty] private ImageSource? image;
+    [ObservableProperty] private decimal quantity;
+    [ObservableProperty] private decimal costPrice;
+    [ObservableProperty] private decimal totalAmount;
 
-    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> types = [];
+    // UI-only
+    public ProductTypeItemViewModel? LinkedItem { get; set; }
+
+    [ObservableProperty] private bool isEditing;
+    [ObservableProperty] private bool isSelected;
 
     [RelayCommand]
     private void SelectImage()
@@ -37,4 +43,19 @@ public partial class ProductViewModel : ViewModelBase
             Image = bmp;
         }
     }
+
+    partial void OnCostPriceChanged(decimal value) => CalculateTotalAmount();
+    partial void OnQuantityChanged(decimal value) => CalculateTotalAmount();
+
+    partial void OnTotalAmountChanged(decimal value)
+    {
+        CostPrice = Quantity != 0 ? value / Quantity : 0;
+    }
+
+    private void CalculateTotalAmount()
+    {
+        TotalAmount = CostPrice * Quantity;
+    }
 }
+
+

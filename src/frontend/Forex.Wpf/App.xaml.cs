@@ -1,52 +1,48 @@
 ﻿namespace Forex.Wpf;
 
-using AutoMapper;
-using Forex.ClientService;
-using Forex.ClientService.Services.FileStorage.Minio;
-using Forex.Wpf.Common;
-using Forex.Wpf.Windows;
-using Minio;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Windows;
-using Forex.ClientService.Services.Models;
 
 public partial class App : Application
 {
-    public static ForexClient Client { get; private set; } = default!;
-    public static IMapper Mapper { get; private set; } = default!;
-    public static MinioFileStorageService FileStorage { get; private set; } = default!;
+    public static IHost? AppHost { get; private set; }
 
-    protected override void OnStartup(StartupEventArgs e)
+    public App()
     {
-        base.OnStartup(e);
+        AppHost = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                var env = context.HostingEnvironment;
 
-        // --- appsettings.json ---
-        var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", false, true);
+                config.AddJsonFile($"appsettings.Development.json", true, true);
+                config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services.AddApplicationServices(context.Configuration);
+            })
             .Build();
+    }
 
-        // --- API client ---
-        Client = new ForexClient(config.GetValue<string>("ApiBaseUrl")!);
+    protected override async void OnStartup(StartupEventArgs e)
+    {
+        await AppHost!.StartAsync();
 
-        // --- Mapper ---
-        ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Warning));
-        var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>(), loggerFactory);
-        Mapper = mapperConfig.CreateMapper();
-
-        // --- Minio sozlamasi ---
-        var minioOptions = config.GetSection("Minio").Get<MinioOptions>()!;
-        var minioClient = new MinioClient()
-            .WithEndpoint(minioOptions.Endpoint)
-            .WithCredentials(minioOptions.AccessKey, minioOptions.SecretKey)
-            .Build();
-
-        FileStorage = new MinioFileStorageService(minioClient, minioOptions);
-
-        // --- UI ---
-        var mainWindow = new MainWindow();
+        var mainWindow = AppHost.Services.GetRequiredService<Windows.MainWindow>();
         mainWindow.Show();
+
+        base.OnStartup(e);
+    }
+
+    protected override async void OnExit(ExitEventArgs e)
+    {
+        await AppHost!.StopAsync();
+        AppHost.Dispose();
+        base.OnExit(e);
     }
 }

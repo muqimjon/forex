@@ -2,6 +2,7 @@
 
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,7 +14,8 @@ public partial class RegisterPage : Page
     {
         InitializeComponent();
 
-        this.vm = new RegisterViewModel();
+        var services = App.AppHost!.Services;
+        this.vm = services.GetRequiredService<RegisterViewModel>();
         DataContext = vm;
 
         FocusNavigator.AttachEnterNavigation([
@@ -61,6 +63,10 @@ public partial class RegisterPage : Page
         if (NavigationService?.CanGoBack == true)
             NavigationService.GoBack();
         else
-            NavigationService?.Navigate(new LoginPage());
+        {
+            var services = App.AppHost!.Services;
+            var loginPage = services.GetRequiredService<LoginPage>();
+            NavigationService?.Navigate(loginPage);
+        }
     }
 }

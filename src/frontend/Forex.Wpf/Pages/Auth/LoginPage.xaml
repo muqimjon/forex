@@ -71,7 +71,7 @@
                     Content="🔐 Login"
                     FontWeight="Bold"
                     Foreground="White"
-                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}" />
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}" />
 
                 <Button
                     x:Name="btnGoRegister"

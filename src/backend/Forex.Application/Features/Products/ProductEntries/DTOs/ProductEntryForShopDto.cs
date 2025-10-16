@@ -1,6 +1,6 @@
 ﻿namespace Forex.Application.Features.Products.ProductEntries.DTOs;
 
-using Forex.Application.Features.Products.ProductTypes;
+using Forex.Application.Features.Products.ProductTypes.DTOs;
 using Forex.Application.Features.Users.DTOs;
 
 public sealed record ProductEntryForShopDto

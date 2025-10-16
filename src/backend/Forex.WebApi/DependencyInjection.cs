@@ -1,14 +1,12 @@
 ﻿namespace Forex.WebApi;
 
 using Forex.Application;
-using Forex.Application.Commons.Exceptions;
 using Forex.Infrastructure;
 using Forex.WebApi.Conventions;
 using Forex.WebApi.Extensions;
 using Forex.WebApi.Middlewares;
 using Forex.WebApi.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -32,7 +30,7 @@ public static class DependencyInjection
 
     public static void UseInfrastructure(this WebApplication app)
     {
-        app.UseMiddleware<ExceptionHandlerMiddleware>();
+        //app.UseMiddleware<ExceptionHandlerMiddleware>();
 
         app.UseHttpsRedirection();
         app.UseCors("DefaultPolicy");

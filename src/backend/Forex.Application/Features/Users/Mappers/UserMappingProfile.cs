@@ -24,5 +24,8 @@ public class UserMappingProfile : Profile
                 opt => opt.MapFrom(src => src.Name.ToNormalized()))
             .ForMember(dest => dest.NormalizedEmail,
                 opt => opt.MapFrom(src => src.Email!.ToNormalized()));
+
+        CreateMap<User, UserForSaleDto>();
+        CreateMap<User, UserForTransactionDto>();
     }
 }

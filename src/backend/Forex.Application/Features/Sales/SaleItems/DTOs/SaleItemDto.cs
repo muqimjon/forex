@@ -1,9 +1,7 @@
 ﻿namespace Forex.Application.Features.Sales.SaleItems.DTOs;
 
-using Forex.Application.Features.Products.ProductTypes;
+using Forex.Application.Features.Products.ProductTypes.DTOs;
 using Forex.Application.Features.Sales.DTOs;
-using Forex.Domain.Entities.Products;
-using Forex.Domain.Entities.Sales;
 
 public sealed record SaleItemDto
 {

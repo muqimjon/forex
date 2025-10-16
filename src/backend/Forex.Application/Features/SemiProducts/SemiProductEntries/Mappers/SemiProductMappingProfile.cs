@@ -1,10 +1,10 @@
 ﻿namespace Forex.Application.Features.SemiProducts.SemiProductEntries.Mappers;
 
 using AutoMapper;
-using Forex.Domain.Entities;
-using Forex.Domain.Entities.SemiProducts;
-using Forex.Domain.Entities.Products;
 using Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
+using Forex.Domain.Entities;
+using Forex.Domain.Entities.Products;
+using Forex.Domain.Entities.SemiProducts;
 
 public class SemiProductMappingProfile : Profile
 {

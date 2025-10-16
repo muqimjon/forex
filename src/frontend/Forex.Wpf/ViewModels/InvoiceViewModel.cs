@@ -1,22 +1,23 @@
 ﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
 
-using AutoMapper;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
+using Forex.Wpf.ViewModels;
+using MapsterMapper;
 using System.Collections.ObjectModel;
 
 public partial class InvoiceViewModel : ViewModelBase
 {
     private readonly ForexClient client;
     private readonly IMapper mapper;
-    public InvoiceViewModel()
+    public InvoiceViewModel(ForexClient client, IMapper mapper)
     {
-        mapper = App.Mapper;
-        client = App.Client;
+        this.client = client;
+        this.mapper = mapper;
         _ = LoadPageAsync();
     }
 
@@ -70,8 +71,8 @@ public partial class InvoiceViewModel : ViewModelBase
             return;
         }
 
-        Suppliers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == Role.Taminotchi));
-        Agents = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == Role.Vositachi));
+        Suppliers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Taminotchi));
+        Agents = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Vositachi));
     }
     [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = default!;
     [ObservableProperty] private ObservableCollection<UserViewModel> agents = default!;

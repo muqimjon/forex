@@ -1,4 +1,4 @@
-﻿namespace Forex.Application.Features.Products.ProductTypes;
+﻿namespace Forex.Application.Features.Products.ProductTypes.DTOs;
 
 using Forex.Application.Features.Products.ProductEntries.DTOs;
 using Forex.Application.Features.Products.ProductResidues.DTOs;

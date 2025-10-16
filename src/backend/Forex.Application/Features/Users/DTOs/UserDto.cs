@@ -10,17 +10,14 @@ public sealed record UserDto
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string? NormalizedName { get; set; } = string.Empty;
     public string? Phone { get; set; } = string.Empty;
     public string? Email { get; set; }
-    public string? NormalizedEmail { get; set; }
     public UserRole Role { get; set; }
     public string? Address { get; set; }
     public string? Description { get; set; }
-    public string? PasswordHash { get; set; }
 
-    public ICollection<UserAccountDto> Accounts { get; set; } = default!;
-    public ICollection<SaleDto> Sales { get; set; } = default!;
-    public ICollection<TransactionDto> Transactions { get; set; } = default!;
-    public ICollection<ProductEntryDto> ProductEntries { get; set; } = default!;
+    public ICollection<AccountForUserDto> Accounts { get; set; } = default!;
+    public ICollection<SaleForUserDto> Sales { get; set; } = default!;
+    public ICollection<TransactionForUserDto> Transactions { get; set; } = default!;
+    public ICollection<ProductEntryForUserDto> ProductEntries { get; set; } = default!;
 }

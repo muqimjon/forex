@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Accounts.DTOs;
 
-using Forex.Application.Features.Shops.DTOs;
 using Forex.Application.Features.Currencies.DTOs;
+using Forex.Application.Features.Shops.DTOs;
 
 public class ShopAccountDto
 {

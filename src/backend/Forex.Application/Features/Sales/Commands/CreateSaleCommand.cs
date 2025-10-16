@@ -3,12 +3,12 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
+using Forex.Application.Features.Sales.SaleItems.DTOs;
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.Sales;
 using Forex.Domain.Entities.Products;
+using Forex.Domain.Entities.Sales;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Forex.Application.Features.Sales.SaleItems.DTOs;
 
 public record CreateSaleCommand(
     DateTime Date,

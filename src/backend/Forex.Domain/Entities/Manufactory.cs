@@ -1,7 +1,7 @@
 ﻿namespace Forex.Domain.Entities;
 
-using Forex.Domain.Entities.SemiProducts;
 using Forex.Domain.Commons;
+using Forex.Domain.Entities.SemiProducts;
 
 public class Manufactory : Auditable
 {

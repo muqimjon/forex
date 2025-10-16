@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Accounts.DTOs;
 
-using Forex.Application.Features.Users.DTOs;
 using Forex.Application.Features.Currencies.DTOs;
+using Forex.Application.Features.Users.DTOs;
 
 public sealed record UserAccountDto
 {

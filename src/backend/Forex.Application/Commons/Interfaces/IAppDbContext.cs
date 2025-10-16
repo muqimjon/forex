@@ -1,9 +1,9 @@
 ﻿namespace Forex.Application.Commons.Interfaces;
 
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.SemiProducts;
-using Forex.Domain.Entities.Sales;
 using Forex.Domain.Entities.Products;
+using Forex.Domain.Entities.Sales;
+using Forex.Domain.Entities.SemiProducts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 

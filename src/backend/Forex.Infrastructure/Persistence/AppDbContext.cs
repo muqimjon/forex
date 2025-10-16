@@ -2,9 +2,9 @@
 
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.SemiProducts;
-using Forex.Domain.Entities.Sales;
 using Forex.Domain.Entities.Products;
+using Forex.Domain.Entities.Sales;
+using Forex.Domain.Entities.SemiProducts;
 using Forex.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -90,6 +90,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         optionsBuilder.AddInterceptors(new AuditInterceptor());
 
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

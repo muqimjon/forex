@@ -1,6 +1,6 @@
 ﻿namespace Forex.Application.Features.Products.ProductTypeItems.DTOs;
 
-using Forex.Application.Features.Products.ProductTypes;
+using Forex.Application.Features.Products.ProductTypes.DTOs;
 using Forex.Application.Features.SemiProducts.SemiProducts.DTOs;
 
 public class ProductTypeItemDto

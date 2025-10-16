@@ -1,8 +1,8 @@
 ﻿namespace Forex.ClientService.Services;
 
+using Microsoft.AspNetCore.Http;
 using System.Collections;
 using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Http;
 
 public static class MultipartFormDataBuilder
 {

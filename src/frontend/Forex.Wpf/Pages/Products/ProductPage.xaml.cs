@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,7 +16,7 @@ public partial class ProductPage : Page
     public ProductPage()
     {
         InitializeComponent();
-        vm = new ProductPageViewModel(App.Client);
+        vm = App.AppHost!.Services.GetRequiredService<ProductPageViewModel>();
         DataContext = vm;
     }
 

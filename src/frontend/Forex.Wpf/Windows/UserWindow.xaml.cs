@@ -1,8 +1,11 @@
 ﻿namespace Forex.Wpf.Windows;
 
+using Forex.ClientService;
 using Forex.ClientService.Enums;
+using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,7 +37,9 @@ public partial class UserWindow : Window
     {
         try
         {
-            var valyutaTypes = await App.Client.Currency.GetAll();
+
+            var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
+            var valyutaTypes = await client.Currency.GetAll().Handle();
             somId = valyutaTypes.Data!.FirstOrDefault(v =>
                 v.Symbol.Equals("UZS", StringComparison.OrdinalIgnoreCase))?.Id ?? 0;
         }
@@ -71,22 +76,22 @@ public partial class UserWindow : Window
                 Phone = txtPhone.Text,
                 Address = txtAddress.Text,
                 Description = txtDescription.Text,
-                Role = Role.Mijoz,
-                CurrencyBalances =
+                Role = UserRole.Mijoz,
+                Accounts =
         [
             new UserAccount
             {
                 CurrencyId = somId,
-                Balance = balance,
+                OpeningBalance = balance,
                 Discount = 0
             }
         ]
             };
 
             // 🧩 Global client orqali ishlaymiz
-            var createdUser = await App.Client.Users.Create(userRequest);
+            var response = await App.AppHost!.Services.GetRequiredService<ForexClient>().Users.Create(userRequest).Handle();
 
-            if (createdUser != null)
+            if (response.IsSuccess)
             {
                 DialogResult = true;
                 Close();

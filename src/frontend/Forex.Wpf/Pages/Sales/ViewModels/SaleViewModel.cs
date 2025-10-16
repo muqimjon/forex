@@ -98,9 +98,9 @@ public partial class SaleViewModel(ForexClient client) : ViewModelBase
             var response = await client.Users.GetAll();
             if (response.IsSuccess && response.Data != null)
             {
-                // 🔹 Faqat mijozlar (Role.Customer) ni tanlaymiz
+                // 🔹 Faqat mijozlar (UserRole.Customer) ni tanlaymiz
                 var customersOnly = response.Data
-                    .Where(u => u.Role == Role.Mijoz)
+                    .Where(u => u.Role == UserRole.Mijoz)
                     .ToList();
 
                 Customers = new ObservableCollection<UserResponse>(customersOnly);

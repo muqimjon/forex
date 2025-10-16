@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Products.ProductResidues.DTOs;
 
 using Forex.Application.Features.Products.ProductEntries.DTOs;
-using Forex.Application.Features.Products.ProductTypes;
+using Forex.Application.Features.Products.ProductTypes.DTOs;
 using Forex.Application.Features.Shops.DTOs;
 
 public class ProductResidueDto

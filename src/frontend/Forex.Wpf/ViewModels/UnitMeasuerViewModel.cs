@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
+﻿namespace Forex.Wpf.ViewModels;
 
 public class UnitMeasuerViewModel
 {

@@ -1,15 +1,15 @@
 ﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
 
-using AutoMapper;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
-using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.Pages.SemiProducts.Views;
+using Forex.Wpf.ViewModels;
+using MapsterMapper;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
@@ -19,14 +19,16 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private readonly ForexClient client;
     private readonly IMapper mapper;
 
-    public SemiProductPageViewModel()
+    public SemiProductPageViewModel(ForexClient client, IMapper mapper)
     {
-        mapper = App.Mapper;
-        client = App.Client;
+        this.client = client;
+        this.mapper = mapper;
+        invoice = new(client, mapper);
+
         _ = LoadPageAsync();
     }
 
-    [ObservableProperty] private InvoiceViewModel invoice = new();
+    [ObservableProperty] private InvoiceViewModel invoice;
     [ObservableProperty] private ObservableCollection<UnitMeasuerViewModel> availableMeasures = [];
 
     private ProductTypeViewModel? selectedProductType;
@@ -134,15 +136,16 @@ public partial class SemiProductPageViewModel : ViewModelBase
             Products = mapper.Map<ICollection<ProductRequest>>(Products)
         };
 
-        var multipart = MultipartFormDataBuilder.Build(requestObject);
 
-        var response = await client.SemiProduct.CreateIntake(multipart)
-            .Handle(isLoading => IsLoading = isLoading);
 
-        if (response.IsSuccess)
-            SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
-        else
-            ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
+
+        //var response = await client.SemiProduct.CreateIntake(requestObject)
+        //    .Handle(isLoading => IsLoading = isLoading);
+
+        //if (response.IsSuccess)
+        //    SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
+        //else
+        //    ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
     }
 
 
@@ -254,7 +257,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void SaveSemiProduct(SemiProductViewModel item)
+    private static void SaveSemiProduct(SemiProductViewModel item)
         => item.IsEditing = false;
 
     [RelayCommand]
