@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 
 public partial class ProductTypeViewModel : ViewModelBase
 {
+    public long Id { get; set; }
     [ObservableProperty] private string type = string.Empty;
     [ObservableProperty] private int? count;
     [ObservableProperty] private decimal? cost;

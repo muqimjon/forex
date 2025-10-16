@@ -3,13 +3,12 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Sales.DTOs;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Sales;
-using Forex.Domain.Entities.Shops;
-using Forex.Domain.Entities.Users;
+using Forex.Domain.Entities.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Forex.Application.Features.Sales.SaleItems.DTOs;
 
 public record CreateSaleCommand(
     DateTime Date,
@@ -47,7 +46,7 @@ public class CreateSaleCommandHandler(
 
             var productResidues = await context.ProductResidues
                 .Include(p => p.ProductEntries)
-                .Where(p => productTypeIds.Contains(p.ProductTypeId))
+                .Where(p => productTypeIds.Contains(p.ProductType.Id))
                 .ToListAsync(cancellationToken);
 
 
@@ -56,18 +55,18 @@ public class CreateSaleCommandHandler(
             context.Sales.Add(sale);
             await context.SaveAsync(cancellationToken); // shu joyda sale.Id hosil bo‘ladi
 
-            List<SaleItem> saleItems = new();
+            List<SaleItem> saleItems = [];
 
             foreach (var item in request.SaleItems)
             {
-                var residue = productResidues.FirstOrDefault(r => r.ProductTypeId == item.ProductTypeId)
+                var residue = productResidues.FirstOrDefault(r => r.ProductType.Id == item.ProductTypeId)
                     ?? throw new NotFoundException(nameof(ProductResidue), nameof(item.ProductTypeId), item.ProductTypeId);
 
-                residue.TypeCount -= item.TypeCount;
+                residue.ProductType.Count -= item.TypeCount;
 
                 var saleItem = mapper.Map<SaleItem>(item);
                 var lastEntry = residue.ProductEntries.LastOrDefault()
-                        ?? throw new NotFoundException(nameof(residue.ProductTypeId), nameof(residue.ProductTypeId), residue.ProductTypeId);
+                        ?? throw new NotFoundException(nameof(residue.ProductType.Id), nameof(residue.ProductType.Id), residue.ProductType.Id);
 
                 var costPrice = lastEntry.CostPrice;
 

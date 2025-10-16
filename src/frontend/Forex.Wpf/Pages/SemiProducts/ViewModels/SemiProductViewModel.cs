@@ -9,10 +9,11 @@ using System.Windows.Media.Imaging;
 
 public partial class SemiProductViewModel : ViewModelBase
 {
+    public long Id { get; set; }
     [ObservableProperty] private string? name;
     [ObservableProperty] private UnitMeasuerViewModel measure = default!;
     [ObservableProperty] private ImageSource? image;
-    [ObservableProperty] private int quantity;
+    [ObservableProperty] private decimal quantity;
     [ObservableProperty] private decimal costPrice;
     [ObservableProperty] private decimal totalAmount;
 
@@ -43,7 +44,7 @@ public partial class SemiProductViewModel : ViewModelBase
     }
 
     partial void OnCostPriceChanged(decimal value) => CalculateTotalAmount();
-    partial void OnQuantityChanged(int value) => CalculateTotalAmount();
+    partial void OnQuantityChanged(decimal value) => CalculateTotalAmount();
 
     partial void OnTotalAmountChanged(decimal value)
     {

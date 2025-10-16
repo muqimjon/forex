@@ -1,42 +1,72 @@
 ﻿namespace Forex.ClientService.Services;
 
-using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.Requests;
+using System.Collections;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http;
 
-public static class MultipartBuilder
+public static class MultipartFormDataBuilder
 {
-    public static MultipartFormDataContent BuildIntake(InvoiceRequest command)
+    public static MultipartFormDataContent Build(object obj)
     {
-        var content = new MultipartFormDataContent();
+        var form = new MultipartFormDataContent();
+        AddObject(form, obj, string.Empty);
+        return form;
+    }
 
-        content.AddFormField(nameof(command.SenderId), command.SenderId);
-        content.AddFormField(nameof(command.ManufactoryId), command.ManufactoryId);
-        content.AddFormField(nameof(command.EntryDate), command.EntryDate.ToString("o"));
-        content.AddFormField(nameof(command.TransferFeePerContainer), command.TransferFeePerContainer);
+    private static void AddObject(MultipartFormDataContent form, object? obj, string prefix)
+    {
+        if (obj == null) return;
 
-        content.AddIndexedFields(command.Containers, (c, item, i) =>
+        var type = obj.GetType();
+
+        // Agar oddiy tip bo‘lsa
+        if (IsSimple(type))
         {
-            c.AddFormField($"Containers[{i}].Count", item.Count);
-            c.AddFormField($"Containers[{i}].Price", item.Price);
-        });
+            form.Add(new StringContent(obj.ToString() ?? ""), prefix);
+            return;
+        }
 
-        content.AddIndexedFields(command.Items, (c, item, i) =>
+        // Agar fayl bo‘lsa
+        if (obj is IFormFile file)
         {
-            c.AddFormField($"Items[{i}].SemiProductId", item.SemiProductId);
-            c.AddFormField($"Items[{i}].Name", item.Name);
-            c.AddFormField($"Items[{i}].Code", item.Code);
-            c.AddFormField($"Items[{i}].Measure", item.Measure);
-            c.AddFormField($"Items[{i}].Quantity", item.Quantity);
-            c.AddFormField($"Items[{i}].CostPrice", item.CostPrice);
-            c.AddFormField($"Items[{i}].CostDelivery", item.CostDelivery);
-            c.AddFormField($"Items[{i}].TransferFee", item.TransferFee);
+            var streamContent = new StreamContent(file.OpenReadStream());
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+            form.Add(streamContent, prefix, file.FileName);
+            return;
+        }
 
-            if (!string.IsNullOrWhiteSpace(item.PhotoPath))
+        // Agar ro‘yxat (list, array) bo‘lsa
+        if (obj is IEnumerable enumerable && obj is not string)
+        {
+            int index = 0;
+            foreach (var item in enumerable)
             {
-                c.AddFileField($"Items[{i}].Photo", item.PhotoPath, item.PhotoContentType, item.PhotoFileName);
+                var newPrefix = $"{prefix}[{index}]";
+                AddObject(form, item, newPrefix);
+                index++;
             }
-        });
+            return;
+        }
 
-        return content;
+        // Agar complex obyekt bo‘lsa
+        foreach (var prop in type.GetProperties())
+        {
+            var value = prop.GetValue(obj);
+            var newPrefix = string.IsNullOrEmpty(prefix)
+                ? prop.Name
+                : $"{prefix}.{prop.Name}";
+
+            AddObject(form, value, newPrefix);
+        }
+    }
+
+    private static bool IsSimple(Type type)
+    {
+        return type.IsPrimitive
+               || type.IsEnum
+               || type == typeof(string)
+               || type == typeof(decimal)
+               || type == typeof(DateTime)
+               || type == typeof(Guid);
     }
 }

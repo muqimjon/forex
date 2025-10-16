@@ -2,11 +2,9 @@
 
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.Manufactories;
-using Forex.Domain.Entities.Payments;
+using Forex.Domain.Entities.SemiProducts;
 using Forex.Domain.Entities.Sales;
-using Forex.Domain.Entities.Shops;
-using Forex.Domain.Entities.Users;
+using Forex.Domain.Entities.Products;
 using Forex.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -16,7 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<UserAccount> UserAccounts { get; set; }
-    public DbSet<ShopCashAccount> ShopCashAccounts { get; set; }
+    public DbSet<ShopAccount> ShopCashAccounts { get; set; }
     public DbSet<Currency> Currencies { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Manufactory> Manufactories { get; set; }
@@ -100,7 +98,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .ToTable("Accounts")
             .HasDiscriminator<string>("AccountType")
             .HasValue<UserAccount>("User")
-            .HasValue<ShopCashAccount>("ShopCash");
+            .HasValue<ShopAccount>("ShopCash");
 
         modelBuilder.Ignore<System.Transactions.Transaction>();
     }

@@ -3,13 +3,12 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Sales.DTOs;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Sales;
-using Forex.Domain.Entities.Shops;
-using Forex.Domain.Entities.Users;
+using Forex.Domain.Entities.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Forex.Application.Features.Sales.SaleItems.DTOs;
 
 public record UpdateSaleCommand(
     long Id,
@@ -57,17 +56,17 @@ public class UpdateSaleCommandHandler(
 
             var productResidues = await context.ProductResidues
                 .Include(p => p.ProductEntries)
-                .Where(p => productTypeIds.Contains(p.ProductTypeId))
+                .Where(p => productTypeIds.Contains(p.ProductType.Id))
                 .ToListAsync(cancellationToken);
 
             // === 5️⃣ Eski sale itemlarni o‘chirib tashlaymiz ===
             foreach (var oldItem in sale.SaleItems)
             {
                 var residue = await context.ProductResidues
-                    .FirstOrDefaultAsync(r => r.ProductTypeId == oldItem.ProductTypeId, cancellationToken);
+                    .FirstOrDefaultAsync(r => r.ProductType.Id == oldItem.ProductTypeId, cancellationToken);
 
                 if (residue is not null)
-                    residue.TypeCount += oldItem.TypeCount; // qaytarib qo‘yamiz
+                    residue.Count += oldItem.Count; // qaytarib qo‘yamiz
 
                 context.SaleItems.Remove(oldItem);
             }
@@ -77,13 +76,13 @@ public class UpdateSaleCommandHandler(
 
             foreach (var item in request.SaleItems)
             {
-                var residue = productResidues.FirstOrDefault(r => r.ProductTypeId == item.ProductTypeId)
+                var residue = productResidues.FirstOrDefault(r => r.ProductType.Id == item.ProductTypeId)
                     ?? throw new NotFoundException(nameof(ProductResidue), nameof(item.ProductTypeId), item.ProductTypeId);
 
-                residue.TypeCount -= item.TypeCount;
+                residue.Count -= item.TypeCount;
 
                 var lastEntry = residue.ProductEntries.LastOrDefault()
-                    ?? throw new NotFoundException(nameof(residue.ProductTypeId), nameof(residue.ProductTypeId), residue.ProductTypeId);
+                    ?? throw new NotFoundException(nameof(residue.ProductType));
 
                 var saleItem = mapper.Map<SaleItem>(item);
                 saleItem.SaleId = sale.Id;

@@ -1,6 +1,6 @@
 ﻿namespace Forex.ClientService.Models.Requests;
 
-public class RegisterRequest
+public sealed record RegisterRequest
 {
     public string Name { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;

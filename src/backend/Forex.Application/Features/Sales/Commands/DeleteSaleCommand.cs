@@ -36,15 +36,15 @@ public class DeleteSaleCommandHandler(
             var productTypeIds = sale.SaleItems.Select(i => i.ProductTypeId).ToList();
 
             var productResidues = await context.ProductResidues
-                .Where(p => productTypeIds.Contains(p.ProductTypeId))
+                .Where(p => productTypeIds.Contains(p.ProductType.Id))
                 .ToListAsync(cancellationToken);
 
             foreach (var item in sale.SaleItems)
             {
-                var residue = productResidues.FirstOrDefault(r => r.ProductTypeId == item.ProductTypeId);
+                var residue = productResidues.FirstOrDefault(r => r.ProductType.Id == item.ProductTypeId);
                 if (residue is not null)
                 {
-                    residue.TypeCount += item.TypeCount; // qoldiqni qaytarib qo'yamiz
+                    residue.Count += item.Count; // qoldiqni qaytarib qo'yamiz
                 }
             }
 

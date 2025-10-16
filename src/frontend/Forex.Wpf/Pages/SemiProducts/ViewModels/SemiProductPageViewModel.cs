@@ -6,6 +6,8 @@ using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
+using Forex.ClientService.Models.Requests;
+using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.Pages.SemiProducts.Views;
 using System.Collections.ObjectModel;
@@ -117,17 +119,32 @@ public partial class SemiProductPageViewModel : ViewModelBase
     #region Commands
 
     [RelayCommand]
-    private void Submit()
+    private async Task SubmitAsync()
     {
-        if (Products.Count == 0)
+        if (SemiProducts.Count == 0)
         {
-            ErrorMessage = "Hech qanday mahsulot kiritilmadi.";
+            ErrorMessage = "Hech qanday yarim tayyor mahsulot kiritilmadi.";
             return;
         }
 
-        SuccessMessage = "Kirim muvaffaqiyatli yuborildi!";
-        // TODO: Backend API chaqirish
+        var requestObject = new
+        {
+            Invoice = mapper.Map<InvoiceRequest>(Invoice),
+            SemiProducts = mapper.Map<ICollection<SemiProductRequest>>(SemiProducts),
+            Products = mapper.Map<ICollection<ProductRequest>>(Products)
+        };
+
+        var multipart = MultipartFormDataBuilder.Build(requestObject);
+
+        var response = await client.SemiProduct.CreateIntake(multipart)
+            .Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess)
+            SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
+        else
+            ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
     }
+
 
     private Window? semiProductsWindow;
     [RelayCommand]
@@ -166,8 +183,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
         ProductTypeViewModel type = new() { Product = new() };
         ProductTypes.Add(type);
         EditProduct(type);
-
-        var typ = type;
     }
 
     [RelayCommand]

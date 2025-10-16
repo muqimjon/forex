@@ -1,7 +1,7 @@
 ﻿namespace Forex.Infrastructure.Security;
 
 using Forex.Application.Commons.Interfaces;
-using Forex.Domain.Entities.Users;
+using Forex.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

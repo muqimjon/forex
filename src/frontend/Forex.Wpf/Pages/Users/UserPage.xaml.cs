@@ -122,7 +122,7 @@ public partial class UserPage : Page
             if (decimal.TryParse(tbAccount.Text, out decimal accountBalance) &&
                 decimal.TryParse(tbDiscount.Text, out decimal discount))
             {
-                updateUser.CurrencyBalances.Add(new CurrencyBalanceRequest
+                updateUser.CurrencyBalances.Add(new UserAccount
                 {
                     CurrencyId = (long)cbxValutaType.SelectedValue,
                     Balance = accountBalance,
@@ -277,7 +277,7 @@ public partial class UserPage : Page
                 Role = role,
                 CurrencyBalances =
                 [
-                    new CurrencyBalanceRequest
+                    new UserAccount
                     {
                         CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
                         Balance = decimal.TryParse(tbAccount.Text, out var bal) ? bal : 0,

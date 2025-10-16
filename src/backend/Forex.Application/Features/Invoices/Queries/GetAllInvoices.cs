@@ -15,8 +15,7 @@ public class GetAllInvoicesQueryHandler(
 {
     public async Task<List<InvoiceDto>> Handle(GetAllInvoicesQuery request, CancellationToken cancellationToken)
     => mapper.Map<List<InvoiceDto>>(await context.Invoices
-        .Include(i => i.SemiProducts)
-        .Include(i => i.SemiProducts)
+        .Include(i => i.SemiProductEntries)
         .AsQueryable()
         .ToListAsync(cancellationToken));
 }

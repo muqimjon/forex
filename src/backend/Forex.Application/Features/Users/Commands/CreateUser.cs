@@ -3,10 +3,8 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Users.DTOs;
+using Forex.Application.Features.Accounts.DTOs;
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.Payments;
-using Forex.Domain.Entities.Users;
 using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +13,11 @@ public record CreateUserCommand(
     string Name,
     string? Phone,
     string? Email,
-    Role Role,
+    UserRole Role,
     string? Address,
     string? Description,
-    List<CurrencyBalanceDto> CurrencyBalances)
+    string? Password,
+    List<CreateUserAccountCommand> Accounts)
     : IRequest<long>;
 
 public class CreateUserCommandHandler(
@@ -39,7 +38,7 @@ public class CreateUserCommandHandler(
         var currencies = await context.Currencies.ToListAsync(cancellationToken);
         var currencyIds = currencies.Select(c => c.Id).ToHashSet();
 
-        foreach (var dto in request.CurrencyBalances)
+        foreach (var dto in request.Accounts)
         {
             if (!currencyIds.Contains(dto.CurrencyId))
                 throw new NotFoundException(nameof(Currency), nameof(dto.CurrencyId), dto.CurrencyId);
@@ -48,8 +47,8 @@ public class CreateUserCommandHandler(
             {
                 User = user,
                 CurrencyId = dto.CurrencyId,
-                OpeningBalance = dto.Balance,
-                Balance = dto.Balance,
+                OpeningBalance = dto.OpeningBalance,
+                Balance = dto.OpeningBalance,
                 Discount = dto.Discount
             });
         }

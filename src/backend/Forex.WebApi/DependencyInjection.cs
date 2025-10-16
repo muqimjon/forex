@@ -104,13 +104,13 @@ public static class DependencyInjection
 
     private static void AddValidation(this IServiceCollection services)
     {
-        services.Configure((Action<ApiBehaviorOptions>)(options =>
-        {
-            options.InvalidModelStateResponseFactory = context =>
-                throw new ValidationAppException(context.ModelState
-                    .SelectMany(kvp => kvp.Value!.Errors
-                        .Select(e => new FluentValidation.Results.ValidationFailure(kvp.Key, e.ErrorMessage))));
-        }));
+        //services.Configure((Action<ApiBehaviorOptions>)(options =>
+        //{
+        //    options.InvalidModelStateResponseFactory = context =>
+        //        throw new ValidationAppException(context.ModelState
+        //            .SelectMany(kvp => kvp.Value!.Errors
+        //                .Select(e => new FluentValidation.Results.ValidationFailure(kvp.Key, e.ErrorMessage))));
+        //}));
     }
 
     private static void AddAppCors(this IServiceCollection services)

@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 
 public partial class ProductViewModel : ViewModelBase
 {
+    public long Id { get; set; }
     [ObservableProperty] private int? code = default!;
     [ObservableProperty] private string name = string.Empty;
     [ObservableProperty] private UnitMeasuerViewModel measure = default!;

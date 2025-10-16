@@ -4,7 +4,7 @@ using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Users.DTOs;
-using Forex.Domain.Entities.Users;
+using Forex.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

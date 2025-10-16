@@ -74,7 +74,7 @@ public partial class UserWindow : Window
                 Role = Role.Mijoz,
                 CurrencyBalances =
         [
-            new CurrencyBalanceRequest
+            new UserAccount
             {
                 CurrencyId = somId,
                 Balance = balance,

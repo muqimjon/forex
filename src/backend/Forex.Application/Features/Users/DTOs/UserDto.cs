@@ -1,16 +1,26 @@
 ﻿namespace Forex.Application.Features.Users.DTOs;
 
+using Forex.Application.Features.Accounts.DTOs;
+using Forex.Application.Features.Products.ProductEntries.DTOs;
+using Forex.Application.Features.Sales.DTOs;
+using Forex.Application.Features.Transactions.DTOs;
 using Forex.Domain.Enums;
 
-public record UserDto
+public sealed record UserDto
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public Role Role { get; set; }
-    public string Address { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public string? NormalizedName { get; set; } = string.Empty;
+    public string? Phone { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? NormalizedEmail { get; set; }
+    public UserRole Role { get; set; }
+    public string? Address { get; set; }
+    public string? Description { get; set; }
+    public string? PasswordHash { get; set; }
 
-    public List<AccountDto> Accounts { get; set; } = default!;
+    public ICollection<UserAccountDto> Accounts { get; set; } = default!;
+    public ICollection<SaleDto> Sales { get; set; } = default!;
+    public ICollection<TransactionDto> Transactions { get; set; } = default!;
+    public ICollection<ProductEntryDto> ProductEntries { get; set; } = default!;
 }

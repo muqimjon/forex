@@ -2,7 +2,7 @@
 
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Domain.Entities.Payments;
+using Forex.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

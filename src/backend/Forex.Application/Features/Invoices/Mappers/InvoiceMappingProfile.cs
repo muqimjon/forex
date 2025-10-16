@@ -2,7 +2,7 @@
 
 using AutoMapper;
 using Forex.Application.Features.Invoices.DTOs;
-using Forex.Domain.Entities.Manufactories;
+using Forex.Domain.Entities;
 
 public class InvoiceMappingProfile : Profile
 {

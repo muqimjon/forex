@@ -44,9 +44,8 @@ public partial class InvoiceViewModel : ViewModelBase
         Manufactories = mapper.Map<ObservableCollection<ManufactoryViewModel>>(response.Data!);
         Manufactory = Manufactories.FirstOrDefault() ?? new();
     }
-
-    [ObservableProperty] private ManufactoryViewModel manufactory = default!;
     [ObservableProperty] private ObservableCollection<ManufactoryViewModel> manufactories = default!;
+
 
     #endregion Manufactory
 
@@ -74,8 +73,6 @@ public partial class InvoiceViewModel : ViewModelBase
         Suppliers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == Role.Taminotchi));
         Agents = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == Role.Vositachi));
     }
-    [ObservableProperty] private UserViewModel supplier = default!;
-    [ObservableProperty] private UserViewModel? agent = default!;
     [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = default!;
     [ObservableProperty] private ObservableCollection<UserViewModel> agents = default!;
 
@@ -97,13 +94,17 @@ public partial class InvoiceViewModel : ViewModelBase
             ?? Currencies.FirstOrDefault()
             ?? new();
     }
-    [ObservableProperty] private CurrencyViewModel currency = default!;
     [ObservableProperty] private ObservableCollection<CurrencyViewModel> currencies = default!;
 
     #endregion Currency
 
     #endregion Loading Data
 
+    public long Id { get; set; }
+    [ObservableProperty] private ManufactoryViewModel manufactory = default!;
+    [ObservableProperty] private UserViewModel supplier = default!;
+    [ObservableProperty] private UserViewModel? agent = default!;
+    [ObservableProperty] private CurrencyViewModel currency = default!;
     [ObservableProperty] private DateTime entryDate = DateTime.Now;
     [ObservableProperty] private string? number;
     [ObservableProperty] private decimal? costPrice;

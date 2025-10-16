@@ -1,9 +1,9 @@
 ﻿namespace Forex.WebApi.Controllers;
 
-using Forex.Application.Features.SemiProductEntries.Commands;
-using Forex.Application.Features.SemiProducts.Commands;
-using Forex.Application.Features.SemiProducts.DTOs;
-using Forex.Application.Features.SemiProducts.Queries;
+using Forex.Application.Features.SemiProducts.SemiProductEntries.Commands;
+using Forex.Application.Features.SemiProducts.SemiProducts.Commands;
+using Forex.Application.Features.SemiProducts.SemiProducts.DTOs;
+using Forex.Application.Features.SemiProducts.SemiProducts.Queries;
 using Forex.WebApi.Controllers.Common;
 using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +33,6 @@ public class SemiProductsController
         => Ok(new Response { Data = await Mediator.Send(new DeleteSemiProductCommand(id)) });
 
     [HttpPost("intake")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> CreateIntake([FromForm] CreateSemiProductIntakeCommand command)
+    public async Task<IActionResult> CreateIntake(CreateSemiProductIntakeCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 }

@@ -5,7 +5,7 @@ using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Auth.DTOs;
 using Forex.Application.Features.Users.DTOs;
-using Forex.Domain.Entities.Users;
+using Forex.Domain.Entities;
 using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +16,7 @@ public record RegisterCommand(
     string Name,
     string Phone,
     string? Email,
-    Role Role,
+    UserRole Role,
     string? Address,
     string? Description,
     string Password)
