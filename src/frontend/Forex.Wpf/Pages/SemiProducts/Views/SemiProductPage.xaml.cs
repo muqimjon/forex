@@ -19,6 +19,25 @@ public partial class SemiProductPage : Page
 
         vm = App.AppHost!.Services.GetRequiredService<SemiProductPageViewModel>();
         DataContext = vm;
+
+        FocusNavigator.AttachEnterNavigation(
+            [
+                btnAddProduct,
+                btnShowAll,
+                tbAddSemiProduct,
+                dpDate,
+                tbCostPrice,
+                tbCostDelivery,
+                tbTransferFee,
+                tbTotalAmount,
+                cbCurrency,
+                cbManufactory,
+                cbSupplierName,
+                tbSupplierPhone,
+                tbSupplierEmail,
+                tbSupplierAddress,
+                tgbViaMiddleman,
+            ]);
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)

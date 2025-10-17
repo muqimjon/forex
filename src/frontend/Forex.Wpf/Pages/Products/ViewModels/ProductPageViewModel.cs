@@ -11,7 +11,7 @@ using System.Collections.ObjectModel;
 public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
 {
     [ObservableProperty] private ObservableCollection<UserResponse> employees = [];
-    
+
     [ObservableProperty] private ObservableCollection<UserViewModel> users = [];
     private UserViewModel? selectedEmployee;
 
@@ -87,18 +87,18 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
         }
     }
 
-    public UserViewModel SelectedEmployee 
-    { 
+    public UserViewModel SelectedEmployee
+    {
         get => selectedEmployee!;
-        set 
+        set
         {
             if (value != selectedEmployee)
             {
                 selectedEmployee = value;
                 UpdateProducts();
             }
-        } 
-    } 
+        }
+    }
 
     public void UpdateProducts()
     {

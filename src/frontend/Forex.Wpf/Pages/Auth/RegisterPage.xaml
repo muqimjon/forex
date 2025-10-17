@@ -79,7 +79,7 @@
                         Foreground="White"
                         FontWeight="Bold"
                         Padding="8"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}"
                         BorderThickness="0"
                         md:ButtonAssist.CornerRadius="6"
                         Click="BtnRegister_Click"/>

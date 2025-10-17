@@ -17,45 +17,88 @@ public static class FocusNavigator
         {
             control.PreviewKeyDown += (s, e) =>
             {
-                if (e.Key != Key.Enter && e.Key != Key.Tab)
-                    return;
-
                 bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
 
-                // Hozirgi elementning indexini aniqlash
                 int idx = focusOrder.IndexOf(control);
-
                 UIElement? nextElement = null;
 
-                if (shift)
+                switch (e.Key)
                 {
-                    // Orqaga yurish → faqat Visible elementni topish
-                    for (int i = idx - 1; i >= 0; i--)
-                    {
-                        if (IsElementFocusable(focusOrder[i]))
+                    case Key.Enter:
+                    case Key.Tab:
+                        if (shift)
                         {
-                            nextElement = focusOrder[i];
-                            break;
+                            // Orqaga
+                            for (int i = idx - 1; i >= 0; i--)
+                            {
+                                if (IsElementFocusable(focusOrder[i]))
+                                {
+                                    nextElement = focusOrder[i];
+                                    break;
+                                }
+                            }
                         }
-                    }
-                }
-                else
-                {
-                    // Oldinga yurish → faqat Visible elementni topish
-                    for (int i = idx + 1; i < focusOrder.Count; i++)
-                    {
-                        if (IsElementFocusable(focusOrder[i]))
+                        else
                         {
-                            nextElement = focusOrder[i];
-                            break;
-                        }
-                    }
-                }
+                            // Oldinga
+                            for (int i = idx + 1; i < focusOrder.Count; i++)
+                            {
+                                if (IsElementFocusable(focusOrder[i]))
+                                {
+                                    nextElement = focusOrder[i];
+                                    break;
+                                }
+                            }
 
-                if (nextElement is not null)
-                {
-                    FocusElement(nextElement);
-                    e.Handled = true;
+                            // Oxirgi element va Button bo'lsa, click qilamiz
+                            if (nextElement is null && control is Button btn)
+                            {
+                                btn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                                e.Handled = true;
+                                return;
+                            }
+                        }
+
+                        if (nextElement is not null)
+                        {
+                            FocusElement(nextElement);
+                            e.Handled = true;
+                        }
+                        break;
+
+                    case Key.Up:
+                        // Orqaga arrow
+                        for (int i = idx - 1; i >= 0; i--)
+                        {
+                            if (IsElementFocusable(focusOrder[i]))
+                            {
+                                nextElement = focusOrder[i];
+                                break;
+                            }
+                        }
+                        if (nextElement is not null)
+                        {
+                            FocusElement(nextElement);
+                            e.Handled = true;
+                        }
+                        break;
+
+                    case Key.Down:
+                        // Oldinga arrow
+                        for (int i = idx + 1; i < focusOrder.Count; i++)
+                        {
+                            if (IsElementFocusable(focusOrder[i]))
+                            {
+                                nextElement = focusOrder[i];
+                                break;
+                            }
+                        }
+                        if (nextElement is not null)
+                        {
+                            FocusElement(nextElement);
+                            e.Handled = true;
+                        }
+                        break;
                 }
             };
         }
@@ -66,17 +109,13 @@ public static class FocusNavigator
         if (element.Visibility != Visibility.Visible || !element.IsEnabled)
             return false;
 
-        switch (element)
+        return element switch
         {
-            case TextBox tb:
-                return tb.IsVisible && tb.IsEnabled && tb.IsTabStop;
-            case ComboBox cb:
-                return cb.IsVisible && cb.IsEnabled && cb.IsTabStop;
-            case Button btn:
-                return btn.IsVisible && btn.IsEnabled && btn.IsTabStop;
-            default:
-                return element.IsVisible && element.IsEnabled;
-        }
+            TextBox tb => tb.IsVisible && tb.IsEnabled && tb.IsTabStop,
+            ComboBox cb => cb.IsVisible && cb.IsEnabled && cb.IsTabStop,
+            Button btn => btn.IsVisible && btn.IsEnabled && btn.IsTabStop,
+            _ => element.IsVisible && element.IsEnabled,
+        };
     }
 
     private static void FocusElement(UIElement element)
@@ -97,8 +136,4 @@ public static class FocusNavigator
             }
         }
     }
-
-
-
-
 }
