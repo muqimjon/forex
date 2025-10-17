@@ -13,6 +13,6 @@ public sealed record ProductTypeForProductResidueDto
     public long ProductId { get; set; }
     public ProductForProductTypeDto Product { get; set; } = default!;
 
-    public ICollection<ProductTypeItemForProductTypeDto> Items { get; set; } = default!;
-    public ICollection<ProductEntryForProductTypeDto> Entries { get; set; } = default!;
+    public ICollection<ProductTypeItemForProductTypeDto> ProductTypeItems { get; set; } = default!;
+    public ICollection<ProductEntryForProductTypeDto> ProductEntries { get; set; } = default!;
 }

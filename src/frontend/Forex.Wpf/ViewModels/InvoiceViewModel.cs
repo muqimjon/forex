@@ -106,7 +106,7 @@ public partial class InvoiceViewModel : ViewModelBase
     [ObservableProperty] private UserViewModel supplier = default!;
     [ObservableProperty] private UserViewModel? agent = default!;
     [ObservableProperty] private CurrencyViewModel currency = default!;
-    [ObservableProperty] private DateTime entryDate = DateTime.Now;
+    [ObservableProperty] private DateTime date = DateTime.Now;
     [ObservableProperty] private string? number;
     [ObservableProperty] private decimal? costPrice;
     [ObservableProperty] private decimal? costDelivery;

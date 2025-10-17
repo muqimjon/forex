@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Features.Invoices.Mappers;
 
 using AutoMapper;
+using Forex.Application.Commons.Extensions;
 using Forex.Application.Features.Invoices.Commands;
 using Forex.Application.Features.Invoices.DTOs;
 using Forex.Domain.Entities;
@@ -14,6 +15,7 @@ public class InvoiceMappingProfile : Profile
         CreateMap<Invoice, InvoiceForSemiProductEntryDto>();
         CreateMap<Invoice, InvoiceForUserDto>();
 
-        CreateMap<InvoiceCommand, Invoice>();
+        CreateMap<InvoiceCommand, Invoice>()
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date.ToUtcSafe()));
     }
 }

@@ -186,7 +186,7 @@
                                 <Label DockPanel.Dock="Left"
                                        Content="Sana:" />
                                 <DatePicker DockPanel.Dock="Right"
-                                            SelectedDate="{Binding EntryDate, Mode=TwoWay}"
+                                            SelectedDate="{Binding Date, Mode=TwoWay}"
                                             VerticalAlignment="Center"
                                             HorizontalContentAlignment="Center" Height="20" Padding="0"/>
                             </DockPanel>

@@ -7,7 +7,7 @@ public sealed record ProductTypeItemForProductTypeDto
     public long Id { get; set; }
     public decimal Quantity { get; set; }   // miqdori
 
-    public long TypeId { get; set; }
+    public long ProductTypeId { get; set; }
 
     public long SemiProductId { get; set; }
     public SemiProductDto SemiProduct { get; set; } = default!;

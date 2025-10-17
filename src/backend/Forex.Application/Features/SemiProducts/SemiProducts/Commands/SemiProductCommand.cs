@@ -6,5 +6,5 @@ public sealed record SemiProductCommand
     public long UnitMeasureId { get; set; }
     public int Quantity { get; set; }
     public decimal CostPrice { get; set; }
-    public string ImagePath { get; set; } = string.Empty;
+    public string? ImagePath { get; set; } = string.Empty;
 }

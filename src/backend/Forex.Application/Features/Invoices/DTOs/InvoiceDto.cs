@@ -13,8 +13,8 @@ public sealed record InvoiceDto
     public decimal CostPrice { get; set; }
     public decimal CostDelivery { get; set; }
     public bool ViaMiddleman { get; set; }
-    public int ContainerCount { get; set; }
-    public decimal PricePerUnit { get; set; }
+    public int? ContainerCount { get; set; }
+    public decimal? PricePerUnit { get; set; }
     public decimal? TransferFee { get; set; }
     public decimal TotalAmount { get; set; }
 
@@ -28,7 +28,7 @@ public sealed record InvoiceDto
     public UserForInvoiceDto Supplier { get; set; } = default!;
 
     public long? SenderId { get; set; }
-    public UserForInvoiceDto Sender { get; set; } = default!;
+    public UserForInvoiceDto? Sender { get; set; }
 
     public ICollection<SemiProductEntryForInvoiceDto> SemiProductEntries { get; set; } = default!;
 }

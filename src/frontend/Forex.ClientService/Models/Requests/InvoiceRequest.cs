@@ -15,6 +15,6 @@ public sealed record InvoiceRequest
 
     public long CurrencyId { get; set; }
     public long ManufactoryId { get; set; }
-    public long? SupplierId { get; set; }
-    public long SenderId { get; set; }
+    public long SupplierId { get; set; }
+    public long? SenderId { get; set; }
 }

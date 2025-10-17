@@ -106,7 +106,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             return;
         }
 
-        foreach (var item in SelectedProductType.Items)
+        foreach (var item in SelectedProductType.ProductTypeItems)
         {
             if (item.SemiProduct is not null)
             {
@@ -129,24 +129,22 @@ public partial class SemiProductPageViewModel : ViewModelBase
             return;
         }
 
-        var requestObject = new
+        var requestObject = new SemiProductIntakeRequest
         {
             Invoice = mapper.Map<InvoiceRequest>(Invoice),
             SemiProducts = mapper.Map<ICollection<SemiProductRequest>>(SemiProducts),
             Products = mapper.Map<ICollection<ProductRequest>>(Products)
         };
 
+        var response = await client.SemiProduct.CreateIntake(requestObject)
+            .Handle(isLoading => IsLoading = isLoading);
 
-
-
-        //var response = await client.SemiProduct.CreateIntake(requestObject)
-        //    .Handle(isLoading => IsLoading = isLoading);
-
-        //if (response.IsSuccess)
-        //    SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
-        //else
-        //    ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
+        if (response.IsSuccess)
+            SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
+        else
+            ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
     }
+
 
 
     private Window? semiProductsWindow;
@@ -230,7 +228,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             };
             newSemi.LinkedItem = pti;
 
-            SelectedProductType.Items.Add(pti);
+            SelectedProductType.ProductTypeItems.Add(pti);
         }
         else IndependentSemiProducts.Add(newSemi);
 
@@ -267,8 +265,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
         IndependentSemiProducts?.Remove(item);
 
         foreach (var type in ProductTypes)
-            type.Items = new ObservableCollection<ProductTypeItemViewModel>(
-                type.Items.Where(i => i.SemiProduct != item));
+            type.ProductTypeItems = new ObservableCollection<ProductTypeItemViewModel>(
+                type.ProductTypeItems.Where(i => i.SemiProduct != item));
 
         UpdateSemiProductsForSelectedProduct();
     }

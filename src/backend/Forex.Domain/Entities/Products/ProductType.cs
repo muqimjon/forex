@@ -12,6 +12,6 @@ public class ProductType : Auditable
 
     public ProductResidue ProductResidue { get; set; } = default!;
 
-    public ICollection<ProductTypeItem> Items { get; set; } = default!;
-    public ICollection<ProductEntry> Entries { get; set; } = default!;
+    public ICollection<ProductTypeItem> ProductTypeItems { get; set; } = default!;
+    public ICollection<ProductEntry> ProductEntries { get; set; } = default!;
 }

@@ -103,7 +103,7 @@ public class CreateSemiProductIntakeCommandHandler(
             context.Accounts.Add(account);
         }
 
-        account.Balance += (decimal)invoice.TransferFee!;
+        account.Balance += (decimal)invoice.CostPrice!;
     }
 
     // --- 1️⃣ Product va unga bog‘langan SemiProduct’lar ---
@@ -119,20 +119,27 @@ public class CreateSemiProductIntakeCommandHandler(
             .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct)
             ?? throw new NotFoundException(nameof(Manufactory), nameof(invoice.ManufactoryId), invoice.ManufactoryId);
 
+        var defaultMeasure = await context.UnitMeasures
+            .FirstOrDefaultAsync(um => um.Name == "Dona" || um.Name == "dona", ct)
+            ?? await context.UnitMeasures.FirstOrDefaultAsync(um => um.IsDefault, ct)
+            ?? await context.UnitMeasures.FirstOrDefaultAsync(ct)
+            ?? throw new ForbiddenException("O'lchov birliklari mavjud emas");
+
         var linkedSemiProducts = new List<SemiProduct>();
 
         foreach (var pCmd in productCommands)
         {
             // 🔹 Har bir Product doimo yangi yaratiladi
             var product = mapper.Map<Product>(pCmd);
+            product.UnitMeasure = defaultMeasure;
             context.Products.Add(product);
 
-            foreach (var typeCmd in pCmd.Types)
+            foreach (var typeCmd in pCmd.ProductTypes)
             {
                 var productType = mapper.Map<ProductType>(typeCmd);
-                productType.Items.Clear();
+                productType.ProductTypeItems.Clear();
 
-                foreach (var itemCmd in typeCmd.Items)
+                foreach (var itemCmd in typeCmd.ProductTypeItems)
                 {
                     var semi = await context.SemiProducts
                         .FirstOrDefaultAsync(s => s.Name == itemCmd.SemiProduct.Name, ct);
@@ -186,7 +193,7 @@ public class CreateSemiProductIntakeCommandHandler(
                         SemiProduct = semi,
                         Quantity = itemCmd.Quantity
                     };
-                    productType.Items.Add(item);
+                    productType.ProductTypeItems.Add(item);
                 }
 
                 product.ProductTypes.Add(productType);

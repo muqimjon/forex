@@ -15,5 +15,5 @@ public sealed record ProductTypeForProductEntryDto
 
     public ProductResidueForProductTypeDto ProductResidue { get; set; } = default!;
 
-    public ICollection<ProductTypeItemForProductTypeDto> Items { get; set; } = default!;
+    public ICollection<ProductTypeItemForProductTypeDto> ProductTypeItems { get; set; } = default!;
 }

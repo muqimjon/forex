@@ -8,8 +8,8 @@ public class ProductTypeItemDto
     public long Id { get; set; }
     public decimal Quantity { get; set; }   // miqdori
 
-    public long TypeId { get; set; }
-    public ProductTypeDto Type { get; set; } = default!;
+    public long ProductTypeId { get; set; }
+    public ProductTypeDto ProductType { get; set; } = default!;
 
     public long SemiProductId { get; set; }
     public SemiProductDto SemiProduct { get; set; } = default!;

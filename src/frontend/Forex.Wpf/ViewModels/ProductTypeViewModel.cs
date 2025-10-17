@@ -10,7 +10,7 @@ public partial class ProductTypeViewModel : ViewModelBase
     [ObservableProperty] private string type = string.Empty;
     [ObservableProperty] private int? count;
     [ObservableProperty] private decimal? cost;
-    [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> items = [];
+    [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> productTypeItems = [];
 
     // for UI only
     [ObservableProperty] private bool isEditing;
@@ -20,9 +20,9 @@ public partial class ProductTypeViewModel : ViewModelBase
     private ProductViewModel? previousProduct;
     partial void OnProductChanged(ProductViewModel value)
     {
-        if (value is not null && !value.Types.Contains(this))
+        if (value is not null && !value.ProductTypes.Contains(this))
         {
-            value.Types.Add(this);
+            value.ProductTypes.Add(this);
         }
 
         previousProduct = value;

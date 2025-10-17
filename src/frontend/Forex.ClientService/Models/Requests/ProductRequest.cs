@@ -1,5 +1,7 @@
 ﻿namespace Forex.ClientService.Models.Requests;
 
+using System.Text.Json.Serialization;
+
 public sealed record ProductRequest
 {
     public long Id { get; set; }
@@ -8,5 +10,8 @@ public sealed record ProductRequest
     public long UnitMeasureId { get; set; }
     public string? ImagePath { get; set; }
 
-    public ICollection<ProductTypeRequest> Types { get; set; } = default!;
+    public ICollection<ProductTypeRequest> ProductTypes { get; set; } = default!;
+
+    [JsonIgnore]
+    public byte[]? ImageBytes { get; set; }
 }

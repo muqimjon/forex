@@ -17,7 +17,7 @@ public partial class ProductViewModel : ViewModelBase
     [ObservableProperty] private UnitMeasuerViewModel measure = default!;
     [ObservableProperty] private ImageSource? image;
 
-    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> types = [];
+    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
 
     [RelayCommand]
     private void SelectImage()

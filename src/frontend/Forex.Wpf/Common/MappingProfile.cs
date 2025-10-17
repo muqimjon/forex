@@ -5,49 +5,67 @@ using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.SemiProducts.ViewModels;
 using Forex.Wpf.ViewModels;
 using Mapster;
+using System.IO;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 public static class MappingProfile
 {
     public static void Register(TypeAdapterConfig config)
     {
-        // Product
+        // 🔹 Product
         config.NewConfig<ProductResponse, ProductViewModel>();
         config.NewConfig<ProductViewModel, ProductRequest>()
-            .Map(dest => dest.UnitMeasureId, src => src.Measure.Id);
+            .Map(dest => dest.UnitMeasureId, src => src.Measure.Id)
+            .Map(dest => dest.ImageBytes, src => ImageToBytes(src.Image));
 
-        // Product Type
+        // 🔹 ProductType
         config.NewConfig<ProductTypeResponse, ProductTypeViewModel>();
         config.NewConfig<ProductTypeViewModel, ProductTypeRequest>();
 
-        // Type Item
+        // 🔹 ProductTypeItem
         config.NewConfig<ProductTypeItemViewModel, ProductTypeItemRequest>();
 
-        // SemiProduct
+        // 🔹 SemiProduct
         config.NewConfig<SemiProductResponse, SemiProductViewModel>();
         config.NewConfig<SemiProductViewModel, SemiProductRequest>()
-            .Map(dest => dest.UnitMeasureId, src => src.Measure.Id);
+            .Map(dest => dest.UnitMeasureId, src => src.Measure.Id)
+            .Map(dest => dest.ImageBytes, src => ImageToBytes(src.Image));
 
-        // UnitMeasure
+        // 🔹 UnitMeasure
         config.NewConfig<UnitMeasureResponse, UnitMeasuerViewModel>();
         config.NewConfig<UnitMeasuerViewModel, UnitMeasureRequest>();
 
-        // User
+        // 🔹 User
         config.NewConfig<UserResponse, UserViewModel>();
         config.NewConfig<UserViewModel, UserRequest>();
 
-        // Currency
+        // 🔹 Currency
         config.NewConfig<CurrencyResponse, CurrencyViewModel>();
         config.NewConfig<CurrencyViewModel, CurrencyRequest>();
 
-        // Manufactory
+        // 🔹 Manufactory
         config.NewConfig<ManufactoryResponse, ManufactoryViewModel>();
 
-        // Invoice
+        // 🔹 Invoice
         config.NewConfig<InvoiceResponse, InvoiceViewModel>();
         config.NewConfig<InvoiceViewModel, InvoiceRequest>()
             .Map(dest => dest.CurrencyId, src => src.Currency.Id)
             .Map(dest => dest.SupplierId, src => src.Supplier.Id)
             .Map(dest => dest.SenderId, src => src.Agent != null ? src.Agent.Id : (long?)null)
             .Map(dest => dest.ManufactoryId, src => src.Manufactory.Id);
+    }
+
+    // 🔹 ImageSource → byte[] maplash (Minioga upload uchun)
+    private static byte[]? ImageToBytes(ImageSource? img)
+    {
+        if (img is not BitmapSource bmp) return null;
+
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+        using var ms = new MemoryStream();
+        encoder.Save(ms);
+        return ms.ToArray();
     }
 }
