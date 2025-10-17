@@ -60,7 +60,7 @@ public partial class SalePage : Page
 
     private void ComboBox_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter && DataContext is SaleViewModel vm)
+        if ((e.Key == Key.Enter || e.Key == Key.Tab) && DataContext is SaleViewModel vm)
         {
             string text = ((ComboBox)sender).Text?.Trim() ?? "";
             vm.CheckCustomerNameCommand.Execute(text);
