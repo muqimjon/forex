@@ -98,8 +98,8 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Hodimlar"
                                        Grid.Column="0"
-                                       Margin="10,0"
-                                       FontSize="14"
+                                       Margin="10,2"
+                                       FontSize="20"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource PrimaryTextColor}"/>
                             <Button Grid.Column="1"
@@ -111,7 +111,8 @@
                                     Foreground="{StaticResource PrimaryTextColor}"/>
                         </Grid>
 
-                        <DataGrid x:Name="dgEmployees" Grid.Row="2"
+                        <DataGrid x:Name="dgEmployees"
+                                  Grid.Row="2"
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
                                   HeadersVisibility="Column"
@@ -119,19 +120,37 @@
                                   Height="220"
                                   RowHeaderWidth="0"
                                   RowHeight="36"
+                                  EnableRowVirtualization="True"
+                                  EnableColumnVirtualization="True"
+                                  VirtualizingPanel.IsVirtualizing="True"
+                                  VirtualizingPanel.VirtualizationMode="Recycling"
+                                  SelectedItem="{Binding SelectedEmployee,Mode=TwoWay}"
                                   ItemsSource="{Binding Users}">
+                            <DataGrid.Resources>
+                                <!-- 🔹 Header’larni markazlashtirish uchun umumiy style -->
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                </Style>
+                                <!-- 🔹 O‘ngga hizalangan sonlar uchun umumiy style -->
+                                <Style x:Key="RightAlignedText" TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="Margin" Value="0,0,5,0"/>
+                                </Style>
+
+                            </DataGrid.Resources>
 
                             <DataGrid.Columns>
 
-                                <!-- 🔽 Hodim nomi: ComboBox -->
-                                <DataGridTemplateColumn Header="Hodim" MinWidth="200">
+                                <!-- 👤 Hodim -->
+                                <DataGridTemplateColumn Header="Hodim" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ComboBox
                                                 ItemsSource="{Binding DataContext.Employees, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                SelectedItem="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                SelectedItem="{Binding SelectedUser, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                 DisplayMemberPath="Name"
-                                                BorderThickness="1"
+                                                BorderThickness="0"
                                                 Padding="5 0"
                                                 Height="25"
                                                 FontSize="14"
@@ -140,18 +159,35 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" IsReadOnly="True" Width="200" />
-                                <DataGridTextColumn Header="Manzil" Binding="{Binding Address}" IsReadOnly="True" Width="250" />
-                                <DataGridTextColumn Header="Balans" Binding="{Binding Balance,StringFormat={}{0:N2}}" IsReadOnly="True" Width="150" />
 
-                                <!-- 🔹 Actions -->
-                                <DataGridTemplateColumn Width="auto" >
+                                <!-- ☎️ Telefon -->
+                                <DataGridTextColumn Header="Telefon"
+                                                    Binding="{Binding Phone}"
+                                                    IsReadOnly="True"
+                                                    Width="0.7*" />
+
+                                <!-- 🏠 Manzil -->
+                                <DataGridTextColumn Header="Manzil"
+                                                    Binding="{Binding Address}"
+                                                    IsReadOnly="True"
+                                                    Width="1.5*" />
+
+                                <!-- 💰 Balans -->
+                                <DataGridTextColumn Header="Balans"
+                                                    Binding="{Binding Balance, StringFormat={}{0:N2}}"
+                                                    IsReadOnly="True"
+                                                    Width="150"
+                                                    ElementStyle="{StaticResource RightAlignedText}"/>
+
+                                <!-- ⚙️ Actions -->
+                                <DataGridTemplateColumn Header="" Width="0.2*">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <controls:ActionButton
+                                                Margin="0,0,10,0"
                                                 HorizontalContentAlignment="Right"
                                                 CommandParameter="{Binding}"
                                                 DeleteCommand="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
@@ -161,6 +197,7 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
+
 
                             </DataGrid.Columns>
                         </DataGrid>
@@ -189,8 +226,8 @@
 
                             <TextBlock Text="Mahsulotlar"
                                        Grid.Column="0"
-                                       Margin="10,0"
-                                       FontSize="14"
+                                       Margin="10,2"
+                                       FontSize="20"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource PrimaryTextColor}"/>
                             <Button Grid.Column="1"
@@ -200,7 +237,7 @@
                                     Background="{DynamicResource PrimaryBackground}"
                                     BorderBrush="{StaticResource BackButtonBorder}"
                                     BorderThickness="0"
-                                    Command="{Binding ShowAllSemiProductsCommand}"
+                                    Command="{Binding ShowAllProductsCommand}"
                                     Content="Barchasini ko'rsatish"
                                     Foreground="{StaticResource BackButtonForeground}"/>
                             <Button Grid.Column="2"
@@ -214,17 +251,40 @@
 
                         <DataGrid Grid.Row="2"
                                   AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
+                                  CanUserAddRows="True"
                                   HeadersVisibility="Column"
-                                  IsReadOnly="True"
+                                  IsReadOnly="False"
                                   RowHeaderWidth="0"
                                   RowHeight="36"
                                   Height="250"
-                                  ItemsSource="{Binding Products}">
+                                  ItemsSource="{Binding FilteredProducts}"
+                                  EnableRowVirtualization="False"
+                                  EnableColumnVirtualization="True"
+                                  VirtualizingPanel.IsVirtualizing="True"
+                                  VirtualizingPanel.VirtualizationMode="Recycling"
+                                  ScrollViewer.CanContentScroll="True"
+                                  SnapsToDevicePixels="True"
+                                  UseLayoutRounding="True"
+                                  Background="White"
+                                  BorderThickness="0">
+
+                            <DataGrid.Resources>
+                                <!-- 🔹 Headerlarni o‘rtaga joylashtirish -->
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                                <!-- 🔹 O‘ngga hizalangan sonlar uchun umumiy style -->
+                                <Style x:Key="RightAlignedText" TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="Margin" Value="0,0,5,0"/>
+                                </Style>
+                            </DataGrid.Resources>
 
                             <DataGrid.Columns>
 
-                                <!-- Image preview -->
+                                <!-- 🖼️ Rasm -->
                                 <DataGridTemplateColumn Header="Rasm" Width="100">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -233,55 +293,85 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- Kod ComboBox -->
-                                <DataGridTemplateColumn Header="Kod" Width="100">
+                                <!-- 🔢 Kod -->
+                                <DataGridTemplateColumn Header="Kod" Width="0.8*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ComboBox ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
                                                       SelectedItem="{Binding SelectedCode, Mode=TwoWay}"
                                                       DisplayMemberPath="Code"
-                                                      Width="90"/>
+                                                      BorderThickness="0"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <!-- Nomi ComboBox -->
-                                <DataGridTemplateColumn Header="Nomi" Width="200">
+
+                                <!-- 🧾 Nomi -->
+                                <DataGridTemplateColumn Header="Nomi" Width="1.5*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ComboBox ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
                                                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                                                       DisplayMemberPath="Name"
-                                                      Width="180"/>
+                                                      BorderThickness="0"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <!-- Razmer ComboBox -->
-                                <DataGridTemplateColumn Header="O'lcham" Width="150">
+
+                                <!-- 📏 O‘lcham -->
+                                <DataGridTemplateColumn Header="O'lcham" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ComboBox ItemsSource="{Binding Types}"
                                                       SelectedItem="{Binding SelectedType, Mode=TwoWay}"
                                                       DisplayMemberPath="Type"
-                                                      Width="130"/>
+                                                      BorderThickness="0"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- Razmerdagi miqdor -->
-                                <DataGridTextColumn Header="Soni" Binding="{Binding CountOfType}" Width="100" />
-                                <DataGridTextColumn Header="Razmerlar soni" Binding="{Binding TypeCount}" Width="120" />
-                                <DataGridTextColumn Header="Jami soni" Binding="{Binding TotalCount}" Width="120" />
-                                <DataGridTextColumn Header="Dona haqi" Binding="{Binding PerPairRate}" Width="100"/>
-                                <DataGridTextColumn Header="Jami summa" Binding="{Binding TotalAmount}" Width="150" />
+                                <!-- 📦 Miqdorlar -->
+                                <DataGridTextColumn Header="Soni"
+                                                    Binding="{Binding CountOfType, StringFormat={}{0:N0}}"
+                                                    Width="0.5*"
+                                                    IsReadOnly="True"
+                                                    ElementStyle="{StaticResource RightAlignedText}" />
 
-                                <!-- Actions -->
-                                <DataGridTemplateColumn Width="Auto">
+                                <!-- Razmerlar soni -->
+                                <DataGridTextColumn Header="Razmerlar soni"
+                                                    Binding="{Binding TypeCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
+                                                    Width="0.8*"
+                                                    ElementStyle="{StaticResource RightAlignedText}" />
+
+                                <!-- Jami soni -->
+                                <DataGridTextColumn Header="Jami soni"
+                                                    Binding="{Binding TotalCount, StringFormat={}{0:N0}}"
+                                                    Width="*"
+                                                    IsReadOnly="True"
+                                                    ElementStyle="{StaticResource RightAlignedText}" />
+
+                                <!-- Dona haqi -->
+                                <DataGridTextColumn Header="Dona haqi"
+                                                    Binding="{Binding PerPairRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}"
+                                                    Width="0.8*"
+                                                    ElementStyle="{StaticResource RightAlignedText}" />
+
+                                <!-- Jami summa -->
+                                <DataGridTextColumn Header="Jami summa"
+                                                    Binding="{Binding TotalAmount, StringFormat={}{0:N2}}"
+                                                    Width="*"
+                                                    IsReadOnly="True"
+                                                    ElementStyle="{StaticResource RightAlignedText}" />
+
+                                <!-- ⚙️ Actions -->
+                                <DataGridTemplateColumn Header="" Width="Auto">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <controls:ActionButton
+                                                Margin="0,0,10,0"
+                                                HorizontalContentAlignment="Right"
                                                 CommandParameter="{Binding}"
                                                 DeleteCommand="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                                 EditCommand="{Binding DataContext.EditProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
@@ -303,7 +393,7 @@
                     Background="AliceBlue"
                     CornerRadius="4">
                 <Border.Effect>
-                    <DropShadowEffect BlurRadius="50" Direction="250" Opacity="0.3" ShadowDepth="15" Color="Black"/>
+                    <DropShadowEffect BlurRadius="50" Direction="300" Opacity="0.3" ShadowDepth="15" Color="Black"/>
                 </Border.Effect>
 
                 <StackPanel Orientation="Vertical" DataContext="{Binding Invoice}">

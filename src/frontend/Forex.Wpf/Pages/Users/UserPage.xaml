@@ -47,7 +47,7 @@
             <TextBox
                 x:Name="txtSearch"
                 Width="230"
-                Margin="5,5,5,5"
+                Margin="5,1,2,1"
                 Padding="0"
                 md:HintAssist.Hint="Qidiruv.."
                 BorderBrush="Gray"
@@ -77,7 +77,7 @@
                 <ComboBox
                     x:Name="cbRole"
                     Width="105"
-                    Padding="5,0,2,0"
+                    Padding="5,1,2,1"
                     md:HintAssist.Hint="Tanlash"
                     BorderThickness="0"
                     FontSize="16"
@@ -97,7 +97,7 @@
                 <TextBox
                     x:Name="txtName"
                     Width="112"
-                    Padding="5"
+                    Padding="3 1 2 1"
                     md:HintAssist.Hint="Nomi"
                     BorderThickness="0"
                     FontSize="16" />
@@ -113,7 +113,7 @@
                 <TextBox
                     x:Name="txtPhone"
                     Width="140"
-                    Padding="5,5,2,5"
+                    Padding="3,1,2,1"
                     md:HintAssist.Hint="Telefon"
                     BorderThickness="0"
                     FontSize="16"
@@ -130,7 +130,7 @@
                 <TextBox
                     x:Name="txtAddress"
                     Width="195"
-                    Padding="5"
+                    Padding="3 1 2 1"
                     md:HintAssist.Hint="Manzil"
                     BorderThickness="0"
                     FontSize="16" />
@@ -146,7 +146,7 @@
                 <TextBox
                     x:Name="txtDescription"
                     Width="195"
-                    Padding="5"
+                    Padding="3 1 2 1"
                     md:HintAssist.Hint="Izoh"
                     BorderThickness="0"
                     FontSize="16" />
@@ -164,7 +164,7 @@
                 <ComboBox
                     x:Name="cbxValutaType"
                     Width="105"
-                    Padding="5,0,2,0"
+                    Padding="3,1,2,1"
                     md:HintAssist.Hint="Valyuta turi"
                     BorderThickness="0"
                     FontSize="16"
@@ -186,7 +186,7 @@
                 <TextBox
                     x:Name="tbDiscount"
                     Width="115"
-                    Padding="5"
+                    Padding="3 1 2 1"
                     md:HintAssist.Hint="Bonus"
                     BorderThickness="0"
                     FontSize="16" />
@@ -204,7 +204,7 @@
                 <TextBox
                     x:Name="tbAccount"
                     Width="115"
-                    Padding="5"
+                    Padding="3 1 2 1"
                     md:HintAssist.Hint="Hisob qoldiq"
                     BorderThickness="0"
                     FontSize="16" />
@@ -214,7 +214,7 @@
                 x:Name="btnSave"
                 MinWidth="50"
                 Margin="3,0,0,3"
-                Padding="5"
+                Padding="3 1 2 1"
                 md:ButtonAssist.CornerRadius="4"
                 Background="{DynamicResource OtherBackground}"
                 BorderThickness="0"
@@ -228,7 +228,7 @@
                 x:Name="btnUpdate"
                 MinWidth="50"
                 Margin="3,0,0,3"
-                Padding="5"
+                Padding="3 1 2 1"
                 md:ButtonAssist.CornerRadius="4"
                 Background="{DynamicResource OtherBackground}"
                 BorderThickness="0"

@@ -7,14 +7,12 @@ using System.Collections.ObjectModel;
 public partial class ProductViewModel : ViewModelBase
 {
     [ObservableProperty] private string photoPath = string.Empty;
-
     [ObservableProperty] private ProductResponse? selectedCode;
     [ObservableProperty] private ProductResponse? selectedProduct;
-    [ObservableProperty] private ObservableCollection<ProductResponse> products = new();
-
+    
+    [ObservableProperty] private ObservableCollection<ProductTypeResponse> types = [];
     [ObservableProperty] private ProductTypeResponse? selectedType;
-    [ObservableProperty] private ObservableCollection<ProductTypeResponse> types = new();
-
+    
     [ObservableProperty] private int countOfType;
     [ObservableProperty] private int typeCount;
     [ObservableProperty] private int totalCount;
@@ -29,8 +27,6 @@ public partial class ProductViewModel : ViewModelBase
         {
             SelectedProduct = value;
             PhotoPath = value.PhotoPath ?? string.Empty;
-
-            // Product uchun razmer turlari (demo uchun misol)
             Types = new ObservableCollection<ProductTypeResponse>(
                 value.ProductTypes ?? new List<ProductTypeResponse>()
             );
@@ -65,7 +61,7 @@ public partial class ProductViewModel : ViewModelBase
         }
     }
 
-    // 🔹 Razmer tanlanganda — razmerga mos countni to‘ldiramiz
+
     partial void OnSelectedTypeChanged(ProductTypeResponse? value)
     {
         if (value != null)
@@ -77,16 +73,14 @@ public partial class ProductViewModel : ViewModelBase
     {
         TotalAmount = value * PerPairRate;
     }
-    partial void OnPerPairRateChanged(decimal value)
+
+    partial void OnCountOfTypeChanged(int value) => RecalculateTotals();
+    partial void OnTypeCountChanged(int value) => RecalculateTotals();
+    partial void OnPerPairRateChanged(decimal value) => RecalculateTotals();
+
+    private void RecalculateTotals()
     {
-        TotalAmount = value * TotalCount;
-    }
-    partial void OnCountOfTypeChanged(int value)
-    {
-        TotalCount = value * TypeCount;
-    }
-    partial void OnTypeCountChanged(int value)
-    {
-        TotalCount = value * CountOfType;
+        TotalCount = CountOfType * TypeCount;
+        TotalAmount = TotalCount * PerPairRate;
     }
 }
