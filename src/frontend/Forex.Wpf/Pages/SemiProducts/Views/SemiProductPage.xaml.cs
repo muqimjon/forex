@@ -66,7 +66,15 @@ public partial class SemiProductPage : Page
         var existing = vm.Products.FirstOrDefault(p => p.Code == newCode);
 
         if (existing is not null)
+        {
+            if (type.Product == existing)
+                return;
+
+            if (type.Product.ProductTypes.Count < 2 && type.Product.ProductTypes.Contains(type))
+                vm.Products.Remove(type.Product);
+
             type.Product = existing;
+        }
         else
         {
             type.Product ??= new ProductViewModel();
