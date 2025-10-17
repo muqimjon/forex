@@ -132,7 +132,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         var requestObject = new SemiProductIntakeRequest
         {
             Invoice = mapper.Map<InvoiceRequest>(Invoice),
-            SemiProducts = mapper.Map<ICollection<SemiProductRequest>>(SemiProducts),
+            SemiProducts = mapper.Map<ICollection<SemiProductRequest>>(IndependentSemiProducts),
             Products = mapper.Map<ICollection<ProductRequest>>(Products)
         };
 

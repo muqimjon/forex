@@ -44,10 +44,10 @@ public class CreateSemiProductIntakeCommandHandler(
             var transferRatio = (request.Invoice.TransferFee ?? 0) / request.Invoice.CostPrice;
 
             // 🔹 Avvalo Productlar va ularga bog‘langan SemiProductlarni saqlaymiz
-            var linkedSemiProducts = await AddProductsAsync(request.Products, invoice, deliveryRatio, transferRatio, ct);
+            await AddProductsAsync(request.Products, invoice, deliveryRatio, transferRatio, ct);
 
             // 🔹 Keyin mustaqil SemiProductlarni (productga bog‘liq bo‘lmagan)
-            await AddIndependentSemiProductsAsync(request.SemiProducts, invoice, linkedSemiProducts, deliveryRatio, transferRatio, ct);
+            await AddIndependentSemiProductsAsync(request.SemiProducts, invoice, deliveryRatio, transferRatio, ct);
 
             await context.CommitTransactionAsync(ct);
             return invoice.Id;
@@ -64,19 +64,20 @@ public class CreateSemiProductIntakeCommandHandler(
     {
         if (!invoice.ViaMiddleman) return;
 
-        var sender = await context.Users
+        var user = await context.Users
             .Include(u => u.Accounts)
             .FirstOrDefaultAsync(u => u.Id == invoice.SenderId, ct);
 
-        if (sender is null) return;
+        if (user is null) return;
 
-        var account = sender.Accounts.FirstOrDefault(a => a.Id == invoice.CurrencyId);
+        var account = user.Accounts.FirstOrDefault(a => a.Id == invoice.CurrencyId);
         if (account is null)
         {
             account = new UserAccount
             {
                 OpeningBalance = (decimal)invoice.TransferFee!,
-                User = sender
+                CurrencyId = invoice.CurrencyId,
+                User = user
             };
             context.Accounts.Add(account);
         }
@@ -97,17 +98,18 @@ public class CreateSemiProductIntakeCommandHandler(
         {
             account = new UserAccount
             {
-                OpeningBalance = (decimal)invoice.TransferFee!,
+                OpeningBalance = invoice.CostPrice,
+                CurrencyId = invoice.CurrencyId,
                 User = user
             };
             context.Accounts.Add(account);
         }
 
-        account.Balance += (decimal)invoice.CostPrice!;
+        account.Balance += invoice.CostPrice;
     }
 
     // --- 1️⃣ Product va unga bog‘langan SemiProduct’lar ---
-    private async Task<List<SemiProduct>> AddProductsAsync(
+    private async Task AddProductsAsync(
         IEnumerable<ProductCommand> productCommands,
         Invoice invoice,
         decimal deliveryRatio,
@@ -125,7 +127,6 @@ public class CreateSemiProductIntakeCommandHandler(
             ?? await context.UnitMeasures.FirstOrDefaultAsync(ct)
             ?? throw new ForbiddenException("O'lchov birliklari mavjud emas");
 
-        var linkedSemiProducts = new List<SemiProduct>();
 
         foreach (var pCmd in productCommands)
         {
@@ -147,10 +148,8 @@ public class CreateSemiProductIntakeCommandHandler(
                     if (semi is null)
                     {
                         semi = mapper.Map<SemiProduct>(itemCmd.SemiProduct);
-                        context.SemiProducts.Add(semi);
+                        //context.SemiProducts.Add(semi);
                     }
-
-                    linkedSemiProducts.Add(semi);
 
                     // 🔹 Costlarni invoice nisbatiga ko‘ra hisoblaymiz
                     var semiCost = itemCmd.SemiProduct.CostPrice;
@@ -193,21 +192,19 @@ public class CreateSemiProductIntakeCommandHandler(
                         SemiProduct = semi,
                         Quantity = itemCmd.Quantity
                     };
-                    productType.ProductTypeItems.Add(item);
+                    //productType.ProductTypeItems.Add(item);
                 }
 
-                product.ProductTypes.Add(productType);
+                //product.ProductTypes.Add(productType);
             }
         }
 
-        return linkedSemiProducts;
     }
 
     // --- 2️⃣ Mustaqil SemiProduct’lar ---
     private async Task AddIndependentSemiProductsAsync(
         IEnumerable<SemiProductCommand> semiProductCommands,
         Invoice invoice,
-        IEnumerable<SemiProduct> productLinkedSemiProducts,
         decimal deliveryRatio,
         decimal transferRatio,
         CancellationToken ct)
@@ -220,9 +217,7 @@ public class CreateSemiProductIntakeCommandHandler(
 
         foreach (var cmd in semiProductCommands)
         {
-            if (productLinkedSemiProducts.Any(sp => sp.Name == cmd.Name))
-                continue;
-
+ 
             var semi = await context.SemiProducts
                 .FirstOrDefaultAsync(sp => sp.Name == cmd.Name, ct);
 
