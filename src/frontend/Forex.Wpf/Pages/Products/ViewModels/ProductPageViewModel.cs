@@ -21,6 +21,7 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
 
 
 
+
     public async Task LoadEmployeesAsync()
     {
         try
@@ -50,7 +51,7 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
         await LoadEmployeesAsync();
 
         Users.Add(new UserViewModel { });
-
+        UpdateProducts();
     }
 
     [RelayCommand]
@@ -87,18 +88,21 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
         }
     }
 
-    public UserViewModel SelectedEmployee 
-    { 
+
+
+
+    public UserViewModel SelectedEmployee
+    {
         get => selectedEmployee!;
-        set 
+        set
         {
             if (value != selectedEmployee)
             {
                 selectedEmployee = value;
                 UpdateProducts();
             }
-        } 
-    } 
+        }
+    }
 
     public void UpdateProducts()
     {
@@ -113,5 +117,4 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
             FilteredProducts.AddRange(SelectedEmployee.EmployeeProducts);
         }
     }
-
 }
