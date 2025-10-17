@@ -11,7 +11,7 @@ using System.Collections.ObjectModel;
 public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
 {
     [ObservableProperty] private ObservableCollection<UserResponse> employees = [];
-    
+
     [ObservableProperty] private ObservableCollection<UserViewModel> users = [];
     private UserViewModel? selectedEmployee;
 
@@ -30,7 +30,7 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
             if (response.IsSuccess && response.Data != null)
             {
                 var hodimlar = response.Data
-                    .Where(u => u.Role == Role.Hodim)
+                    .Where(u => u.Role == UserRole.Hodim)
                     .ToList();
 
                 Employees = new ObservableCollection<UserResponse>(hodimlar);

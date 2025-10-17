@@ -9,10 +9,10 @@ public partial class ProductViewModel : ViewModelBase
     [ObservableProperty] private string photoPath = string.Empty;
     [ObservableProperty] private ProductResponse? selectedCode;
     [ObservableProperty] private ProductResponse? selectedProduct;
-    
+
     [ObservableProperty] private ObservableCollection<ProductTypeResponse> types = [];
     [ObservableProperty] private ProductTypeResponse? selectedType;
-    
+
     [ObservableProperty] private int countOfType;
     [ObservableProperty] private int typeCount;
     [ObservableProperty] private int totalCount;

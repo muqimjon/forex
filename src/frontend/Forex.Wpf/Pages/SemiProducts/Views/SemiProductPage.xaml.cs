@@ -4,23 +4,40 @@ using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.SemiProducts.ViewModels;
 using Forex.Wpf.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-/// <summary>
-/// Interaction logic for SemiProductPage.xaml
-/// </summary>
 public partial class SemiProductPage : Page
 {
-    private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
     private readonly SemiProductPageViewModel vm;
 
     public SemiProductPage()
     {
         InitializeComponent();
 
-        vm = new SemiProductPageViewModel();
+        vm = App.AppHost!.Services.GetRequiredService<SemiProductPageViewModel>();
         DataContext = vm;
+
+        FocusNavigator.AttachEnterNavigation(
+            [
+                btnAddProduct,
+                btnShowAll,
+                tbAddSemiProduct,
+                dpDate,
+                tbCostPrice,
+                tbCostDelivery,
+                tbTransferFee,
+                tbTotalAmount,
+                cbCurrency,
+                cbManufactory,
+                cbSupplierName,
+                tbSupplierPhone,
+                tbSupplierEmail,
+                tbSupplierAddress,
+                tgbViaMiddleman,
+            ]);
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -34,7 +51,7 @@ public partial class SemiProductPage : Page
         if (NavigationService?.CanGoBack == true)
             NavigationService.GoBack();
         else
-            Main.NavigateTo(new HomePage());
+            (Application.Current.MainWindow as MainWindow)?.NavigateTo(new HomePage());
     }
 
     private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
@@ -53,7 +70,6 @@ public partial class SemiProductPage : Page
         else
         {
             type.Product ??= new ProductViewModel();
-
             type.Product.Code = newCode;
             vm.Products.Add(type.Product);
             vm.ExistProducts.Add(type.Product);

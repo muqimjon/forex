@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 
 public class AuthHeaderHandler : DelegatingHandler
 {
-    public AuthHeaderHandler() : base(new HttpClientHandler()) { }
+    public AuthHeaderHandler() { }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {

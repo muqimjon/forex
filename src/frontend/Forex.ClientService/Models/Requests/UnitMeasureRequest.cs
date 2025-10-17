@@ -1,6 +1,6 @@
 ﻿namespace Forex.ClientService.Models.Requests;
 
-public record UnitMeasureRequest
+public sealed record UnitMeasureRequest
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;

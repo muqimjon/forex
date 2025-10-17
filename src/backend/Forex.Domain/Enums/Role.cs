@@ -1,6 +1,6 @@
 ﻿namespace Forex.Domain.Enums;
 
-public enum Role
+public enum UserRole
 {
     User,
     Taminotchi,

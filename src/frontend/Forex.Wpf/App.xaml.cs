@@ -1,41 +1,48 @@
 ﻿namespace Forex.Wpf;
 
-using AutoMapper;
-using Forex.ClientService;
-using Forex.Wpf.Common;
-using Forex.Wpf.Windows;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.IO;
 using System.Windows;
 
 public partial class App : Application
 {
-    public static ForexClient Client { get; private set; } = default!;
-    public static IMapper Mapper { get; private set; } = default!;
+    public static IHost? AppHost { get; private set; }
 
-    protected override void OnStartup(StartupEventArgs e)
+    public App()
     {
-        base.OnStartup(e);
+        AppHost = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                var env = context.HostingEnvironment;
 
-        Client = new ForexClient("https://localhost:7041/api");
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", false, true);
+                config.AddJsonFile($"appsettings.Development.json", true, true);
+                config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true);
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services.AddApplicationServices(context.Configuration);
+            })
+            .Build();
+    }
 
-        #region Mapper Configuration..
+    protected override async void OnStartup(StartupEventArgs e)
+    {
+        await AppHost!.StartAsync();
 
-        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-        {
-            builder
-                .SetMinimumLevel(LogLevel.Warning);
-        });
-
-        var mapperConfig = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<MappingProfile>();
-        }, loggerFactory);
-
-        #endregion
-
-        Mapper = mapperConfig.CreateMapper();
-
-        var mainWindow = new MainWindow();
+        var mainWindow = AppHost.Services.GetRequiredService<Windows.MainWindow>();
         mainWindow.Show();
+
+        base.OnStartup(e);
+    }
+
+    protected override async void OnExit(ExitEventArgs e)
+    {
+        await AppHost!.StopAsync();
+        AppHost.Dispose();
+        base.OnExit(e);
     }
 }

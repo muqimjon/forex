@@ -6,16 +6,12 @@ using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Common;
 using System.Threading.Tasks;
 
-public class RegisterViewModel() : ViewModelBase
+public class RegisterViewModel(IApiAuth apiAuth) : ViewModelBase
 {
-    private readonly IApiAuth apiAuth = App.Client.Auth;
-
     public async Task<bool> RegisterAsync(string name, string email, string phone, string password, string confirm)
     {
-        ErrorMessage = "";
-
         if (string.IsNullOrWhiteSpace(name) ||
-            string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(phone) ||
+            (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(phone)) ||
             string.IsNullOrWhiteSpace(password))
         {
             ErrorMessage = "Ism, telefon raqam va parol majburiy.";
@@ -38,7 +34,7 @@ public class RegisterViewModel() : ViewModelBase
 
         if (resp.StatusCode != 200 || resp.Data is null)
         {
-            ErrorMessage = resp.Message ?? "Registration failed.";
+            ErrorMessage = resp.Message ?? "Ro‘yxatdan o‘tish muvaffaqiyatsiz.";
             return false;
         }
 

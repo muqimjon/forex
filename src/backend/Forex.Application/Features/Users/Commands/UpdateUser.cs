@@ -3,10 +3,8 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Users.DTOs;
+using Forex.Application.Features.Accounts.Commands;
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.Payments;
-using Forex.Domain.Entities.Users;
 using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +12,13 @@ using Microsoft.EntityFrameworkCore;
 public record UpdateUserCommand(
     long Id,
     string Name,
-    string Phone,
+    string? Phone,
     string? Email,
-    Role Role,
-    string Address,
-    string Description,
-    List<CurrencyBalanceDto> CurrencyBalances)
+    UserRole Role,
+    string? Address,
+    string? Description,
+    string? Password,
+    List<UpdateUserAccountCommand> Accounts)
     : IRequest<bool>;
 
 
@@ -40,7 +39,7 @@ public class UpdateUserCommandHandler(
         var currencies = await context.Currencies.ToListAsync(cancellationToken);
         var currencyIds = currencies.Select(c => c.Id).ToHashSet();
 
-        foreach (var dto in request.CurrencyBalances)
+        foreach (var dto in request.Accounts)
         {
             if (!currencyIds.Contains(dto.CurrencyId))
                 throw new NotFoundException(nameof(Currency), nameof(dto.CurrencyId), dto.CurrencyId);

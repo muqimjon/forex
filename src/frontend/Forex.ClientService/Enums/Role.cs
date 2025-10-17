@@ -1,6 +1,6 @@
 ﻿namespace Forex.ClientService.Enums;
 
-public enum Role
+public enum UserRole
 {
     User,
     Taminotchi,

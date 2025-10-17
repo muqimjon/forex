@@ -3,46 +3,39 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
+using Forex.Application.Features.Accounts.Commands;
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.Shops;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 public record UpdateShopCommand(
     long Id,
-    string Name)
+    string Name,
+    List<UpdateShopAccountCommand> AccountsCommand)
     : IRequest<bool>;
 
 public class UpdateShopCommandHandler(
     IAppDbContext context,
-    IMapper mapper)
-    : IRequestHandler<UpdateShopCommand, bool>
+    IMapper mapper
+) : IRequestHandler<UpdateShopCommand, bool>
 {
     public async Task<bool> Handle(UpdateShopCommand request, CancellationToken cancellationToken)
     {
         var shop = await context.Shops
-            .Include(s => s.ShopCashes)
+            .Include(s => s.ShopAccounts)
             .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(Shop), nameof(request.Id), request.Id);
 
         mapper.Map(request, shop);
 
-        var currencies = await context.Currencies.ToListAsync(cancellationToken);
-        var existingCurrencyIds = shop.ShopCashes.Select(a => a.CurrencyId).ToHashSet();
-
-        foreach (var currency in currencies)
+        foreach (var accountCmd in request.AccountsCommand)
         {
-            if (!existingCurrencyIds.Contains(currency.Id))
-            {
-                context.ShopCashAccounts.Add(new ShopCashAccount
-                {
-                    Shop = shop,
-                    CurrencyId = currency.Id,
-                    OpeningBalance = 0m,
-                    Balance = 0m,
-                    Discount = 0m
-                });
-            }
+            var existing = shop.ShopAccounts.FirstOrDefault(x => x.Id == accountCmd.Id);
+
+            if (existing is not null)
+                mapper.Map(accountCmd, existing);
+            else
+                shop.ShopAccounts.Add(mapper.Map<ShopAccount>(accountCmd));
         }
 
         return await context.SaveAsync(cancellationToken);

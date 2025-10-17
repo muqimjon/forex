@@ -73,6 +73,8 @@
                                    DockPanel.Dock="Left"
                                    Foreground="{StaticResource PrimaryTextColor}"
                                    VerticalAlignment="Center"
+                                   IsTabStop="False"
+                                   Focusable="False"
                                    Margin="0,0,8,0" />
 
                             <TextBox x:Name="ValueBox"
@@ -186,7 +188,8 @@
                                 <Label DockPanel.Dock="Left"
                                        Content="Sana:" />
                                 <DatePicker DockPanel.Dock="Right"
-                                            SelectedDate="{Binding EntryDate, Mode=TwoWay}"
+                                            SelectedDate="{Binding Date, Mode=TwoWay}"
+                                            x:Name="dpDate"
                                             VerticalAlignment="Center"
                                             HorizontalContentAlignment="Center" Height="20" Padding="0"/>
                             </DockPanel>
@@ -194,6 +197,7 @@
                             <!--  Tan narxi  -->
                                 <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Tan narxi:"
+                                                x:Name="tbCostPrice"
                                             IsHitTestVisible="False"
                                             Content="{Binding CostPrice, Mode=TwoWay}"/>
 
@@ -201,12 +205,14 @@
                                 <!--  Yetkazish xizmati  -->
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Yetkazish xizmati:"
+                                            x:Name="tbCostDelivery"
                                             Content="{Binding CostDelivery, Mode=TwoWay}"/>
 
                             <!--  Yuboruvchi xizmati  -->
                             <ContentControl Visibility="{Binding ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"
                                             Style="{StaticResource LabelValueStyle}"
                                             Tag="Vositachi xizmati:"
+                                            x:Name="tbTransferFee"
                                             IsHitTestVisible="False"
                                             Content="{Binding TransferFee, Mode=TwoWay}"/>
 
@@ -214,6 +220,7 @@
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Jami:"
+                                            x:Name="tbTotalAmount"
                                             IsHitTestVisible="False"
                                             Content="{Binding TotalAmountWithCurrency, Mode=TwoWay}" />
 
@@ -225,6 +232,7 @@
                                 <ComboBox ItemsSource="{Binding Currencies}"
                                           SelectedValue="{Binding Currency}"
                                           DisplayMemberPath="Name"
+                                          x:Name="cbCurrency"
                                           DockPanel.Dock="Right"
                                           HorizontalContentAlignment="Center"
                                           Foreground="{StaticResource PrimaryTextColor}" />
@@ -243,6 +251,7 @@
                             <ComboBox ItemsSource="{Binding Manufactories}"
                                       SelectedValue="{Binding Manufactory}"
                                       DisplayMemberPath="Name"
+                                      x:Name="cbManufactory"
                                       DockPanel.Dock="Right"
                                       HorizontalContentAlignment="Center"
                                       Foreground="{StaticResource PrimaryTextColor}" />
@@ -271,20 +280,24 @@
                                           DisplayMemberPath="Name"
                                           IsEditable="True"
                                           DockPanel.Dock="Right"
+                                          x:Name="cbSupplierName"
                                           HorizontalContentAlignment="Center"
                                           Foreground="{StaticResource PrimaryTextColor}" />
                             </DockPanel>
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Telefon:"
+                                            x:Name="tbSupplierPhone"
                                             Content="{Binding Supplier.Phone, Mode=TwoWay}" />
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Email:"
+                                            x:Name="tbSupplierEmail"
                                             Content="{Binding Supplier.Email, Mode=TwoWay}" />
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Manzil:"
+                                            x:Name="tbSupplierAddress"
                                             Content="{Binding Supplier.Address, Mode=TwoWay}" />
 
                         </StackPanel>
@@ -292,6 +305,7 @@
                         <DockPanel>
                             <Label Content="Vositachi orqalimi:"
                                    DockPanel.Dock="Left"
+                                   x:Name="tgbViaMiddleman"
                                    Foreground="{StaticResource PrimaryTextColor}" />
                             <ToggleButton IsChecked="{Binding ViaMiddleman, Mode=TwoWay}" />
                         </DockPanel>
@@ -314,6 +328,7 @@
                                           SelectedValue="{Binding Agent}"
                                           DisplayMemberPath="Name"
                                           DockPanel.Dock="Right"
+                                          x:Name="cbAgentName"
                                           IsEditable="True"
                                           HorizontalContentAlignment="Center"
                                           Foreground="{StaticResource PrimaryTextColor}" />
@@ -321,23 +336,28 @@
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Telefon:"
+                                            x:Name="tbAgentPhone"
                                             Content="{Binding Agent.Phone, Mode=TwoWay}" />
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Email:"
+                                            x:Name="tbAgentEmail"
                                             Content="{Binding Agent.Email, Mode=TwoWay}" />
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Manzil:"
+                                            x:Name="tbAgentAddress"
                                             Content="{Binding Agent.Address, Mode=TwoWay}" />
 
 
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="Kontinerlar soni:"
+                                            x:Name="tbContainerCount"
                                             Content="{Binding ContainerCount, Mode=TwoWay}" />
                             
                             <ContentControl Style="{StaticResource LabelValueStyle}"
                                             Tag="To'lov (donasi uchun):"
+                                            x:Name="tbPricePerUnit"
                                             Content="{Binding PricePerUnitContainer, Mode=TwoWay}" />
 
                         </StackPanel>
@@ -395,6 +415,7 @@
 
                             <Button Grid.Column="1"
                                     Padding="4"
+                                    x:Name="btnAddProduct"
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Command="{Binding AddProductCommand}"
@@ -585,6 +606,7 @@
                                     Height="28"
                                     Margin="10,0"
                                     Padding="4"
+                                    x:Name="btnShowAll"
                                     VerticalAlignment="Center"
                                     IsEnabled="{Binding SelectedProductType, Converter={StaticResource NullToBoolConverter}}"
                                     Background="{DynamicResource PrimaryBackground}"
@@ -596,6 +618,7 @@
 
                             <Button Grid.Column="2"
                                     Padding="4"
+                                    x:Name="tbAddSemiProduct"
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Command="{Binding AddSemiProductCommand}"

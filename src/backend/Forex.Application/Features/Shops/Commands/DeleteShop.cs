@@ -2,7 +2,7 @@
 
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Domain.Entities.Shops;
+using Forex.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +14,12 @@ public class DeleteShopCommandHandler(IAppDbContext context)
     public async Task<bool> Handle(DeleteShopCommand request, CancellationToken cancellationToken)
     {
         var shop = await context.Shops
-            .Include(s => s.ShopCashes)
+            .Include(s => s.ShopAccounts)
                 .ThenInclude(a => a.Currency)
             .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(Shop), nameof(request.Id), request.Id);
 
-        var nonZeroAccounts = shop.ShopCashes
+        var nonZeroAccounts = shop.ShopAccounts
             .Where(a => Math.Round(a.Balance, 2) != 0m || Math.Round(a.Discount, 2) != 0m)
             .ToList();
 
@@ -33,7 +33,7 @@ public class DeleteShopCommandHandler(IAppDbContext context)
         }
 
         shop.IsDeleted = true;
-        foreach (var account in shop.ShopCashes)
+        foreach (var account in shop.ShopAccounts)
             account.IsDeleted = true;
 
         return await context.SaveAsync(cancellationToken);

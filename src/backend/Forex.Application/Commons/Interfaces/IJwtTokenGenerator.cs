@@ -1,6 +1,6 @@
 ﻿namespace Forex.Application.Commons.Interfaces;
 
-using Forex.Domain.Entities.Users;
+using Forex.Domain.Entities;
 
 public interface IJwtTokenGenerator
 {

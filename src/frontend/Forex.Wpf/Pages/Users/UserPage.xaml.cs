@@ -3,12 +3,14 @@
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
+using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.SemiProducts.ViewModels;
 using Forex.Wpf.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,7 +23,7 @@ public partial class UserPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
 
-    private readonly ForexClient client = App.Client;
+    private readonly ForexClient client = App.AppHost!.Services.GetRequiredService<ForexClient>();
     private List<UserResponse> rawUsers = [];
     private ObservableCollection<UserResponse> filteredUsers = [];
 
@@ -114,18 +116,18 @@ public partial class UserPage : Page
                 Phone = txtPhone.Text.Trim(),
                 Address = txtAddress.Text.Trim(),
                 Description = txtDescription.Text.Trim(),
-                Role = Enum.TryParse<Role>(cbRole.SelectedItem?.ToString(), out var role) ? role : user.Role,
-                CurrencyBalances = []
+                Role = Enum.TryParse<UserRole>(cbRole.SelectedItem?.ToString(), out var role) ? role : user.Role,
+                Accounts = []
             };
 
             // Agar account fieldlari mavjud bo‘lsa
             if (decimal.TryParse(tbAccount.Text, out decimal accountBalance) &&
                 decimal.TryParse(tbDiscount.Text, out decimal discount))
             {
-                updateUser.CurrencyBalances.Add(new CurrencyBalanceRequest
+                updateUser.Accounts.Add(new UserAccount
                 {
                     CurrencyId = (long)cbxValutaType.SelectedValue,
-                    Balance = accountBalance,
+                    OpeningBalance = accountBalance,
                     Discount = discount
                 });
             }
@@ -183,7 +185,7 @@ public partial class UserPage : Page
     {
         try
         {
-            var response = await client.Users.GetAll();
+            var response = await client.Users.GetAll().Handle();
             rawUsers = response.Data?.OrderByDescending(u => u.Id).ToList() ?? [];
 
             ApplyFilters();
@@ -196,7 +198,7 @@ public partial class UserPage : Page
 
     private void UpdateRoleList()
     {
-        var roles = Enum.GetNames<Role>().ToList();
+        var roles = Enum.GetNames<UserRole>().ToList();
         cbRole.ItemsSource = roles;
         cbRole.SelectedItem = roles[0];
     }
@@ -209,7 +211,7 @@ public partial class UserPage : Page
 
         var filtered = rawUsers.AsEnumerable();
 
-        // 🔹 Role bo‘yicha filter
+        // 🔹 UserRole bo‘yicha filter
         if (!string.IsNullOrWhiteSpace(selectedRole) && selectedRole != "User")
         {
             filtered = filtered.Where(u => u.Role.ToString() == selectedRole);
@@ -260,7 +262,7 @@ public partial class UserPage : Page
         try
         {
             var roleText = cbRole.SelectedItem?.ToString();
-            if (string.IsNullOrWhiteSpace(roleText) || !Enum.TryParse<Role>(roleText, out var role))
+            if (string.IsNullOrWhiteSpace(roleText) || !Enum.TryParse<UserRole>(roleText, out var role))
             {
                 MessageBox.Show("Rol tanlanmagan yoki noto‘g‘ri.");
                 return;
@@ -275,18 +277,18 @@ public partial class UserPage : Page
                 Address = txtAddress.Text.Trim(),
                 Description = txtDescription.Text.Trim(),
                 Role = role,
-                CurrencyBalances =
+                Accounts =
                 [
-                    new CurrencyBalanceRequest
+                    new UserAccount
                     {
                         CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
-                        Balance = decimal.TryParse(tbAccount.Text, out var bal) ? bal : 0,
+                        OpeningBalance = decimal.TryParse(tbAccount.Text, out var bal) ? bal : 0,
                         Discount = decimal.TryParse(tbDiscount.Text, out var disc) ? disc : 0
                     }
                 ]
             };
 
-            var response = await client.Users.Create(request);
+            var response = await client.Users.Create(request).Handle();
             if (response.Data > 0)
             {
                 ClearForm();
@@ -335,7 +337,7 @@ public partial class UserPage : Page
         string text = tb.Text ?? string.Empty;
         cbRole.IsDropDownOpen = true;
 
-        var roles = Enum.GetNames<Role>().ToList();
+        var roles = Enum.GetNames<UserRole>().ToList();
         roles.Insert(0, "");
 
         cbRole.ItemsSource = string.IsNullOrWhiteSpace(text)

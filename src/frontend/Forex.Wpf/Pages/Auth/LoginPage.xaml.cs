@@ -2,6 +2,7 @@
 
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,7 +16,8 @@ public partial class LoginPage : Page
     public LoginPage()
     {
         InitializeComponent();
-        this.viewModel = new LoginViewModel();
+        var services = App.AppHost!.Services;
+        viewModel = services.GetRequiredService<LoginViewModel>();
         DataContext = viewModel;
 
         tbLogin.Focus();

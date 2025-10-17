@@ -1,18 +1,16 @@
 ﻿namespace Forex.ClientService.Models.Requests;
 
+using System.Text.Json.Serialization;
+
 public sealed record SemiProductRequest
 {
-    public long? SemiProductId { get; set; }
+    public long Id { get; set; }
     public string? Name { get; set; }
-    public int? Code { get; set; }
-    public string? Measure { get; set; }
-
-    public string? PhotoPath { get; set; }   // UI’dan fayl yo‘lini olamiz
-    public string? PhotoContentType { get; set; }
-    public string? PhotoFileName { get; set; }
-
+    public long UnitMeasureId { get; set; }
+    public string? ImagePath { get; set; }
     public decimal Quantity { get; set; }
     public decimal CostPrice { get; set; }
-    public decimal CostDelivery { get; set; }
-    public decimal TransferFee { get; set; }
+
+    [JsonIgnore]
+    public byte[]? ImageBytes { get; set; }
 }

@@ -1,14 +1,11 @@
 ﻿namespace Forex.WebApi;
 
 using Forex.Application;
-using Forex.Application.Commons.Exceptions;
 using Forex.Infrastructure;
 using Forex.WebApi.Conventions;
 using Forex.WebApi.Extensions;
-using Forex.WebApi.Middlewares;
 using Forex.WebApi.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -32,7 +29,7 @@ public static class DependencyInjection
 
     public static void UseInfrastructure(this WebApplication app)
     {
-        app.UseMiddleware<ExceptionHandlerMiddleware>();
+        //app.UseMiddleware<ExceptionHandlerMiddleware>();
 
         app.UseHttpsRedirection();
         app.UseCors("DefaultPolicy");
@@ -104,13 +101,13 @@ public static class DependencyInjection
 
     private static void AddValidation(this IServiceCollection services)
     {
-        services.Configure((Action<ApiBehaviorOptions>)(options =>
-        {
-            options.InvalidModelStateResponseFactory = context =>
-                throw new ValidationAppException(context.ModelState
-                    .SelectMany(kvp => kvp.Value!.Errors
-                        .Select(e => new FluentValidation.Results.ValidationFailure(kvp.Key, e.ErrorMessage))));
-        }));
+        //services.Configure((Action<ApiBehaviorOptions>)(options =>
+        //{
+        //    options.InvalidModelStateResponseFactory = context =>
+        //        throw new ValidationAppException(context.ModelState
+        //            .SelectMany(kvp => kvp.Value!.Errors
+        //                .Select(e => new FluentValidation.Results.ValidationFailure(kvp.Key, e.ErrorMessage))));
+        //}));
     }
 
     private static void AddAppCors(this IServiceCollection services)

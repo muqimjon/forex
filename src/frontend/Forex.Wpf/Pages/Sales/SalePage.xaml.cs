@@ -3,6 +3,7 @@
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,10 +15,11 @@ public partial class SalePage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
     private SaleViewModel vm;
+
     public SalePage()
     {
         InitializeComponent();
-        vm = new SaleViewModel(App.Client); // ✅ shart
+        vm = App.AppHost!.Services.GetRequiredService<SaleViewModel>();
         DataContext = vm;
         _ = vm.LoadUsersAsync();
         btnBack.Click += BtnBack_Click;

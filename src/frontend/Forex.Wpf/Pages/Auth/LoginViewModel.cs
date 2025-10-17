@@ -6,14 +6,10 @@ using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Common;
 using System.Threading.Tasks;
 
-public class LoginViewModel : ViewModelBase
+public class LoginViewModel(IApiAuth apiAuth) : ViewModelBase
 {
-    private readonly IApiAuth apiAuth = App.Client.Auth;
-
     public async Task<bool> LoginAsync(string login, string password)
     {
-        ErrorMessage = "";
-
         if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
         {
             ErrorMessage = "Login va parol majburiy.";

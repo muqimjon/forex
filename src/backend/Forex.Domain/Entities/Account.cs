@@ -1,9 +1,6 @@
 ﻿namespace Forex.Domain.Entities;
 
 using Forex.Domain.Commons;
-using Forex.Domain.Entities.Payments;
-using Forex.Domain.Entities.Shops;
-using Forex.Domain.Entities.Users;
 
 public class Account : Auditable
 {
@@ -20,8 +17,8 @@ public class UserAccount : Account
     public User User { get; set; } = default!;
 }
 
-public class ShopCashAccount : Account
+public class ShopAccount : Account
 {
-    public long ShopCashId { get; set; }
+    public long ShopId { get; set; }
     public Shop Shop { get; set; } = default!;
 }

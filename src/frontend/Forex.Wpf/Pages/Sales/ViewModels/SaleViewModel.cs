@@ -9,18 +9,16 @@ using Forex.Wpf.Pages.Common;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Controls;
-using System.Xml.Linq;
 
 public partial class SaleViewModel(ForexClient client) : ViewModelBase
 {
 
-// 🗓 Sana
-[ObservableProperty] private DateTime operationDate = DateTime.Now;
+    // 🗓 Sana
+    [ObservableProperty] private DateTime operationDate = DateTime.Now;
 
-// 👤 Mijoz
-[ObservableProperty] private UserResponse? selectedCustomer;
-[ObservableProperty] private ObservableCollection<UserResponse> customers = [];
+    // 👤 Mijoz
+    [ObservableProperty] private UserResponse? selectedCustomer;
+    [ObservableProperty] private ObservableCollection<UserResponse> customers = [];
 
     // 💵 Hisoblar
     [ObservableProperty] private decimal? totalAmount;
@@ -40,149 +38,149 @@ public partial class SaleViewModel(ForexClient client) : ViewModelBase
     // 🧮 Ro‘yxat (DataGrid uchun)
     [ObservableProperty] private ObservableCollection<SaleItemViewModel> saleItems = [];
 
-        public event EventHandler<string>? RequestNewCustomer;
+    public event EventHandler<string>? RequestNewCustomer;
 
-            partial void OnSelectedCustomerChanged(UserResponse? value)
-            {
-            if (value is not null)
-            {
+    partial void OnSelectedCustomerChanged(UserResponse? value)
+    {
+        if (value is not null)
+        {
             var account = value.Accounts.FirstOrDefault();
 
             LastBalance = account?.Balance ?? 0;
 
             Phone = value.Phone ?? string.Empty;
-            }
-            else
-            {
+        }
+        else
+        {
             LastBalance = 0;
             Phone = string.Empty;
-            }
-            }
+        }
+    }
 
-            partial void OnFinalAmountChanged(decimal? value)
-            {
-            if (SelectedCustomer is not null)
-            {
+    partial void OnFinalAmountChanged(decimal? value)
+    {
+        if (SelectedCustomer is not null)
+        {
             var accountBalance = SelectedCustomer.Accounts.FirstOrDefault()?.Balance ?? 0;
             BeginBalance = accountBalance - (value ?? 0);
+        }
+        else
+        {
+            BeginBalance = 0;
+        }
+    }
+
+    // ✅ Mijoz nomini tekshirish — shu joy generator orqali .Command ni yaratadi
+    [RelayCommand]
+    private void CheckCustomerName(string inputText)
+    {
+        if (string.IsNullOrWhiteSpace(inputText))
+            return;
+
+        var existing = Customers.FirstOrDefault(c =>
+                        c.Name.Equals(inputText, StringComparison.OrdinalIgnoreCase));
+
+        if (existing is not null)
+        {
+            SelectedCustomer = existing;
+            return;
+        }
+
+        // Agar topilmasa — hodisa chiqaramiz (View ushlab oladi)
+        RequestNewCustomer?.Invoke(this, inputText);
+    }
+
+
+    // 🔄 Backend’dan foydalanuvchilarni olish
+    public async Task LoadUsersAsync()
+    {
+        try
+        {
+            var response = await client.Users.GetAll();
+            if (response.IsSuccess && response.Data != null)
+            {
+                // 🔹 Faqat mijozlar (Role.Customer) ni tanlaymiz
+                var customersOnly = response.Data
+                    .Where(u => u.Role == UserRole.Mijoz)
+                    .ToList();
+
+                Customers = new ObservableCollection<UserResponse>(customersOnly);
             }
             else
             {
-            BeginBalance = 0;
+                WarningMessage = "Foydalanuvchilarni yuklashda xatolik.";
             }
-            }
+        }
+        catch (Exception ex)
+        {
+            WarningMessage = $"Server bilan aloqa yo'q: {ex.Message}";
+        }
+    }
 
-            // ✅ Mijoz nomini tekshirish — shu joy generator orqali .Command ni yaratadi
-            [RelayCommand]
-            private void CheckCustomerName(string inputText)
+    public async Task LoadProductsAsync()
+    {
+        try
+        {
+            var response = await client.Users.GetAll();
+            if (response.IsSuccess)
             {
-            if (string.IsNullOrWhiteSpace(inputText))
+                Customers = new ObservableCollection<UserResponse>(response.Data!);
+            }
+            else
+            {
+                WarningMessage = "Foydalanuvchilarni yuklashda xatolik.";
+            }
+        }
+        catch (Exception ex)
+        {
+            WarningMessage = $"Server bilan aloqa yo'q: {ex.Message}";
+        }
+    }
+
+    // ➕ Mahsulot qo‘shish
+    [RelayCommand]
+    private void Add()
+    {
+        if (CurrentSaleItem == null || CurrentSaleItem.Count <= 0)
+        {
+            WarningMessage = "Mahsulot tanlanmagan yoki miqdor noto‘g‘ri!";
             return;
+        }
 
-var existing = Customers.FirstOrDefault(c =>
-                c.Name.Equals(inputText, StringComparison.OrdinalIgnoreCase));
+        SaleItems.Add(CurrentSaleItem);
+        CurrentSaleItem.PropertyChanged += Item_PropertyChanged;
+        RecalculateTotals();
+        CurrentSaleItem = new SaleItemViewModel();
+    }
 
-                if (existing is not null)
-                {
-                SelectedCustomer = existing;
-                return;
-                }
+    // 📤 Sotuvni yuborish
+    [RelayCommand]
+    private void Submit()
+    {
+        if (SaleItems.Count == 0)
+        {
+            WarningMessage = "Hech qanday mahsulot kiritilmagan!";
+            return;
+        }
 
-                // Agar topilmasa — hodisa chiqaramiz (View ushlab oladi)
-                RequestNewCustomer?.Invoke(this, inputText);
-                }
+        SuccessMessage = $"Savdo muvaffaqiyatli yuborildi. Mahsulotlar soni: {SaleItems.Count}";
+    }
 
+    #region CalculateTotalAmount
 
-                // 🔄 Backend’dan foydalanuvchilarni olish
-                public async Task LoadUsersAsync()
-                {
-                try
-                {
-                var response = await client.Users.GetAll();
-                if (response.IsSuccess && response.Data != null)
-                {
-                // 🔹 Faqat mijozlar (Role.Customer) ni tanlaymiz
-                var customersOnly = response.Data
-.Where(u => u.Role == Role.Mijoz)
-                    .ToList();
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SaleItemViewModel.TotalAmount))
+        {
+            RecalculateTotals();
+        }
+    }
 
-                    Customers = new ObservableCollection<UserResponse>(customersOnly);
-                        }
-                        else
-                        {
-                        WarningMessage = "Foydalanuvchilarni yuklashda xatolik.";
-                        }
-                        }
-                        catch (Exception ex)
-                        {
-                        WarningMessage = $"Server bilan aloqa yo'q: {ex.Message}";
-                        }
-                        }
+    private void RecalculateTotals()
+    {
+        TotalAmount = SaleItems.Sum(x => x.TotalAmount);
+        FinalAmount = TotalAmount; // agar chegirma yoki qo‘shimcha bo‘lsa shu yerda hisoblanadi
+    }
 
-                        public async Task LoadProductsAsync()
-                        {
-                        try
-                        {
-                        var response = await client.Users.GetAll();
-                        if (response.IsSuccess)
-                        {
-                        Customers = new ObservableCollection<UserResponse>(response.Data!);
-                            }
-                            else
-                            {
-                            WarningMessage = "Foydalanuvchilarni yuklashda xatolik.";
-                            }
-                            }
-                            catch (Exception ex)
-                            {
-                            WarningMessage = $"Server bilan aloqa yo'q: {ex.Message}";
-                            }
-                            }
-
-                            // ➕ Mahsulot qo‘shish
-                            [RelayCommand]
-                            private void Add()
-                            {
-                            if (CurrentSaleItem == null || CurrentSaleItem.Count <= 0)
-                               {
-                               WarningMessage = "Mahsulot tanlanmagan yoki miqdor noto‘g‘ri!";
-                               return;
-                               }
-
-                               SaleItems.Add(CurrentSaleItem);
-                               CurrentSaleItem.PropertyChanged += Item_PropertyChanged;
-                               RecalculateTotals();
-                               CurrentSaleItem = new SaleItemViewModel();
-                               }
-
-                               // 📤 Sotuvni yuborish
-                               [RelayCommand]
-                               private void Submit()
-                               {
-                               if (SaleItems.Count == 0)
-                               {
-                               WarningMessage = "Hech qanday mahsulot kiritilmagan!";
-                               return;
-                               }
-
-                               SuccessMessage = $"Savdo muvaffaqiyatli yuborildi. Mahsulotlar soni: {SaleItems.Count}";
-                               }
-
-                               #region CalculateTotalAmount
-
-                               private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-                               {
-                               if (e.PropertyName == nameof(SaleItemViewModel.TotalAmount))
-                               {
-                               RecalculateTotals();
-                               }
-                               }
-
-                               private void RecalculateTotals()
-                               {
-                               TotalAmount = SaleItems.Sum(x => x.TotalAmount);
-                                FinalAmount = TotalAmount; // agar chegirma yoki qo‘shimcha bo‘lsa shu yerda hisoblanadi
-                                }
-
-                                #endregion CalculateTotalAmount
-                                }
+    #endregion CalculateTotalAmount
+}

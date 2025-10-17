@@ -10,6 +10,6 @@ public sealed record UserRequest
     public string Email { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public Role Role { get; set; }
-    public List<CurrencyBalanceRequest> CurrencyBalances { get; set; } = new();
+    public UserRole Role { get; set; }
+    public List<UserAccount> Accounts { get; set; } = default!;
 }

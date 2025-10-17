@@ -1,6 +1,7 @@
 ﻿namespace Forex.ClientService.Interfaces;
 
 using Forex.ClientService.Models.Commons;
+using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
 using Refit;
 
@@ -33,5 +34,5 @@ public interface IApiSemiProduct
                                 [AliasAs("Photo")] StreamPart photo);
 
     [Post("/semi-products/intake")]
-    Task<Response<bool>> CreateIntake([Body] MultipartFormDataContent content);
+    Task<Response<long>> CreateIntake(SemiProductIntakeRequest content);
 }

@@ -1,8 +1,8 @@
 ﻿namespace Forex.WebApi.Controllers;
 
-using Forex.Application.Features.Products.Commands;
-using Forex.Application.Features.Products.DTOs;
-using Forex.Application.Features.Products.Queries;
+using Forex.Application.Features.Products.Products.Commands;
+using Forex.Application.Features.Products.Products.DTOs;
+using Forex.Application.Features.Products.Products.Queries;
 using Forex.WebApi.Controllers.Common;
 using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;

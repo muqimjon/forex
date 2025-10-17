@@ -2,7 +2,7 @@
 
 public record FilteringRequest : PagingRequest
 {
-    /// <summary>Key-value filterlar: { "Role": "Supplier", "IsActive": true }</summary>
+    /// <summary>Key-value filterlar: { "UserRole": "Supplier", "IsActive": true }</summary>
     public Dictionary<string, List<string>>? Filters { get; set; }
 
     /// <summary>Global search (string fieldlar bo‘yicha)</summary>

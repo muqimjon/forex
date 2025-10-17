@@ -11,11 +11,11 @@ public class UnitMeasureMappingProfile : Profile
     public UnitMeasureMappingProfile()
     {
         CreateMap<CreateUnitMeasureCommand, UnitMeasure>()
-            .ForMember(dest => dest.SearchName,
+            .ForMember(dest => dest.NormalizedName,
             opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<UpdateUnitMeasureCommand, UnitMeasure>()
-            .ForMember(dest => dest.SearchName,
+            .ForMember(dest => dest.NormalizedName,
             opt => opt.MapFrom(src => src.Name.ToNormalized()));
 
         CreateMap<UnitMeasure, UnitMeasureDto>();

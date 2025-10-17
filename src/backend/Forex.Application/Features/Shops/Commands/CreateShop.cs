@@ -3,13 +3,14 @@
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
+using Forex.Application.Features.Accounts.Commands;
 using Forex.Domain.Entities;
-using Forex.Domain.Entities.Shops;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 public record CreateShopCommand(
-    string Name)
+    string Name,
+    List<CreateShopAccountCommand> Accounts)
     : IRequest<long>;
 
 public class CreateShopCommandHandler(
@@ -30,7 +31,7 @@ public class CreateShopCommandHandler(
         var currencies = await context.Currencies.ToListAsync(cancellationToken);
         foreach (var currency in currencies)
         {
-            context.ShopCashAccounts.Add(new ShopCashAccount
+            context.ShopCashAccounts.Add(new ShopAccount
             {
                 Shop = shop,
                 CurrencyId = currency.Id,
