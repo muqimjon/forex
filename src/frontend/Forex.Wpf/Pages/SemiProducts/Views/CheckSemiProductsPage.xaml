@@ -138,7 +138,7 @@
                                                        HorizontalAlignment="Center" />
 
                                                 <!-- Types -->
-                                                <DataGrid ItemsSource="{Binding Types}"
+                                                <DataGrid ItemsSource="{Binding ProductTypes}"
                                                           Grid.Column="1"
                                                           AutoGenerateColumns="False"
                                                           HeadersVisibility="None"
@@ -166,7 +166,7 @@
                                                         <DataGridTemplateColumn Width="*">
                                                             <DataGridTemplateColumn.CellTemplate>
                                                                 <DataTemplate>
-                                                                    <DataGrid ItemsSource="{Binding Items}"
+                                                                    <DataGrid ItemsSource="{Binding ProductTypeItems}"
                                                                               AutoGenerateColumns="False"
                                                                               HeadersVisibility="None"
                                                                               CanUserAddRows="False"
