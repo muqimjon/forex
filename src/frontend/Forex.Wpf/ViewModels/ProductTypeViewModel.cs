@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
+﻿namespace Forex.Wpf.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.Wpf.Pages.Common;
@@ -26,5 +26,25 @@ public partial class ProductTypeViewModel : ViewModelBase
         }
 
         previousProduct = value;
+    }
+
+
+    private ProductTypeViewModel? selected;
+
+    public ProductTypeViewModel? Selected
+    {
+        get => selected;
+        set
+        {
+            if (SetProperty(ref selected, value) && value is not null)
+            {
+                Id = value.Id;
+                Product = value.Product;
+                Type = value.Type;
+                Count = value.Count;
+                Cost = value.Cost;
+                ProductTypeItems = value.ProductTypeItems;
+            }
+        }
     }
 }

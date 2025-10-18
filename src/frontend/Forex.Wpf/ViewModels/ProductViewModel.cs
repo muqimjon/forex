@@ -1,9 +1,8 @@
-﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
+﻿namespace Forex.Wpf.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.Wpf.Pages.Common;
-using Forex.Wpf.ViewModels;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
@@ -18,6 +17,7 @@ public partial class ProductViewModel : ViewModelBase
     [ObservableProperty] private ImageSource? image;
 
     [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
+    [ObservableProperty] private ProductTypeViewModel productType = default!;
 
     [RelayCommand]
     private void SelectImage()
@@ -38,4 +38,26 @@ public partial class ProductViewModel : ViewModelBase
             Image = bmp;
         }
     }
+
+    private ProductViewModel? selected;
+    public ProductViewModel? Selected
+    {
+        get => selected;
+        set
+        {
+            if (SetProperty(ref selected, value) && value is not null)
+            {
+                Id = value.Id;
+                Code = value.Code;
+                Name = value.Name;
+                Measure = value.Measure;
+                Image = value.Image;
+
+                ProductType = value.ProductType;
+
+                ProductTypes = new ObservableCollection<ProductTypeViewModel>(value.ProductTypes ?? []);
+            }
+        }
+    }
+
 }

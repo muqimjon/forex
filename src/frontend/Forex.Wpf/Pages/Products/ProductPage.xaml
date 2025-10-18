@@ -125,7 +125,7 @@
                                   VirtualizingPanel.IsVirtualizing="True"
                                   VirtualizingPanel.VirtualizationMode="Recycling"
                                   SelectedItem="{Binding SelectedEmployee,Mode=TwoWay}"
-                                  ItemsSource="{Binding Users}">
+                                  ItemsSource="{Binding Employees}">
                             <DataGrid.Resources>
                                 <!-- 🔹 Header’larni markazlashtirish uchun umumiy style -->
                                 <Style TargetType="DataGridColumnHeader">
@@ -146,16 +146,15 @@
                                 <DataGridTemplateColumn Header="Hodim" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox
-                                                ItemsSource="{Binding DataContext.Employees, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                SelectedItem="{Binding SelectedUser, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                DisplayMemberPath="Name"
-                                                BorderThickness="0"
-                                                Padding="5 0"
-                                                Height="25"
-                                                FontSize="14"
-                                                IsEditable="True"
-                                                IsEnabled="{Binding IsEditing}" />
+                                            <ComboBox ItemsSource="{Binding DataContext.AvailableEmployees, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      DisplayMemberPath="Name"
+                                                      SelectedItem="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      BorderThickness="0"
+                                                      Padding="5 0"
+                                                      Height="25"
+                                                      FontSize="14"
+                                                      IsEditable="False" />
+
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -205,7 +204,7 @@
                     </Grid>
                 </Border>
 
-                <!-- Semi Product DataGrid -->
+                <!-- Product DataGrid -->
                 <Border Background="AliceBlue" CornerRadius="4">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="50" Direction="280" Opacity="0.2" ShadowDepth="15" Color="Black"/>
@@ -297,12 +296,11 @@
                                 <DataGridTemplateColumn Header="Kod" Width="0.8*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.ComboProducts, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                      SelectedItem="{Binding SelectedCode, Mode=TwoWay}"
+                                            <ComboBox ItemsSource="{Binding DataContext.AvailableProducts, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                       DisplayMemberPath="Code"
                                                       Padding="0"
                                                       IsEditable="True"
-
                                                       BorderThickness="0"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -312,8 +310,8 @@
                                 <DataGridTemplateColumn Header="Nomi" Width="1.5*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.ComboProducts, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                      SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
+                                            <ComboBox ItemsSource="{Binding DataContext.AvailableProducts, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      SelectedItem="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                       DisplayMemberPath="Name"
                                                       Padding="0"
                                                       IsEditable="True"
@@ -327,8 +325,8 @@
                                 <DataGridTemplateColumn Header="O'lcham" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding Types}"
-                                                      SelectedItem="{Binding SelectedType, Mode=TwoWay}"
+                                            <ComboBox ItemsSource="{Binding ProductTypes}"
+                                                      SelectedItem="{Binding Selected, Mode=TwoWay}"
                                                       DisplayMemberPath="Type"
                                                       Padding="0"
                                                       IsEditable="True"

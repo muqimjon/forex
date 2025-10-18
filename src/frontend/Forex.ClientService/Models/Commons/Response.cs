@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 public class Response<T>
 {
-    public T? Data { get; set; }
+    public T Data { get; set; } = default!;
     public string Message { get; set; } = string.Empty;
     public int StatusCode { get; set; }
 

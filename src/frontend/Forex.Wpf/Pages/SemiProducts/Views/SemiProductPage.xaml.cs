@@ -3,6 +3,7 @@
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.SemiProducts.ViewModels;
+using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;

@@ -1,106 +1,86 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿namespace Forex.Wpf.Pages.Products.ViewModels;
+
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
-using Forex.ClientService.Enums;
-using Forex.ClientService.Models.Responses;
+using Forex.ClientService.Extensions;
+using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Common.Extensions;
 using Forex.Wpf.Pages.Common;
-using Forex.Wpf.Pages.Products.ViewModels;
+using Forex.Wpf.ViewModels;
+using MapsterMapper;
 using System.Collections.ObjectModel;
 
-public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
+public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : ViewModelBase
 {
-    [ObservableProperty] private ObservableCollection<UserResponse> employees = [];
-
-    [ObservableProperty] private ObservableCollection<UserViewModel> users = [];
+    [ObservableProperty] private ObservableCollection<UserViewModel> employees = [];
+    [ObservableProperty] private ObservableCollection<UserViewModel> availableEmployees = [];
     private UserViewModel? selectedEmployee;
 
-    [ObservableProperty] private ObservableCollection<ProductResponse> comboProducts = [];
+    [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> filteredProducts = [];
-
-    [ObservableProperty] private ObservableCollection<ProductTypeResponse> allTypes = [];
-
-
-    public async Task LoadEmployeesAsync()
-    {
-        try
-        {
-            var response = await _client.Users.GetAll();
-            if (response.IsSuccess && response.Data != null)
-            {
-                var hodimlar = response.Data
-                    .Where(u => u.Role == UserRole.Hodim)
-                    .ToList();
-
-                Employees = new ObservableCollection<UserResponse>(hodimlar);
-            }
-            else
-            {
-                WarningMessage = "Hodimlarni yuklashda xatolik.";
-            }
-        }
-        catch (Exception ex)
-        {
-            WarningMessage = $"Server bilan aloqa yo'q: {ex.Message}";
-        }
-    }
 
     public async Task InitializeAsync()
     {
         await LoadEmployeesAsync();
         await LoadProductsAsync();
-        await LoadProductTypeAsync();
 
-        Users.Add(new UserViewModel { });
+        Employees.Add(new UserViewModel { });
         UpdateProducts();
     }
 
-    public async Task LoadProductsAsync()
-    {
-        try
-        {
-            var response = await _client.Products.GetAll();
 
-            if (response.IsSuccess && response.Data != null)
-            {
-                ComboProducts = new ObservableCollection<ProductResponse>(response.Data);
-            }
-            else
-            {
-                WarningMessage = "Mahsulotlarni yuklashda xatolik.";
-            }
-        }
-        catch (Exception ex)
+    public async Task LoadEmployeesAsync()
+    {
+        FilteringRequest request = new()
         {
-            WarningMessage = $"Server bilan aloqa yo‘q: {ex.Message}";
-        }
+            Filters = new()
+            {
+                ["role"] = ["hodim"],
+                ["accounts"] = ["include:currency"]
+            }
+        };
+
+        var response = await Client.Users.Filter(request)
+            .Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess)
+            AvailableEmployees = Mapper.Map<ObservableCollection<UserViewModel>>(response.Data);
+        else
+            WarningMessage = response.Message ?? "Hodimlarni yuklashda xatolik.";
     }
 
-    public async Task LoadProductTypeAsync()
+
+    public async Task LoadProductsAsync()
     {
-        try
+
+        FilteringRequest request = new()
         {
-            var response = await _client.ProductType.GetAll();
-            if (response.IsSuccess && response.Data != null)
+            Filters = new()
             {
-                AllTypes = new ObservableCollection<ProductTypeResponse>(response.Data);
+                ["productTypes"] = ["include"]
             }
-            else
-            {
-                WarningMessage = "Mahsulot turlarini yuklashda xatolik.";
-            }
-        }
-        catch (Exception ex)
+        };
+
+        var response = await Client.Products.Filter(request)
+            .Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess && response.Data != null)
         {
-            WarningMessage = $"Server bilan aloqa yo‘q: {ex.Message}";
+            AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
         }
+        else
+        {
+            WarningMessage = "Mahsulotlarni yuklashda xatolik.";
+        }
+
     }
 
     [RelayCommand]
     private void AddEmployee()
     {
-        Users.Add(new UserViewModel { });
+        Employees.Add(new UserViewModel { });
     }
 
     [RelayCommand]
@@ -118,32 +98,8 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
             return;
         }
 
-        // 🔹 Agar typelar hali yuklanmagan bo‘lsa
-        if (AllTypes == null || AllTypes.Count == 0)
-        {
-            WarningMessage = "Mahsulot turlari hali yuklanmagan.";
-            return;
-        }
-
-        var product = new ProductViewModel
-        {
-            Parent = this
-        };
-
-        if (!string.IsNullOrEmpty(SelectedEmployee.Name))
-        {
-            SelectedEmployee.EmployeeProducts.Add(product);
-            Products.Add(product);
-            UpdateProducts();
-        }
-        else
-        {
-            WarningMessage = "Hodim tanla";
-        }
+        FilteredProducts.Add(new ProductViewModel());
     }
-
-
-
 
     public UserViewModel SelectedEmployee
     {
@@ -153,12 +109,13 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
             if (value != selectedEmployee)
             {
                 selectedEmployee = value;
+
                 UpdateProducts();
             }
         }
     }
 
-    public void UpdateProducts()
+    private void UpdateProducts()
     {
         FilteredProducts.Clear();
 
@@ -168,7 +125,7 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
         }
         else
         {
-            FilteredProducts.AddRange(SelectedEmployee.EmployeeProducts);
+            FilteredProducts.AddRange(SelectedEmployee.PreparedProducts);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
+﻿namespace Forex.Wpf.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.ClientService;
@@ -6,7 +6,6 @@ using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
-using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
 

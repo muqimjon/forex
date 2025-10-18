@@ -2,7 +2,6 @@
 
 using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
-using Forex.Wpf.Pages.SemiProducts.ViewModels;
 using Forex.Wpf.ViewModels;
 using Mapster;
 using System.IO;
@@ -54,6 +53,9 @@ public static class MappingProfile
             .Map(dest => dest.SupplierId, src => src.Supplier.Id)
             .Map(dest => dest.SenderId, src => src.Agent != null ? src.Agent.Id : (long?)null)
             .Map(dest => dest.ManufactoryId, src => src.Manufactory.Id);
+
+        config.NewConfig<CurrencyResponse, CurrencyViewModel>();
+        config.NewConfig<UserAccountResponse, UserAccountViewModel>();
     }
 
     // 🔹 ImageSource → byte[] maplash (Minioga upload uchun)

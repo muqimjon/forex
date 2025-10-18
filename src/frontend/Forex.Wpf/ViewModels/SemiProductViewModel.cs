@@ -1,9 +1,8 @@
-﻿namespace Forex.Wpf.Pages.SemiProducts.ViewModels;
+﻿namespace Forex.Wpf.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.Wpf.Pages.Common;
-using Forex.Wpf.ViewModels;
 using Microsoft.Win32;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;

@@ -8,7 +8,7 @@ using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
-using Forex.Wpf.Pages.SemiProducts.ViewModels;
+using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -283,7 +283,8 @@ public partial class UserPage : Page
                     {
                         CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
                         OpeningBalance = decimal.TryParse(tbAccount.Text, out var bal) ? bal : 0,
-                        Discount = decimal.TryParse(tbDiscount.Text, out var disc) ? disc : 0
+                        Discount = decimal.TryParse(tbDiscount.Text, out var disc) ? disc : 0,
+
                     }
                 ]
             };

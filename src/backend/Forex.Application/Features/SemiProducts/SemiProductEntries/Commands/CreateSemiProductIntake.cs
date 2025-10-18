@@ -44,10 +44,10 @@ public class CreateSemiProductIntakeCommandHandler(
             var transferRatio = (request.Invoice.TransferFee ?? 0) / request.Invoice.CostPrice;
 
             // 🔹 Avvalo Productlar va ularga bog‘langan SemiProductlarni saqlaymiz
-            await AddProductsAsync(request.Products, invoice, deliveryRatio, transferRatio, ct);
+            var linkedSemiProducts = await AddProductsAsync(request.Products, invoice, deliveryRatio, transferRatio, ct);
 
             // 🔹 Keyin mustaqil SemiProductlarni (productga bog‘liq bo‘lmagan)
-            await AddIndependentSemiProductsAsync(request.SemiProducts, invoice, deliveryRatio, transferRatio, ct);
+            await AddIndependentSemiProductsAsync(request.SemiProducts, invoice, linkedSemiProducts, deliveryRatio, transferRatio, ct);
 
             await context.CommitTransactionAsync(ct);
             return invoice.Id;
@@ -111,7 +111,7 @@ public class CreateSemiProductIntakeCommandHandler(
     }
 
     // --- 1️⃣ Product va unga bog‘langan SemiProduct’lar ---
-    private async Task AddProductsAsync(
+    private async Task<List<SemiProduct>> AddProductsAsync(
         IEnumerable<ProductCommand> productCommands,
         Invoice invoice,
         decimal deliveryRatio,
@@ -189,7 +189,7 @@ public class CreateSemiProductIntakeCommandHandler(
                     });
                 }
 
-                //product.ProductTypes.Add(productType);
+                product.ProductTypes.Add(productType);
             }
         }
 

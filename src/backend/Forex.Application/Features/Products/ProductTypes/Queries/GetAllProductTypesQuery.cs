@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public record GetAllProductTypesQuery():IRequest<IReadOnlyCollection<ProductTypeDto>>;
+public record GetAllProductTypesQuery() : IRequest<IReadOnlyCollection<ProductTypeDto>>;
 
 public class GetAllProductTypesHandler(
     IAppDbContext context,
-    IMapper mapper): IRequestHandler<GetAllProductTypesQuery, IReadOnlyCollection<ProductTypeDto>>
+    IMapper mapper) : IRequestHandler<GetAllProductTypesQuery, IReadOnlyCollection<ProductTypeDto>>
 {
     public async Task<IReadOnlyCollection<ProductTypeDto>> Handle(GetAllProductTypesQuery request, CancellationToken cancellationToken)
         => mapper.Map<IReadOnlyCollection<ProductTypeDto>>(await context.ProductTypes.AsNoTracking().ToListAsync(cancellationToken));

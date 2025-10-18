@@ -4,18 +4,18 @@ using AutoMapper;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Commons.Models;
-using Forex.Application.Features.SemiProducts.SemiProducts.DTOs;
+using Forex.Application.Features.Products.Products.DTOs;
 using MediatR;
 
-public record ProductFilterQuery : FilteringRequest, IRequest<IReadOnlyCollection<SemiProductDto>>;
+public record ProductFilterQuery : FilteringRequest, IRequest<IReadOnlyCollection<ProductDto>>;
 
 public class ProductFilterQueryHandler(
     IAppDbContext context,
     IMapper mapper,
     IPagingMetadataWriter writer)
-    : IRequestHandler<ProductFilterQuery, IReadOnlyCollection<SemiProductDto>>
+    : IRequestHandler<ProductFilterQuery, IReadOnlyCollection<ProductDto>>
 {
-    public async Task<IReadOnlyCollection<SemiProductDto>> Handle(ProductFilterQuery request, CancellationToken cancellationToken)
-        => mapper.Map<IReadOnlyCollection<SemiProductDto>>(await context.SemiProducts
+    public async Task<IReadOnlyCollection<ProductDto>> Handle(ProductFilterQuery request, CancellationToken cancellationToken)
+        => mapper.Map<IReadOnlyCollection<ProductDto>>(await context.Products
             .ToPagedListAsync(request, writer, cancellationToken));
 }
