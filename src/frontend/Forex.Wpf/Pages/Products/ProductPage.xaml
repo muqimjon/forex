@@ -251,13 +251,13 @@
 
                         <DataGrid Grid.Row="2"
                                   AutoGenerateColumns="False"
-                                  CanUserAddRows="True"
+                                  CanUserAddRows="False"
                                   HeadersVisibility="Column"
                                   IsReadOnly="False"
                                   RowHeaderWidth="0"
                                   RowHeight="36"
                                   Height="250"
-                                  ItemsSource="{Binding FilteredProducts}"
+                                  ItemsSource="{Binding FilteredProducts,Mode=TwoWay}"
                                   EnableRowVirtualization="False"
                                   EnableColumnVirtualization="True"
                                   VirtualizingPanel.IsVirtualizing="True"
@@ -297,9 +297,12 @@
                                 <DataGridTemplateColumn Header="Kod" Width="0.8*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            <ComboBox ItemsSource="{Binding DataContext.ComboProducts, RelativeSource={RelativeSource AncestorType=Page}}"
                                                       SelectedItem="{Binding SelectedCode, Mode=TwoWay}"
                                                       DisplayMemberPath="Code"
+                                                      Padding="0"
+                                                      IsEditable="True"
+
                                                       BorderThickness="0"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -309,9 +312,12 @@
                                 <DataGridTemplateColumn Header="Nomi" Width="1.5*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.Products, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            <ComboBox ItemsSource="{Binding DataContext.ComboProducts, RelativeSource={RelativeSource AncestorType=Page}}"
                                                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                                                       DisplayMemberPath="Name"
+                                                      Padding="0"
+                                                      IsEditable="True"
+                                                      Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                       BorderThickness="0"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -324,6 +330,8 @@
                                             <ComboBox ItemsSource="{Binding Types}"
                                                       SelectedItem="{Binding SelectedType, Mode=TwoWay}"
                                                       DisplayMemberPath="Type"
+                                                      Padding="0"
+                                                      IsEditable="True"
                                                       BorderThickness="0"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>

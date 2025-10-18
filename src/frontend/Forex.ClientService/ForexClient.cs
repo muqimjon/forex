@@ -7,6 +7,7 @@ public class ForexClient(
     IApiUser users,
     IApiSemiProduct semiProduct,
     IApiManufactory manufactory,
+    IApiProductTypes productType,
     IApiCurrency currency,
     IApiUnitMeasure unitMeasure,
     IApiProducts products)
@@ -18,4 +19,6 @@ public class ForexClient(
     public IApiCurrency Currency { get; } = currency;
     public IApiUnitMeasure UnitMeasure { get; } = unitMeasure;
     public IApiProducts Products { get; } = products;
+    public IApiProductTypes ProductType { get; } = productType;
+
 }

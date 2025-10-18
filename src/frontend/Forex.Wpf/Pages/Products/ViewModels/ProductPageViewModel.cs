@@ -15,10 +15,11 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
     [ObservableProperty] private ObservableCollection<UserViewModel> users = [];
     private UserViewModel? selectedEmployee;
 
-
+    [ObservableProperty] private ObservableCollection<ProductResponse> comboProducts = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> filteredProducts = [];
 
+    [ObservableProperty] private ObservableCollection<ProductTypeResponse> allTypes = [];
 
 
     public async Task LoadEmployeesAsync()
@@ -48,9 +49,52 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
     public async Task InitializeAsync()
     {
         await LoadEmployeesAsync();
+        await LoadProductsAsync();
+        await LoadProductTypeAsync();
 
         Users.Add(new UserViewModel { });
+        UpdateProducts();
+    }
 
+    public async Task LoadProductsAsync()
+    {
+        try
+        {
+            var response = await _client.Products.GetAll();
+
+            if (response.IsSuccess && response.Data != null)
+            {
+                ComboProducts = new ObservableCollection<ProductResponse>(response.Data);
+            }
+            else
+            {
+                WarningMessage = "Mahsulotlarni yuklashda xatolik.";
+            }
+        }
+        catch (Exception ex)
+        {
+            WarningMessage = $"Server bilan aloqa yo‘q: {ex.Message}";
+        }
+    }
+
+    public async Task LoadProductTypeAsync()
+    {
+        try
+        {
+            var response = await _client.ProductType.GetAll();
+            if (response.IsSuccess && response.Data != null)
+            {
+                AllTypes = new ObservableCollection<ProductTypeResponse>(response.Data);
+            }
+            else
+            {
+                WarningMessage = "Mahsulot turlarini yuklashda xatolik.";
+            }
+        }
+        catch (Exception ex)
+        {
+            WarningMessage = $"Server bilan aloqa yo‘q: {ex.Message}";
+        }
     }
 
     [RelayCommand]
@@ -74,7 +118,18 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
             return;
         }
 
-        ProductViewModel product = new();
+        // 🔹 Agar typelar hali yuklanmagan bo‘lsa
+        if (AllTypes == null || AllTypes.Count == 0)
+        {
+            WarningMessage = "Mahsulot turlari hali yuklanmagan.";
+            return;
+        }
+
+        var product = new ProductViewModel
+        {
+            Parent = this
+        };
+
         if (!string.IsNullOrEmpty(SelectedEmployee.Name))
         {
             SelectedEmployee.EmployeeProducts.Add(product);
@@ -86,6 +141,9 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
             WarningMessage = "Hodim tanla";
         }
     }
+
+
+
 
     public UserViewModel SelectedEmployee
     {
@@ -113,5 +171,4 @@ public partial class ProductPageViewModel(ForexClient _client) : ViewModelBase
             FilteredProducts.AddRange(SelectedEmployee.EmployeeProducts);
         }
     }
-
 }
