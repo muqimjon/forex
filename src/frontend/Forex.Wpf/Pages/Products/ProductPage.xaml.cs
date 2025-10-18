@@ -2,10 +2,8 @@
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 /// <summary>
 /// Interaction logic for ProductPage.xaml
