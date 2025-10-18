@@ -76,9 +76,10 @@ public class CreateSemiProductIntakeCommandHandler(
             account = new UserAccount
             {
                 OpeningBalance = (decimal)invoice.TransferFee!,
-                CurrencyId = invoice.CurrencyId,
-                User = user
+                User = user,
+                CurrencyId = invoice.CurrencyId
             };
+
             context.Accounts.Add(account);
         }
 
@@ -99,13 +100,14 @@ public class CreateSemiProductIntakeCommandHandler(
             account = new UserAccount
             {
                 OpeningBalance = invoice.CostPrice,
-                CurrencyId = invoice.CurrencyId,
-                User = user
+                Balance = invoice.CostPrice,
+                User = user,
+                CurrencyId = invoice.CurrencyId
             };
             context.Accounts.Add(account);
         }
 
-        account.Balance += invoice.CostPrice;
+        account.Balance += invoice.CostPrice!;
     }
 
     // --- 1️⃣ Product va unga bog‘langan SemiProduct’lar ---
@@ -127,10 +129,10 @@ public class CreateSemiProductIntakeCommandHandler(
             ?? await context.UnitMeasures.FirstOrDefaultAsync(ct)
             ?? throw new ForbiddenException("O'lchov birliklari mavjud emas");
 
+        var linkedSemiProducts = new Dictionary<string, SemiProduct>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var pCmd in productCommands)
         {
-            // 🔹 Har bir Product doimo yangi yaratiladi
             var product = mapper.Map<Product>(pCmd);
             product.UnitMeasure = defaultMeasure;
             context.Products.Add(product);
@@ -142,22 +144,27 @@ public class CreateSemiProductIntakeCommandHandler(
 
                 foreach (var itemCmd in typeCmd.ProductTypeItems)
                 {
-                    var semi = await context.SemiProducts
-                        .FirstOrDefaultAsync(s => s.Name == itemCmd.SemiProduct.Name, ct);
+                    var semiName = itemCmd.SemiProduct.Name;
 
-                    if (semi is null)
+                    if (!linkedSemiProducts.TryGetValue(semiName!, out var semi))
                     {
-                        semi = mapper.Map<SemiProduct>(itemCmd.SemiProduct);
-                        //context.SemiProducts.Add(semi);
+                        semi = await context.SemiProducts
+                            .FirstOrDefaultAsync(s => s.Name == semiName, ct);
+
+                        if (semi is null)
+                        {
+                            semi = mapper.Map<SemiProduct>(itemCmd.SemiProduct);
+                            context.SemiProducts.Add(semi);
+                        }
+
+                        linkedSemiProducts[semiName!] = semi;
                     }
 
-                    // 🔹 Costlarni invoice nisbatiga ko‘ra hisoblaymiz
                     var semiCost = itemCmd.SemiProduct.CostPrice;
                     var costDelivery = semiCost * deliveryRatio;
                     var transferFee = semiCost * transferRatio;
 
-                    // 🔹 Entry yozuvi
-                    var entry = new SemiProductEntry
+                    context.SemiProductEntries.Add(new SemiProductEntry
                     {
                         SemiProduct = semi,
                         Quantity = itemCmd.Quantity,
@@ -166,48 +173,38 @@ public class CreateSemiProductIntakeCommandHandler(
                         CostPrice = semiCost,
                         CostDelivery = costDelivery,
                         TransferFee = transferFee
-                    };
-                    context.SemiProductEntries.Add(entry);
+                    });
 
-                    // 🔹 Residue yangilash yoki yaratish
-                    var residue = manufactory.SemiProductResidues.FirstOrDefault(r => r.SemiProductId == semi.Id);
-                    if (residue is null)
+                    context.SemiProductResidues.Add(new SemiProductResidue
                     {
-                        residue = new SemiProductResidue
-                        {
-                            SemiProduct = semi,
-                            Manufactory = manufactory,
-                            Quantity = itemCmd.Quantity
-                        };
-                        context.SemiProductResidues.Add(residue);
-                    }
-                    else
-                    {
-                        residue.Quantity += itemCmd.Quantity;
-                    }
+                        SemiProduct = semi,
+                        Manufactory = manufactory,
+                        Quantity = itemCmd.Quantity
+                    });
 
-                    // 🔹 ProductTypeItem
-                    var item = new ProductTypeItem
+                    productType.ProductTypeItems.Add(new ProductTypeItem
                     {
                         SemiProduct = semi,
                         Quantity = itemCmd.Quantity
-                    };
-                    //productType.ProductTypeItems.Add(item);
+                    });
                 }
 
                 //product.ProductTypes.Add(productType);
             }
         }
 
+        return [.. linkedSemiProducts.Values];
     }
+
 
     // --- 2️⃣ Mustaqil SemiProduct’lar ---
     private async Task AddIndependentSemiProductsAsync(
-        IEnumerable<SemiProductCommand> semiProductCommands,
-        Invoice invoice,
-        decimal deliveryRatio,
-        decimal transferRatio,
-        CancellationToken ct)
+    IEnumerable<SemiProductCommand> semiProductCommands,
+    Invoice invoice,
+    IEnumerable<SemiProduct> productLinkedSemiProducts,
+    decimal deliveryRatio,
+    decimal transferRatio,
+    CancellationToken ct)
     {
         var manufactory = await context.Manufactories
             .Include(m => m.SemiProductResidues)
@@ -215,9 +212,15 @@ public class CreateSemiProductIntakeCommandHandler(
             .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct)
             ?? throw new NotFoundException(nameof(Manufactory), nameof(invoice.ManufactoryId), invoice.ManufactoryId);
 
+        var existingNames = new HashSet<string>(
+            productLinkedSemiProducts.Select(sp => sp.Name)!,
+            StringComparer.OrdinalIgnoreCase);
+
         foreach (var cmd in semiProductCommands)
         {
- 
+            if (existingNames.Contains(cmd.Name!))
+                continue;
+
             var semi = await context.SemiProducts
                 .FirstOrDefaultAsync(sp => sp.Name == cmd.Name, ct);
 
@@ -227,7 +230,6 @@ public class CreateSemiProductIntakeCommandHandler(
                 context.SemiProducts.Add(semi);
             }
 
-            // 🔹 Costlarni nisbat asosida hisoblash
             var costDelivery = cmd.CostPrice * deliveryRatio;
             var transferFee = cmd.CostPrice * transferRatio;
 
