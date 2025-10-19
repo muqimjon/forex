@@ -16,19 +16,20 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="150"/>
-            <RowDefinition Height="38"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Grid Grid.Row="0" Margin="5 0">
+        <Grid Grid.Row="0" Margin="10 0">
             <TextBlock Text="🛒 Savdo bo'limi"
                        FontSize="18"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
                        Foreground="{DynamicResource PrimaryTextColor}"/>
+            
             <Button x:Name="btnBack"
                     BorderThickness="0"
                     md:ButtonAssist.CornerRadius="5"
@@ -47,7 +48,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80"/>
                     <ColumnDefinition Width="*"/>
@@ -62,23 +63,23 @@
                 </Grid.RowDefinitions>
 
                 <!-- Labels -->
-                <Label Grid.Row="0" Grid.Column="0" Content="Sana:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
-                <Label Grid.Row="1" Grid.Column="0" Content="Mijoz:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
-                <Label Grid.Row="2" Grid.Column="0" Content="Summa:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
-                <Label Grid.Row="3" Grid.Column="0" Content="Izox:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
+                <Label Grid.Row="0" Content="Sana:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
+                <Label Grid.Row="1" Content="Mijoz:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
+                <Label Grid.Row="2" Content="Summa:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
+                <Label Grid.Row="3" Content="Izox:" VerticalAlignment="Center" FontSize="14" Margin="5,0,0,0"/>
 
                 <!-- Sana -->
-                <Grid Grid.Row="0" Grid.Column="1">
-                    <Border CornerRadius="4" HorizontalAlignment="Left" Width="125" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="0,2,2,2">
-                        <controls:UserCalendar x:Name="supplyDate"
-                                               SelectedDate="{Binding OperationDate}"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Left"
-                                               Width="120" FontSize="14"
-                                               Padding="0"
-                                               Background="{DynamicResource PrimaryBackground}"
-                                               Margin="2,0,5,0" />
-                    </Border>
+                <Grid Grid.Row="0"
+                      Grid.Column="1">
+                    <controls:UserCalendar x:Name="supplyDate"
+                                           SelectedDate="{Binding OperationDate}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Width="120"
+                                           FontSize="14"
+                                           Padding="0"
+                                           Background="{DynamicResource PrimaryBackground}"
+                                           Margin="0,0,5,0" />
                 </Grid>
 
                 <!-- Mijoz -->
@@ -189,36 +190,37 @@
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Text="Mijoz hisobi:"
                            FontSize="12"
+                           Padding="0"
                            FontWeight="Bold"
                            FontStyle="Italic"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"/>
+                
                 <TextBlock Grid.Row="1" Text="Joriy:" VerticalAlignment="Center"/>
                 <TextBox x:Name="beginBalans"
                          Grid.Row="1"
                          IsReadOnly="True"
                          Text="{Binding BeginBalance,StringFormat={}{0:N2}}"
                          IsTabStop="False"
+                         Padding="0"
                          Background="Transparent"
-                         HorizontalContentAlignment="Right"
-                         HorizontalAlignment="Stretch"
-                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"
                          BorderThickness="0"
                          FontSize="12"
                          Margin="35,2,2,2"/>
+                
                 <TextBlock Grid.Row="2" Text="Qoldiq:" VerticalAlignment="Center"/>
                 <TextBox x:Name="lastBalans"
                          Grid.Row="2"
                          IsReadOnly="True"
-                         IsTabStop="False"
+                         Padding="0"
                          Text="{Binding LastBalance,StringFormat={}{0:N2}}"
                          Background="Transparent"
-                         HorizontalContentAlignment="Right"
-                         HorizontalAlignment="Stretch"
-                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"
                          BorderThickness="0"
                          FontSize="12"
                          Margin="35,2,2,2"/>
+                
                 <TextBlock Grid.Row="3" Text="Telefon:" VerticalAlignment="Center"/>
                 <TextBox x:Name="tel"
                          Grid.Row="3"
@@ -227,12 +229,12 @@
                          IsTabStop="False"
                          Background="Transparent"
                          BorderThickness="0"
-                         HorizontalAlignment="Stretch"
-                         VerticalAlignment="Center"
+                         Padding="0"
+                         HorizontalAlignment="Right"
                          FontSize="12" Margin="42,2,2,2"/>
             </Grid>
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Margin="0 5 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MaxWidth="120"/>
                 <ColumnDefinition Width="1.5*" MinWidth="100"/>
@@ -245,104 +247,62 @@
             </Grid.ColumnDefinitions>
 
             <!-- Mahsulot kodi -->
-            <TextBlock Grid.Column="0"
-                       Foreground="{DynamicResource PrimaryTextColor}"
-                       FontSize="14" Text="Mahsulot kodi"
-                       Style="{StaticResource FloatingLabelStyle}"
-                       Tag="{Binding ElementName=cbxProductCode}"
-                       IsHitTestVisible="False" Panel.ZIndex="1"/>
-            <Border Grid.Column="0" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
-                <ComboBox x:Name="cbxProductCode"
-                          Text="{Binding CurrentSaleItem.ProductCode}"
-                          IsTextSearchEnabled="True"
-                          FontSize="14"
-                          Padding="0 0 3 0"
-                          Margin="1 1 2 1"
-                          BorderThickness="0"/>
-            </Border>
+
+            <controls:FloatingComboBox x:Name="cbxProductCode"
+                                       Label="Kodi"
+                                       ItemsSource="{Binding Products}"
+                                       Text="{Binding Product.ProductCode}"
+                                       IsTextSearchEnabled="True"
+                                       Margin="10 0 2 0" />
 
             <!-- Mahsulot nomi -->
-            <TextBlock Grid.Column="1" Foreground="{DynamicResource PrimaryTextColor}" FontSize="14" Text="Mahsulot nomi"
-                       Style="{StaticResource FloatingLabelStyle}"
-                       Tag="{Binding ElementName=cbxProductName}"
-                       IsHitTestVisible="False" Panel.ZIndex="1"/>
-            <Border Grid.Column="1" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
-                <ComboBox x:Name="cbxProductName"
-                          Text="{Binding CurrentSaleItem.ProductName}"
-                          FontSize="14"
-                          Padding="0 0 5 0"
-                          IsTextSearchEnabled="True"
-                          BorderThickness="0"/>
-            </Border>
+            <controls:FloatingComboBox x:Name="cbxProductName"
+                                       Grid.Column="1"
+                                       Label="Nomi"
+                                       ItemsSource="{Binding Products}"
+                                       Text="{Binding Product.ProductName}"
+                                       IsTextSearchEnabled="True"
+                                       Margin="2 0" />
 
             <!-- Razmer -->
-            <TextBlock Grid.Column="2" Foreground="{DynamicResource PrimaryTextColor}" FontSize="14" Text="Razmer"
-                       Style="{StaticResource FloatingLabelStyle}"
-                       Tag="{Binding ElementName=cbxRazmerType}"
-                       IsHitTestVisible="False" Panel.ZIndex="1"/>
-            <Border Grid.Column="2" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
-                <ComboBox x:Name="cbxRazmerType"
-                          Text="{Binding CurrentSaleItem.Type}"
-                          FontSize="14"
-                          Padding="0 0 5 0"
-                          IsTextSearchEnabled="True"
-                          BorderThickness="0"/>
-            </Border>
+            <controls:FloatingComboBox x:Name="cbxRazmerType"
+                                       Grid.Column="2"
+                                       Label="Turi"
+                                       ItemsSource="{Binding ProductItems}"
+                                       Text="{Binding Type.Type}"
+                                       IsTextSearchEnabled="True"
+                                       Margin="2 0" />
 
             <!-- Razmer soni -->
-            <TextBlock Grid.Column="3" Foreground="{DynamicResource PrimaryTextColor}" FontSize="14" Text="Razmer soni"
-                       Style="{StaticResource FloatingLabelStyle}"
-                       Tag="{Binding ElementName=tbxRazmerCount}"
-                       IsHitTestVisible="False" Panel.ZIndex="1"/>
-            <Border Grid.Column="3" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
-                <TextBox x:Name="tbxRazmerCount"
-                         Text="{Binding CurrentSaleItem.TypeCount}"
-                         FontSize="14"
-                         BorderThickness="0"/>
-            </Border>
-
+            <controls:FloatingInput x:Name="tbxRazmerCount"
+                                    Grid.Column="3"
+                                    Label="Razmer soni"
+                                    Text="{Binding CurrentSaleItem.TypeCount, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="2 0" />
             <!-- Jami soni -->
-            <TextBlock Grid.Column="4" Foreground="{DynamicResource PrimaryTextColor}" FontSize="14" Text="Jami soni"
-                       Style="{StaticResource FloatingLabelStyle}"
-                       Tag="{Binding ElementName=tbxQuantity}"
-                       IsHitTestVisible="False" Panel.ZIndex="1"/>
-            <Border Grid.Column="4" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
-                <TextBox x:Name="tbxQuantity"
-                         Text="{Binding CurrentSaleItem.Count}"
-                         FontSize="14"
-                         IsReadOnly="True"
-                         BorderThickness="0" Height="30" VerticalAlignment="Bottom"/>
-            </Border>
+            <controls:FloatingInput x:Name="tbxQuantity"
+                                    Grid.Column="4"
+                                    Label="Jami soni"
+                                    Text="{Binding CurrentSaleItem.Count, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="2 0" />
 
             <!-- Narxi -->
-            <TextBlock Grid.Column="5" Foreground="{DynamicResource PrimaryTextColor}" FontSize="14" Text="Narxi"
-                       Style="{StaticResource FloatingLabelStyle}"
-                       Tag="{Binding ElementName=tbxPrice}"
-                       IsHitTestVisible="False" Panel.ZIndex="1"/>
-            <Border Grid.Column="5" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
-                <TextBox x:Name="tbxPrice"
-                         Text="{Binding CurrentSaleItem.Price}"
-                         FontSize="14"
-                         BorderThickness="0"/>
-            </Border>
+            <controls:FloatingInput x:Name="tbxPrice"
+                                    Grid.Column="5"
+                                    Label="Narxi"
+                                    Text="{Binding CurrentSaleItem.Price, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="2 0" />
 
             <!-- Jami summa -->
-            <TextBlock Grid.Column="6" Foreground="{DynamicResource PrimaryTextColor}" FontSize="14" Text="Jami summa"
-                       Style="{StaticResource FloatingLabelStyle}"
-                       Tag="{Binding ElementName=tbxSum}"
-                       IsHitTestVisible="False" Panel.ZIndex="1"/>
-            <Border Grid.Column="6" CornerRadius="4" BorderThickness="1" BorderBrush="{DynamicResource PrimaryTextColor}" Margin="1,3">
-                <TextBox x:Name="tbxSum"
-                         Text="{Binding CurrentSaleItem.TotalAmount}"
-                         FontSize="14"
-                         IsReadOnly="True"
-                         BorderThickness="0"/>
-            </Border>
-
+            <controls:FloatingInput x:Name="tbxSum"
+                                    Grid.Column="6"
+                                    Label="Jami summa"
+                                    Text="{Binding CurrentSaleItem.TotalAmount, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="2 0" />
             <Button x:Name="addButton"
                     Grid.Column="7"
-                    Padding="0"
-                    Margin="2 3"
+                    Height="30"
+                    Margin=" 2 0 7 0"
                     Background="{DynamicResource OtherBackground}"
                     md:ButtonAssist.CornerRadius="4"
                     Content="Qo'shish"

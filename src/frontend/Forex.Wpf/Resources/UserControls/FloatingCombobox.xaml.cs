@@ -34,7 +34,7 @@ public partial class FloatingComboBox : UserControl
         set => SetValue(TextProperty, value);
     }
 
-    // ItemsSource (YANGI)
+    // ItemsSource
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(FloatingComboBox),
             new PropertyMetadata(null));
@@ -67,7 +67,30 @@ public partial class FloatingComboBox : UserControl
         set => SetValue(SelectedItemProperty, value);
     }
 
-    // (Ixtiyoriy) SelectedValue/SelectedValuePath passthrough — kerak bo‘lsa yoqing
+
+    // IsEditable
+    public static readonly DependencyProperty IsEditableProperty =
+        DependencyProperty.Register(nameof(IsEditable), typeof(object), typeof(FloatingComboBox),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+    public object? IsEditable
+    {
+        get => GetValue(IsEditableProperty);
+        set => SetValue(IsEditableProperty, value);
+    }
+
+    // IsTextSearchEnabled
+    public static readonly DependencyProperty IsTextSearchEnabledProperty =
+        DependencyProperty.Register(nameof(IsTextSearchEnabled), typeof(object), typeof(FloatingComboBox),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+    public object? IsTextSearchEnabled
+    {
+        get => GetValue(IsTextSearchEnabledProperty);
+        set => SetValue(IsTextSearchEnabledProperty, value);
+    }
+
+    // SelectedValue/SelectedValuePath passthrough — kerak bo‘lsa yoqing
     public static readonly DependencyProperty SelectedValuePathProperty =
         DependencyProperty.Register(nameof(SelectedValuePath), typeof(string), typeof(FloatingComboBox),
             new PropertyMetadata(string.Empty));
