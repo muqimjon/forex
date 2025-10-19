@@ -16,8 +16,50 @@ public partial class ProductViewModel : ViewModelBase
     [ObservableProperty] private UnitMeasuerViewModel measure = default!;
     [ObservableProperty] private ImageSource? image;
 
+    
     [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
-    [ObservableProperty] private ProductTypeViewModel productType = default!;
+    [ObservableProperty] private ProductTypeViewModel? selectedType;
+    [ObservableProperty] private int count;
+    [ObservableProperty] private int typeCount;
+    [ObservableProperty] private int totalCount;
+    [ObservableProperty] private decimal perPairRate;
+    [ObservableProperty] private decimal totalAmount;
+
+
+    partial void OnSelectedTypeChanged(ProductTypeViewModel? value)
+    {
+        Count = value?.Count ?? 0;
+    }
+
+    partial void OnTypeCountChanged(int oldValue, int newValue)
+    {
+        CalculateTotalCount();
+    }
+   
+    partial void OnCountChanged(int oldValue, int newValue)
+    {
+        CalculateTotalCount();
+    }
+
+    partial void OnTotalCountChanged(int oldValue, int newValue)
+    {
+        CalculateTotalAmount();
+    }
+    partial void OnPerPairRateChanged(decimal oldValue, decimal newValue)
+    {
+        CalculateTotalAmount();
+    }
+
+    private void CalculateTotalCount()
+    {
+        TotalCount = Count * TypeCount;
+    }
+
+    private void CalculateTotalAmount()
+    {
+        TotalAmount = PerPairRate * TotalCount;
+    }
+
 
     [RelayCommand]
     private void SelectImage()
@@ -53,11 +95,9 @@ public partial class ProductViewModel : ViewModelBase
                 Measure = value.Measure;
                 Image = value.Image;
 
-                ProductType = value.ProductType;
-
+                SelectedType = value.SelectedType;
                 ProductTypes = new ObservableCollection<ProductTypeViewModel>(value.ProductTypes ?? []);
             }
         }
     }
-
 }
