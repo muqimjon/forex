@@ -11,27 +11,36 @@
 
     <Grid>
         <!--  Floating label  -->
-        <TextBlock
-            Panel.ZIndex="1"
-            IsHitTestVisible="False"
-            Style="{StaticResource FloatingLabelStyle}"
-            Tag="{Binding ElementName=comboBox}"
-            Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <TextBlock FontSize="14"
+                   HorizontalAlignment="Center"
+                   Foreground="{DynamicResource PrimaryTextColor}"
+                   Style="{StaticResource FloatingLabelStyle}"
+                   Tag="{Binding ElementName=comboBox}"
+                   Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
         <!--  Inner ComboBox bound to the UserControl dependency properties  -->
-        <ComboBox
-            x:Name="comboBox"
-            Height="30"
-            Padding="4"
-            BorderBrush="Gray"
-            BorderThickness="1"
-            DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            DropDownOpened="ComboBox_DropDownOpened"
-            IsEditable="True"
-            ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-            SelectedValue="{Binding SelectedValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-            SelectedValuePath="{Binding SelectedValuePath, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Border CornerRadius="4"
+                BorderBrush="{DynamicResource PrimaryTextColor}"
+                BorderThickness="1"
+                Height="30"
+                Padding="5 0"
+                VerticalAlignment="Bottom">
+
+            <ComboBox x:Name="comboBox"
+                      VerticalContentAlignment="Center"
+                      Background="Transparent"
+                      FontSize="14"
+                      VerticalAlignment="Center"
+                      BorderThickness="0"
+                      DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      DropDownOpened="ComboBox_DropDownOpened"
+                      IsEditable="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      SelectedValue="{Binding SelectedValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      SelectedValuePath="{Binding SelectedValuePath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                          IsTextSearchEnabled="{Binding IsTextSearchEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" />
+        </Border>
     </Grid>
 </UserControl>
