@@ -13,23 +13,17 @@ public partial class ProductTypeViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> productTypeItems = [];
 
     // for UI only
-    [ObservableProperty] private bool isEditing;
-    [ObservableProperty] private bool isSelected;
-
     [ObservableProperty] private ProductViewModel product = default!;
-    private ProductViewModel? previousProduct;
+    private ProductTypeViewModel? selected;
+
+
+    #region Property Changes
+
     partial void OnProductChanged(ProductViewModel value)
     {
-        if (value is not null && !value.ProductTypes.Contains(this))
-        {
+        if (value is not null && value.ProductTypes is not null && !value.ProductTypes.Contains(this))
             value.ProductTypes.Add(this);
-        }
-
-        previousProduct = value;
     }
-
-
-    private ProductTypeViewModel? selected;
 
     public ProductTypeViewModel? Selected
     {
@@ -39,7 +33,6 @@ public partial class ProductTypeViewModel : ViewModelBase
             if (SetProperty(ref selected, value) && value is not null)
             {
                 Id = value.Id;
-                Product = value.Product;
                 Type = value.Type;
                 Count = value.Count;
                 Cost = value.Cost;
@@ -47,4 +40,6 @@ public partial class ProductTypeViewModel : ViewModelBase
             }
         }
     }
+
+    #endregion Property Changes
 }

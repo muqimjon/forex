@@ -1,7 +1,13 @@
 ﻿namespace Forex.ClientService.Models.Requests;
 
-public sealed record ContainerRequest
+public sealed record ProductEntryRequest
 {
-    public long Count { get; set; }
-    public decimal Price { get; set; }
+    public long Id { get; set; }
+    public int Count { get; set; }
+    public decimal CostPrice { get; set; }     // tannarxi
+    public decimal CostPreparation { get; set; }  // tayyorlashga ketgan xarajat summasi
+
+    public long ProductTypeId { get; set; }
+    public long ShopId { get; set; }
+    public long EmployeeId { get; set; }
 }

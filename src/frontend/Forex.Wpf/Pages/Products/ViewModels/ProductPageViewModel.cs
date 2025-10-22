@@ -10,40 +10,79 @@ using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
-using System.Windows;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
 public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : ViewModelBase
 {
-    [ObservableProperty] private ObservableCollection<UserViewModel> employees = [];
+
+    [ObservableProperty] private int count;
+    [ObservableProperty] private decimal totalCount;
+    [ObservableProperty] private decimal costPreparation;
+    [ObservableProperty] private decimal totalAmount;
+
     [ObservableProperty] private ObservableCollection<UserViewModel> availableEmployees = [];
+    [ObservableProperty] private ObservableCollection<UserViewModel> employees = [];
     private UserViewModel? selectedEmployee;
 
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
-    [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
-    [ObservableProperty] private ObservableCollection<ProductViewModel> filteredProducts = [];
-    [ObservableProperty] private string productName = string.Empty;
-
-    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
+    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> availableProductTypes = [];
+    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> filteredProductTypes = [];
+    [ObservableProperty] private ProductTypeViewModel? selectedProductType;
 
 
-    private ProductViewModel? selectedProduct;
-    [ObservableProperty] private Visibility detailTextVisibility = Visibility.Collapsed;
+    #region Commands
 
-    public ProductViewModel? SelectedProduct
+    [RelayCommand]
+    private void AddEmployee() => Employees.Add(new());
+
+    [RelayCommand]
+    private void DeleteEmployee(UserViewModel user)
     {
-        get => selectedProduct;
-        set
-        {
-            if (SetProperty(ref selectedProduct, value))
-            {
-                ProductName = selectedProduct?.Name ?? string.Empty;
-                DetailTextVisibility =
-                    string.IsNullOrEmpty(selectedProduct?.Name)
-                    ? Visibility.Collapsed
-                    : Visibility.Visible;
-            }
-        }
+        if (user is null)
+            return;
+
+        if (user.PreparedProductTypes is not null && user.PreparedProductTypes.Any())
+            foreach (var type in user.PreparedProductTypes)
+                RemoveProductType(type);
+
+        Employees.Remove(user);
+
+        if (user == SelectedEmployee)
+            SelectedEmployee = null!;
+
+        UpdateProducts();
     }
+
+    [RelayCommand]
+    private void ShowAllProducts() => SelectedEmployee = null!;
+
+    [RelayCommand]
+    private void AddProduct()
+    {
+        if (SelectedEmployee is null || string.IsNullOrEmpty(SelectedEmployee.Name))
+        {
+            WarningMessage = "Hodim tanla";
+            return;
+        }
+
+        ProductTypeViewModel type = new();
+        type.PropertyChanged += ProductTypePropertyChanged;
+        FilteredProductTypes.Add(type);
+    }
+
+    [RelayCommand]
+    private void DeleteProduct(ProductTypeViewModel type)
+    {
+        if (type is null || SelectedEmployee is null)
+            return;
+
+        RemoveProductType(type);
+    }
+
+    #endregion Commands
+
+    #region Load Data
 
     public async Task InitializeAsync()
     {
@@ -51,7 +90,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         await LoadProductsAsync();
 
         Employees.Add(new UserViewModel { });
-        UpdateProducts();
     }
 
     public async Task LoadEmployeesAsync()
@@ -81,84 +119,41 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         {
             Filters = new()
             {
-                ["unitMeasure"] = ["include"],
-                ["productTypes"] = ["include:productTypeItems.semiProduct.unitMeasure"]
+                ["unitMeasure"] = ["include"]
             }
         };
 
         var response = await Client.Products.Filter(request)
             .Handle(isLoading => IsLoading = isLoading);
 
-        if (response.IsSuccess && response.Data != null)
-        {
+        if (response.IsSuccess)
             AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
-        }
-        else
+        else WarningMessage = "Mahsulotlarni yuklashda xatolik.";
+    }
+
+    private async Task LoadTypesAsync(ProductTypeViewModel type)
+    {
+        FilteringRequest request = new()
         {
-            WarningMessage = "Mahsulotlarni yuklashda xatolik.";
-        }
-
-    }
-
-    [RelayCommand]
-    private void AddEmployee()
-    {
-        Employees.Add(new UserViewModel { });
-    }
-
-    [RelayCommand]
-    private void ShowAllProducts()
-    {
-        SelectedEmployee = null!;
-    }
-
-    [RelayCommand]
-    private void AddProduct()
-    {
-        if (SelectedEmployee == null || string.IsNullOrEmpty(SelectedEmployee.Name)) 
-        {
-            WarningMessage = "Hodim tanla";
-            return;
-        }
-        var product = new ProductViewModel();
-        Products.Add(product);
-        SelectedEmployee.PreparedProducts.Add(product);
-        FilteredProducts.Add(product);
-    }
-
-    [RelayCommand]
-    private void DeleteUser(UserViewModel user)
-    {
-        if (user == null)
-            return;
-
-        // 🔹 Avval hodimga tegishli mahsulotlarni o‘chir
-        if (user.PreparedProducts != null && user.PreparedProducts.Any())
-        {
-            foreach (var product in user.PreparedProducts.ToList())
+            Filters = new()
             {
-                Products.Remove(product); // umumiy ro‘yxatdan o‘chir
+                ["productid"] = [type.Product.Id.ToString()]
             }
-        }
-        // 🔹 Keyin hodimni o‘chir
-        Employees.Remove(user);
+        };
 
-        // 🔹 Agar o‘chirilgan hodim tanlangan bo‘lsa, uni tozalaymiz
-        if (user == SelectedEmployee)
-            SelectedEmployee = null!;
-
-        // 🔹 Filter yangilansin
-        UpdateProducts();
+        var response = await Client.ProductType.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        if (response.IsSuccess)
+            AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
+        else ErrorMessage = response.Message ?? "Mahsulot o'lchamlarini yuklashda xatolik!";
     }
 
-    [RelayCommand]
-    private void DeleteProduct(ProductViewModel product)
+    #endregion Load Data
+
+    #region Property Changes
+
+    partial void OnCountChanged(int value)
     {
-        if (product == null || SelectedEmployee == null)
-            return;
-        SelectedEmployee.PreparedProducts.Remove(product);
-        Products.Remove(product);
-        FilteredProducts.Remove(product);
+        TotalCount = SelectedEmployee.PreparedProductTypes.Sum(t => t.Count ?? 0);
     }
 
     public UserViewModel SelectedEmployee
@@ -174,17 +169,40 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             }
         }
     }
+
+    private void ProductTypePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not ProductTypeViewModel type)
+            return;
+
+        if (e.PropertyName == nameof(ProductTypeViewModel.Product))
+        {
+            if (SelectedEmployee is not null)
+                _ = LoadTypesAsync(type);
+        }
+        else if (e.PropertyName == nameof(ProductTypeViewModel.Type))
+            SelectedEmployee.PreparedProductTypes.Add(type);
+    }
+
+    #endregion Property Changes
+
+    #region Provate Helpers
+
     private void UpdateProducts()
     {
-        FilteredProducts.Clear();
+        FilteredProductTypes.Clear();
 
         if (SelectedEmployee is null)
-        {
-            FilteredProducts.AddRange(Products);
-        }
-        else
-        {
-            FilteredProducts.AddRange(SelectedEmployee.PreparedProducts);
-        }
+            FilteredProductTypes.AddRange(Employees.SelectMany(e => e.PreparedProductTypes));
+        else FilteredProductTypes.AddRange(SelectedEmployee.PreparedProductTypes);
     }
+
+    private void RemoveProductType(ProductTypeViewModel type)
+    {
+        SelectedEmployee?.PreparedProductTypes.Remove(type);
+        type.Product.ProductTypes.Remove(type);
+        FilteredProductTypes.Remove(type);
+    }
+
+    #endregion Provate Helpers
 }

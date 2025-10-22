@@ -5,7 +5,7 @@ using Forex.Wpf.Pages.Common;
 
 public partial class CurrencyViewModel : ViewModelBase
 {
-    public long Id { get; set; }
+    public long Id;
     [ObservableProperty] private string name = string.Empty;
     [ObservableProperty] private string code = string.Empty;
     [ObservableProperty] private string symbol = string.Empty;

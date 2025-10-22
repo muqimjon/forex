@@ -12,4 +12,8 @@ public class ProductTypesController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetAll() =>
         Ok(new Response { Data = await Mediator.Send(new GetAllProductTypesQuery()) });
+
+    [HttpPost("filter")]
+    public async Task<IActionResult> GetFiltered(ProductTypeFilterQuery query)
+        => Ok(new Response { Data = await Mediator.Send(query) });
 }
