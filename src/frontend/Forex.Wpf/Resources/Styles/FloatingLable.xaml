@@ -13,7 +13,7 @@
         <Style.Triggers>
             <!--  When the text is not empty  -->
             <DataTrigger Binding="{Binding Tag.Text, RelativeSource={RelativeSource Self}, Converter={StaticResource StringIsNotEmptyConverter}}" Value="True">
-                
+
                 <Setter Property="VerticalAlignment" Value="Top" />
                 <Setter Property="Margin" Value="0,-18,0,0" />
             </DataTrigger>

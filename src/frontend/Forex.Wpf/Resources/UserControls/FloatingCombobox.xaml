@@ -11,36 +11,39 @@
 
     <Grid>
         <!--  Floating label  -->
-        <TextBlock FontSize="14"
-                   HorizontalAlignment="Center"
-                   Foreground="{DynamicResource PrimaryTextColor}"
-                   Style="{StaticResource FloatingLabelStyle}"
-                   Tag="{Binding ElementName=comboBox}"
-                   Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <TextBlock
+            HorizontalAlignment="Center"
+            FontSize="14"
+            Foreground="{DynamicResource PrimaryTextColor}"
+            Style="{StaticResource FloatingLabelStyle}"
+            Tag="{Binding ElementName=comboBox}"
+            Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
         <!--  Inner ComboBox bound to the UserControl dependency properties  -->
-        <Border CornerRadius="4"
-                BorderBrush="{DynamicResource PrimaryTextColor}"
-                BorderThickness="1"
-                Height="30"
-                Padding="5 0"
-                VerticalAlignment="Bottom">
+        <Border
+            Height="30"
+            Padding="5,0"
+            VerticalAlignment="Bottom"
+            BorderBrush="{DynamicResource PrimaryTextColor}"
+            BorderThickness="1"
+            CornerRadius="4">
 
-            <ComboBox x:Name="comboBox"
-                      VerticalContentAlignment="Center"
-                      Background="Transparent"
-                      FontSize="14"
-                      VerticalAlignment="Center"
-                      BorderThickness="0"
-                      DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      DropDownOpened="ComboBox_DropDownOpened"
-                      IsEditable="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      SelectedValue="{Binding SelectedValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      SelectedValuePath="{Binding SelectedValuePath, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
-                          IsTextSearchEnabled="{Binding IsTextSearchEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox
+                x:Name="comboBox"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                DropDownOpened="ComboBox_DropDownOpened"
+                FontSize="14"
+                IsEditable="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                IsTextSearchEnabled="{Binding IsTextSearchEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                SelectedValue="{Binding SelectedValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                SelectedValuePath="{Binding SelectedValuePath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" />
         </Border>
     </Grid>
 </UserControl>

@@ -4,9 +4,9 @@ using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Responses;
 using Refit;
 
-public interface IApiProductTypes
+public interface IApiProductTypeItems
 
 {
-    [Get("/product-types")]
-    Task<Response<List<ProductTypeResponse>>> GetAll();
+    [Get("/product-type-items")]
+    Task<Response<List<ProductTypeItemResponse>>> GetAll();
 }

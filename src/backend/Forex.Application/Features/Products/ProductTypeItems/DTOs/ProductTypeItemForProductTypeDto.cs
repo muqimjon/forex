@@ -10,5 +10,5 @@ public sealed record ProductTypeItemForProductTypeDto
     public long ProductTypeId { get; set; }
 
     public long SemiProductId { get; set; }
-    public SemiProductDto SemiProduct { get; set; } = default!;
+    public SemiProductForProductTypeItemDto SemiProduct { get; set; } = default!;
 }

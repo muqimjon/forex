@@ -23,6 +23,9 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
     [ObservableProperty] private ObservableCollection<ProductViewModel> filteredProducts = [];
     [ObservableProperty] private string productName = string.Empty;
 
+    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
+
+
     private ProductViewModel? selectedProduct;
     [ObservableProperty] private Visibility detailTextVisibility = Visibility.Collapsed;
 
@@ -51,7 +54,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         UpdateProducts();
     }
 
- 
     public async Task LoadEmployeesAsync()
     {
         FilteringRequest request = new()
@@ -72,7 +74,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             WarningMessage = response.Message ?? "Hodimlarni yuklashda xatolik.";
     }
 
-
     public async Task LoadProductsAsync()
     {
 
@@ -80,7 +81,8 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         {
             Filters = new()
             {
-                ["productTypes"] = ["include"]
+                ["unitMeasure"] = ["include"],
+                ["productTypes"] = ["include:productTypeItems.semiProduct.unitMeasure"]
             }
         };
 
@@ -113,7 +115,7 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
     [RelayCommand]
     private void AddProduct()
     {
-        if (string.IsNullOrEmpty(SelectedEmployee.Name))
+        if (SelectedEmployee == null || string.IsNullOrEmpty(SelectedEmployee.Name)) 
         {
             WarningMessage = "Hodim tanla";
             return;

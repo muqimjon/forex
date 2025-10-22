@@ -423,23 +423,53 @@
                                Margin="5,2,0,0"
                                Visibility="{Binding DetailTextVisibility}"/>
 
-                    <ListView ItemsSource="{Binding SelectedProduct.SemiFinishedProducts}"
-                              Margin="5"
+                    <ListView ItemsSource="{Binding FilteredProductTypeItems}"
+                              Margin="0"
                               BorderThickness="1"
                               BorderBrush="#DDD"
                               Background="White"
                               Height="200">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Mahsulot"
-                                                DisplayMemberBinding="{Binding Name}"
-                                                Width="auto"/>
-                                <GridViewColumn Header="Miqdori"
-                                                DisplayMemberBinding="{Binding Count}"
-                                                Width="auto"/>
-                                <GridViewColumn Header="O‘lchov birligi"
-                                                DisplayMemberBinding="{Binding Measure}"
-                                                Width="auto"/>
+                                <GridViewColumn Header="Mahsulot">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding SemiProductViewModel.Name}"
+                                                       Foreground="Black"
+                                                       FontSize="14"
+                                                       VerticalAlignment="Center"
+                                                       Padding="0"
+                                                       HorizontalAlignment="Center"/>
+
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Miqdori">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Count}"
+                                                        Foreground="Black"
+                                                       Padding="0"
+ FontSize="14"
+ VerticalAlignment="Center"
+ HorizontalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="O‘lchov birligi">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Measure.Name}" 
+                                                        Foreground="Red"
+                                                       Padding="0"
+ FontSize="14"
+ VerticalAlignment="Center"
+ HorizontalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                             </GridView>
                         </ListView.View>
                     </ListView>

@@ -9,34 +9,34 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 /// <summary>
-    /// Interaction logic for SalePage.xaml
+/// Interaction logic for SalePage.xaml
 /// </summary>
 public partial class SalePage : Page
 {
-private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
+    private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
     private SaleViewModel vm;
 
     public SalePage()
     {
-    InitializeComponent();
-    vm = App.AppHost!.Services.GetRequiredService<SaleViewModel>();
+        InitializeComponent();
+        vm = App.AppHost!.Services.GetRequiredService<SaleViewModel>();
         DataContext = vm;
         _ = vm.LoadUsersAsync();
         btnBack.Click += BtnBack_Click;
         vm.RequestNewCustomer += Vm_RequestNewCustomer;
         supplyDate.SelectedDate = DateTime.Now;
-        }
+    }
 
-        private void BtnBack_Click(object sender, RoutedEventArgs e)
-        {
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
         if (NavigationService?.CanGoBack == true)
-        NavigationService.GoBack();
+            NavigationService.GoBack();
         else
-        Main.NavigateTo(new HomePage());
-        }
+            Main.NavigateTo(new HomePage());
+    }
 
-        private async void Vm_RequestNewCustomer(object? sender, string name)
-        {
+    private async void Vm_RequestNewCustomer(object? sender, string name)
+    {
         var result = MessageBox.Show(
         $"“{name}” nomli mijoz topilmadi.\nYangi mijoz qo‘shmoqchimisiz?",
         "Yangi mijoz",
@@ -45,32 +45,32 @@ private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
 
         if (result == MessageBoxResult.Yes)
         {
-        var userWindow = new UserWindow();
-        userWindow.Owner = Application.Current.MainWindow;
-        bool? dialogResult = userWindow.ShowDialog();
+            var userWindow = new UserWindow();
+            userWindow.Owner = Application.Current.MainWindow;
+            bool? dialogResult = userWindow.ShowDialog();
 
-        if (dialogResult == true && sender is SaleViewModel vm)
+            if (dialogResult == true && sender is SaleViewModel vm)
+            {
+                await vm.LoadUsersAsync();
+                vm.SelectedCustomer = vm.Customers
+        .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            }
+        }
+    }
+
+    private void ComboBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if ((e.Key == Key.Enter || e.Key == Key.Tab) && DataContext is SaleViewModel vm)
         {
-        await vm.LoadUsersAsync();
-        vm.SelectedCustomer = vm.Customers
-.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            }
-            }
-            }
-
-            private void ComboBox_KeyDown(object sender, KeyEventArgs e)
-            {
-            if ((e.Key == Key.Enter || e.Key == Key.Tab) && DataContext is SaleViewModel vm)
-            {
             string text = ((ComboBox)sender).Text?.Trim() ?? "";
             vm.CheckCustomerNameCommand.Execute(text);
-            }
-            }
-            private void ComboBox_GotFocus(object sender, RoutedEventArgs e)
-            {
-            if (sender is ComboBox comboBox)
-            {
+        }
+    }
+    private void ComboBox_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is ComboBox comboBox)
+        {
             comboBox.IsDropDownOpen = true;
-            }
-            }
-            }
+        }
+    }
+}

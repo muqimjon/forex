@@ -1,7 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.Wpf.Pages.Common;
-
+using Forex.Wpf.ViewModels;
 
 public partial class SaleItemViewModel : ViewModelBase
 {
@@ -12,9 +12,10 @@ public partial class SaleItemViewModel : ViewModelBase
     [ObservableProperty] private int? count;   // jami necha dona sotilayotgani typeCount * countOfType yoki typeCount * 6
     [ObservableProperty] private decimal? price;
     [ObservableProperty] private decimal? totalAmount;
+    [ObservableProperty] private ProductViewModel? product;
 
-    [ObservableProperty] private int? countOfType = 1;
-    private readonly int? residueOfType = 20;
+    [ObservableProperty] private int? countOfType = 6;
+    private readonly int? residueOfType = 50;
 
     partial void OnCountOfTypeChanged(int? value)
         => RecalculateQuantity();
