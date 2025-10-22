@@ -1,119 +1,139 @@
-﻿<Page x:Class="Forex.Wpf.Pages.Auth.RegisterPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:local="clr-namespace:Forex.Wpf.Pages.Auth"
-      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
-      mc:Ignorable="d" 
-      d:DesignHeight="550" d:DesignWidth="500"
-      Title="RegisterPage"
-      Loaded="Page_Loaded">
+﻿<Page
+    x:Class="Forex.Wpf.Pages.Auth.RegisterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Forex.Wpf.Pages.Auth"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="RegisterPage"
+    d:DesignHeight="550"
+    d:DesignWidth="500"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
 
     <Grid Background="#1E1E2F">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border x:Name="RegisterPanel"
-                Width="400"
-                Padding="20"
-                Background="#2D2D44"
-                CornerRadius="12"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Opacity="0"
-                Effect="{DynamicResource MaterialDesignElevationShadow8}">
+        <Border
+            x:Name="RegisterPanel"
+            Width="400"
+            Padding="20"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="#2D2D44"
+            CornerRadius="12"
+            Effect="{DynamicResource MaterialDesignElevationShadow8}"
+            Opacity="0">
             <StackPanel>
-                <TextBlock Text="Create account 📝" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+                <TextBlock
+                    Margin="0,0,0,20"
+                    FontSize="24"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    Text="Create account 📝" />
 
-                <TextBox x:Name="tbName"
-                         FontSize="16"
-                         Margin="0,0,0,10"
-                         Padding="8"
-                         md:HintAssist.Hint="Full name"
-                         BorderThickness="0"
-                         Background="#3A3A55"
-                         Foreground="White"/>
+                <TextBox
+                    x:Name="tbName"
+                    Margin="0,0,0,10"
+                    Padding="8"
+                    md:HintAssist.Hint="Full name"
+                    Background="#3A3A55"
+                    BorderThickness="0"
+                    FontSize="16"
+                    Foreground="White" />
 
-                <TextBox x:Name="tbEmail"
-                         FontSize="16"
-                         Margin="0,0,0,10"
-                         Padding="8"
-                         md:HintAssist.Hint="Email"
-                         BorderThickness="0"
-                         Background="#3A3A55"
-                         Foreground="White"/>
+                <TextBox
+                    x:Name="tbEmail"
+                    Margin="0,0,0,10"
+                    Padding="8"
+                    md:HintAssist.Hint="Email"
+                    Background="#3A3A55"
+                    BorderThickness="0"
+                    FontSize="16"
+                    Foreground="White" />
 
-                <TextBox x:Name="tbPhone"
-                         FontSize="16"
-                         Margin="0,0,0,10"
-                         Padding="8"
-                         md:HintAssist.Hint="Phone"
-                         BorderThickness="0"
-                         Background="#3A3A55"
-                         Foreground="White"/>
+                <TextBox
+                    x:Name="tbPhone"
+                    Margin="0,0,0,10"
+                    Padding="8"
+                    md:HintAssist.Hint="Phone"
+                    Background="#3A3A55"
+                    BorderThickness="0"
+                    FontSize="16"
+                    Foreground="White" />
 
-                <PasswordBox x:Name="pbPassword"
-                             FontSize="16"
-                             Margin="0,0,0,10"
-                             Padding="8"
-                             md:HintAssist.Hint="Password"
-                             BorderThickness="0"
-                             Background="#3A3A55"
-                             Foreground="White"/>
+                <PasswordBox
+                    x:Name="pbPassword"
+                    Margin="0,0,0,10"
+                    Padding="8"
+                    md:HintAssist.Hint="Password"
+                    Background="#3A3A55"
+                    BorderThickness="0"
+                    FontSize="16"
+                    Foreground="White" />
 
-                <PasswordBox x:Name="pbConfirm"
-                             FontSize="16"
-                             Margin="0,0,0,10"
-                             Padding="8"
-                             md:HintAssist.Hint="Confirm password"
-                             BorderThickness="0"
-                             Background="#3A3A55"
-                             Foreground="White"/>
+                <PasswordBox
+                    x:Name="pbConfirm"
+                    Margin="0,0,0,10"
+                    Padding="8"
+                    md:HintAssist.Hint="Confirm password"
+                    Background="#3A3A55"
+                    BorderThickness="0"
+                    FontSize="16"
+                    Foreground="White" />
 
-                <Button x:Name="btnRegister"
-                        Content="📝 Register"
-                        Background="#4C8EF7"
-                        Foreground="White"
-                        FontWeight="Bold"
-                        Padding="8"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}"
-                        BorderThickness="0"
-                        md:ButtonAssist.CornerRadius="6"
-                        Click="BtnRegister_Click"/>
+                <Button
+                    x:Name="btnRegister"
+                    Padding="8"
+                    md:ButtonAssist.CornerRadius="6"
+                    Background="#4C8EF7"
+                    BorderThickness="0"
+                    Click="BtnRegister_Click"
+                    Content="📝 Register"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}" />
 
-                <Button x:Name="btnGoLogin"
-                        Content="Back to login"
-                        Background="Transparent"
-                        Foreground="#AABBDD"
-                        BorderThickness="0"
-                        Margin="0,10,0,0"
-                        Click="BtnGoLogin_Click"/>
+                <Button
+                    x:Name="btnGoLogin"
+                    Margin="0,10,0,0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="BtnGoLogin_Click"
+                    Content="Back to login"
+                    Foreground="#AABBDD" />
 
-                <TextBlock x:Name="lblError"
-                           Foreground="Crimson"
-                           Visibility="Collapsed"
-                           Margin="0,10,0,0"
-                           TextWrapping="Wrap"/>
+                <TextBlock
+                    x:Name="lblError"
+                    Margin="0,10,0,0"
+                    Foreground="Crimson"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
 
-                <TextBlock x:Name="lblOk"
-                           Foreground="LightGreen"
-                           Visibility="Collapsed"
-                           Margin="0,5,0,0"
-                           TextWrapping="Wrap"/>
+                <TextBlock
+                    x:Name="lblOk"
+                    Margin="0,5,0,0"
+                    Foreground="LightGreen"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
             </StackPanel>
         </Border>
 
-        <!-- Animatsiya -->
+        <!--  Animatsiya  -->
         <Grid.Triggers>
             <EventTrigger RoutedEvent="Grid.Loaded">
                 <BeginStoryboard>
                     <Storyboard>
-                        <DoubleAnimation Storyboard.TargetName="RegisterPanel"
-                                         Storyboard.TargetProperty="Opacity"
-                                         From="0" To="1" Duration="0:0:1"/>
+                        <DoubleAnimation
+                            Storyboard.TargetName="RegisterPanel"
+                            Storyboard.TargetProperty="Opacity"
+                            From="0"
+                            To="1"
+                            Duration="0:0:1" />
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger>

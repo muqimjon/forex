@@ -1,38 +1,42 @@
-﻿<UserControl x:Class="Forex.Wpf.Resources.UserControls.FloatingInput"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             Height="30"
-             d:DesignHeight="32"
-             d:DesignWidth="100"
-             mc:Ignorable="d">
+﻿<UserControl
+    x:Class="Forex.Wpf.Resources.UserControls.FloatingInput"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Height="30"
+    d:DesignHeight="32"
+    d:DesignWidth="100"
+    mc:Ignorable="d">
 
     <Grid>
         <!--  Floating label  -->
-        <TextBlock FontSize="14"
-                   HorizontalAlignment="Center"
-                   Foreground="{DynamicResource PrimaryTextColor}"
-                   Style="{StaticResource FloatingLabelStyle}"
-                   Tag="{Binding ElementName=inputBox}"
-                   Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        <TextBlock
+            HorizontalAlignment="Center"
+            FontSize="14"
+            Foreground="{DynamicResource PrimaryTextColor}"
+            Style="{StaticResource FloatingLabelStyle}"
+            Tag="{Binding ElementName=inputBox}"
+            Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
         <!--  Input  -->
-        <Border CornerRadius="4"
-                BorderBrush="{DynamicResource PrimaryTextColor}"
-                BorderThickness="1"
-                Height="30"
-                Padding="5 0"
-                VerticalAlignment="Bottom">
-            
-            <TextBox x:Name="inputBox"
-                     VerticalContentAlignment="Center"
-                     Background="Transparent"
-                     FontSize="14"
-                     VerticalAlignment="Center"
-                     BorderThickness="0"
-                     Style="{x:Null}"
-                     Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Border
+            Height="30"
+            Padding="5,0"
+            VerticalAlignment="Bottom"
+            BorderBrush="{DynamicResource PrimaryTextColor}"
+            BorderThickness="1"
+            CornerRadius="4">
+
+            <TextBox
+                x:Name="inputBox"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                FontSize="14"
+                Style="{x:Null}"
+                Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </Border>
     </Grid>
 </UserControl>

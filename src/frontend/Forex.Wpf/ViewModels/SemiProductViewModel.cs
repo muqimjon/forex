@@ -10,8 +10,8 @@ using System.Windows.Media.Imaging;
 public partial class SemiProductViewModel : ViewModelBase
 {
     public long Id { get; set; }
-    [ObservableProperty] private string? name;
-    [ObservableProperty] private UnitMeasuerViewModel measure = default!;
+    [ObservableProperty] public string? name;
+    [ObservableProperty] public UnitMeasuerViewModel measure = default!;
     [ObservableProperty] private ImageSource? image;
     [ObservableProperty] private decimal quantity;
     [ObservableProperty] private decimal costPrice;

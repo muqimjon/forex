@@ -38,10 +38,10 @@ public partial class SalePage : Page
     private async void Vm_RequestNewCustomer(object? sender, string name)
     {
         var result = MessageBox.Show(
-            $"“{name}” nomli mijoz topilmadi.\nYangi mijoz qo‘shmoqchimisiz?",
-            "Yangi mijoz",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+        $"“{name}” nomli mijoz topilmadi.\nYangi mijoz qo‘shmoqchimisiz?",
+        "Yangi mijoz",
+        MessageBoxButton.YesNo,
+        MessageBoxImage.Question);
 
         if (result == MessageBoxResult.Yes)
         {
@@ -53,7 +53,7 @@ public partial class SalePage : Page
             {
                 await vm.LoadUsersAsync();
                 vm.SelectedCustomer = vm.Customers
-                    .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             }
         }
     }

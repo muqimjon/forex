@@ -7,8 +7,8 @@ public record ProductResponse
     public int Code { get; set; }
     public string PhotoPath { get; set; } = string.Empty;
 
-    public long MeasureId { get; set; }
-    public UnitMeasureResponse Measure { get; set; } = default!;
+    public long UnitMeasureId { get; set; }
+    public UnitMeasureResponse UnitMeasure { get; set; } = default!;
     public ICollection<ProductTypeResponse> ProductTypes { get; set; } = default!;
 
 }

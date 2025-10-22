@@ -11,7 +11,7 @@ public class SemiProduct : Auditable
     public string? ImagePath { get; set; }
 
     public long UnitMeasureId { get; set; }
-    public UnitMeasure UnitMeasuer { get; set; } = default!;
+    public UnitMeasure UnitMeasure { get; set; } = default!;
 
     public ICollection<ProductTypeItem>? ProductTypeItem { get; set; }
     public ICollection<SemiProductResidue> SemiProductResidues { get; set; } = default!;

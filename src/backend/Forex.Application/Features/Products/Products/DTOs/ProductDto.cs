@@ -2,6 +2,7 @@
 
 using Forex.Application.Features.Products.ProductTypes.DTOs;
 using Forex.Application.Features.UnitMeasures.DTOs;
+using Forex.Domain.Entities;
 
 public sealed record ProductDto
 {
@@ -10,8 +11,9 @@ public sealed record ProductDto
     public int Code { get; set; }  // mahsulot kodi 101 misol uchun
     public string? ImagePath { get; set; } = string.Empty;
 
-    public long MeasureId { get; set; }
-    public UnitMeasureDto Measure { get; set; } = default!;
+    public long UnitMeasureId { get; set; }
+    public UnitMeasure UnitMeasure { get; set; } = default!;
 
-    public ICollection<ProductTypeDto> ProductTypes { get; set; } = default!;
+
+    public ICollection<ProductTypeForProductDto> ProductTypes { get; set; } = default!;
 }

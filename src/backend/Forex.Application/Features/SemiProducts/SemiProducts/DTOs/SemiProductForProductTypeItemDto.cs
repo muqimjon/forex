@@ -11,7 +11,7 @@ public sealed record SemiProductForProductTypeItemDto
     public string? ImagePath { get; set; }
 
     public long UnitMeasureId { get; set; }
-    public UnitMeasureDto UnitMeasuer { get; set; } = default!;
+    public UnitMeasureDto UnitMeasure { get; set; } = default!;
 
     public ICollection<SemiProductResidueForSemiProdutDto> SemiProductResidues { get; set; } = default!;
     public ICollection<SemiProductEntryForSemiProductDto> SemiProductEntries { get; set; } = default!;

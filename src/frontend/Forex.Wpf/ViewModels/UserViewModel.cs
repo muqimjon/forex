@@ -21,8 +21,9 @@ public partial class UserViewModel : ViewModelBase
     partial void OnAccountsChanged(ObservableCollection<UserAccountViewModel> value)
     {
         if (accounts.Any())
-            Balance = accounts.Where(x => x.Currency is not null)
-                .Select(x => x.Balance * x.Currency.ExchangeRate).Sum();
+            Balance = accounts
+                .Where(x => x.Currency is not null && x.Currency.Symbol == "Uzs")
+                .Sum(x => x.Balance);
     }
 
 

@@ -10,6 +10,7 @@ using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : ViewModelBase
 {
@@ -20,6 +21,29 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> filteredProducts = [];
+    [ObservableProperty] private string productName = string.Empty;
+
+    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
+
+
+    private ProductViewModel? selectedProduct;
+    [ObservableProperty] private Visibility detailTextVisibility = Visibility.Collapsed;
+
+    public ProductViewModel? SelectedProduct
+    {
+        get => selectedProduct;
+        set
+        {
+            if (SetProperty(ref selectedProduct, value))
+            {
+                ProductName = selectedProduct?.Name ?? string.Empty;
+                DetailTextVisibility =
+                    string.IsNullOrEmpty(selectedProduct?.Name)
+                    ? Visibility.Collapsed
+                    : Visibility.Visible;
+            }
+        }
+    }
 
     public async Task InitializeAsync()
     {
@@ -29,7 +53,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         Employees.Add(new UserViewModel { });
         UpdateProducts();
     }
-
 
     public async Task LoadEmployeesAsync()
     {
@@ -51,7 +74,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             WarningMessage = response.Message ?? "Hodimlarni yuklashda xatolik.";
     }
 
-
     public async Task LoadProductsAsync()
     {
 
@@ -59,7 +81,8 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         {
             Filters = new()
             {
-                ["productTypes"] = ["include"]
+                ["unitMeasure"] = ["include"],
+                ["productTypes"] = ["include:productTypeItems.semiProduct.unitMeasure"]
             }
         };
 
@@ -92,13 +115,50 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
     [RelayCommand]
     private void AddProduct()
     {
-        if (selectedEmployee == null)
+        if (SelectedEmployee == null || string.IsNullOrEmpty(SelectedEmployee.Name)) 
         {
             WarningMessage = "Hodim tanla";
             return;
         }
+        var product = new ProductViewModel();
+        Products.Add(product);
+        SelectedEmployee.PreparedProducts.Add(product);
+        FilteredProducts.Add(product);
+    }
 
-        FilteredProducts.Add(new ProductViewModel());
+    [RelayCommand]
+    private void DeleteUser(UserViewModel user)
+    {
+        if (user == null)
+            return;
+
+        // 🔹 Avval hodimga tegishli mahsulotlarni o‘chir
+        if (user.PreparedProducts != null && user.PreparedProducts.Any())
+        {
+            foreach (var product in user.PreparedProducts.ToList())
+            {
+                Products.Remove(product); // umumiy ro‘yxatdan o‘chir
+            }
+        }
+        // 🔹 Keyin hodimni o‘chir
+        Employees.Remove(user);
+
+        // 🔹 Agar o‘chirilgan hodim tanlangan bo‘lsa, uni tozalaymiz
+        if (user == SelectedEmployee)
+            SelectedEmployee = null!;
+
+        // 🔹 Filter yangilansin
+        UpdateProducts();
+    }
+
+    [RelayCommand]
+    private void DeleteProduct(ProductViewModel product)
+    {
+        if (product == null || SelectedEmployee == null)
+            return;
+        SelectedEmployee.PreparedProducts.Remove(product);
+        Products.Remove(product);
+        FilteredProducts.Remove(product);
     }
 
     public UserViewModel SelectedEmployee
@@ -114,7 +174,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             }
         }
     }
-
     private void UpdateProducts()
     {
         FilteredProducts.Clear();

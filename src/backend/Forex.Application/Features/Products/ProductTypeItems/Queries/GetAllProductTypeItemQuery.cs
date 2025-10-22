@@ -1,0 +1,26 @@
+﻿namespace Forex.Application.Features.Products.ProductTypeItems.Queries;
+
+using AutoMapper;
+using Forex.Application.Commons.Interfaces;
+using Forex.Application.Features.Products.ProductTypeItems.DTOs;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+public record GetAllProductTypeItemQuery(): IRequest<IReadOnlyCollection<ProductTypeItemDto>>;
+
+public class GetAllProductTypeItemHandler(
+    IAppDbContext context,
+    IMapper mapper)
+    : IRequestHandler<GetAllProductTypeItemQuery, IReadOnlyCollection<ProductTypeItemDto>>
+{
+    public async Task<IReadOnlyCollection<ProductTypeItemDto>> Handle(GetAllProductTypeItemQuery request, CancellationToken cancellationToken)
+  => mapper.Map<IReadOnlyCollection<ProductTypeItemDto>>(await context.ProductItems.AsNoTracking()
+      .Include(a=>a.SemiProduct)  
+        .ThenInclude(sp=>sp.UnitMeasure)
+      .ToListAsync(cancellationToken));
+}

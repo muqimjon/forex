@@ -14,24 +14,34 @@
         </Grid.ColumnDefinitions>
 
         <!--  TextBox taraf  -->
-        <Border Background="Transparent" CornerRadius="4 0 0 4" BorderBrush="Black" BorderThickness="1 1 0 1">
-            <TextBox x:Name="dateTextBox"
-                     Padding="0"
-                     HorizontalAlignment="Center"
-                     md:HintAssist.Hint="{Binding Hint, RelativeSource={RelativeSource AncestorType=local:UserCalendar}}"
-                     BorderThickness="0" />
+        <Border
+            Background="Transparent"
+            BorderBrush="Black"
+            BorderThickness="1,1,0,1"
+            CornerRadius="4 0 0 4">
+            <TextBox
+                x:Name="dateTextBox"
+                Padding="0"
+                HorizontalAlignment="Center"
+                md:HintAssist.Hint="{Binding Hint, RelativeSource={RelativeSource AncestorType=local:UserCalendar}}"
+                BorderThickness="0" />
         </Border>
-        
-        <!-- kalendar iconkasi -->
-        <Border Grid.Column="1" BorderBrush="Black" CornerRadius="0 4 4 0" BorderThickness="0 1 1 1">
-            <Button Padding="0"
-                    VerticalAlignment="Center"
-                    md:ButtonAssist.CornerRadius="0"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OpenCalendar_Click"
-                    Content="📅"
-                    IsTabStop="False" />
+
+        <!--  kalendar iconkasi  -->
+        <Border
+            Grid.Column="1"
+            BorderBrush="Black"
+            BorderThickness="0,1,1,1"
+            CornerRadius="0 4 4 0">
+            <Button
+                Padding="0"
+                VerticalAlignment="Center"
+                md:ButtonAssist.CornerRadius="0"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="OpenCalendar_Click"
+                Content="📅"
+                IsTabStop="False" />
         </Border>
 
         <!--  Calendar popup  -->
