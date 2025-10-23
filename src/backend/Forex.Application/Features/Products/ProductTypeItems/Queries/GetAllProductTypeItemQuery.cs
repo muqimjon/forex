@@ -16,7 +16,7 @@ public class GetAllProductTypeItemHandler(
     : IRequestHandler<GetAllProductTypeItemQuery, IReadOnlyCollection<ProductTypeItemDto>>
 {
     public async Task<IReadOnlyCollection<ProductTypeItemDto>> Handle(GetAllProductTypeItemQuery request, CancellationToken cancellationToken)
-  => mapper.Map<IReadOnlyCollection<ProductTypeItemDto>>(await context.ProductItems.AsNoTracking()
+  => mapper.Map<IReadOnlyCollection<ProductTypeItemDto>>(await context.ProductTypeItems.AsNoTracking()
       .Include(a => a.SemiProduct)
         .ThenInclude(sp => sp.UnitMeasure)
       .ToListAsync(cancellationToken));

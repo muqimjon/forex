@@ -5,8 +5,6 @@ using Forex.WebApi.Controllers.Common;
 using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/[controller]")]
-[ApiController]
 public class ProductTypesController : BaseController
 {
     [HttpGet]

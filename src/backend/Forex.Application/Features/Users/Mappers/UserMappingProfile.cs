@@ -23,12 +23,14 @@ public class UserMappingProfile : Profile
             .ForMember(dest => dest.NormalizedEmail,
                 opt => opt.MapFrom(src => src.Email!.ToNormalized()));
 
+        CreateMap<UserCommand, User>()
+            .ForMember(dest => dest.NormalizedName,
+                opt => opt.MapFrom(src => src.Name.ToNormalized()));
+
         CreateMap<User, UserForSaleDto>();
         CreateMap<User, UserForTransactionDto>();
         CreateMap<User, UserForProductEntryDto>();
         CreateMap<User, UserForAccountDto>();
         CreateMap<User, UserForInvoiceDto>();
-
-        CreateMap<UserCommand, User>();
     }
 }

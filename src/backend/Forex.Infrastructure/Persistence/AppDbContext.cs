@@ -21,7 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductType> ProductTypes { get; set; }
     public DbSet<ProductEntry> ProductEntries { get; set; }
-    public DbSet<ProductTypeItem> ProductItems { get; set; }
+    public DbSet<ProductTypeItem> ProductTypeItems { get; set; }
     public DbSet<SemiProductResidue> SemiProductResidues { get; set; }
     public DbSet<ProductResidue> ResidueShops { get; set; }
     public DbSet<Sale> Sales { get; set; }

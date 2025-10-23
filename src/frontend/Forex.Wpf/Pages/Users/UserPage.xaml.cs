@@ -46,6 +46,7 @@ public partial class UserPage : Page
         LoadValyutaType();
         LoadUsers();
         UpdateRoleList();
+
         FocusNavigator.AttachEnterNavigation(
         [
             txtSearch,
@@ -167,14 +168,22 @@ public partial class UserPage : Page
     {
         try
         {
-            var valyutaTypes = await client.Currency.GetAll();
-            cbxValutaType.ItemsSource = valyutaTypes.Data?.ToList();
+            var response = await client.Currency.GetAll();
+            if (!response.IsSuccess)
+            {
+                MessageBox.Show("Valyutani yuklashda xatolik");
+                return;
+            }
+
+            cbxValutaType.ItemsSource = response.Data?.ToList();
 
             // Faqat symbol ko‘rinsin
-            cbxValutaType.DisplayMemberPath = "Symbol";
+            cbxValutaType.DisplayMemberPath = "Code";
 
             // SelectedValue sifatida Id ishlatiladi
             cbxValutaType.SelectedValuePath = "Id";
+
+            cbxValutaType.SelectedItem = response.Data!.FirstOrDefault(v => v.IsDefault);
         }
         catch (Exception ex)
         {

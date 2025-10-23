@@ -6,7 +6,6 @@ using Forex.ClientService.Models.Responses;
 using Refit;
 
 public interface IApiProducts
-
 {
     [Get("/products")]
     Task<Response<List<ProductResponse>>> GetAll();

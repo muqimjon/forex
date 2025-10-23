@@ -26,6 +26,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
         invoice = new(client, mapper);
 
         _ = LoadPageAsync();
+        AddProduct();
+        GetSelectedProductInfo(null);
     }
 
     [ObservableProperty] private InvoiceViewModel invoice;
@@ -35,11 +37,170 @@ public partial class SemiProductPageViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<ProductViewModel> existProducts = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> products = [];
     [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
-    [ObservableProperty] private string selectedProductInfo = "Barcha yarim tayyor mahsulotlar";
+    [ObservableProperty] private string selectedProductInfo = string.Empty;
 
     [ObservableProperty] private ObservableCollection<SemiProductViewModel> semiProducts = [];
     [ObservableProperty] private ObservableCollection<SemiProductViewModel> filteredSemiProducts = [];
     [ObservableProperty] private ObservableCollection<SemiProductViewModel> independentSemiProducts = [];
+
+    #region Commands
+
+    [RelayCommand]
+    private void AddProduct()
+    {
+        ProductTypeViewModel type = new() { Product = new() };
+        type.Product.PropertyChanged += ProductPropertyChanged;
+        type.PropertyChanged += ProductTypePropertyChanged;
+        ProductTypes.Add(type);
+        EditProduct(type);
+    }
+
+    [RelayCommand]
+    private void EditProduct(ProductTypeViewModel? item)
+    {
+        foreach (var row in ProductTypes)
+            row.IsEditing = false;
+
+        foreach (var row in SemiProducts)
+            row.IsEditing = false;
+
+        if (item is not null)
+            item.IsEditing = true;
+    }
+
+    [RelayCommand]
+    private static void SaveProduct(ProductTypeViewModel? item)
+    {
+        if (item is not null)
+            item.IsEditing = false;
+    }
+
+    [RelayCommand]
+    private void RemoveProduct(ProductTypeViewModel item)
+    {
+        ProductTypes.Remove(item);
+    }
+
+    [RelayCommand]
+    private void AddSemiProduct()
+    {
+        var newSemi = new SemiProductViewModel();
+
+        if (SelectedProductType is not null)
+        {
+            var pti = new ProductTypeItemViewModel
+            {
+                SemiProduct = newSemi,
+                ParentType = SelectedProductType
+            };
+            newSemi.LinkedItem = pti;
+
+            SelectedProductType.ProductTypeItems.Add(pti);
+        }
+        else IndependentSemiProducts.Add(newSemi);
+
+        newSemi.UnitMeasure = AvailableMeasures.FirstOrDefault(m => m.IsDefault)
+            ?? AvailableMeasures.FirstOrDefault()!;
+
+        EditSemiProduct(newSemi);
+        newSemi.PropertyChanged += SemiProductPropertyChanged;
+        SemiProducts.Add(newSemi);
+        UpdateSemiProductsForSelectedProduct();
+    }
+
+    [RelayCommand]
+    private void EditSemiProduct(SemiProductViewModel item)
+    {
+        foreach (var row in SemiProducts)
+            row.IsEditing = false;
+
+        foreach (var row in ProductTypes)
+            row.IsEditing = false;
+
+        if (item is not null)
+            item.IsEditing = true;
+    }
+
+    [RelayCommand]
+    private static void SaveSemiProduct(SemiProductViewModel item)
+        => item.IsEditing = false;
+
+    [RelayCommand]
+    private void RemoveSemiProduct(SemiProductViewModel item)
+    {
+        SemiProducts.Remove(item);
+        IndependentSemiProducts?.Remove(item);
+
+        foreach (var type in ProductTypes)
+            type.ProductTypeItems = new ObservableCollection<ProductTypeItemViewModel>(
+                type.ProductTypeItems.Where(i => i.SemiProduct != item));
+
+        UpdateSemiProductsForSelectedProduct();
+    }
+
+    [RelayCommand]
+    private void ShowAllSemiProducts()
+    {
+        SelectedProductType = default!;
+        UpdateSemiProductsForSelectedProduct();
+        SelectedProductInfo = "Barcha yarim tayyor mahsulotlar";
+    }
+
+    private Window? semiProductsWindow;
+    [RelayCommand]
+    private void ShowReportInPopup()
+    {
+        if (semiProductsWindow is null)
+        {
+            semiProductsWindow = new Window
+            {
+                Title = "Yarim tayyor mahsulotlar ro‘yxati",
+                Content = new CheckSemiProductsPage(this)
+            };
+
+            semiProductsWindow.Closing += (s, e) =>
+            {
+                e.Cancel = true;
+                semiProductsWindow.Hide();
+            };
+        }
+
+        semiProductsWindow.Width = 1000;
+        semiProductsWindow.Height = 700;
+        semiProductsWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+        if (!semiProductsWindow.IsVisible)
+            semiProductsWindow.Show();
+        else
+            semiProductsWindow.Activate();
+    }
+
+    [RelayCommand]
+    private async Task SubmitAsync()
+    {
+        if (SemiProducts.Count == 0)
+        {
+            ErrorMessage = "Hech qanday yarim tayyor mahsulot kiritilmadi.";
+            return;
+        }
+
+        var requestObject = new SemiProductIntakeRequest
+        {
+            Invoice = mapper.Map<InvoiceRequest>(Invoice),
+            SemiProducts = mapper.Map<ICollection<SemiProductRequest>>(IndependentSemiProducts),
+            Products = mapper.Map<ICollection<ProductRequest>>(Products)
+        };
+
+        var response = await client.SemiProductEntry.Create(requestObject)
+            .Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess)
+            SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
+        else
+            ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
+    }
+
+    #endregion
 
     #region Loading Data
 
@@ -118,180 +279,31 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     #endregion Loading Data
 
-    #region Commands
+    #region Property Changes
 
-    [RelayCommand]
-    private async Task SubmitAsync()
+    private void ProductTypePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (SemiProducts.Count == 0)
-        {
-            ErrorMessage = "Hech qanday yarim tayyor mahsulot kiritilmadi.";
+        if (sender is not ProductTypeViewModel productType)
             return;
-        }
 
-        var requestObject = new SemiProductIntakeRequest
+        if (e.PropertyName == nameof(ProductTypeViewModel.Product))
         {
-            Invoice = mapper.Map<InvoiceRequest>(Invoice),
-            SemiProducts = mapper.Map<ICollection<SemiProductRequest>>(IndependentSemiProducts),
-            Products = mapper.Map<ICollection<ProductRequest>>(Products)
-        };
-
-        var response = await client.SemiProduct.CreateIntake(requestObject)
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess)
-            SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
-        else
-            ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
-    }
-
-
-
-    private Window? semiProductsWindow;
-    [RelayCommand]
-    private void ShowReportInPopup()
-    {
-        if (semiProductsWindow is null)
-        {
-            semiProductsWindow = new Window
-            {
-                Title = "Yarim tayyor mahsulotlar ro‘yxati",
-                Content = new CheckSemiProductsPage(this)
-            };
-
-            semiProductsWindow.Closing += (s, e) =>
-            {
-                e.Cancel = true;
-                semiProductsWindow.Hide();
-            };
+            GetSelectedProductInfo(productType.Product);
         }
-
-        semiProductsWindow.Width = 1000;
-        semiProductsWindow.Height = 700;
-        semiProductsWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
-        if (!semiProductsWindow.IsVisible)
-            semiProductsWindow.Show();
-        else
-            semiProductsWindow.Activate();
     }
 
-    // ==================== Product Commands
-
-    [RelayCommand]
-    private void AddProduct()
-    {
-        ProductTypeViewModel type = new() { Product = new() };
-        ProductTypes.Add(type);
-        EditProduct(type);
-    }
-
-    [RelayCommand]
-    private void EditProduct(ProductTypeViewModel? item)
-    {
-        foreach (var row in ProductTypes)
-            row.IsEditing = false;
-
-        foreach (var row in SemiProducts)
-            row.IsEditing = false;
-
-        if (item is not null)
-            item.IsEditing = true;
-    }
-
-    [RelayCommand]
-    private static void SaveProduct(ProductTypeViewModel? item)
-    {
-        if (item is not null)
-            item.IsEditing = false;
-    }
-
-    [RelayCommand]
-    private void RemoveProduct(ProductTypeViewModel item)
-    {
-        ProductTypes.Remove(item);
-    }
-
-    // ==================== SemiProduct Commands
-
-    [RelayCommand]
-    private void AddSemiProduct()
-    {
-        var newSemi = new SemiProductViewModel();
-
-        if (SelectedProductType is not null)
-        {
-            var pti = new ProductTypeItemViewModel
-            {
-                SemiProduct = newSemi,
-                ParentType = SelectedProductType
-            };
-            newSemi.LinkedItem = pti;
-
-            SelectedProductType.ProductTypeItems.Add(pti);
-        }
-        else IndependentSemiProducts.Add(newSemi);
-
-        newSemi.Measure = AvailableMeasures.FirstOrDefault(m => m.IsDefault)
-            ?? AvailableMeasures.FirstOrDefault()!;
-
-        EditSemiProduct(newSemi);
-        newSemi.PropertyChanged += SemiProduct_PropertyChanged;
-        SemiProducts.Add(newSemi);
-        UpdateSemiProductsForSelectedProduct();
-    }
-
-    [RelayCommand]
-    private void EditSemiProduct(SemiProductViewModel item)
-    {
-        foreach (var row in SemiProducts)
-            row.IsEditing = false;
-
-        foreach (var row in ProductTypes)
-            row.IsEditing = false;
-
-        if (item is not null)
-            item.IsEditing = true;
-    }
-
-    [RelayCommand]
-    private static void SaveSemiProduct(SemiProductViewModel item)
-        => item.IsEditing = false;
-
-    [RelayCommand]
-    private void RemoveSemiProduct(SemiProductViewModel item)
-    {
-        SemiProducts.Remove(item);
-        IndependentSemiProducts?.Remove(item);
-
-        foreach (var type in ProductTypes)
-            type.ProductTypeItems = new ObservableCollection<ProductTypeItemViewModel>(
-                type.ProductTypeItems.Where(i => i.SemiProduct != item));
-
-        UpdateSemiProductsForSelectedProduct();
-    }
-
-    [RelayCommand]
-    private void ShowAllSemiProducts()
-    {
-        SelectedProductType = default!;
-        UpdateSemiProductsForSelectedProduct();
-        SelectedProductInfo = "Barcha yarim tayyor mahsulotlar";
-    }
-
-    #endregion
-
-    #region Helpers Calcs
-
-    private void SemiProduct_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void SemiProductPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SemiProductViewModel.TotalAmount))
             RecalculateTotalQuantity();
     }
 
-    private void RecalculateTotalQuantity()
+    private void ProductPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        Invoice.CostPrice = FilteredSemiProducts.Sum(x => x.TotalAmount);
+        if (sender is not ProductViewModel product)
+            return;
+
+        GetSelectedProductInfo(product);
     }
 
     public ProductTypeViewModel SelectedProductType
@@ -304,12 +316,29 @@ public partial class SemiProductPageViewModel : ViewModelBase
                 selectedProductType = value;
                 OnPropertyChanged();
                 UpdateSemiProductsForSelectedProduct();
-
-                if (selectedProductType?.Product?.Code < 1)
-                    SelectedProductInfo = $"{SelectedProductType.Product.Name} {SelectedProductType.Product.Code} Yangi mahsulot uchun detallar";
-                else SelectedProductInfo = $"{SelectedProductType?.Product.Name} - {SelectedProductType?.Product.Code}";
+                GetSelectedProductInfo(SelectedProductType?.Product);
             }
         }
+    }
+
+    #endregion Property Changes
+
+    #region Privat Helpers
+
+    private void RecalculateTotalQuantity()
+    {
+        Invoice.CostPrice = SemiProducts.Sum(x => x.TotalAmount);
+    }
+
+    private void GetSelectedProductInfo(ProductViewModel? product)
+    {
+        if (product is null || string.IsNullOrEmpty(product.Name))
+        {
+            SelectedProductInfo = "Barcha yarim tayyor mahsulotlar";
+            return;
+        }
+
+        SelectedProductInfo = $"{product.Name} {product.Code} mahsulot uchun detallar";
     }
 
     #endregion Helpers

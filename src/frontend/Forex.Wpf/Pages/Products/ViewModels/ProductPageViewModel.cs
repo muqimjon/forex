@@ -5,36 +5,35 @@ using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
+using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Extensions;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Threading.Tasks;
 
 public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : ViewModelBase
 {
-
-    [ObservableProperty] private int count;
-    [ObservableProperty] private decimal totalCount;
-    [ObservableProperty] private decimal costPreparation;
-    [ObservableProperty] private decimal totalAmount;
-
     [ObservableProperty] private ObservableCollection<UserViewModel> availableEmployees = [];
     [ObservableProperty] private ObservableCollection<UserViewModel> employees = [];
     private UserViewModel? selectedEmployee;
 
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
-    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> availableProductTypes = [];
-    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> filteredProductTypes = [];
-    [ObservableProperty] private ProductTypeViewModel? selectedProductType;
+
+    [ObservableProperty] private ObservableCollection<ProductEntryViewModel> filteredProducts = [];
+    [ObservableProperty] private ProductEntryViewModel? selectedProduct;
 
 
     #region Commands
 
     [RelayCommand]
-    private void AddEmployee() => Employees.Add(new());
+    private void AddEmployee()
+    {
+        UserViewModel employee = new();
+        //employee.PropertyChanged += EmployeePropertyChanged;
+        Employees.Add(employee);
+    }
 
     [RelayCommand]
     private void DeleteEmployee(UserViewModel user)
@@ -42,8 +41,8 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         if (user is null)
             return;
 
-        if (user.PreparedProductTypes is not null && user.PreparedProductTypes.Any())
-            foreach (var type in user.PreparedProductTypes)
+        if (user.PreparedProducts is not null && user.PreparedProducts.Any())
+            foreach (var type in user.PreparedProducts)
                 RemoveProductType(type);
 
         Employees.Remove(user);
@@ -66,18 +65,49 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             return;
         }
 
-        ProductTypeViewModel type = new();
-        type.PropertyChanged += ProductTypePropertyChanged;
-        FilteredProductTypes.Add(type);
+        ProductEntryViewModel entry = new();
+        entry.PropertyChanged += ProductEntryPropertyChanged;
+        FilteredProducts.Add(entry);
     }
 
     [RelayCommand]
-    private void DeleteProduct(ProductTypeViewModel type)
+    private void DeleteProduct(ProductEntryViewModel type)
     {
         if (type is null || SelectedEmployee is null)
             return;
 
         RemoveProductType(type);
+    }
+
+    [RelayCommand]
+    private async Task Submit()
+    {
+        List<ProductEntryRequest> requests = [];
+
+        foreach (var entry in Employees.SelectMany(e => e.PreparedProducts))
+        {
+            if (entry.Product is null || entry.ProductType is null)
+            {
+                WarningMessage = "Barcha maydonlarni to'ldiring!";
+                return;
+            }
+
+            requests.Add(new ProductEntryRequest
+            {
+                TypeCount = (int)entry.TypeCount!,
+                PreparationCostPerUnit = (decimal)entry.PreparationCostPerUnit!,
+                TotalAmount = (decimal)entry.TotalAmount!,
+                ProductTypeId = entry.ProductType.Id,
+                EmployeeId = SelectedEmployee!.Id
+            });
+        }
+
+        var response = await Client.ProductEntries.Create(new() { Command = requests });
+
+        if (response.IsSuccess)
+            SuccessMessage = "Mahsulotlar muvaffaqiyatli saqlandi.";
+        else
+            ErrorMessage = response.Message ?? "Mahsulotlarni saqlashda xatolik yuz berdi.";
     }
 
     #endregion Commands
@@ -131,30 +161,42 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         else WarningMessage = "Mahsulotlarni yuklashda xatolik.";
     }
 
-    private async Task LoadTypesAsync(ProductTypeViewModel type)
+    private async Task LoadTypesAsync(ProductEntryViewModel model)
     {
         FilteringRequest request = new()
         {
             Filters = new()
             {
-                ["productid"] = [type.Product.Id.ToString()]
+                ["productid"] = [model.Product.Id.ToString()]
             }
         };
 
         var response = await Client.ProductType.Filter(request).Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
-            AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
+            model.AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
         else ErrorMessage = response.Message ?? "Mahsulot o'lchamlarini yuklashda xatolik!";
+    }
+
+    private async Task LoadTypeItemssAsync(ProductEntryViewModel model)
+    {
+        FilteringRequest request = new()
+        {
+            Filters = new()
+            {
+                ["productTypeId"] = [model.ProductType.Id.ToString()],
+                ["semiproduct"] = ["include:unitMeasure"]
+            }
+        };
+
+        var response = await Client.ProductTypeItems.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        if (response.IsSuccess)
+            model.ProductType.ProductTypeItems = Mapper.Map<ObservableCollection<ProductTypeItemViewModel>>(response.Data);
+        else ErrorMessage = response.Message ?? "Yarim tayyor mahsulotlarni yuklashda xatolik!";
     }
 
     #endregion Load Data
 
     #region Property Changes
-
-    partial void OnCountChanged(int value)
-    {
-        TotalCount = SelectedEmployee.PreparedProductTypes.Sum(t => t.Count ?? 0);
-    }
 
     public UserViewModel SelectedEmployee
     {
@@ -164,25 +206,29 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             if (value != selectedEmployee)
             {
                 selectedEmployee = value;
-
                 UpdateProducts();
             }
         }
     }
 
-    private void ProductTypePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void ProductEntryPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender is not ProductTypeViewModel type)
+        if (sender is not ProductEntryViewModel entry)
             return;
 
-        if (e.PropertyName == nameof(ProductTypeViewModel.Product))
+        if (e.PropertyName == nameof(ProductEntryViewModel.Product))
         {
             if (SelectedEmployee is not null)
-                _ = LoadTypesAsync(type);
+                _ = LoadTypesAsync(entry);
         }
-        else if (e.PropertyName == nameof(ProductTypeViewModel.Type))
-            SelectedEmployee.PreparedProductTypes.Add(type);
+        else if (e.PropertyName == nameof(ProductEntryViewModel.ProductType))
+        {
+            SelectedEmployee.PreparedProducts.Add(entry);
+            _ = LoadTypeItemssAsync(entry);
+        }
     }
+
+    //private void EmployeePropertyChanged(object? sender, PropertyChangedEventArgs e) => AddProduct();
 
     #endregion Property Changes
 
@@ -190,18 +236,18 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
 
     private void UpdateProducts()
     {
-        FilteredProductTypes.Clear();
+        FilteredProducts.Clear();
 
         if (SelectedEmployee is null)
-            FilteredProductTypes.AddRange(Employees.SelectMany(e => e.PreparedProductTypes));
-        else FilteredProductTypes.AddRange(SelectedEmployee.PreparedProductTypes);
+            FilteredProducts.AddRange(Employees.SelectMany(e => e.PreparedProducts));
+        else FilteredProducts.AddRange(SelectedEmployee.PreparedProducts);
     }
 
-    private void RemoveProductType(ProductTypeViewModel type)
+    private void RemoveProductType(ProductEntryViewModel model)
     {
-        SelectedEmployee?.PreparedProductTypes.Remove(type);
-        type.Product.ProductTypes.Remove(type);
-        FilteredProductTypes.Remove(type);
+        SelectedEmployee?.PreparedProducts.Remove(model);
+        model.ProductType.Product.ProductTypes.Remove(model.ProductType);
+        FilteredProducts.Remove(model);
     }
 
     #endregion Provate Helpers

@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
@@ -20,6 +21,53 @@ public partial class InvoiceViewModel : ViewModelBase
         _ = LoadPageAsync();
     }
 
+    public long Id { get; set; }
+    [ObservableProperty] private ManufactoryViewModel manufactory = default!;
+    [ObservableProperty] private UserViewModel supplier = default!;
+    [ObservableProperty] private UserViewModel? agent = default!;
+    [ObservableProperty] private CurrencyViewModel currency = default!;
+    [ObservableProperty] private DateTime date = DateTime.Now;
+    [ObservableProperty] private string? number;
+    [ObservableProperty] private decimal? costPrice;
+    [ObservableProperty] private decimal? costDelivery;
+    [ObservableProperty] private int? containerCount;
+    [ObservableProperty] private decimal? pricePerUnitContainer;
+    [ObservableProperty] private decimal? transferFee;
+    [ObservableProperty] private bool viaMiddleman;
+
+    [ObservableProperty] private decimal? totalAmount;
+    [ObservableProperty] private string totalAmountWithCurrency = string.Empty;
+
+    // For UI 
+    [ObservableProperty] private ObservableCollection<CurrencyViewModel> currencies = default!;
+    [ObservableProperty] private ObservableCollection<ManufactoryViewModel> manufactories = default!;
+    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = default!;
+    [ObservableProperty] private ObservableCollection<UserViewModel> agents = default!;
+
+
+    #region Commands
+
+    [RelayCommand]
+    private void GetMiddleman()
+    {
+        Agent = Agents.LastOrDefault();
+    }
+
+    #endregion
+
+    #region Property Changes
+
+    partial void OnCostDeliveryChanged(decimal? value) => ReCalculateTotal();
+    partial void OnCostPriceChanged(decimal? value) => ReCalculateTotal();
+    partial void OnTransferFeeChanged(decimal? value) => ReCalculateTotal();
+    partial void OnViaMiddlemanChanged(bool value) => ReCalculateTotal();
+    partial void OnContainerCountChanged(int? value) => ReCalculateTransferFee();
+    partial void OnPricePerUnitContainerChanged(decimal? value) => ReCalculateTransferFee();
+    partial void OnTotalAmountChanged(decimal? value) => RefreshAmount();
+    partial void OnCurrencyChanged(CurrencyViewModel value) => RefreshAmount();
+
+    #endregion Property Changes
+
     #region Loading Data
 
     private async Task LoadPageAsync()
@@ -28,8 +76,6 @@ public partial class InvoiceViewModel : ViewModelBase
         await LoadManufactoriesAsync();
         await LoadCurrenciesAsync();
     }
-
-    #region Manufactory
 
     private async Task LoadManufactoriesAsync()
     {
@@ -44,12 +90,6 @@ public partial class InvoiceViewModel : ViewModelBase
         Manufactories = mapper.Map<ObservableCollection<ManufactoryViewModel>>(response.Data!);
         Manufactory = Manufactories.FirstOrDefault() ?? new();
     }
-    [ObservableProperty] private ObservableCollection<ManufactoryViewModel> manufactories = default!;
-
-
-    #endregion Manufactory
-
-    #region User
 
     private async Task LoadUsersAsync()
     {
@@ -72,13 +112,9 @@ public partial class InvoiceViewModel : ViewModelBase
 
         Suppliers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Taminotchi));
         Agents = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Vositachi));
+
+        Supplier = Suppliers.FirstOrDefault() ?? new();
     }
-    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = default!;
-    [ObservableProperty] private ObservableCollection<UserViewModel> agents = default!;
-
-    #endregion User
-
-    #region Currency
 
     private async Task LoadCurrenciesAsync()
     {
@@ -94,37 +130,10 @@ public partial class InvoiceViewModel : ViewModelBase
             ?? Currencies.FirstOrDefault()
             ?? new();
     }
-    [ObservableProperty] private ObservableCollection<CurrencyViewModel> currencies = default!;
-
-    #endregion Currency
 
     #endregion Loading Data
 
-    public long Id { get; set; }
-    [ObservableProperty] private ManufactoryViewModel manufactory = default!;
-    [ObservableProperty] private UserViewModel supplier = default!;
-    [ObservableProperty] private UserViewModel? agent = default!;
-    [ObservableProperty] private CurrencyViewModel currency = default!;
-    [ObservableProperty] private DateTime date = DateTime.Now;
-    [ObservableProperty] private string? number;
-    [ObservableProperty] private decimal? costPrice;
-    [ObservableProperty] private decimal? costDelivery;
-    [ObservableProperty] private int? containerCount;
-    [ObservableProperty] private decimal? pricePerUnitContainer;
-    [ObservableProperty] private decimal? transferFee;
-    [ObservableProperty] private bool viaMiddleman;
-
-    [ObservableProperty] private decimal? totalAmount;
-    [ObservableProperty] private string totalAmountWithCurrency = string.Empty;
-
-    partial void OnCostDeliveryChanged(decimal? value) => ReCalculateTotal();
-    partial void OnCostPriceChanged(decimal? value) => ReCalculateTotal();
-    partial void OnTransferFeeChanged(decimal? value) => ReCalculateTotal();
-    partial void OnViaMiddlemanChanged(bool value) => ReCalculateTotal();
-    partial void OnContainerCountChanged(int? value) => ReCalculateTransferFee();
-    partial void OnPricePerUnitContainerChanged(decimal? value) => ReCalculateTransferFee();
-    partial void OnTotalAmountChanged(decimal? value) => RefreshAmount();
-    partial void OnCurrencyChanged(CurrencyViewModel value) => RefreshAmount();
+    #region Private Helpers
 
     private void RefreshAmount()
     {
@@ -143,5 +152,7 @@ public partial class InvoiceViewModel : ViewModelBase
             if (ViaMiddleman) TotalAmount = (CostPrice ?? 0) + (CostDelivery ?? 0) + (TransferFee ?? 0);
             else TotalAmount = (CostPrice ?? 0) + (CostDelivery ?? 0);
     }
+
+    #endregion Private Helpers
 }
 

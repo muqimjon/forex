@@ -5,7 +5,7 @@ using Forex.Domain.Entities;
 
 public class ProductResidue : Auditable
 {
-    public int Count { get; set; }  // 24-29,30-35 yoki 36-41 razmerlarda nechtadan borligi
+    public int Count { get; set; }
 
     public long ProductTypeId { get; set; }
     public ProductType ProductType { get; set; } = default!;

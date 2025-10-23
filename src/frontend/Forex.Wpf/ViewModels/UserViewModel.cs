@@ -14,7 +14,7 @@ public partial class UserViewModel : ViewModelBase
     [ObservableProperty] private string description = string.Empty;
 
     [ObservableProperty] private ObservableCollection<UserAccountViewModel> accounts = [];
-    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> preparedProductTypes = [];
+    [ObservableProperty] private ObservableCollection<ProductEntryViewModel> preparedProducts = [];
     private UserViewModel? selected;
 
     // UI qismi uchun
@@ -36,7 +36,7 @@ public partial class UserViewModel : ViewModelBase
                 Address = value.Address;
                 Description = value.Description;
                 Accounts = new ObservableCollection<UserAccountViewModel>(value.Accounts ?? []);
-                PreparedProductTypes = new ObservableCollection<ProductTypeViewModel>(value.PreparedProductTypes ?? []);
+                PreparedProducts = new ObservableCollection<ProductEntryViewModel>(value.PreparedProducts ?? []);
             }
         }
     }

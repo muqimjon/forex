@@ -16,15 +16,9 @@ public partial class ProductViewModel : ViewModelBase
     [ObservableProperty] private UnitMeasuerViewModel unitMeasure = default!;
     [ObservableProperty] private ImageSource? image;
 
-
     [ObservableProperty] private ObservableCollection<ProductTypeViewModel> productTypes = [];
     [ObservableProperty] private ProductTypeViewModel? selectedType;
-    [ObservableProperty] private int count;
-    [ObservableProperty] private int typeCount;
-    [ObservableProperty] private int totalCount;
-    [ObservableProperty] private decimal perPairRate;
-    [ObservableProperty] private decimal totalAmount;
-
+    private ProductViewModel? selected;
 
     #region Commands
 
@@ -52,7 +46,6 @@ public partial class ProductViewModel : ViewModelBase
 
     #region Property Changes
 
-    private ProductViewModel? selected;
     public ProductViewModel? Selected
     {
         get => selected;
@@ -71,44 +64,5 @@ public partial class ProductViewModel : ViewModelBase
         }
     }
 
-    partial void OnSelectedTypeChanged(ProductTypeViewModel? value)
-    {
-        Count = value?.Count ?? 0;
-    }
-
-    partial void OnTypeCountChanged(int oldValue, int newValue)
-    {
-        CalculateTotalCount();
-    }
-
-    partial void OnCountChanged(int oldValue, int newValue)
-    {
-        CalculateTotalCount();
-    }
-
-    partial void OnTotalCountChanged(int oldValue, int newValue)
-    {
-        CalculateTotalAmount();
-    }
-
-    partial void OnPerPairRateChanged(decimal oldValue, decimal newValue)
-    {
-        CalculateTotalAmount();
-    }
-
     #endregion Property Changes
-
-    #region Private Helpers
-
-    private void CalculateTotalCount()
-    {
-        TotalCount = Count * TypeCount;
-    }
-
-    private void CalculateTotalAmount()
-    {
-        TotalAmount = PerPairRate * TotalCount;
-    }
-
-    #endregion Private Helpers
 }

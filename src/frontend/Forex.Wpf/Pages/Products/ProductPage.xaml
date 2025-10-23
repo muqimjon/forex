@@ -62,10 +62,15 @@
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <!--== header:: sahifa nomi va ortga tugmasi ==-->
             <RowDefinition Height="10" />
+            
             <RowDefinition Height="*" />
+            <!--== body:: asosiy ma'lumotlar ==-->
             <RowDefinition Height="10" />
+            
             <RowDefinition Height="Auto" />
+            <!--== footer:: submit tugmasi ==-->
         </Grid.RowDefinitions>
 
         <!-- Page Header -->
@@ -74,7 +79,7 @@
                    FontSize="18"
                    FontWeight="Bold"
                    Foreground="{StaticResource SecondaryTextColor}" />
-
+    
             <Button x:Name="btnBack"
                     Padding="8,0"
                     md:ButtonAssist.CornerRadius="4"
@@ -295,8 +300,8 @@
                                   RowHeaderWidth="0"
                                   RowHeight="36"
                                   MinHeight="300"
-                                  SelectedItem="{Binding SelectedProductType, Mode=TwoWay}"
-                                  ItemsSource="{Binding FilteredProductTypes}"
+                                  ItemsSource="{Binding FilteredProducts}"
+                                  SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                                   EnableRowVirtualization="False"
                                   EnableColumnVirtualization="True"
                                   VirtualizingPanel.IsVirtualizing="True"
@@ -310,20 +315,15 @@
                             <DataGrid.Resources>
                                 <!-- 🔹 Headerlarni o‘rtaga joylashtirish -->
                                 <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalContentAlignment"
-                                            Value="Center" />
-                                    <Setter Property="VerticalContentAlignment"
-                                            Value="Center" />
-                                    <Setter Property="FontWeight"
-                                            Value="SemiBold" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
                                 </Style>
+                                
                                 <!-- 🔹 O‘ngga hizalangan sonlar uchun umumiy style -->
-                                <Style x:Key="RightAlignedText"
-                                       TargetType="TextBlock">
-                                    <Setter Property="TextAlignment"
-                                            Value="Right" />
-                                    <Setter Property="Margin"
-                                            Value="0,0,5,0" />
+                                <Style x:Key="RightAlignedText" TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                    <Setter Property="Margin" Value="0 0 5 0" />
                                 </Style>
                             </DataGrid.Resources>
 
@@ -366,7 +366,6 @@
                                                       DisplayMemberPath="Name"
                                                       Padding="0"
                                                       IsTextSearchEnabled="True"
-                                                      Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                       BorderThickness="0" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -377,8 +376,8 @@
                                                         Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.AvailableProductTypes, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                      SelectedItem="{Binding Selected, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                            <ComboBox ItemsSource="{Binding AvailableProductTypes}"
+                                                      SelectedItem="{Binding ProductType, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                                       DisplayMemberPath="Type"
                                                       Padding="20 0 0 0"
                                                       IsTextSearchEnabled="True"
@@ -389,33 +388,33 @@
 
                                 <!-- 📦 Miqdorlar -->
                                 <DataGridTextColumn Header="Soni"
-                                                    Binding="{Binding Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
+                                                    Binding="{Binding ProductType.Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
                                                     Width="0.5*"
                                                     IsReadOnly="True"
                                                     ElementStyle="{StaticResource RightAlignedText}" />
 
                                 <!-- Razmerlar soni -->
                                 <DataGridTextColumn Header="Razmerlar soni"
-                                                    Binding="{Binding DataContext.Count, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
+                                                    Binding="{Binding TypeCount,UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
                                                     Width="0.8*"
                                                     ElementStyle="{StaticResource RightAlignedText}" />
 
                                 <!-- Jami soni -->
                                 <DataGridTextColumn Header="Jami soni"
-                                                    Binding="{Binding DataContext.TotalCount, RelativeSource={RelativeSource AncestorType=Page}, StringFormat={}{0:N0}}"
+                                                    Binding="{Binding TotalCount, StringFormat={}{0:N0}}"
                                                     Width="*"
                                                     IsReadOnly="True"
                                                     ElementStyle="{StaticResource RightAlignedText}" />
 
                                 <!-- Dona haqi -->
                                 <DataGridTextColumn Header="Dona haqi"
-                                                    Binding="{Binding DataContext.CostPreparation, RelativeSource={RelativeSource AncestorType=Page}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
+                                                    Binding="{Binding PreparationCostPerUnit, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
                                                     Width="0.8*"
                                                     ElementStyle="{StaticResource RightAlignedText}" />
 
                                 <!-- Jami summa -->
                                 <DataGridTextColumn Header="Jami summa"
-                                                    Binding="{Binding DataContext.TotalAmount, RelativeSource={RelativeSource AncestorType=Page}, StringFormat={}{0:N2}}"
+                                                    Binding="{Binding TotalAmount, StringFormat={}{0:N2}}"
                                                     Width="*"
                                                     IsReadOnly="True"
                                                     ElementStyle="{StaticResource RightAlignedText}" />
@@ -458,10 +457,10 @@
                                       Color="Black" />
                 </Border.Effect>
 
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Vertical" Visibility="{Binding SelectedProduct, Converter={StaticResource NullToVisibility}}">
 
                     <TextBlock x:Name="tbcProductName"
-                               Text="{Binding ProductName}"
+                               Text="{Binding SelectedProduct.Product.Name}"
                                HorizontalAlignment="Center"
                                FontSize="18"
                                Margin=" 3 0 0 0"
@@ -479,7 +478,7 @@
                                Margin="5,2,0,0"
                                Visibility="{Binding DetailTextVisibility}" />
 
-                    <ListView ItemsSource="{Binding FilteredProductTypeItems}"
+                    <ListView ItemsSource="{Binding SelectedProduct.ProductType.ProductTypeItems}"
                               Margin="0"
                               BorderThickness="1"
                               BorderBrush="#DDD"
@@ -490,7 +489,7 @@
                                 <GridViewColumn Header="Mahsulot">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding SemiProductViewModel.Name}"
+                                            <TextBlock Text="{Binding SemiProduct.Name}"
                                                        Foreground="Black"
                                                        FontSize="14"
                                                        VerticalAlignment="Center"
@@ -504,7 +503,7 @@
                                 <GridViewColumn Header="Miqdori">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Count}"
+                                            <TextBlock Text="{Binding Quantity}"
                                                        Foreground="Black"
                                                        Padding="0"
                                                        FontSize="14"
@@ -517,10 +516,10 @@
                                 <GridViewColumn Header="O‘lchov birligi">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Measure.Name}"
-                                                       Foreground="Red"
+                                            <TextBlock Text="{Binding SemiProduct.UnitMeasure.Name}"
                                                        Padding="0"
                                                        FontSize="14"
+                                                       ToolTip="{Binding SemiProduct.UnitMeasure.Description}"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </DataTemplate>
