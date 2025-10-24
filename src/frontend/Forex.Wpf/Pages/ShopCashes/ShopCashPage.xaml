@@ -109,10 +109,9 @@
             </md:Card>
         </StackPanel>
 
-        <md:Card
+        <Grid
             Grid.Row="2"
-            Margin="0,0,0,20"
-            UniformCornerRadius="4">
+            Margin="0,0,0,20">
             <StackPanel Orientation="Vertical">
                 <TextBlock
                     Margin="5,0,0,15"
@@ -131,123 +130,64 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Border
+
+                    <controls:UserCalendar
                         Grid.Column="0"
-                        Margin="5,0,5,5"
-                        Background="{DynamicResource SecondaryBackground}"
-                        CornerRadius="4">
-                        <controls:UserCalendar
-                            x:Name="OperationDate"
-                            Width="120"
-                            Height="40"
-                            Margin="5,0"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            FontSize="16"
-                            Hint="sana"
-                            SelectedDate="" />
-                    </Border>
+                        x:Name="supplyDate"
+                        MinWidth="120"
+                        Margin="0,0,5,0"
+                        Padding="0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource PrimaryBackground}"
+                        FontSize="14"
+                        SelectedDate="{Binding OperationDate}" />
                     <!--  Mijoz tanlash  -->
-                    <Border
+                    <controls:FloatingComboBox
+                        x:Name="cbxUser"
                         Grid.Column="1"
-                        Margin="5,0,10,5"
-                        Background="{DynamicResource SecondaryBackground}"
-                        BorderBrush="{DynamicResource PrimaryHueLightBrush}"
-                        CornerRadius="4">
-                        <ComboBox
-                            x:Name="cbxUser"
-                            Width="150"
-                            Padding="5,4"
-                            md:HintAssist.Hint="User tanlash"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            FontSize="16"
-                            IsEditable="true"
-                            SelectedValue="{Binding NewTransactionType}">
-                            <ComboBoxItem Content="Ovoza Plyus" IsSelected="True" />
-                            <ComboBoxItem Content="Avazbek" />
-                        </ComboBox>
-                    </Border>
+                        MinWidth="120"
+                        Margin="2,0"
+                        IsEditable="True"
+                        IsTextSearchEnabled="True"
+                        Label="User tanlash" />
 
                     <!--  Amaliyot turi  -->
-                    <Border
+                    <controls:FloatingComboBox
+                        x:Name="cbxIncome"
                         Grid.Column="2"
-                        Margin="5,0,10,5"
-                        Background="{DynamicResource SecondaryBackground}"
-                        BorderBrush="{DynamicResource PrimaryHueLightBrush}"
-                        CornerRadius="4">
-                        <ComboBox
-                            x:Name="cbxIncome"
-                            Width="150"
-                            Padding="5,4"
-                            md:HintAssist.Hint="Amaliyot turi"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            FontSize="16"
-                            SelectedValue="{Binding NewTransactionType}">
-                            <ComboBoxItem Content="Kirim" IsSelected="True" />
-                            <ComboBoxItem Content="Chiqim" />
-                        </ComboBox>
-                    </Border>
+                        MinWidth="120"
+                        Margin="2,0"
+                        IsEditable="True"
+                        IsTextSearchEnabled="True"
+                        Label="Amaliyot turi" />
 
 
                     <!--  Valyuta  -->
-                    <Border
+                    <controls:FloatingComboBox
+                        x:Name="cbxValyutaType"
                         Grid.Column="3"
-                        Margin="0,0,10,5"
-                        Background="{DynamicResource SecondaryBackground}"
-                        BorderBrush="{DynamicResource PrimaryHueLightBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <ComboBox
-                            x:Name="cbxValyutaType"
-                            Width="100"
-                            Padding="5,4"
-                            md:HintAssist.Hint="Valyuta"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            FontSize="16"
-                            SelectedValue="{Binding NewTransactionCurrency}">
-                            <ComboBoxItem Content="UZS" />
-                            <ComboBoxItem Content="USD" />
-                        </ComboBox>
-                    </Border>
+                        Margin="2,0"
+                        IsEditable="True"
+                        IsTextSearchEnabled="True"
+                        Label="Valyuta" />
 
                     <!--  Summa  -->
-                    <Border
+                    <controls:FloatingInput
+                        x:Name="tbSum"
                         Grid.Column="4"
-                        Margin="0,1,10,7"
-                        Background="{DynamicResource SecondaryBackground}"
-                        BorderBrush="{DynamicResource PrimaryHueLightBrush}"
-                        BorderThickness="0"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="tbSum"
-                            Width="170"
-                            Padding="5"
-                            md:HintAssist.Hint="Summa"
-                            BorderThickness="0"
-                            FontSize="16"
-                            LostFocus="TextBox_LostFocus"
-                            TextAlignment="Right" />
-                    </Border>
+                        Margin="2,0"
+                        Label="Summa"
+                        Text="{Binding Summa, StringFormat=N2}"/>
+
+
 
                     <!--  Izoh  -->
-                    <Border
+                    <controls:FloatingInput
+                        x:Name="tbDescription"
                         Grid.Column="5"
-                        Margin="0,1,10,7"
-                        Background="{DynamicResource SecondaryBackground}"
-                        BorderBrush="{DynamicResource PrimaryHueLightBrush}"
-                        BorderThickness="0"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="tbDescription"
-                            Padding="5"
-                            md:HintAssist.Hint="Izoh"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            FontSize="16" />
-                    </Border>
+                        Margin="2,0"
+                        Label="Izoh"/>
 
                     <Button
                         x:Name="btnRegister"
@@ -259,7 +199,7 @@
                         Content="Saqlash" />
                 </Grid>
             </StackPanel>
-        </md:Card>
+        </Grid>
 
         <md:Card
             Grid.Row="3"
