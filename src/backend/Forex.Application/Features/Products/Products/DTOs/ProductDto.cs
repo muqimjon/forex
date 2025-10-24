@@ -1,7 +1,6 @@
 ﻿namespace Forex.Application.Features.Products.Products.DTOs;
 
 using Forex.Application.Features.Products.ProductTypes.DTOs;
-using Forex.Application.Features.UnitMeasures.DTOs;
 using Forex.Domain.Entities;
 
 public sealed record ProductDto

@@ -14,20 +14,14 @@ public partial class UserViewModel : ViewModelBase
     [ObservableProperty] private string description = string.Empty;
 
     [ObservableProperty] private ObservableCollection<UserAccountViewModel> accounts = [];
-    [ObservableProperty] private ObservableCollection<ProductViewModel> preparedProducts = [];
+    [ObservableProperty] private ObservableCollection<ProductEntryViewModel> preparedProducts = [];
+    private UserViewModel? selected;
 
     // UI qismi uchun
     [ObservableProperty] private decimal? balance;
-    partial void OnAccountsChanged(ObservableCollection<UserAccountViewModel> value)
-    {
-        if (accounts.Any())
-            Balance = accounts
-                .Where(x => x.Currency is not null && x.Currency.Symbol == "Uzs")
-                .Sum(x => x.Balance);
-    }
 
+    #region Property Changes
 
-    private UserViewModel? selected;
     public UserViewModel? Selected
     {
         get => selected;
@@ -42,8 +36,22 @@ public partial class UserViewModel : ViewModelBase
                 Address = value.Address;
                 Description = value.Description;
                 Accounts = new ObservableCollection<UserAccountViewModel>(value.Accounts ?? []);
-                PreparedProducts = new ObservableCollection<ProductViewModel>(value.PreparedProducts ?? []);
+                PreparedProducts = new ObservableCollection<ProductEntryViewModel>(value.PreparedProducts ?? []);
             }
         }
     }
+
+    #endregion Property Changes
+
+    #region Private Helpers
+
+    partial void OnAccountsChanged(ObservableCollection<UserAccountViewModel> value)
+    {
+        if (accounts.Any())
+            Balance = Accounts
+                .Where(x => x.Currency is not null && x.Currency.Code == "UZS")
+                .Sum(x => x.Balance);
+    }
+
+    #endregion Private Helpers
 }

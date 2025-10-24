@@ -18,11 +18,13 @@ public class SemiProductMappingProfile : Profile
             .ForMember(dest => dest.NormalizedName,
                 opt => opt.MapFrom(src => src.Name!.ToNormalized()));
 
+        CreateMap<SemiProductCommand, SemiProduct>()
+            .ForMember(dest => dest.NormalizedName,
+                opt => opt.MapFrom(src => src.Name!.ToNormalized()));
+
         CreateMap<SemiProduct, SemiProductDto>();
         CreateMap<SemiProduct, SemiProductForProductTypeItemDto>();
         CreateMap<SemiProduct, SemiProductForSemiProductEntryDto>();
         CreateMap<SemiProduct, SemiProductForSemiProductResidueDto>();
-
-        CreateMap<SemiProductCommand, SemiProduct>();
     }
 }

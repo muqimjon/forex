@@ -78,6 +78,9 @@ public partial class SemiProductPage : Page
         }
         else
         {
+            if (type.Product.ProductTypes.Count < 2 && type.Product.ProductTypes.Contains(type))
+                vm.Products.Remove(type.Product);
+
             type.Product ??= new ProductViewModel();
             type.Product.Code = newCode;
             vm.Products.Add(type.Product);

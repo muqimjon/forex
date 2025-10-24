@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
+using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Invoices.Commands;
 using Forex.Application.Features.Products.Products.Commands;
@@ -44,10 +45,10 @@ public class CreateSemiProductIntakeCommandHandler(
             var transferRatio = (request.Invoice.TransferFee ?? 0) / request.Invoice.CostPrice;
 
             // 🔹 Avvalo Productlar va ularga bog‘langan SemiProductlarni saqlaymiz
-            var linkedSemiProducts = await AddProductsAsync(request.Products, invoice, deliveryRatio, transferRatio, ct);
+            await AddProductsAsync(request.Products, invoice, deliveryRatio, transferRatio, ct);
 
             // 🔹 Keyin mustaqil SemiProductlarni (productga bog‘liq bo‘lmagan)
-            await AddIndependentSemiProductsAsync(request.SemiProducts, invoice, linkedSemiProducts, deliveryRatio, transferRatio, ct);
+            await AddIndependentSemiProductsAsync(request.SemiProducts, invoice, deliveryRatio, transferRatio, ct);
 
             await context.CommitTransactionAsync(ct);
             return invoice.Id;
@@ -66,11 +67,10 @@ public class CreateSemiProductIntakeCommandHandler(
 
         var user = await context.Users
             .Include(u => u.Accounts)
-            .FirstOrDefaultAsync(u => u.Id == invoice.SenderId, ct);
+            .FirstOrDefaultAsync(u => u.Id == invoice.SenderId, ct)
+            ?? throw new NotFoundException(nameof(User), nameof(invoice.SenderId), invoice.SenderId!);
 
-        if (user is null) return;
-
-        var account = user.Accounts.FirstOrDefault(a => a.Id == invoice.CurrencyId);
+        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == invoice.CurrencyId);
         if (account is null)
         {
             account = new UserAccount
@@ -86,7 +86,6 @@ public class CreateSemiProductIntakeCommandHandler(
         account.Balance += (decimal)invoice.TransferFee!;
     }
 
-    // --- Supplier Account ---
     private async Task EnsureSupplierExistsAsync(InvoiceCommand invoice, CancellationToken ct)
     {
         var user = await context.Users
@@ -94,13 +93,12 @@ public class CreateSemiProductIntakeCommandHandler(
             .FirstOrDefaultAsync(u => u.Id == invoice.SupplierId, ct)
             ?? throw new NotFoundException(nameof(User), nameof(invoice.SupplierId), invoice.SupplierId);
 
-        var account = user.Accounts.FirstOrDefault(a => a.Id == invoice.CurrencyId);
+        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == invoice.CurrencyId);
         if (account is null)
         {
             account = new UserAccount
             {
                 OpeningBalance = invoice.CostPrice,
-                Balance = invoice.CostPrice,
                 User = user,
                 CurrencyId = invoice.CurrencyId
             };
@@ -110,8 +108,7 @@ public class CreateSemiProductIntakeCommandHandler(
         account.Balance += invoice.CostPrice!;
     }
 
-    // --- 1️⃣ Product va unga bog‘langan SemiProduct’lar ---
-    private async Task<List<SemiProduct>> AddProductsAsync(
+    private async Task AddProductsAsync(
         IEnumerable<ProductCommand> productCommands,
         Invoice invoice,
         decimal deliveryRatio,
@@ -119,55 +116,42 @@ public class CreateSemiProductIntakeCommandHandler(
         CancellationToken ct)
     {
         var manufactory = await context.Manufactories
-            .Include(m => m.SemiProductResidues)
-            .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct)
-            ?? throw new NotFoundException(nameof(Manufactory), nameof(invoice.ManufactoryId), invoice.ManufactoryId);
+            .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct);
+
+        if (manufactory is null)
+            context.Manufactories.Add(manufactory = new() { Name = "Default" });
 
         var defaultMeasure = await context.UnitMeasures
-            .FirstOrDefaultAsync(um => um.Name == "Dona" || um.Name == "dona", ct)
+            .FirstOrDefaultAsync(um => um.NormalizedName == "Dona".ToNormalized(), ct)
             ?? await context.UnitMeasures.FirstOrDefaultAsync(um => um.IsDefault, ct)
             ?? await context.UnitMeasures.FirstOrDefaultAsync(ct)
             ?? throw new ForbiddenException("O'lchov birliklari mavjud emas");
-
-        var linkedSemiProducts = new Dictionary<string, SemiProduct>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var pCmd in productCommands)
         {
             var product = mapper.Map<Product>(pCmd);
             product.UnitMeasure = defaultMeasure;
+            product.ProductTypes.Clear();
             context.Products.Add(product);
 
             foreach (var typeCmd in pCmd.ProductTypes)
             {
                 var productType = mapper.Map<ProductType>(typeCmd);
                 productType.ProductTypeItems.Clear();
+                product.ProductTypes.Add(productType);
 
                 foreach (var itemCmd in typeCmd.ProductTypeItems)
                 {
-                    var semiName = itemCmd.SemiProduct.Name;
+                    var semi = mapper.Map<SemiProduct>(itemCmd.SemiProduct);
 
-                    if (!linkedSemiProducts.TryGetValue(semiName!, out var semi))
-                    {
-                        semi = await context.SemiProducts
-                            .FirstOrDefaultAsync(s => s.Name == semiName, ct);
-
-                        if (semi is null)
-                        {
-                            semi = mapper.Map<SemiProduct>(itemCmd.SemiProduct);
-                            context.SemiProducts.Add(semi);
-                        }
-
-                        linkedSemiProducts[semiName!] = semi;
-                    }
-
-                    var semiCost = itemCmd.SemiProduct.CostPrice;
+                    var semiCost = itemCmd.SemiProduct.CostPrice / itemCmd.Quantity;
                     var costDelivery = semiCost * deliveryRatio;
                     var transferFee = semiCost * transferRatio;
 
                     context.SemiProductEntries.Add(new SemiProductEntry
                     {
                         SemiProduct = semi,
-                        Quantity = itemCmd.Quantity,
+                        Quantity = itemCmd.SemiProduct.Quantity,
                         Manufactory = manufactory!,
                         Invoice = invoice,
                         CostPrice = semiCost,
@@ -179,7 +163,7 @@ public class CreateSemiProductIntakeCommandHandler(
                     {
                         SemiProduct = semi,
                         Manufactory = manufactory,
-                        Quantity = itemCmd.Quantity
+                        Quantity = itemCmd.SemiProduct.Quantity
                     });
 
                     productType.ProductTypeItems.Add(new ProductTypeItem
@@ -188,12 +172,8 @@ public class CreateSemiProductIntakeCommandHandler(
                         Quantity = itemCmd.Quantity
                     });
                 }
-
-                product.ProductTypes.Add(productType);
             }
         }
-
-        return [.. linkedSemiProducts.Values];
     }
 
 
@@ -201,34 +181,22 @@ public class CreateSemiProductIntakeCommandHandler(
     private async Task AddIndependentSemiProductsAsync(
     IEnumerable<SemiProductCommand> semiProductCommands,
     Invoice invoice,
-    IEnumerable<SemiProduct> productLinkedSemiProducts,
     decimal deliveryRatio,
     decimal transferRatio,
     CancellationToken ct)
     {
         var manufactory = await context.Manufactories
-            .Include(m => m.SemiProductResidues)
-            .Include(m => m.SemiProductEntries)
-            .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct)
-            ?? throw new NotFoundException(nameof(Manufactory), nameof(invoice.ManufactoryId), invoice.ManufactoryId);
+            .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct);
 
-        var existingNames = new HashSet<string>(
-            productLinkedSemiProducts.Select(sp => sp.Name)!,
-            StringComparer.OrdinalIgnoreCase);
+        if (manufactory is null)
+            context.Manufactories.Add(manufactory = new() { Name = "Default" });
+
+
 
         foreach (var cmd in semiProductCommands)
         {
-            if (existingNames.Contains(cmd.Name!))
-                continue;
-
-            var semi = await context.SemiProducts
-                .FirstOrDefaultAsync(sp => sp.Name == cmd.Name, ct);
-
-            if (semi is null)
-            {
-                semi = mapper.Map<SemiProduct>(cmd);
-                context.SemiProducts.Add(semi);
-            }
+            var semi = mapper.Map<SemiProduct>(cmd);
+            context.SemiProducts.Add(semi);
 
             var costDelivery = cmd.CostPrice * deliveryRatio;
             var transferFee = cmd.CostPrice * transferRatio;
@@ -244,21 +212,12 @@ public class CreateSemiProductIntakeCommandHandler(
                 TransferFee = transferFee
             });
 
-            var residue = manufactory.SemiProductResidues.FirstOrDefault(r => r.SemiProductId == semi.Id);
-            if (residue is null)
+            context.SemiProductResidues.Add(new SemiProductResidue
             {
-                residue = new SemiProductResidue
-                {
-                    SemiProduct = semi,
-                    Manufactory = manufactory,
-                    Quantity = cmd.Quantity
-                };
-                context.SemiProductResidues.Add(residue);
-            }
-            else
-            {
-                residue.Quantity += cmd.Quantity;
-            }
+                SemiProduct = semi,
+                Manufactory = manufactory,
+                Quantity = cmd.Quantity
+            });
         }
     }
 }

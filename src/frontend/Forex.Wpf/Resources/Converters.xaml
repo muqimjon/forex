@@ -13,5 +13,7 @@
     <conv:ToStringConverter x:Key="ToStringConverter" />
     <conv:NullToBoolConverter x:Key="NullToBoolConverter" />
     <conv:RowNumberConverter x:Key="RowNumber" />
+    <conv:NullToVisibilityConverter x:Key="NullToVisibility" />
+    <conv:InverseNullToVisibilityConverter x:Key="InverseNullToVisibility" />
 
 </ResourceDictionary>

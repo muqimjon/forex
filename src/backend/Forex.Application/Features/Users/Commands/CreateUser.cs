@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
+using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Accounts.Commands;
 using Forex.Domain.Entities;
@@ -27,31 +28,13 @@ public class CreateUserCommandHandler(
     public async Task<long> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var isExist = await context.Users
-            .AnyAsync(user => user.Name == request.Name.Trim(), cancellationToken);
+            .AnyAsync(user => user.NormalizedName == request.Name.ToNormalized(), cancellationToken);
 
         if (isExist)
             throw new AlreadyExistException(nameof(User), nameof(request.Name), request.Name);
 
         var user = mapper.Map<User>(request);
         context.Users.Add(user);
-
-        var currencies = await context.Currencies.ToListAsync(cancellationToken);
-        var currencyIds = currencies.Select(c => c.Id).ToHashSet();
-
-        foreach (var dto in request.Accounts)
-        {
-            if (!currencyIds.Contains(dto.CurrencyId))
-                throw new NotFoundException(nameof(Currency), nameof(dto.CurrencyId), dto.CurrencyId);
-
-            context.UserAccounts.Add(new UserAccount
-            {
-                User = user,
-                CurrencyId = dto.CurrencyId,
-                OpeningBalance = dto.OpeningBalance,
-                Balance = dto.OpeningBalance,
-                Discount = dto.Discount
-            });
-        }
 
         await context.SaveAsync(cancellationToken);
         return user.Id;

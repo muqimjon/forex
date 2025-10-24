@@ -20,7 +20,7 @@ public interface IAppDbContext
     DbSet<ProductResidue> ProductResidues { get; }
     DbSet<ProductType> ProductTypes { get; }
     DbSet<ProductEntry> ProductEntries { get; }
-    DbSet<ProductTypeItem> ProductItems { get; }
+    DbSet<ProductTypeItem> ProductTypeItems { get; }
     DbSet<SemiProductResidue> SemiProductResidues { get; }
     DbSet<ProductResidue> ResidueShops { get; }
     DbSet<UnitMeasure> UnitMeasures { get; }

@@ -9,4 +9,7 @@ public interface IApiProductTypes
 {
     [Get("/product-types")]
     Task<Response<List<ProductTypeResponse>>> GetAll();
+
+    [Post("/product-types/filter")]
+    Task<Response<List<ProductTypeResponse>>> Filter(FilteringRequest request);
 }

@@ -7,14 +7,7 @@ using Forex.Wpf.Common.Services;
 public abstract partial class ViewModelBase : ObservableObject
 {
     // 🔄 Spinner
-    [ObservableProperty]
-    private bool isLoading;
-
-    partial void OnIsLoadingChanged(bool value)
-    {
-        if (value) SpinnerService.Show();
-        else SpinnerService.Hide();
-    }
+    [ObservableProperty] private bool isLoading;
 
     // 🔔 Notifications
     [ObservableProperty] private string errorMessage = string.Empty;
@@ -22,6 +15,8 @@ public abstract partial class ViewModelBase : ObservableObject
     [ObservableProperty] private string infoMessage = string.Empty;
     [ObservableProperty] private string successMessage = string.Empty;
 
+    [ObservableProperty] private bool isEditing;
+    [ObservableProperty] private bool isSelected;
 
     partial void OnErrorMessageChanged(string value)
         => ShowNotification(value, NotificationType.Error);
@@ -44,5 +39,11 @@ public abstract partial class ViewModelBase : ObservableObject
         NotificationService.Show(message, type, durationSeconds: duration);
 
         ErrorMessage = WarningMessage = InfoMessage = SuccessMessage = string.Empty;
+    }
+
+    partial void OnIsLoadingChanged(bool value)
+    {
+        if (value) SpinnerService.Show();
+        else SpinnerService.Hide();
     }
 }

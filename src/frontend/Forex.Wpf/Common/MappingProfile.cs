@@ -28,7 +28,7 @@ public static class MappingProfile
         // 🔹 SemiProduct
         config.NewConfig<SemiProductResponse, SemiProductViewModel>();
         config.NewConfig<SemiProductViewModel, SemiProductRequest>()
-            .Map(dest => dest.UnitMeasureId, src => src.Measure.Id)
+            .Map(dest => dest.UnitMeasureId, src => src.UnitMeasure.Id)
             .Map(dest => dest.ImageBytes, src => ImageToBytes(src.Image));
 
         // 🔹 UnitMeasure

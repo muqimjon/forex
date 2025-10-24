@@ -6,13 +6,9 @@ using Forex.ClientService.Models.Responses;
 using Refit;
 
 public interface IApiProducts
-
 {
     [Get("/products")]
     Task<Response<List<ProductResponse>>> GetAll();
-
-    [Post("/products/filter")]
-    Task<Response<List<ProductResponse>>> Filter(FilteringRequest request);
 
     [Get("/products/{id}")]
     Task<Response<ProductResponse>> GetById(long id);
@@ -25,4 +21,7 @@ public interface IApiProducts
 
     [Delete("/products/{id}")]
     Task<Response<bool>> Delete(long id);
+
+    [Post("/products/filter")]
+    Task<Response<List<ProductResponse>>> Filter(FilteringRequest request);
 }

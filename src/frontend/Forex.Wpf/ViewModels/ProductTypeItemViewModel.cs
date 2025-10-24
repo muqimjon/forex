@@ -6,7 +6,7 @@ using Forex.Wpf.Pages.Common;
 public partial class ProductTypeItemViewModel : ViewModelBase
 {
     public long Id { get; set; }
-    [ObservableProperty] private decimal quantity;
+    [ObservableProperty] private decimal quantity = 1;
     [ObservableProperty] private SemiProductViewModel semiProduct = default!;
 
     // UI-only

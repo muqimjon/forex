@@ -1,28 +1,36 @@
-﻿<Page
-    x:Class="Forex.Wpf.Pages.Users.UserPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="UserPage"
-    d:DesignHeight="580"
-    d:DesignWidth="810"
-    mc:Ignorable="d">
+﻿<Page x:Class="Forex.Wpf.Pages.Users.UserPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+      Title="UserPage"
+      d:DesignHeight="580"
+      d:DesignWidth="810"
+      mc:Ignorable="d">
 
 
     <Page.Resources>
         <!--  Umumiy DataGridCell style  -->
-        <Style x:Key="TransparentCellStyle" TargetType="DataGridCell">
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="BorderBrush" Value="Transparent" />
+        <Style x:Key="TransparentCellStyle"
+               TargetType="DataGridCell">
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="Margin"
+                    Value="0" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+            <Setter Property="FocusVisualStyle"
+                    Value="{x:Null}" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="BorderBrush"
+                    Value="Transparent" />
         </Style>
     </Page.Resources>
 
@@ -34,244 +42,218 @@
         </Grid.RowDefinitions>
 
         <!--  🔎 Qidiruv  -->
-        <Border
-            Grid.Row="0"
-            Width="240"
-            Margin="0,5"
-            Padding="0"
-            HorizontalAlignment="Left"
-            Background="{DynamicResource SelectedBackground}"
-            BorderBrush="{DynamicResource SelectedBorderColor}"
-            BorderThickness="1"
-            CornerRadius="5">
-            <TextBox
-                x:Name="txtSearch"
-                Width="230"
-                Margin="5,1,2,1"
+        <Border Grid.Row="0"
+                Width="240"
+                Margin="0,5"
                 Padding="0"
-                md:HintAssist.Hint="Qidiruv.."
-                BorderBrush="Gray"
-                BorderThickness="0"
-                FontSize="16" />
+                HorizontalAlignment="Left"
+                Background="{DynamicResource SelectedBackground}"
+                BorderBrush="{DynamicResource SelectedBorderColor}"
+                BorderThickness="1"
+                CornerRadius="5">
+            <TextBox x:Name="txtSearch"
+                     Width="230"
+                     Margin="5,1,2,1"
+                     Padding="0"
+                     md:HintAssist.Hint="Qidiruv.."
+                     BorderBrush="Gray"
+                     BorderThickness="0"
+                     FontSize="16" />
         </Border>
 
-        <Button
-            x:Name="btnBack"
-            Grid.Row="0"
-            HorizontalAlignment="Right"
-            md:ButtonAssist.CornerRadius="5"
-            Background="{DynamicResource OtherBackground}"
-            BorderThickness="0"
-            Content="🔙 Orqaga"
-            ToolTip="Orqaga" />
+        <Button x:Name="btnBack"
+                Grid.Row="0"
+                HorizontalAlignment="Right"
+                md:ButtonAssist.CornerRadius="5"
+                Background="{DynamicResource OtherBackground}"
+                BorderThickness="0"
+                Content="🔙 Orqaga"
+                ToolTip="Orqaga" />
 
         <!--  ➕ Qo‘shish formasi  -->
-        <WrapPanel Grid.Row="1" Orientation="Horizontal">
-            <Border
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <ComboBox
-                    x:Name="cbRole"
-                    Width="105"
-                    Padding="5,1,2,1"
-                    md:HintAssist.Hint="Tanlash"
-                    BorderThickness="0"
-                    FontSize="16"
-                    IsEditable="False"
-                    IsTextSearchEnabled="False"
-                    Loaded="CbRole_Loaded"
-                    StaysOpenOnEdit="True" />
+        <WrapPanel Grid.Row="1"
+                   Orientation="Horizontal">
+            <Border Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <ComboBox x:Name="cbRole"
+                          Width="105"
+                          Padding="5,1,2,1"
+                          md:HintAssist.Hint="Tanlash"
+                          BorderThickness="0"
+                          FontSize="16"
+                          IsEditable="False"
+                          IsTextSearchEnabled="False"
+                          Loaded="CbRole_Loaded"
+                          StaysOpenOnEdit="True" />
             </Border>
 
-            <Border
-                Width="115"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtName"
-                    Width="112"
+            <Border Width="115"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtName"
+                         Width="112"
+                         Padding="3 1 2 1"
+                         md:HintAssist.Hint="Nomi"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Border Width="142"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtPhone"
+                         Width="140"
+                         Padding="3,1,2,1"
+                         md:HintAssist.Hint="Telefon"
+                         BorderThickness="0"
+                         FontSize="16"
+                         TextChanged="TxtPhone_TextChanged" />
+            </Border>
+
+            <Border Width="200"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtAddress"
+                         Width="195"
+                         Padding="3 1 2 1"
+                         md:HintAssist.Hint="Manzil"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Border Width="200"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtDescription"
+                         Width="195"
+                         Padding="3 1 2 1"
+                         md:HintAssist.Hint="Izoh"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Border x:Name="brValutaType"
+                    Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="Collapsed">
+                <ComboBox x:Name="cbxValutaType"
+                          Width="105"
+                          Padding="3,1,2,1"
+                          md:HintAssist.Hint="Valyuta turi"
+                          BorderThickness="0"
+                          FontSize="16"
+                          IsEditable="False"
+                          IsTextSearchEnabled="False"
+                          StaysOpenOnEdit="True" />
+            </Border>
+
+
+            <Border x:Name="brDiscount"
+                    Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="Collapsed">
+                <TextBox x:Name="tbDiscount"
+                         Width="115"
+                         Padding="3 1 2 1"
+                         md:HintAssist.Hint="Bonus"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Border x:Name="brAccount"
+                    Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="Collapsed">
+                <TextBox x:Name="tbAccount"
+                         Width="115"
+                         Padding="3 1 2 1"
+                         md:HintAssist.Hint="Hisob qoldiq"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Button x:Name="btnSave"
+                    MinWidth="50"
+                    Margin="3,0,0,3"
                     Padding="3 1 2 1"
-                    md:HintAssist.Hint="Nomi"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="{DynamicResource OtherBackground}"
                     BorderThickness="0"
-                    FontSize="16" />
-            </Border>
+                    Content="💾 Saqlash"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    ToolTip="Saqlash"
+                    Visibility="Collapsed" />
 
-            <Border
-                Width="142"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtPhone"
-                    Width="140"
-                    Padding="3,1,2,1"
-                    md:HintAssist.Hint="Telefon"
-                    BorderThickness="0"
-                    FontSize="16"
-                    TextChanged="TxtPhone_TextChanged" />
-            </Border>
-
-            <Border
-                Width="200"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtAddress"
-                    Width="195"
+            <Button x:Name="btnUpdate"
+                    MinWidth="50"
+                    Margin="3,0,0,3"
                     Padding="3 1 2 1"
-                    md:HintAssist.Hint="Manzil"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="{DynamicResource OtherBackground}"
                     BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Border
-                Width="200"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtDescription"
-                    Width="195"
-                    Padding="3 1 2 1"
-                    md:HintAssist.Hint="Izoh"
-                    BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Border
-                x:Name="brValutaType"
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Visibility="Collapsed">
-                <ComboBox
-                    x:Name="cbxValutaType"
-                    Width="105"
-                    Padding="3,1,2,1"
-                    md:HintAssist.Hint="Valyuta turi"
-                    BorderThickness="0"
-                    FontSize="16"
-                    IsEditable="False"
-                    IsTextSearchEnabled="False"
-                    StaysOpenOnEdit="True" />
-            </Border>
-
-
-            <Border
-                x:Name="brDiscount"
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Visibility="Collapsed">
-                <TextBox
-                    x:Name="tbDiscount"
-                    Width="115"
-                    Padding="3 1 2 1"
-                    md:HintAssist.Hint="Bonus"
-                    BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Border
-                x:Name="brAccount"
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Visibility="Collapsed">
-                <TextBox
-                    x:Name="tbAccount"
-                    Width="115"
-                    Padding="3 1 2 1"
-                    md:HintAssist.Hint="Hisob qoldiq"
-                    BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Button
-                x:Name="btnSave"
-                MinWidth="50"
-                Margin="3,0,0,3"
-                Padding="3 1 2 1"
-                md:ButtonAssist.CornerRadius="4"
-                Background="{DynamicResource OtherBackground}"
-                BorderThickness="0"
-                Content="💾 Saqlash"
-                FontWeight="Bold"
-                Foreground="{DynamicResource PrimaryTextColor}"
-                ToolTip="Saqlash"
-                Visibility="Collapsed" />
-
-            <Button
-                x:Name="btnUpdate"
-                MinWidth="50"
-                Margin="3,0,0,3"
-                Padding="3 1 2 1"
-                md:ButtonAssist.CornerRadius="4"
-                Background="{DynamicResource OtherBackground}"
-                BorderThickness="0"
-                Content="🔄 Yangilash"
-                FontWeight="Bold"
-                Foreground="{DynamicResource PrimaryTextColor}"
-                ToolTip="Yangilash"
-                Visibility="Collapsed" />
+                    Content="🔄 Yangilash"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    ToolTip="Yangilash"
+                    Visibility="Collapsed" />
         </WrapPanel>
 
         <!--  📋 Jadval  -->
-        <DataGrid
-            x:Name="dgUsers"
-            Grid.Row="2"
-            Margin="0"
-            AutoGenerateColumns="False"
-            BorderBrush="Gray"
-            BorderThickness="1"
-            CanUserAddRows="False"
-            HeadersVisibility="Column"
-            IsReadOnly="True"
-            ItemsSource="{Binding filteredUsers}">
+        <DataGrid x:Name="dgUsers"
+                  Grid.Row="2"
+                  Margin="0"
+                  AutoGenerateColumns="False"
+                  BorderBrush="Gray"
+                  BorderThickness="1"
+                  CanUserAddRows="False"
+                  HeadersVisibility="Column"
+                  IsReadOnly="True"
+                  ItemsSource="{Binding filteredUsers}">
             <DataGrid.Columns>
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Name}"
-                    Header="Nomi" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Phone}"
-                    Header="Telefon" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Address}"
-                    Header="Manzil" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Description}"
-                    Header="Izoh" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Role}"
-                    Header="Rol" />
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding Name}"
+                                    Header="Nomi" />
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding Phone}"
+                                    Header="Telefon" />
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding Address}"
+                                    Header="Manzil" />
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding Description}"
+                                    Header="Izoh" />
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding Role}"
+                                    Header="Rol" />
 
 
                 <!--  Actions  -->
@@ -281,11 +263,10 @@
                     </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <controls:ActionButton
-                                CommandParameter="{Binding}"
-                                DeleteCommand="{Binding RemoveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                EditCommand="{Binding EditUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                SaveCommand="{Binding SaveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
+                            <controls:ActionButton CommandParameter="{Binding}"
+                                                   DeleteCommand="{Binding RemoveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                   EditCommand="{Binding EditUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                   SaveCommand="{Binding SaveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
