@@ -23,14 +23,12 @@ public static class ApiExtensions
         {
             setLoading?.Invoke(true);
 
-            // 🔹 Minio service va request obyektni olish
             var fileStorage = _serviceProvider?.GetService<MinioFileStorageService>();
             var requestObject = GetRefitRequestBody(task);
 
-            if (fileStorage != null && requestObject != null)
+            if (fileStorage is not null && requestObject is not null)
                 await UploadFilesRecursiveAsync(requestObject, fileStorage);
 
-            // 🔹 Asl requestni yuborish
             return await task;
         }
         catch (ApiException apiEx)

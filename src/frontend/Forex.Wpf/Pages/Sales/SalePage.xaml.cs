@@ -1,12 +1,14 @@
 ﻿namespace Forex.Wpf.Pages.Sales;
 
+using Forex.ClientService;
+using Forex.ClientService.Extensions;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 /// <summary>
 /// Interaction logic for SalePage.xaml
@@ -14,17 +16,13 @@ using System.Windows.Input;
 public partial class SalePage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-    private SaleViewModel vm;
+    private readonly SalePageViewModel vm;
 
     public SalePage()
     {
         InitializeComponent();
-        vm = App.AppHost!.Services.GetRequiredService<SaleViewModel>();
+        vm = App.AppHost!.Services.GetRequiredService<SalePageViewModel>();
         DataContext = vm;
-        _ = vm.LoadUsersAsync();
-        btnBack.Click += BtnBack_Click;
-        vm.RequestNewCustomer += Vm_RequestNewCustomer;
-        supplyDate.SelectedDate = DateTime.Now;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -35,37 +33,48 @@ public partial class SalePage : Page
             Main.NavigateTo(new HomePage());
     }
 
-    private async void Vm_RequestNewCustomer(object? sender, string name)
+    private async void CustomerComboBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        var result = MessageBox.Show(
-        $"“{name}” nomli mijoz topilmadi.\nYangi mijoz qo‘shmoqchimisiz?",
-        "Yangi mijoz",
-        MessageBoxButton.YesNo,
-        MessageBoxImage.Question);
+        if (sender is not ComboBox comboBox || string.IsNullOrWhiteSpace(comboBox.Text))
+            return;
 
-        if (result == MessageBoxResult.Yes)
+        var input = comboBox.Text.Trim();
+
+        var existing = vm.AvailableCustomers.FirstOrDefault(c =>
+            c.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
+
+        if (existing is not null)
         {
-            var userWindow = new UserWindow();
-            userWindow.Owner = Application.Current.MainWindow;
-            bool? dialogResult = userWindow.ShowDialog();
+            vm.Customer = existing;
+            return;
+        }
 
-            if (dialogResult == true && sender is SaleViewModel vm)
+        var confirm = MessageBox.Show(
+            $"Mijoz '{input}' topilmadi. Yangi mijoz yaratilishini istaysizmi?",
+            "Yangi mijoz",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (confirm == MessageBoxResult.Yes)
+        {
+            var newCustomer = await CreateCustomerAsync(input);
+            if (newCustomer is not null)
             {
-                await vm.LoadUsersAsync();
-                vm.SelectedCustomer = vm.Customers
-        .FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                vm.Customer = new()
+                {
+                    Id = newCustomer.Id,
+                    Name = newCustomer.Name,
+                    Phone = newCustomer.Phone,
+                    Address = newCustomer.Address,
+                    Description = newCustomer.Description
+                };
+
+                vm.AvailableCustomers.Add(vm.Customer);
+
             }
         }
     }
 
-    private void ComboBox_KeyDown(object sender, KeyEventArgs e)
-    {
-        if ((e.Key == Key.Enter || e.Key == Key.Tab) && DataContext is SaleViewModel vm)
-        {
-            string text = ((ComboBox)sender).Text?.Trim() ?? "";
-            vm.CheckCustomerNameCommand.Execute(text);
-        }
-    }
     private void ComboBox_GotFocus(object sender, RoutedEventArgs e)
     {
         if (sender is ComboBox comboBox)
@@ -73,4 +82,23 @@ public partial class SalePage : Page
             comboBox.IsDropDownOpen = true;
         }
     }
+
+    private async Task<UserResponse?> CreateCustomerAsync(string name)
+    {
+        var dialog = new UserWindow();
+        dialog.txtName.Text = name;
+
+        var result = dialog.ShowDialog();
+        if (result != true)
+            return null;
+
+        var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
+        var all = await client.Users.GetAll().Handle();
+
+        if (!all.IsSuccess || all.Data is null)
+            return null;
+
+        return all.Data.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+    }
+
 }
