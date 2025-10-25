@@ -109,9 +109,8 @@
             </md:Card>
         </StackPanel>
 
-        <Grid
-            Grid.Row="2"
-            Margin="0,0,0,20">
+        <Grid Grid.Row="2"
+              Margin="0,0,0,20">
             <StackPanel Orientation="Vertical">
                 <TextBlock
                     Margin="5,0,0,15"
@@ -119,84 +118,142 @@
                     FontWeight="Medium"
                     Text="Kassa kirim, chiqim amaliyoti" />
 
-                <Grid>
+                <Grid Margin="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <!-- Chap ustun -->
+                        <ColumnDefinition Width="*" />
+                        <!-- O‘ng ustun -->
                     </Grid.ColumnDefinitions>
 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Sana / Hisob -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Mijoz / Joriy -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Kirim / Qoldiq -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Summa / Valyuta -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Izoh / To‘lash sana -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Qo‘shimcha izoh -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Tugma -->
+                    </Grid.RowDefinitions>
 
-                    <controls:UserCalendar
-                        Grid.Column="0"
-                        x:Name="supplyDate"
-                        MinWidth="120"
-                        Margin="0,0,5,0"
-                        Padding="0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Background="{DynamicResource PrimaryBackground}"
-                        FontSize="14"
-                        SelectedDate="{Binding OperationDate}" />
-                    <!--  Mijoz tanlash  -->
-                    <controls:FloatingComboBox
-                        x:Name="cbxUser"
-                        Grid.Column="1"
-                        MinWidth="120"
-                        Margin="2,0"
-                        IsEditable="True"
-                        IsTextSearchEnabled="True"
-                        Label="User tanlash" />
+                    <!-- 1-qator -->
+                    <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,10,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Sana:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:UserCalendar Grid.Column="1"
+                                               x:Name="supplyDate"
+                                               MinWidth="150"
+                                               SelectedDate="{Binding OperationDate}"/>
+                    </Grid>
 
-                    <!--  Amaliyot turi  -->
-                    <controls:FloatingComboBox
-                        x:Name="cbxIncome"
-                        Grid.Column="2"
-                        MinWidth="120"
-                        Margin="2,0"
-                        IsEditable="True"
-                        IsTextSearchEnabled="True"
-                        Label="Amaliyot turi" />
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                        <TextBlock Text="Hisob:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:FloatingComboBox
+                            x:Name="cbxAccount"
+                            MinWidth="180"
+                            Label="Hisob tanlash"
+                            IsEditable="True"
+                            IsTextSearchEnabled="True"/>
+                    </StackPanel>
 
+                    <!-- 2-qator -->
+                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,5,10,0">
+                        <TextBlock Text="Mijoz:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:FloatingComboBox
+                            x:Name="cbxUser"
+                            MinWidth="180"
+                            Label="Mijoz tanlash"
+                            IsEditable="True"
+                            IsTextSearchEnabled="True"/>
+                    </StackPanel>
 
-                    <!--  Valyuta  -->
-                    <controls:FloatingComboBox
-                        x:Name="cbxValyutaType"
-                        Grid.Column="3"
-                        Margin="2,0"
-                        IsEditable="True"
-                        IsTextSearchEnabled="True"
-                        Label="Valyuta" />
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="Joriy:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock x:Name="txtCurrent" Text="{Binding CurrentBalance, StringFormat=N2}" VerticalAlignment="Center"/>
+                    </StackPanel>
 
-                    <!--  Summa  -->
-                    <controls:FloatingInput
-                        x:Name="tbSum"
-                        Grid.Column="4"
-                        Margin="2,0"
-                        Label="Summa"
-                        Text="{Binding Summa, StringFormat=N2}"/>
+                    <!-- 3-qator -->
+                    <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="0,5,10,0">
+                        <TextBlock Text="Kirim:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:FloatingInput
+                            x:Name="tbIncome"
+                            MinWidth="180"
+                            Label="Kirim"/>
+                    </StackPanel>
 
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="Qoldiq:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBlock x:Name="txtBalance" Text="{Binding Balance, StringFormat=N2}" VerticalAlignment="Center"/>
+                    </StackPanel>
 
+                    <!-- 4-qator -->
+                    <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="0,5,10,0">
+                        <TextBlock Text="Summa:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:FloatingInput
+                            x:Name="tbSum"
+                            MinWidth="150"
+                            Label="Summa"
+                            Text="{Binding Summa, StringFormat=N2}"/>
+                    </StackPanel>
 
-                    <!--  Izoh  -->
-                    <controls:FloatingInput
-                        x:Name="tbDescription"
-                        Grid.Column="5"
-                        Margin="2,0"
-                        Label="Izoh"/>
+                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="Valyuta turi:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:FloatingComboBox
+                            x:Name="cbxValyutaType"
+                            MinWidth="150"
+                            Label="Valyuta"
+                            IsEditable="True"
+                            IsTextSearchEnabled="True"/>
+                    </StackPanel>
 
+                    <!-- 5-qator -->
+                    <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Margin="0,5,10,0">
+                        <TextBlock Text="Izoh:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:FloatingInput
+                            x:Name="tbDescription"
+                            MinWidth="200"
+                            Label="Izoh"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="To‘lash sana:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:UserCalendar
+                            x:Name="paymentDate"
+                            MinWidth="150"
+                            SelectedDate="{Binding PaymentDate}"/>
+                    </StackPanel>
+
+                    <!-- 6-qator -->
+                    <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                        <TextBlock Text="Qo‘shimcha izoh:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <controls:FloatingInput
+                            x:Name="tbExtraNote"
+                            MinWidth="200"
+                            Label="Qo‘shimcha izoh"/>
+                    </StackPanel>
+
+                    <!-- 7-qator -->
                     <Button
-                        x:Name="btnRegister"
-                        Grid.Column="6"
-                        Margin="5,-2,5,3"
-                        md:ButtonAssist.CornerRadius="4"
+                        Grid.Row="6"
+                        Grid.ColumnSpan="2"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Right"
+                        Width="100"
+                        Height="30"
+                        md:ButtonAssist.CornerRadius="6"
                         Background="{DynamicResource OtherBackground}"
                         Command="{Binding RecordTransactionCommand}"
-                        Content="Saqlash" />
+                        Content="Saqlash"/>
                 </Grid>
             </StackPanel>
         </Grid>
