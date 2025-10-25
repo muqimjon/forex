@@ -34,8 +34,8 @@ public class DeleteProductEntryCommandHandler(IAppDbContext context)
                 .FirstOrDefaultAsync(u => u.Id == entry.EmployeeId, cancellationToken)
                 ?? throw new NotFoundException(nameof(User), nameof(entry.EmployeeId), entry.EmployeeId);
 
-            await RevertProductResidueAsync(productType, entry.TypeCount, entry.ShopId, cancellationToken);
-            await RevertSemiProductResiduesAsync(productType, entry.TypeCount * entry.BundleItemCount, cancellationToken);
+            await RevertProductResidueAsync(productType, entry.BundleCount, entry.ShopId, cancellationToken);
+            await RevertSemiProductResiduesAsync(productType, entry.BundleCount * entry.BundleItemCount, cancellationToken);
             await RevertEmployeeBalanceAsync(employee, entry.TotalAmount);
 
             context.ProductEntries.Remove(entry);

@@ -18,7 +18,7 @@ public static class MappingProfile
             .Map(dest => dest.UnitMeasureId, src => src.UnitMeasure.Id)
             .Map(dest => dest.ImageBytes, src => ImageToBytes(src.Image));
 
-        // 🔹 ProductType
+        // 🔹 ProductTypes
         config.NewConfig<ProductTypeResponse, ProductTypeViewModel>();
         config.NewConfig<ProductTypeViewModel, ProductTypeRequest>();
 

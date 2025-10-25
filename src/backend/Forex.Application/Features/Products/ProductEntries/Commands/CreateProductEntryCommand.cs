@@ -26,13 +26,13 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
                 await CreditEmployeeAsync(employee, item.TotalAmount, cancellationToken);
 
                 var productType = await GetProductTypeAsync(item.ProductTypeId, cancellationToken);
-                var totalCount = item.TypeCount * productType.Count;
+                var totalCount = item.BundleCount * productType.Count;
 
-                await UpdateProductResidueAsync(productType, item.TypeCount, shop.Id, cancellationToken);
+                var residue = await UpdateProductResidueAsync(productType, item.BundleCount, shop.Id, cancellationToken);
                 await DeductSemiProductResiduesAsync(productType, totalCount, cancellationToken);
 
                 var costPrice = await CalculateCostPriceAsync(productType, totalCount, item.PreparationCostPerUnit, cancellationToken);
-                await SaveProductEntryAsync(item, productType.Count, costPrice, shop.Id, cancellationToken);
+                await SaveProductEntryAsync(item, productType.Count, costPrice, shop, employee, residue, cancellationToken);
             }
 
             await context.CommitTransactionAsync(cancellationToken);
@@ -58,7 +58,6 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
             };
 
             await context.Shops.AddAsync(shop, ct);
-            await context.SaveAsync(ct);
         }
 
         return shop;
@@ -70,7 +69,7 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
             .Include(u => u.Accounts)
             .FirstOrDefaultAsync(u => u.Id == employeeId, ct);
 
-        return employee ?? throw new InvalidOperationException($"User not found: Id={employeeId}");
+        return employee ?? throw new InvalidOperationException($"Customer not found: Id={employeeId}");
     }
 
     private async Task CreditEmployeeAsync(User employee, decimal amount, CancellationToken ct)
@@ -108,7 +107,7 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
         return productType ?? throw new InvalidOperationException($"ProductType not found: Id={productTypeId}");
     }
 
-    private async Task UpdateProductResidueAsync(ProductType productType, int count, long shopId, CancellationToken ct)
+    private async Task<ProductResidue> UpdateProductResidueAsync(ProductType productType, int count, long shopId, CancellationToken ct)
     {
         var residue = await context.ProductResidues
             .FirstOrDefaultAsync(r => r.ProductTypeId == productType.Id && r.ShopId == shopId, ct);
@@ -129,6 +128,8 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
         {
             residue.Count += count;
         }
+
+        return residue;
     }
 
     private async Task DeductSemiProductResiduesAsync(ProductType productType, int countByType, CancellationToken ct)
@@ -175,19 +176,27 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
         return semiTotal + preparationCost;
     }
 
-    private async Task SaveProductEntryAsync(ProductEntryCommand item, int countByType, decimal costPrice, long shopId, CancellationToken ct)
+    private async Task SaveProductEntryAsync(
+        ProductEntryCommand item,
+        int countByType,
+        decimal costPrice,
+        Shop shop,
+        User employee,
+        ProductResidue residue,
+        CancellationToken ct)
     {
         var entry = new ProductEntry
         {
-            TypeCount = item.TypeCount,
+            BundleCount = item.BundleCount,
             BundleItemCount = countByType,
             PreparationCostPerUnit = item.PreparationCostPerUnit,
             CostPrice = costPrice,
             ProductTypeId = item.ProductTypeId,
-            ShopId = shopId,
-            EmployeeId = item.EmployeeId,
-            UnitPrice = costPrice / (countByType * item.TypeCount) + item.PreparationCostPerUnit,
+            Shop = shop,
+            Employee = employee,
+            UnitPrice = costPrice / (countByType * item.BundleCount) + item.PreparationCostPerUnit,
             TotalAmount = item.TotalAmount,
+            ProductResidue = residue
         };
 
         await context.ProductEntries.AddAsync(entry, ct);

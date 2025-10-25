@@ -7,7 +7,7 @@ using Forex.Application.Features.Users.DTOs;
 public sealed record ProductEntryDto
 {
     public long Id { get; set; }
-    public int TypeCount { get; set; }
+    public int BundleCount { get; set; }
     public int BundleItemCount { get; set; }
     public decimal CostPrice { get; set; }     // tannarxi
     public decimal PreparationCostPerUnit { get; set; }  // tayyorlashga ketgan xarajat summasi

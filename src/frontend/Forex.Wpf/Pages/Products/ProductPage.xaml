@@ -309,7 +309,7 @@
                                   ScrollViewer.CanContentScroll="True"
                                   SnapsToDevicePixels="True"
                                   UseLayoutRounding="True"
-                                  Background="White"
+                                  Background="#f1f1f1"
                                   BorderThickness="0">
 
                             <DataGrid.Resources>
@@ -395,7 +395,7 @@
 
                                 <!-- Razmerlar soni -->
                                 <DataGridTextColumn Header="Razmerlar soni"
-                                                    Binding="{Binding TypeCount,UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
+                                                    Binding="{Binding BundleCount,UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}"
                                                     Width="0.8*"
                                                     ElementStyle="{StaticResource RightAlignedText}" />
 
@@ -447,7 +447,7 @@
             <!-- RIGHT PANEL: Invoice va Supplier ma'lumotlari -->
             <Border Grid.Column="2"
                     Padding="10"
-                    Background="AliceBlue"
+                    Background="#f1f1f1"
                     CornerRadius="4">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="50"

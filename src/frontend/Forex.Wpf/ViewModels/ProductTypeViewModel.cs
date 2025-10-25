@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using System.Collections.ObjectModel;
 
@@ -11,6 +12,8 @@ public partial class ProductTypeViewModel : ViewModelBase
     [ObservableProperty] private int? count;
     [ObservableProperty] private decimal? cost;
     [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> productTypeItems = [];
+    [ObservableProperty] private ProductResidueResponse productResidue = default!;
+    [ObservableProperty] private ICollection<SemiProductEntryResponse> productEntries = default!;
 
     // for UI only
     [ObservableProperty] private ProductViewModel product = default!;

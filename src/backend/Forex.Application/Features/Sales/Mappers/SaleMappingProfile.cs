@@ -12,8 +12,6 @@ public class SaleMappingProfile : Profile
     {
         CreateMap<CreateSaleCommand, Sale>()
             .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date.ToUtcSafe()));
-        CreateMap<UpdateSaleCommand, Sale>()
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date.ToUtcSafe()));
 
         CreateMap<Sale, SaleDto>();
         CreateMap<Sale, SaleForSaleItemDto>();
