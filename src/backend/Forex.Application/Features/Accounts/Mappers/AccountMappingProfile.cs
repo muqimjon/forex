@@ -9,7 +9,7 @@ public class AccountMappingProfile : Profile
 {
     public AccountMappingProfile()
     {
-        // User Account
+        // Customer Account
         CreateMap<CreateUserAccountCommand, UserAccount>()
             .ForMember(dest => dest.Balance,
                 opt => opt.MapFrom(src => src.OpeningBalance));

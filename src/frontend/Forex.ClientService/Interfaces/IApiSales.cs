@@ -4,11 +4,11 @@ using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
 using Refit;
 
-public interface IApiProductEntries
+public interface IApiSales
 {
-    [Post("/product-entries")]
-    Task<Response<long>> Create(CreateProductEntryCommandRequest request);
+    [Post("/sales")]
+    Task<Response<long>> Create(SaleRequest request);
 
-    [Delete("/product-entries/{id}")]
+    [Delete("/sales")]
     Task<Response<bool>> Delete(long id);
 }

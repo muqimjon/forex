@@ -9,7 +9,7 @@ public partial class ProductEntryViewModel : ViewModelBase
     public long ProductTypeId { get; set; }
     public long ProductId { get; set; }
     public long Id { get; set; }
-    [ObservableProperty] private int? typeCount;
+    [ObservableProperty] private int? bundleCount;
     [ObservableProperty] private int? totalCount;
     [ObservableProperty] private decimal? preparationCostPerUnit;
     [ObservableProperty] private decimal? totalAmount;
@@ -23,7 +23,7 @@ public partial class ProductEntryViewModel : ViewModelBase
 
     #region Property Changes
 
-    partial void OnTypeCountChanged(int? value) => CalculateTotalCount();
+    partial void OnBundleCountChanged(int? value) => CalculateTotalCount();
     partial void OnTotalCountChanged(int? value) => CalculateTotalAmount();
     partial void OnPreparationCostPerUnitChanged(decimal? value) => CalculateTotalAmount();
 
@@ -33,13 +33,13 @@ public partial class ProductEntryViewModel : ViewModelBase
 
     private void CalculateTotalCount()
     {
-        if (TypeCount is null || ProductType is null)
+        if (BundleCount is null || ProductType is null)
         {
             TotalCount = null;
             return;
         }
 
-        TotalCount = TypeCount * ProductType.Count;
+        TotalCount = BundleCount * ProductType.Count;
     }
 
     private void CalculateTotalAmount()

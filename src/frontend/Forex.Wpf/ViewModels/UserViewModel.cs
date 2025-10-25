@@ -19,6 +19,7 @@ public partial class UserViewModel : ViewModelBase
 
     // UI qismi uchun
     [ObservableProperty] private decimal? balance;
+    [ObservableProperty] private decimal? discount;
 
     #region Property Changes
 
@@ -41,16 +42,30 @@ public partial class UserViewModel : ViewModelBase
         }
     }
 
+    partial void OnAccountsChanged(ObservableCollection<UserAccountViewModel> value)
+    {
+        CalculateBalance();
+        CalculateDiscount();
+    }
+
     #endregion Property Changes
 
     #region Private Helpers
 
-    partial void OnAccountsChanged(ObservableCollection<UserAccountViewModel> value)
+    private void CalculateBalance()
     {
-        if (accounts.Any())
+        if (Accounts.Any())
             Balance = Accounts
                 .Where(x => x.Currency is not null && x.Currency.Code == "UZS")
                 .Sum(x => x.Balance);
+    }
+
+    private void CalculateDiscount()
+    {
+        if (Accounts.Any())
+            Discount = Accounts
+                .Where(x => x.Currency is not null && x.Currency.Code == "UZS")
+                .Sum(x => x.Discount);
     }
 
     #endregion Private Helpers

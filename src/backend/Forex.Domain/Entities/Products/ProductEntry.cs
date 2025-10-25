@@ -5,7 +5,7 @@ using Forex.Domain.Entities;
 
 public class ProductEntry : Auditable
 {
-    public int TypeCount { get; set; }
+    public int BundleCount { get; set; }
     public int BundleItemCount { get; set; }
     public decimal CostPrice { get; set; }     // tannarxi
     public decimal PreparationCostPerUnit { get; set; }  // tayyorlashga ketgan xarajat summasi
@@ -20,4 +20,7 @@ public class ProductEntry : Auditable
 
     public long EmployeeId { get; set; }
     public User Employee { get; set; } = default!;
+
+    public long ProductResidueId { get; set; }
+    public ProductResidue ProductResidue { get; set; } = default!;
 }

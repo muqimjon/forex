@@ -31,7 +31,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
     private void AddEmployee()
     {
         UserViewModel employee = new();
-        //employee.PropertyChanged += EmployeePropertyChanged;
         Employees.Add(employee);
     }
 
@@ -94,7 +93,7 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
 
             requests.Add(new ProductEntryRequest
             {
-                TypeCount = (int)entry.TypeCount!,
+                BundleCount = (int)entry.BundleCount!,
                 PreparationCostPerUnit = (decimal)entry.PreparationCostPerUnit!,
                 TotalAmount = (decimal)entry.TotalAmount!,
                 ProductTypeId = entry.ProductType.Id,
@@ -167,11 +166,12 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         {
             Filters = new()
             {
-                ["productid"] = [model.Product.Id.ToString()]
+                ["productid"] = [model.Product.Id.ToString()],
+                ["productResidue"] = ["include"]
             }
         };
 
-        var response = await Client.ProductType.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        var response = await Client.ProductTypes.Filter(request).Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
             model.AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
         else ErrorMessage = response.Message ?? "Mahsulot o'lchamlarini yuklashda xatolik!";

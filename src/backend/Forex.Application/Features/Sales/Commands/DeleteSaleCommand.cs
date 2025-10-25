@@ -3,66 +3,70 @@
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
+using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.Sales;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public record DeleteSaleCommand(long Id) : IRequest<bool>;
+public record DeleteSaleCommand(long SaleId) : IRequest<bool>;
 
 public class DeleteSaleCommandHandler(
-    IAppDbContext context) : IRequestHandler<DeleteSaleCommand, bool>
+    IAppDbContext context)
+    : IRequestHandler<DeleteSaleCommand, bool>
 {
-    public async Task<bool> Handle(DeleteSaleCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteSaleCommand request, CancellationToken ct)
     {
-        await context.BeginTransactionAsync(cancellationToken);
+        await context.BeginTransactionAsync(ct);
 
         try
         {
-            // === 1️⃣ Sale ni yuklaymiz (itemlari bilan) ===
-            var sale = await context.Sales
-                .Include(s => s.SaleItems)
-                .Include(s => s.User)
-                    .ThenInclude(u => u.Accounts)
-                .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken)
-                ?? throw new NotFoundException(nameof(Sale), nameof(request.Id), request.Id);
+            var sale = await LoadSaleAsync(request.SaleId, ct);
+            var userAccount = sale.Customer.Accounts.FirstOrDefault()
+                ?? throw new NotFoundException(nameof(UserAccount), nameof(sale.CustomerId), sale.CustomerId);
 
-            var userAccount = sale.User.Accounts.FirstOrDefault()
-                ?? throw new NotFoundException(nameof(UserAccount), nameof(sale.UserId), sale.UserId);
-
-            // === 2️⃣ Foydalanuvchi balansini tiklaymiz ===
             userAccount.Balance += sale.TotalAmount;
 
-            // === 3️⃣ Qoldiqlarni tiklaymiz ===
-            var productTypeIds = sale.SaleItems.Select(i => i.ProductTypeId).ToList();
+            var productResidues = await LoadProductResiduesAsync(sale.SaleItems, ct);
 
-            var productResidues = await context.ProductResidues
-                .Where(p => productTypeIds.Contains(p.ProductType.Id))
-                .ToListAsync(cancellationToken);
+            RevertProductResidueCounts(sale.SaleItems, productResidues);
 
-            foreach (var item in sale.SaleItems)
-            {
-                var residue = productResidues.FirstOrDefault(r => r.ProductType.Id == item.ProductTypeId);
-                if (residue is not null)
-                {
-                    residue.Count += item.Count; // qoldiqni qaytarib qo'yamiz
-                }
-            }
-
-            // === 4️⃣ SaleItem larni o‘chiramiz ===
             context.SaleItems.RemoveRange(sale.SaleItems);
-
-            // === 5️⃣ Sale ni o‘chiramiz ===
             context.Sales.Remove(sale);
 
-            // === 6️⃣ Tranzaksiyani commit qilamiz ===
-            await context.CommitTransactionAsync(cancellationToken);
-
-            return true;
+            await context.SaveAsync(ct);
+            return await context.CommitTransactionAsync(ct);
         }
         catch
         {
-            await context.RollbackTransactionAsync(cancellationToken);
+            await context.RollbackTransactionAsync(ct);
             throw;
+        }
+    }
+
+    private async Task<Sale> LoadSaleAsync(long saleId, CancellationToken ct)
+    {
+        var sale = await context.Sales
+            .Include(s => s.SaleItems)
+            .Include(s => s.Customer)
+                .ThenInclude(u => u.Accounts)
+            .FirstOrDefaultAsync(s => s.Id == saleId, ct);
+
+        return sale ?? throw new NotFoundException(nameof(Sale), nameof(saleId), saleId);
+    }
+
+    private Task<List<ProductResidue>> LoadProductResiduesAsync(IEnumerable<SaleItem> saleItems, CancellationToken ct) =>
+        context.ProductResidues
+            .Where(r => saleItems.Select(si => si.ProductTypeId).Distinct().Contains(r.ProductTypeId))
+            .ToListAsync(ct);
+
+    private void RevertProductResidueCounts(IEnumerable<SaleItem> saleItems, List<ProductResidue> residues)
+    {
+        foreach (var item in saleItems)
+        {
+            var residue = residues.FirstOrDefault(r => r.ProductTypeId == item.ProductTypeId)
+                ?? throw new NotFoundException(nameof(ProductResidue), nameof(item.ProductTypeId), item.ProductTypeId);
+
+            residue.Count += item.BundleCount;
         }
     }
 }

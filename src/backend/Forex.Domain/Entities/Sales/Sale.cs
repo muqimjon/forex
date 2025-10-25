@@ -12,8 +12,8 @@ public class Sale : Auditable
     public decimal TotalAmount { get; set; }   // 1 ta savdoda jami summa
     public string? Note { get; set; }
 
-    public long UserId { get; set; }
-    public User User { get; set; } = default!;
+    public long CustomerId { get; set; }
+    public User Customer { get; set; } = default!;
 
     public ICollection<SaleItem> SaleItems { get; set; } = default!;
 }

@@ -2,6 +2,8 @@
 
 using Forex.ClientService;
 using Forex.Wpf.Common;
+using Forex.Wpf.Common.Interfaces;
+using Forex.Wpf.Common.Services;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
@@ -56,7 +58,7 @@ public static class DependencyInjection
         var config = TypeAdapterConfig.GlobalSettings;
 
         MappingProfile.Register(config);
-
+        services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton(config);
         services.AddScoped<IMapper, ServiceMapper>();
     }
