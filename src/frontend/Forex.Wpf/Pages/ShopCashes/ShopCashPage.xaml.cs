@@ -17,11 +17,6 @@ public partial class ShopCashPage : Page
         InitializeComponent();
         FocusNavigator.AttachEnterNavigation(
         [
-            cbxIncome,
-            cbxValyutaType,
-            tbSum,
-            tbDescription,
-            btnRegister
         ]);
 
         FocusNavigator.AttachEnterNavigation(
@@ -30,7 +25,7 @@ public partial class ShopCashPage : Page
             endDate.dateTextBox,
             btnShow
         ]);
-        supplyDate.SelectedDate = DateTime.Now;
+        operationDate.SelectedDate = DateTime.Now;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
