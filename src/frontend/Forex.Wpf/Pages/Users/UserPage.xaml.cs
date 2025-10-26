@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
+using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Common.Services;
@@ -11,6 +12,7 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Minio.DataModel.Notification;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -194,6 +196,15 @@ public partial class UserPage : Page
     {
         try
         {
+            FilteringRequest request = new()
+            {
+                Filters = new()
+                {
+                    ["accounts"] = ["include"],
+                    ["accounts"] = ["include:currency"]
+                }
+            };
+
             var response = await client.Users.GetAll().Handle();
             rawUsers = response.Data?.OrderByDescending(u => u.Id).ToList() ?? [];
 

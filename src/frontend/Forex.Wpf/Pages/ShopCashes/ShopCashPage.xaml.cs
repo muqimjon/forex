@@ -17,13 +17,6 @@ public partial class ShopCashPage : Page
         InitializeComponent();
         FocusNavigator.AttachEnterNavigation(
         [
-            OperationDate,
-            cbxUser,
-            cbxIncome,
-            cbxValyutaType,
-            tbSum,
-            tbDescription,
-            btnRegister
         ]);
 
         FocusNavigator.AttachEnterNavigation(
@@ -32,7 +25,7 @@ public partial class ShopCashPage : Page
             endDate.dateTextBox,
             btnShow
         ]);
-        OperationDate.SelectedDate = DateTime.Now;
+        operationDate.SelectedDate = DateTime.Now;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -41,14 +34,6 @@ public partial class ShopCashPage : Page
             NavigationService.GoBack();
         else
             Main.NavigateTo(new HomePage());
-    }
-
-    private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-    {
-        if (decimal.TryParse(tbSum.Text, out decimal value))
-        {
-            tbSum.Text = value.ToString("N2"); // 2 xona kasr format
-        }
     }
 
 }

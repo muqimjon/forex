@@ -16,4 +16,13 @@ public sealed record UserResponse
 
     [JsonIgnore]
     public bool IsEditing { get; set; }
+
+    // 🟢 Hisob qoldiq (birinchi account bo‘yicha)
+    [JsonIgnore]
+    public decimal? FirstBalance => Accounts?.FirstOrDefault()?.Balance;
+
+    // 🟢 Valyuta nomi (birinchi account bo‘yicha)
+    [JsonIgnore]
+    public string? FirstCurrencyName => Accounts?.FirstOrDefault()?.Currency?.Name;
+
 }
