@@ -39,7 +39,7 @@ public partial class UserWindow : Window
         {
 
             var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
-            var valyutaTypes = await client.Currency.GetAll().Handle();
+            var valyutaTypes = await client.Currencies.GetAllAsync().Handle();
             somId = valyutaTypes.Data!.FirstOrDefault(v =>
                 v.Symbol.Equals("UZS", StringComparison.OrdinalIgnoreCase))?.Id ?? 0;
         }

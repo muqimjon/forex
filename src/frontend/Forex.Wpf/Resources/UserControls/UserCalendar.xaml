@@ -23,7 +23,7 @@
                 x:Name="dateTextBox"
                 Padding="0"
                 TextAlignment="Right"
-                HorizontalAlignment="Center"
+                HorizontalAlignment="Stretch"
                 md:HintAssist.Hint="{Binding Hint, RelativeSource={RelativeSource AncestorType=local:UserCalendar}}"
                 BorderThickness="0" />
         </Border>

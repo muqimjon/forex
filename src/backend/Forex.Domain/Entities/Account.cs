@@ -15,6 +15,8 @@ public class UserAccount : Account
 {
     public long UserId { get; set; }
     public User User { get; set; } = default!;
+    public string? Description { get; set; } = string.Empty;
+    public DateTime? DueDate { get; set; }
 }
 
 public class ShopAccount : Account

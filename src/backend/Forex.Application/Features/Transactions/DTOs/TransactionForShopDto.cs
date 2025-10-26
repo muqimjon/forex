@@ -8,6 +8,8 @@ public sealed record TransactionForShopDto
 {
     public long Id { get; set; }
     public decimal Amount { get; set; }
+    public decimal ExchangeRate { get; set; }
+    public decimal Discount { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public bool IsIncome { get; set; }
     public string? Description { get; set; }

@@ -1,10 +1,8 @@
-﻿namespace Forex.Application.Features.Transactions.DTOs;
+﻿namespace Forex.ClientService.Models.Requests;
 
-using Forex.Application.Features.Currencies.DTOs;
-using Forex.Application.Features.Shops.DTOs;
-using Forex.Domain.Enums;
+using Forex.ClientService.Enums;
 
-public sealed record TransactionForUserDto
+public sealed record TransactionRequest
 {
     public long Id { get; set; }
     public decimal Amount { get; set; }
@@ -14,12 +12,8 @@ public sealed record TransactionForUserDto
     public bool IsIncome { get; set; }
     public string? Description { get; set; }
     public DateTime Date { get; set; }
-
-    public long ShopId { get; set; }
-    public ShopForTransactionDto Shop { get; set; } = default!;
+    public DateTime DueDate { get; set; }
 
     public long UserId { get; set; }
-
     public long CurrencyId { get; set; }
-    public CurrencyDto Currency { get; set; } = default!;
 }

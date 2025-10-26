@@ -2,7 +2,9 @@
 
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
+using Forex.Wpf.Pages.ShopCashes.ViewModels;
 using Forex.Wpf.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -12,12 +14,12 @@ using System.Windows.Controls;
 public partial class ShopCashPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
+
     public ShopCashPage()
     {
         InitializeComponent();
-        FocusNavigator.AttachEnterNavigation(
-        [
-        ]);
+
+        DataContext = App.AppHost!.Services.GetRequiredService<PaymentPageViewModel>();
 
         FocusNavigator.AttachEnterNavigation(
         [
@@ -25,6 +27,7 @@ public partial class ShopCashPage : Page
             endDate.dateTextBox,
             btnShow
         ]);
+
         operationDate.SelectedDate = DateTime.Now;
     }
 
@@ -35,5 +38,4 @@ public partial class ShopCashPage : Page
         else
             Main.NavigateTo(new HomePage());
     }
-
 }

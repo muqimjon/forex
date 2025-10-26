@@ -12,7 +12,6 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using Minio.DataModel.Notification;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -170,7 +169,7 @@ public partial class UserPage : Page
     {
         try
         {
-            var response = await client.Currency.GetAll();
+            var response = await client.Currencies.GetAllAsync();
             if (!response.IsSuccess)
             {
                 MessageBox.Show("Valyutani yuklashda xatolik");
@@ -205,7 +204,7 @@ public partial class UserPage : Page
                 }
             };
 
-            var response = await client.Users.GetAll().Handle();
+            var response = await client.Users.GetAllAsync().Handle();
             rawUsers = response.Data?.OrderByDescending(u => u.Id).ToList() ?? [];
 
             ApplyFilters();

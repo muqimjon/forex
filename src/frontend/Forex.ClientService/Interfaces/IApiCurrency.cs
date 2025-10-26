@@ -7,6 +7,6 @@ using Refit;
 public interface IApiCurrency
 {
     [Get("/currencies")]
-    Task<Response<List<CurrencyResponse>>> GetAll();
+    Task<Response<List<CurrencyResponse>>> GetAllAsync();
 
 }

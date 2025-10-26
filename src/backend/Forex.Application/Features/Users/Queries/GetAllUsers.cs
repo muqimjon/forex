@@ -17,5 +17,6 @@ public class GetAllUsersQueryHandler(
         => mapper.Map<IReadOnlyCollection<UserDto>>(await context.Users.AsNoTracking()
             .Where(u => !u.IsDeleted)
             .Include(u => u.Accounts)
+                .ThenInclude(a => a.Currency)
             .ToListAsync(cancellationToken));
 }

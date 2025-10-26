@@ -3,7 +3,7 @@
 using Forex.Application.Features.Currencies.DTOs;
 using Forex.Application.Features.Shops.DTOs;
 
-public class ShopAccountDto
+public sealed record ShopAccountDto
 {
     public long Id { get; set; }
     public decimal OpeningBalance { get; set; }

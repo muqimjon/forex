@@ -93,7 +93,7 @@ public partial class SalePage : Page
             return null;
 
         var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
-        var all = await client.Users.GetAll().Handle();
+        var all = await client.Users.GetAllAsync().Handle();
 
         if (!all.IsSuccess || all.Data is null)
             return null;

@@ -118,7 +118,7 @@ public partial class InvoiceViewModel : ViewModelBase
 
     private async Task LoadCurrenciesAsync()
     {
-        var response = await client.Currency.GetAll().Handle();
+        var response = await client.Currencies.GetAllAsync().Handle();
         if (!response.IsSuccess)
         {
             ErrorMessage = response.Message;

@@ -2,7 +2,6 @@
 
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Services.FileStorage.Minio;
-using Microsoft.Extensions.DependencyInjection;
 using Refit;
 using System.Reflection;
 using System.Text.Json;
@@ -10,8 +9,6 @@ using System.Text.Json;
 public static class ApiExtensions
 {
     private static IServiceProvider? _serviceProvider;
-
-    // 🔹 DI orqali client service ichida bir marta chaqiriladi
     public static void Configure(IServiceProvider serviceProvider)
         => _serviceProvider = serviceProvider;
 
@@ -23,11 +20,11 @@ public static class ApiExtensions
         {
             setLoading?.Invoke(true);
 
-            var fileStorage = _serviceProvider?.GetService<MinioFileStorageService>();
-            var requestObject = GetRefitRequestBody(task);
+            //var fileStorage = _serviceProvider?.GetService<MinioFileStorageService>();
+            //var requestObject = GetRefitRequestBody(task);
 
-            if (fileStorage is not null && requestObject is not null)
-                await UploadFilesRecursiveAsync(requestObject, fileStorage);
+            //if (fileStorage is not null && requestObject is not null)
+            //    await UploadFilesRecursiveAsync(requestObject, fileStorage);
 
             return await task;
         }

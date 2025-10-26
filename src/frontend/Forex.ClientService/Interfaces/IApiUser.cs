@@ -8,7 +8,7 @@ using Refit;
 public interface IApiUser
 {
     [Get("/users")]
-    Task<Response<List<UserResponse>>> GetAll();
+    Task<Response<List<UserResponse>>> GetAllAsync();
 
     [Post("/users/filter")]
     Task<Response<List<UserResponse>>> Filter(FilteringRequest request);

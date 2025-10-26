@@ -15,5 +15,6 @@
     <conv:RowNumberConverter x:Key="RowNumber" />
     <conv:NullToVisibilityConverter x:Key="NullToVisibility" />
     <conv:InverseNullToVisibilityConverter x:Key="InverseNullToVisibility" />
+    <conv:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
 
 </ResourceDictionary>

@@ -1,4 +1,4 @@
-﻿namespace Forex.Domain.Enums;
+﻿namespace Forex.ClientService.Enums;
 
 public enum PaymentMethod
 {

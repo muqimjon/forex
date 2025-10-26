@@ -33,6 +33,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ProductResidue> ProductResidues { get; set; }
     public DbSet<UnitMeasure> UnitMeasures { get; set; }
 
+
     private IDbContextTransaction? currentTransaction;
 
     public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)

@@ -39,7 +39,7 @@ public static class MappingProfile
         config.NewConfig<UserResponse, UserViewModel>();
         config.NewConfig<UserViewModel, UserRequest>();
 
-        // 🔹 Currency
+        // 🔹 Currencies
         config.NewConfig<CurrencyResponse, CurrencyViewModel>();
         config.NewConfig<CurrencyViewModel, CurrencyRequest>();
 
@@ -56,6 +56,12 @@ public static class MappingProfile
 
         config.NewConfig<CurrencyResponse, CurrencyViewModel>();
         config.NewConfig<UserAccountResponse, UserAccountViewModel>();
+
+        // 🔹 Transaction
+        config.NewConfig<TransactionResponse, TransactionViewModel>();
+        config.NewConfig<TransactionViewModel, TransactionRequest>()
+            .Map(dest => dest.CurrencyId, src => src.Currency.Id)
+            .Map(dest => dest.UserId, src => src.User.Id);
     }
 
     // 🔹 ImageSource → byte[] maplash (Minioga upload uchun)

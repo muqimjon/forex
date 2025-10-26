@@ -14,5 +14,9 @@ public class GetAllShopsQueryHandler(
     : IRequestHandler<GetAllShopsQuery, IReadOnlyCollection<ShopDto>>
 {
     public async Task<IReadOnlyCollection<ShopDto>> Handle(GetAllShopsQuery request, CancellationToken cancellationToken)
-        => mapper.Map<IReadOnlyCollection<ShopDto>>(await context.Shops.AsNoTracking().ToListAsync(cancellationToken));
+        => mapper.Map<IReadOnlyCollection<ShopDto>>(await context.Shops
+            .Include(sh => sh.ShopAccounts)
+                .ThenInclude(sa => sa.Currency)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken));
 }
