@@ -254,6 +254,13 @@
                 <DataGridTextColumn Width="*"
                                     Binding="{Binding Role}"
                                     Header="Rol" />
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding FirstBalance, StringFormat={}{0:N2}}"
+                                    Header="Hisob qoldiq" />
+
+                <DataGridTextColumn Width="*"
+                                    Binding="{Binding FirstCurrencyName}"
+                                    Header="Valyuta turi" />
 
 
                 <!--  Actions  -->
