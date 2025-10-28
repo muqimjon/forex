@@ -204,7 +204,7 @@ public partial class UserPage : Page
                 }
             };
 
-            var response = await client.Users.GetAllAsync().Handle();
+            var response = await client.Users.Filter(request).Handle();
             rawUsers = response.Data?.OrderByDescending(u => u.Id).ToList() ?? [];
 
             ApplyFilters();

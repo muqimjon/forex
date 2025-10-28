@@ -58,7 +58,20 @@ public static class MappingProfile
         config.NewConfig<UserAccountResponse, UserAccountViewModel>();
 
         // 🔹 Transaction
-        config.NewConfig<TransactionResponse, TransactionViewModel>();
+        config.NewConfig<TransactionResponse, TransactionViewModel>()
+      .AfterMapping((src, dest) =>
+      {
+          if (src.IsIncome)
+          {
+              dest.Income = src.Amount;
+              dest.Expense = 0;
+          }
+          else
+          {
+              dest.Expense = -src.Amount;
+              dest.Income = 0;
+          }
+      });
         config.NewConfig<TransactionViewModel, TransactionRequest>()
             .Map(dest => dest.CurrencyId, src => src.Currency.Id)
             .Map(dest => dest.UserId, src => src.User.Id);
