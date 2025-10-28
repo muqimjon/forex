@@ -32,7 +32,7 @@
                 Padding="8,4"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                        md:ElevationAssist.Elevation="Dp8"
+                md:ElevationAssist.Elevation="Dp8"
                 Background="{DynamicResource OtherBackground}"
                 Click="BtnBack_Click"
                 Content="🔙 Orqaga" />
@@ -50,34 +50,34 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border>
-                    <md:Card Width="280"
-                             Margin="10"
-                             BorderThickness="3"
-                             VerticalContentAlignment="Center"
-                             Background="{DynamicResource MaterialDesignPaper}"
-                             Foreground="{DynamicResource PrimaryTextColor}"
-                             UniformCornerRadius="6"
-                             md:ShadowAssist.Darken="True">
-                        <StackPanel>
+                        <md:Card Width="280"
+                                 Margin="10"
+                                 BorderThickness="3"
+                                 VerticalContentAlignment="Center"
+                                 Background="{DynamicResource MaterialDesignPaper}"
+                                 Foreground="{DynamicResource PrimaryTextColor}"
+                                 UniformCornerRadius="6"
+                                 md:ShadowAssist.Darken="True">
+                            <StackPanel>
                                 <StackPanel Orientation="Horizontal"
                                             HorizontalAlignment="Center">
 
                                     <TextBlock FontSize="18"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource PrimaryTextColor}"
-                                           Text="{Binding Currency.Name}" />
-                            </StackPanel>
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextColor}"
+                                               Text="{Binding Currency.Name}" />
+                                </StackPanel>
 
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Center">
-                                <TextBlock FontSize="16"
-                                           FontWeight="Medium"
-                                           Foreground="{DynamicResource PrimaryTextColor}"
-                                           Text="Qoldiq:" />
-                                <TextBlock Margin="10,0,0,0"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center">
+                                    <TextBlock FontSize="16"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextColor}"
+                                               Text="Qoldiq:" />
+                                    <TextBlock Margin="10,0,0,0"
+                                               FontSize="16"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
                                                Text="{Binding Balance, StringFormat=N2}" />
                                     <TextBlock Margin="8,0,0,0"
                                                FontSize="16"
@@ -85,7 +85,7 @@
                                                Foreground="{DynamicResource PrimaryHueMidBrush}"
                                                Text="{Binding Currency.Code, StringFormat=N2}" />
                                 </StackPanel>
-                        </StackPanel>
+                            </StackPanel>
                         </md:Card>
                     </Border>
                 </DataTemplate>
@@ -150,13 +150,12 @@
                 <!--  Sana  -->
                 <!--  Sana + Mijoz  -->
                 <!--  Mijoz  -->
-                <controls:UserCalendar x:Name="operationDate"
-                                       Grid.Column="1"
-                                       Height="25"
-                                       VerticalAlignment="Bottom"
-                                       FontSize="14"
-                                       SelectedDate="{Binding OperationDate}"
-                                       Margin="0,0,0,1" />
+                <controls:UserCalendar
+                    Grid.Column="1"
+                    Height="26"
+                    FontSize="14"
+                    SelectedDate="{Binding Transaction.Date, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                    Margin="0,1,0,1" />
 
                 <Label Grid.Column="2"
                        Margin="5,0,0,0"
@@ -214,7 +213,7 @@
                         BorderBrush="{DynamicResource PrimaryTextColor}"
                         BorderThickness="1"
                         CornerRadius="4">
-                    
+
                     <TextBox x:Name="tbChiqim"
                              Padding="3,0"
                              HorizontalAlignment="Stretch"
@@ -459,14 +458,14 @@
                 <Border Margin="2,5"
                         Background="{DynamicResource SecondaryBackground}"
                         CornerRadius="4">
-                    <controls:UserCalendar x:Name="startDate"
+                    <controls:UserCalendar x:Name="beginDate"
                                            MinWidth="100"
                                            Height="28"
                                            Margin="5,0"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center"
                                            FontSize="14"
-                                           SelectedDate="{Binding OperationDate}" />
+                                           SelectedDate="{Binding BeginDate}" />
                 </Border>
 
                 <TextBlock Text="Tugash sana:"
@@ -482,7 +481,8 @@
                                            Margin="5,0"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center"
-                                           FontSize="14" />
+                                           FontSize="14"
+                                           SelectedDate="{Binding EndDate}" />
                 </Border>
                 <Button x:Name="btnShow"
                         Margin="3"
@@ -495,7 +495,7 @@
         </md:Card>
 
         <Grid Grid.Row="4">
-            <DataGrid ItemsSource="{Binding CashOperations}"
+            <DataGrid ItemsSource="{Binding Transactions}"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       IsReadOnly="True"
@@ -504,37 +504,64 @@
                       AlternatingRowBackground="#F9F9F9"
                       SelectionMode="Single">
 
+                <DataGrid.Resources>
+                    <!-- 🔹 O‘ngga tekislangan hujayralar uchun -->
+                    <Style x:Key="RightAlignedCellStyle" TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Right" />
+                        <Setter Property="Padding" Value="0,0,5,0" />
+                    </Style>
+
+                    <!-- 🔹 Markazga tekislangan hujayralar uchun -->
+                    <Style x:Key="CenterAlignedCellStyle" TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Center" />
+                    </Style>
+
+                    <!-- 🔹 Headerlarni markazga joylash uchun -->
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.Resources>
+
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Sana"
-                                        Binding="{Binding OperationDate, StringFormat={}{0:dd.MM.yyyy}}"
-                                        Width="120" />
+                                        Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
+                                        Width="120"
+                                        ElementStyle="{StaticResource CenterAlignedCellStyle}"/>
 
                     <DataGridTextColumn Header="User"
                                         Binding="{Binding User.Name}"
                                         Width="2*" />
 
+                    <DataGridTextColumn Header="To'lov turi"
+                                        Binding="{Binding PaymentMethod}"
+                                        Width="*"
+                                        ElementStyle="{StaticResource CenterAlignedCellStyle}" />
+
                     <DataGridTextColumn Header="Valyuta turi"
                                         Binding="{Binding Currency.Name}"
-                                        Width="0.5*" />
+                                        Width="0.5*"
+                                        ElementStyle="{StaticResource CenterAlignedCellStyle}" />
 
                     <DataGridTextColumn Header="Kurs"
                                         Binding="{Binding ExchangeRate, StringFormat={}{0:N2}}"
-                                        Width="0.5*" />
+                                        Width="0.5*"
+                                        ElementStyle="{StaticResource RightAlignedCellStyle}" />
 
                     <DataGridTextColumn Header="Kirim"
                                         Binding="{Binding Income, StringFormat={}{0:N2}}"
-                                        Width="*" />
+                                        Width="*"
+                                        ElementStyle="{StaticResource RightAlignedCellStyle}" />
 
                     <DataGridTextColumn Header="Chiqim"
                                         Binding="{Binding Expense, StringFormat={}{0:N2}}"
-                                        Width="*" />
+                                        Width="*"
+                                        ElementStyle="{StaticResource RightAlignedCellStyle}" />
 
                     <DataGridTextColumn Header="Izoh"
-                                        Binding="{Binding Note}"
+                                        Binding="{Binding Description}"
                                         Width="2*" />
                 </DataGrid.Columns>
             </DataGrid>
-
         </Grid>
 
     </Grid>

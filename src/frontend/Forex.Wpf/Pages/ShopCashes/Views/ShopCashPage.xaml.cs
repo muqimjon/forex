@@ -23,12 +23,11 @@ public partial class ShopCashPage : Page
 
         FocusNavigator.AttachEnterNavigation(
         [
-            startDate.dateTextBox,
+            beginDate.dateTextBox,
             endDate.dateTextBox,
             btnShow
         ]);
 
-        operationDate.SelectedDate = DateTime.Now;
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

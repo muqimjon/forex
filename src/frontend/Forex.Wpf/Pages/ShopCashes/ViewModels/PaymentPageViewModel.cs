@@ -25,6 +25,9 @@ public partial class PaymentPageViewModel : ViewModelBase
         _ = LoadDataAsync();
     }
 
+    [ObservableProperty] private ObservableCollection<TransactionViewModel> transactions = [];
+
+
     [ObservableProperty] private ObservableCollection<UserViewModel> availableUsers = [];
     [ObservableProperty] private ObservableCollection<CurrencyViewModel> availableCurrencies = [];
     [ObservableProperty] private ObservableCollection<ShopAccountViewModel> availableShopAccounts = [];
@@ -40,6 +43,15 @@ public partial class PaymentPageViewModel : ViewModelBase
         await LoadShopCashes();
         await LoadUsersAsync();
         await LoadCurrenciesAsync();
+        await LoadTransactionsAsync();
+    }
+
+    private async Task LoadTransactionsAsync()
+    {
+        var response = await client.Transactions.GetAll().Handle(isLoading => IsLoading = isLoading);
+        if (response.IsSuccess)
+            Transactions = mapper.Map<ObservableCollection<TransactionViewModel>>(response.Data);
+        else WarningMessage = response.Message ?? "Tranzaksiyalarni yuklashda xatolik.";
     }
 
     private async Task LoadShopCashes()
