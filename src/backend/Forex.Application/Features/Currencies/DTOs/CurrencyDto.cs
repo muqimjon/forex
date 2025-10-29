@@ -9,5 +9,7 @@ public record CurrencyDto
     public string Symbol { get; set; } = string.Empty;
     public decimal ExchangeRate { get; set; }
     public bool IsDefault { get; set; }
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
+    public bool IsEditable { get; set; }
+    public int Position { get; set; }
 }
