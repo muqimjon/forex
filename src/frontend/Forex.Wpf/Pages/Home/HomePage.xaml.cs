@@ -3,7 +3,7 @@ using Forex.ClientService.Services;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Products;
-using Forex.Wpf.Pages.SaleHistories;
+using Forex.Wpf.Pages.Reports;
 using Forex.Wpf.Pages.Sales;
 using Forex.Wpf.Pages.SemiProducts.Views;
 using Forex.Wpf.Pages.Settings;
@@ -45,18 +45,18 @@ public partial class HomePage : Page
     private void BtnSale_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new SalePage());
 
-    private void BtnSaleHistory_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SaleHistoryPage());
-
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new SettingsPage());
 
     private void BtnSemiProduct_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new SemiProductPage());
+    private void btnReports_Click(object sender, RoutedEventArgs e)
+        => Main.NavigateTo(new ReportsPage());
 
     private void BtnLogout_Click(object sender, RoutedEventArgs e)
     {
         AuthStore.Instance.Logout();
         Main.NavigateTo(new LoginPage());
     }
+
 }

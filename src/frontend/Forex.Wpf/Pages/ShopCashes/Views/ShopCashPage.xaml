@@ -1,18 +1,18 @@
-﻿<Page x:Class="Forex.Wpf.Pages.ShopCashes.ShopCashPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Forex.Wpf.Pages.ShopCashes"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-      Title="Kassa boshqaruvi"
-      d:DesignHeight="700"
-      d:DesignWidth="1000"
-      mc:Ignorable="d">
+﻿<Page
+    x:Class="Forex.Wpf.Pages.ShopCashes.ShopCashPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Forex.Wpf.Pages.ShopCashes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="Kassa boshqaruvi"
+    d:DesignHeight="700"
+    d:DesignWidth="1000"
+    mc:Ignorable="d">
 
-    <Grid Margin="16"
-          Background="AliceBlue">
+    <Grid Margin="16" Background="AliceBlue">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -20,70 +20,75 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0"
-               Margin="5"
-               Content="🏦 Kassa amaliyotlari"
-               FontSize="20"
-               FontWeight="Bold"
-               Foreground="{StaticResource SecondaryTextColor}" />
-        <Button x:Name="btnBack"
-                Grid.Row="0"
-                Grid.Column="2"
-                Padding="8,4"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                md:ElevationAssist.Elevation="Dp8"
-                Background="{DynamicResource OtherBackground}"
-                Click="BtnBack_Click"
-                Content="🔙 Orqaga" />
-        <ItemsControl Grid.Row="1"
-                      ItemsSource="{Binding AvailableShopAccounts}">
+        <Label
+            Grid.Row="0"
+            Margin="5"
+            Content="🏦 Kassa amaliyotlari"
+            FontSize="20"
+            FontWeight="Bold"
+            Foreground="{StaticResource SecondaryTextColor}" />
+        <Button
+            x:Name="btnBack"
+            Grid.Row="0"
+            Grid.Column="2"
+            Padding="8,4"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            md:ElevationAssist.Elevation="Dp8"
+            Background="{DynamicResource OtherBackground}"
+            Click="BtnBack_Click"
+            Content="🔙 Orqaga" />
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding AvailableShopAccounts}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel HorizontalAlignment="Stretch"
-                               Orientation="Horizontal"
-                               ItemWidth="320"
-                               ItemHeight="100" />
+                    <WrapPanel
+                        HorizontalAlignment="Stretch"
+                        ItemHeight="100"
+                        ItemWidth="320"
+                        Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border>
-                        <md:Card Width="280"
-                                 Margin="10"
-                                 BorderThickness="3"
-                                 VerticalContentAlignment="Center"
-                                 Background="{DynamicResource MaterialDesignPaper}"
-                                 Foreground="{DynamicResource PrimaryTextColor}"
-                                 UniformCornerRadius="6"
-                                 md:ShadowAssist.Darken="True">
+                        <md:Card
+                            Width="280"
+                            Margin="10"
+                            VerticalContentAlignment="Center"
+                            md:ShadowAssist.Darken="True"
+                            Background="{DynamicResource MaterialDesignPaper}"
+                            BorderThickness="3"
+                            Foreground="{DynamicResource PrimaryTextColor}"
+                            UniformCornerRadius="6">
                             <StackPanel>
-                                <StackPanel Orientation="Horizontal"
-                                            HorizontalAlignment="Center">
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
 
-                                    <TextBlock FontSize="18"
-                                               FontWeight="SemiBold"
-                                               Foreground="{DynamicResource PrimaryTextColor}"
-                                               Text="{Binding Currency.Name}" />
+                                    <TextBlock
+                                        FontSize="18"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource PrimaryTextColor}"
+                                        Text="{Binding Currency.Name}" />
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal"
-                                            HorizontalAlignment="Center">
-                                    <TextBlock FontSize="16"
-                                               FontWeight="Medium"
-                                               Foreground="{DynamicResource PrimaryTextColor}"
-                                               Text="Qoldiq:" />
-                                    <TextBlock Margin="10,0,0,0"
-                                               FontSize="16"
-                                               FontWeight="Bold"
-                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                               Text="{Binding Balance, StringFormat=N2}" />
-                                    <TextBlock Margin="8,0,0,0"
-                                               FontSize="16"
-                                               FontWeight="Bold"
-                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                               Text="{Binding Currency.Code, StringFormat=N2}" />
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <TextBlock
+                                        FontSize="16"
+                                        FontWeight="Medium"
+                                        Foreground="{DynamicResource PrimaryTextColor}"
+                                        Text="Qoldiq:" />
+                                    <TextBlock
+                                        Margin="10,0,0,0"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                        Text="{Binding Balance, StringFormat=N2}" />
+                                    <TextBlock
+                                        Margin="8,0,0,0"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                        Text="{Binding Currency.Code, StringFormat=N2}" />
                                 </StackPanel>
                             </StackPanel>
                         </md:Card>
@@ -93,11 +98,9 @@
         </ItemsControl>
 
 
-        <Grid Grid.Row="2"
-              Margin="0 5">
+        <Grid Grid.Row="2" Margin="0,5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"
-                                  MaxWidth="500" />
+                <ColumnDefinition Width="*" MaxWidth="500" />
                 <ColumnDefinition Width="20" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
@@ -118,34 +121,39 @@
                 </Grid.RowDefinitions>
 
                 <!--  Labels  -->
-                <Label Margin="5,0,0,0"
-                       VerticalAlignment="Center"
-                       Content="Sana:"
-                       FontSize="14" />
+                <Label
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Sana:"
+                    FontSize="14" />
 
-                <Label Grid.Row="1"
-                       Margin="5,0,0,0"
-                       VerticalAlignment="Center"
-                       Content="Val. turi:"
-                       FontSize="14" />
+                <Label
+                    Grid.Row="1"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Val. turi:"
+                    FontSize="14" />
 
-                <Label Grid.Row="2"
-                       Margin="5,0,0,0"
-                       VerticalAlignment="Center"
-                       Content="To'lov turi:"
-                       FontSize="14" />
+                <Label
+                    Grid.Row="2"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="To'lov turi:"
+                    FontSize="14" />
 
-                <Label Grid.Row="3"
-                       Margin="5,0,0,0"
-                       VerticalAlignment="Center"
-                       Content="Kurs:"
-                       FontSize="14" />
+                <Label
+                    Grid.Row="3"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Kurs:"
+                    FontSize="14" />
 
-                <Label Grid.Row="4"
-                       Margin="5,0,0,0"
-                       VerticalAlignment="Center"
-                       Content="Izoh:"
-                       FontSize="14" />
+                <Label
+                    Grid.Row="4"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Izoh:"
+                    FontSize="14" />
 
                 <!--  Sana  -->
                 <!--  Sana + Mijoz  -->
@@ -153,93 +161,103 @@
                 <controls:UserCalendar
                     Grid.Column="1"
                     Height="26"
+                    Margin="0,1,0,1"
                     FontSize="14"
-                    SelectedDate="{Binding Transaction.Date, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                    Margin="0,1,0,1" />
+                    SelectedDate="{Binding Transaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <Label Grid.Column="2"
-                       Margin="5,0,0,0"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"
-                       Content="User:"
-                       FontSize="14" />
+                <Label
+                    Grid.Column="2"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="User:"
+                    FontSize="14" />
 
-                <Border Margin="0,2,0,2"
-                        Grid.Column="3"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
+                <Border
+                    Grid.Column="3"
+                    Margin="0,2,0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
 
-                    <ComboBox Padding="5,1"
-                              ItemsSource="{Binding AvailableUsers}"
-                              x:Name="cbxCustomer"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Center"
-                              BorderThickness="0"
-                              DisplayMemberPath="Name"
-                              FontSize="14"
-                              IsTextSearchEnabled="True"
-                              SelectedItem="{Binding Transaction.User}" />
+                    <ComboBox
+                        x:Name="cbxCustomer"
+                        Padding="5,1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        BorderThickness="0"
+                        DisplayMemberPath="Name"
+                        FontSize="14"
+                        IsTextSearchEnabled="True"
+                        ItemsSource="{Binding AvailableUsers}"
+                        SelectedItem="{Binding Transaction.User}" />
                 </Border>
 
-                <Border Grid.Column="1"
-                        Grid.Row="1"
-                        Margin="0,2,10,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                    <ComboBox Padding="5,1"
-                              x:Name="cbxValyuta"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Center"
-                              BorderThickness="0"
-                              DisplayMemberPath="Name"
-                              FontSize="14"
-                              ItemsSource="{Binding AvailableCurrencies}"
-                              SelectedItem="{Binding Transaction.Currency}" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="0,2,10,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <ComboBox
+                        x:Name="cbxValyuta"
+                        Padding="5,1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        BorderThickness="0"
+                        DisplayMemberPath="Name"
+                        FontSize="14"
+                        ItemsSource="{Binding AvailableCurrencies}"
+                        SelectedItem="{Binding Transaction.Currency}" />
                 </Border>
 
-                <Label Grid.Column="2"
-                       Grid.Row="2"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Content="Chiqim:"
-                       FontSize="14" />
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="Chiqim:"
+                    FontSize="14" />
 
-                <Border Grid.Column="3"
-                        Grid.Row="2"
-                        Margin="0,2,0,2"
-                        IsEnabled="{Binding Transaction.IsIncome, Converter={StaticResource InverseBoolToBoolConverter}}"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="3"
+                    Margin="0,2,0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    IsEnabled="{Binding Transaction.IsIncome, Converter={StaticResource InverseBoolToBoolConverter}}">
 
-                    <TextBox x:Name="tbChiqim"
-                             Padding="3,0"
-                             HorizontalAlignment="Stretch"
-                             VerticalAlignment="Stretch"
-                             BorderThickness="0"
-                             FontSize="14"
-                             Text="{Binding Transaction.Expense, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
-                             TextAlignment="Right" />
+                    <TextBox
+                        x:Name="tbChiqim"
+                        Padding="3,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        BorderThickness="0"
+                        FontSize="14"
+                        Text="{Binding Transaction.Expense, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
+                        TextAlignment="Right" />
                 </Border>
 
 
 
-                <Border Grid.Column="1"
-                        Grid.Row="2"
-                        Margin="0,2,10,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                    <ComboBox Padding="5,1"
-                              x:Name="cbxPaymentMethod"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Center"
-                              BorderThickness="0"
-                              FontSize="14"
-                              ItemsSource="{Binding AvailablePaymentMethods}"
-                              SelectedItem="{Binding Transaction.PaymentMethod}">
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="0,2,10,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <ComboBox
+                        x:Name="cbxPaymentMethod"
+                        Padding="5,1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        BorderThickness="0"
+                        FontSize="14"
+                        ItemsSource="{Binding AvailablePaymentMethods}"
+                        SelectedItem="{Binding Transaction.PaymentMethod}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
@@ -248,28 +266,31 @@
                     </ComboBox>
                 </Border>
 
-                <Label Grid.Column="2"
-                       Grid.Row="1"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Content="Kirim:"
-                       FontSize="14" />
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="Kirim:"
+                    FontSize="14" />
 
-                <Border Grid.Column="3"
-                        Grid.Row="1"
-                        Margin="0,2,0,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        IsEnabled="{Binding Transaction.IsExpense, Converter={StaticResource InverseBoolToBoolConverter}}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                    <TextBox x:Name="tbKirim"
-                             Padding="3,0"
-                             HorizontalAlignment="Stretch"
-                             VerticalAlignment="Stretch"
-                             BorderThickness="0"
-                             FontSize="14"
-                             Text="{Binding Transaction.Income, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
-                             TextAlignment="Right" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    Margin="0,2,0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    IsEnabled="{Binding Transaction.IsExpense, Converter={StaticResource InverseBoolToBoolConverter}}">
+                    <TextBox
+                        x:Name="tbKirim"
+                        Padding="3,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        BorderThickness="0"
+                        FontSize="14"
+                        Text="{Binding Transaction.Income, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
+                        TextAlignment="Right" />
                 </Border>
 
 
@@ -291,46 +312,51 @@
 
                 </Border>
 
-                <Label Grid.Column="2"
-                       Grid.Row="3"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Content="Chegirma:"
-                       FontSize="14" />
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="Chegirma:"
+                    FontSize="14" />
 
-                <Border Grid.Column="4"
-                        Grid.Row="3"
-                        Margin="0,2,0,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                    <TextBox x:Name="tbDiscount"
-                             Padding="3,0"
-                             HorizontalAlignment="Stretch"
-                             VerticalAlignment="Stretch"
-                             BorderThickness="0"
-                             FontSize="14"
-                             Text="{Binding Transaction.Discount, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
-                             TextAlignment="Right" />
+                <Border
+                    Grid.Row="3"
+                    Grid.Column="4"
+                    Margin="0,2,0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <TextBox
+                        x:Name="tbDiscount"
+                        Padding="3,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        BorderThickness="0"
+                        FontSize="14"
+                        Text="{Binding Transaction.Discount, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
+                        TextAlignment="Right" />
                 </Border>
 
                 <!--  Izox  -->
-                <Border Margin="0,2"
-                        Grid.Row="4"
-                        Grid.Column="1"
-                        Grid.ColumnSpan="3"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
+                <Border
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="3"
+                    Margin="0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
 
-                    <TextBox x:Name="tbNote"
-                             Padding="3,0"
-                             HorizontalAlignment="Stretch"
-                             VerticalAlignment="Stretch"
-                             BorderThickness="0"
-                             FontSize="14"
-                             Text="{Binding Transaction.Description}"
-                             TextAlignment="Left" />
+                    <TextBox
+                        x:Name="tbNote"
+                        Padding="3,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        BorderThickness="0"
+                        FontSize="14"
+                        Text="{Binding Transaction.Description}"
+                        TextAlignment="Left" />
                 </Border>
 
             </Grid>
@@ -349,217 +375,246 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0"
-                           Grid.ColumnSpan="2"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontSize="14"
-                           FontStyle="Italic"
-                           FontWeight="Bold"
-                           Text="Hisob:" />
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    FontStyle="Italic"
+                    FontWeight="Bold"
+                    Text="Hisob:" />
 
-                <TextBlock Grid.Row="1"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Text="Joriy:"
-                           FontSize="14" />
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Joriy:" />
 
-                <TextBox x:Name="beginBalans"
-                         Grid.Row="1"
-                         Grid.Column="1"
-                         Padding="0"
-                         HorizontalAlignment="Right"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         FontSize="14"
-                         IsReadOnly="True"
-                         IsTabStop="False"
-                         Text="{Binding Transaction.TotalAmountWithUserBalance, StringFormat={}{0:N2}}" />
+                <TextBox
+                    x:Name="beginBalans"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Padding="0"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="14"
+                    IsReadOnly="True"
+                    IsTabStop="False"
+                    Text="{Binding Transaction.TotalAmountWithUserBalance, StringFormat={}{0:N2}}" />
 
-                <TextBlock Grid.Row="2"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Text="Qoldiq:"
-                           FontSize="14" />
-                <TextBox x:Name="lastBalans"
-                         Grid.Row="2"
-                         Grid.Column="1"
-                         Padding="0"
-                         HorizontalAlignment="Right"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         FontSize="14"
-                         IsReadOnly="True"
-                         Text="{Binding Transaction.User.Balance, StringFormat={}{0:N2}}" />
+                <TextBlock
+                    Grid.Row="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Qoldiq:" />
+                <TextBox
+                    x:Name="lastBalans"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Padding="0"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="14"
+                    IsReadOnly="True"
+                    Text="{Binding Transaction.User.Balance, StringFormat={}{0:N2}}" />
 
-                <TextBlock Grid.Row="3"
-                           VerticalAlignment="Center"
-                           Text="Telefon:"
-                           HorizontalAlignment="Right"
-                           FontSize="14" />
-                <TextBox x:Name="tel"
-                         Grid.Row="3"
-                         Grid.Column="1"
-                         Padding="0"
-                         HorizontalAlignment="Right"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         FontSize="14"
-                         IsReadOnly="True"
-                         IsTabStop="False"
-                         Text="{Binding Transaction.User.Phone}" />
-                <TextBlock Grid.Row="4"
-                           Grid.RowSpan="2"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Left"
-                           Text="To'lash sana:"
-                           FontSize="14" />
-                <controls:UserCalendar x:Name="dueDate"
-                                       Grid.Row="4"
-                                       Margin="10 0"
-                                       Grid.RowSpan="2"
-                                       Grid.Column="1"
-                                       Height="25"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Center"
-                                       FontSize="14"
-                                       SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay}" />
+                <TextBlock
+                    Grid.Row="3"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Telefon:" />
+                <TextBox
+                    x:Name="tel"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Padding="0"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="14"
+                    IsReadOnly="True"
+                    IsTabStop="False"
+                    Text="{Binding Transaction.User.Phone}" />
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.RowSpan="2"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="To'lash sana:" />
+                <controls:UserCalendar
+                    x:Name="dueDate"
+                    Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    Height="25"
+                    Margin="10,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay}" />
 
-                <Button Grid.Row="4"
-                        Grid.Column="2"
-                        Grid.RowSpan="2"
-                        Margin="10 0"
-                        Height="28"
-                        md:ElevationAssist.Elevation="Dp8"
-                        Background="{StaticResource SuccessButtonBackground}"
-                        BorderBrush="{StaticResource SuccessButtonBorder}"
-                        Command="{Binding SubmitCommand}"
-                        Content="To'lash"
-                        Foreground="{StaticResource SuccessButtonForeground}" />
+                <Button
+                    Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Grid.Column="2"
+                    Height="28"
+                    Margin="10,0"
+                    md:ElevationAssist.Elevation="Dp8"
+                    Background="{StaticResource SuccessButtonBackground}"
+                    BorderBrush="{StaticResource SuccessButtonBorder}"
+                    Command="{Binding SubmitCommand}"
+                    Content="To'lash"
+                    Foreground="{StaticResource SuccessButtonForeground}" />
 
             </Grid>
         </Grid>
 
-        <md:Card Grid.Row="3"
-                 Margin="5,1,5,10"
-                 Background="#F1F1F1"
-                 UniformCornerRadius="4">
-            <StackPanel Margin="5"
-                        HorizontalAlignment="Left"
-                        Orientation="Horizontal">
-                <TextBlock Margin="5,0,20,0"
-                           VerticalAlignment="Center"
-                           FontSize="20"
-                           FontWeight="Medium"
-                           Text="Kassa amaliyotlar tarixi" />
-                <TextBlock Text="Boshlanish sana:"
-                           VerticalAlignment="Center"
-                           FontSize="14" />
-                <Border Margin="2,5"
-                        Background="{DynamicResource SecondaryBackground}"
-                        CornerRadius="4">
-                    <controls:UserCalendar x:Name="beginDate"
-                                           MinWidth="100"
-                                           Height="28"
-                                           Margin="5,0"
-                                           HorizontalAlignment="Left"
-                                           VerticalAlignment="Center"
-                                           FontSize="14"
-                                           SelectedDate="{Binding BeginDate}" />
-                </Border>
-
-                <TextBlock Text="Tugash sana:"
-                           VerticalAlignment="Center"
-                           FontSize="14" />
-                <Border Margin="2,5"
-                        Background="{DynamicResource SecondaryBackground}"
-                        CornerRadius="4">
-
-                    <controls:UserCalendar x:Name="endDate"
-                                           Width="100"
-                                           Height="28"
-                                           Margin="5,0"
-                                           HorizontalAlignment="Left"
-                                           VerticalAlignment="Center"
-                                           FontSize="14"
-                                           SelectedDate="{Binding EndDate}" />
-                </Border>
-                <Button x:Name="btnShow"
-                        Margin="3"
+        <md:Card
+            Grid.Row="3"
+            Margin="5,1,5,10"
+            Background="#F1F1F1"
+            UniformCornerRadius="4">
+            <StackPanel
+                Margin="5"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="5,0,20,0"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Medium"
+                    Text="Kassa amaliyotlar tarixi" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Boshlanish sana:" />
+                <Border
+                    Margin="2,5"
+                    Background="{DynamicResource SecondaryBackground}"
+                    CornerRadius="4">
+                    <controls:UserCalendar
+                        x:Name="beginDate"
                         Height="28"
-                        md:ElevationAssist.Elevation="Dp8"
-                        Background="{DynamicResource OtherBackground}"
-                        Command="{Binding FilterHistoryCommand}"
-                        Content="Ko'rsatish" />
+                        MinWidth="100"
+                        Margin="5,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        SelectedDate="{Binding BeginDate}" />
+                </Border>
+
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Tugash sana:" />
+                <Border
+                    Margin="2,5"
+                    Background="{DynamicResource SecondaryBackground}"
+                    CornerRadius="4">
+
+                    <controls:UserCalendar
+                        x:Name="endDate"
+                        Width="100"
+                        Height="28"
+                        Margin="5,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        SelectedDate="{Binding EndDate}" />
+                </Border>
+                <Button
+                    x:Name="btnShow"
+                    Height="28"
+                    Margin="3"
+                    md:ElevationAssist.Elevation="Dp8"
+                    Background="{DynamicResource OtherBackground}"
+                    Command="{Binding FilterHistoryCommand}"
+                    Content="Ko'rsatish" />
             </StackPanel>
         </md:Card>
 
         <Grid Grid.Row="4">
-            <DataGrid ItemsSource="{Binding Transactions}"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      IsReadOnly="True"
-                      HeadersVisibility="Column"
-                      Margin="5"
-                      AlternatingRowBackground="#F9F9F9"
-                      SelectionMode="Single">
+            <DataGrid
+                Margin="5"
+                AlternatingRowBackground="#F9F9F9"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                HeadersVisibility="Column"
+                IsReadOnly="True"
+                ItemsSource="{Binding Transactions}"
+                SelectionMode="Single">
 
                 <DataGrid.Resources>
-                    <!-- 🔹 O‘ngga tekislangan hujayralar uchun -->
+                    <!--  🔹 O‘ngga tekislangan hujayralar uchun  -->
                     <Style x:Key="RightAlignedCellStyle" TargetType="TextBlock">
                         <Setter Property="TextAlignment" Value="Right" />
                         <Setter Property="Padding" Value="0,0,5,0" />
                     </Style>
 
-                    <!-- 🔹 Markazga tekislangan hujayralar uchun -->
+                    <!--  🔹 Markazga tekislangan hujayralar uchun  -->
                     <Style x:Key="CenterAlignedCellStyle" TargetType="TextBlock">
                         <Setter Property="TextAlignment" Value="Center" />
                     </Style>
 
-                    <!-- 🔹 Headerlarni markazga joylash uchun -->
+                    <!--  🔹 Headerlarni markazga joylash uchun  -->
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="HorizontalContentAlignment" Value="Center" />
                     </Style>
                 </DataGrid.Resources>
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Sana"
-                                        Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
-                                        Width="120"
-                                        ElementStyle="{StaticResource CenterAlignedCellStyle}"/>
+                    <DataGridTextColumn
+                        Width="120"
+                        Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
+                        ElementStyle="{StaticResource CenterAlignedCellStyle}"
+                        Header="Sana" />
 
-                    <DataGridTextColumn Header="User"
-                                        Binding="{Binding User.Name}"
-                                        Width="2*" />
+                    <DataGridTextColumn
+                        Width="2*"
+                        Binding="{Binding User.Name}"
+                        Header="User" />
 
-                    <DataGridTextColumn Header="To'lov turi"
-                                        Binding="{Binding PaymentMethod}"
-                                        Width="*"
-                                        ElementStyle="{StaticResource CenterAlignedCellStyle}" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding PaymentMethod}"
+                        ElementStyle="{StaticResource CenterAlignedCellStyle}"
+                        Header="To'lov turi" />
 
-                    <DataGridTextColumn Header="Valyuta turi"
-                                        Binding="{Binding Currency.Name}"
-                                        Width="0.5*"
-                                        ElementStyle="{StaticResource CenterAlignedCellStyle}" />
+                    <DataGridTextColumn
+                        Width="0.5*"
+                        Binding="{Binding Currency.Name}"
+                        ElementStyle="{StaticResource CenterAlignedCellStyle}"
+                        Header="Valyuta turi" />
 
-                    <DataGridTextColumn Header="Kurs"
-                                        Binding="{Binding ExchangeRate, StringFormat={}{0:N2}}"
-                                        Width="0.5*"
-                                        ElementStyle="{StaticResource RightAlignedCellStyle}" />
+                    <DataGridTextColumn
+                        Width="0.5*"
+                        Binding="{Binding ExchangeRate, StringFormat={}{0:N2}}"
+                        ElementStyle="{StaticResource RightAlignedCellStyle}"
+                        Header="Kurs" />
 
-                    <DataGridTextColumn Header="Kirim"
-                                        Binding="{Binding Income, StringFormat={}{0:N2}}"
-                                        Width="*"
-                                        ElementStyle="{StaticResource RightAlignedCellStyle}" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Income, StringFormat={}{0:N2}}"
+                        ElementStyle="{StaticResource RightAlignedCellStyle}"
+                        Header="Kirim" />
 
-                    <DataGridTextColumn Header="Chiqim"
-                                        Binding="{Binding Expense, StringFormat={}{0:N2}}"
-                                        Width="*"
-                                        ElementStyle="{StaticResource RightAlignedCellStyle}" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Expense, StringFormat={}{0:N2}}"
+                        ElementStyle="{StaticResource RightAlignedCellStyle}"
+                        Header="Chiqim" />
 
-                    <DataGridTextColumn Header="Izoh"
-                                        Binding="{Binding Description}"
-                                        Width="2*" />
+                    <DataGridTextColumn
+                        Width="2*"
+                        Binding="{Binding Description}"
+                        Header="Izoh" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

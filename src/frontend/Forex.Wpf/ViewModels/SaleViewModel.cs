@@ -1,6 +1,9 @@
-﻿namespace Forex.ClientService.Models.Responses;
+﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
 
-public sealed record SaleResponse
+using Forex.ClientService.Models.Responses;
+using Forex.Wpf.Pages.Common;
+
+public partial class SaleViewModel : ViewModelBase
 {
     public long Id { get; set; }
     public DateTime Date { get; set; }
