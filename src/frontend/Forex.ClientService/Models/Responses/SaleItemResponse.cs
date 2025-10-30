@@ -1,9 +1,6 @@
-﻿namespace Forex.Application.Features.Sales.DTOs;
+﻿namespace Forex.ClientService.Models.Responses;
 
-using Forex.Application.Features.Users.DTOs;
-using Forex.Domain.Entities.Products;
-
-public sealed record SaleForSaleItemDto
+public sealed record SaleItemResponse
 {
     public long Id { get; set; }
     public DateTime Date { get; set; }
@@ -14,8 +11,8 @@ public sealed record SaleForSaleItemDto
     public string? Note { get; set; }
 
     public long UserId { get; set; }
-    public UserForSaleDto User { get; set; } = default!;
+    public UserResponse User { get; set; } = default!;
 
     public long ProductTypeId { get; set; }   // 24-29, 30-35, 36-41 razmeri idsi
-    public ProductType ProductType { get; set; } = default!;
+    public ProductTypeResponse ProductType { get; set; } = default!;
 }

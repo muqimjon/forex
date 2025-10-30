@@ -73,6 +73,38 @@
 
         <WrapPanel Margin="35,20">
             <Button
+                x:Name="btnSale"
+                Height="120"
+                MinWidth="220"
+                Margin="10"
+                md:ButtonAssist.CornerRadius="10"
+                md:ElevationAssist.Elevation="Dp24"
+                Background="#FF00C9A7"
+                Click="BtnSale_Click"
+                FontSize="24"
+                FontWeight="Medium"
+                Foreground="{DynamicResource MainMenuTextColor}"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+                🛒 Sotuv
+            </Button>
+
+            <Button
+                x:Name="btnCash"
+                Height="120"
+                MinWidth="220"
+                Margin="10"
+                md:ButtonAssist.CornerRadius="10"
+                md:ElevationAssist.Elevation="Dp24"
+                Background="#FF005F73"
+                Click="BtnCash_Click"
+                FontSize="24"
+                FontWeight="Medium"
+                Foreground="{DynamicResource MainMenuTextColor}"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+                💵 Kassa
+            </Button>
+
+            <Button
                 x:Name="btnUser"
                 Height="120"
                 MinWidth="220"
@@ -105,54 +137,6 @@
             </Button>
 
             <Button
-                x:Name="btnCash"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF005F73"
-                Click="BtnCash_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                💵 Kassa
-            </Button>
-
-            <Button
-                x:Name="btnSale"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF00C9A7"
-                Click="BtnSale_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                🛒 Sotuv
-            </Button>
-
-            <Button
-                x:Name="btnSaleHistory"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF4527A0"
-                Click="BtnSaleHistory_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                📜 Sotuv tarixi
-            </Button>
-
-            <Button
                 x:Name="btnSemiProductEntry"
                 Height="120"
                 MinWidth="220"
@@ -174,6 +158,22 @@
             </Button>
 
             <Button
+                x:Name="btnReports"
+                Height="120"
+                MinWidth="220"
+                Margin="10"
+                md:ButtonAssist.CornerRadius="10"
+                md:ElevationAssist.Elevation="Dp24"
+                Background="#FF4527A0"
+                Click="btnReports_Click"
+                FontSize="24"
+                FontWeight="Medium"
+                Foreground="{DynamicResource MainMenuTextColor}"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+                📈 Hisobot
+            </Button>
+
+            <Button
                 x:Name="btnSettings"
                 Height="120"
                 MinWidth="220"
@@ -188,6 +188,7 @@
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 ⚙️ Sozlash
             </Button>
+
 
         </WrapPanel>
     </StackPanel>
