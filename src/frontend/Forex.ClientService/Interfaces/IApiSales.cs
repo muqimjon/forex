@@ -2,6 +2,7 @@
 
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
+using Forex.ClientService.Models.Responses;
 using Refit;
 
 public interface IApiSales
@@ -11,4 +12,7 @@ public interface IApiSales
 
     [Delete("/sales")]
     Task<Response<bool>> Delete(long id);
+
+    [Post("/sales/filter")]
+    Task<Response<List<SaleResponse>>> Filter(FilteringRequest request);
 }

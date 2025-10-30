@@ -16,5 +16,6 @@
     <conv:NullToVisibilityConverter x:Key="NullToVisibility" />
     <conv:InverseNullToVisibilityConverter x:Key="InverseNullToVisibility" />
     <conv:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+    <conv:BalanceToColorConverter x:Key="BalanceToColorConverter" />
 
 </ResourceDictionary>

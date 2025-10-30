@@ -22,10 +22,10 @@
             <TextBox
                 x:Name="dateTextBox"
                 Padding="0"
-                TextAlignment="Right"
                 HorizontalAlignment="Stretch"
                 md:HintAssist.Hint="{Binding Hint, RelativeSource={RelativeSource AncestorType=local:UserCalendar}}"
-                BorderThickness="0" />
+                BorderThickness="0"
+                TextAlignment="Right" />
         </Border>
 
         <!--  kalendar iconkasi  -->
