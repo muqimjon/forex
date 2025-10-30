@@ -697,6 +697,7 @@
 
                         </Grid>
 
+                        
                         <!--  Yarim tayyor mahsulotlar  -->
                         <DataGrid
                             Grid.Row="3"
