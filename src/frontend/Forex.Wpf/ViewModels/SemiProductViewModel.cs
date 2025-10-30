@@ -20,9 +20,6 @@ public partial class SemiProductViewModel : ViewModelBase
     // UI-only
     public ProductTypeItemViewModel? LinkedItem { get; set; }
 
-    [ObservableProperty] private bool isEditing;
-    [ObservableProperty] private bool isSelected;
-
     [RelayCommand]
     private void SelectImage()
     {
