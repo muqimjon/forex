@@ -69,31 +69,33 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
             .Include(u => u.Accounts)
             .FirstOrDefaultAsync(u => u.Id == employeeId, ct);
 
-        return employee ?? throw new InvalidOperationException($"Customer not found: Id={employeeId}");
+        return employee ?? throw new InvalidOperationException($"Employee not found: Id={employeeId}");
     }
 
     private async Task CreditEmployeeAsync(User employee, decimal amount, CancellationToken ct)
     {
+        const long somCurrencyId = 1;
+
         var account = employee.Accounts
-            .OfType<UserAccount>()
-            .FirstOrDefault(a => a.CurrencyId == 1);
+            .FirstOrDefault();
 
         if (account is null)
         {
             account = new UserAccount
             {
                 UserId = employee.Id,
-                CurrencyId = 1,
-                Balance = 0,
+                CurrencyId = somCurrencyId,
+                Balance = amount,
                 Discount = 0,
                 OpeningBalance = amount
             };
 
             await context.UserAccounts.AddAsync(account, ct);
-            employee.Accounts.Add(account);
         }
-
-        account.Balance += amount;
+        else
+        {
+            account.Balance += amount;
+        }
     }
 
     private async Task<ProductType> GetProductTypeAsync(long productTypeId, CancellationToken ct)

@@ -200,8 +200,11 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
             semiProductsWindow?.Close();
             semiProductsWindow = null;
-            SemiProducts = [];
-            Products = [];
+            SemiProducts.Clear();
+            ProductTypes.Clear();
+            FilteredSemiProducts.Clear();
+            IndependentSemiProducts.Clear();
+            Products.Clear();
 
             await LoadPageAsync();
         }
