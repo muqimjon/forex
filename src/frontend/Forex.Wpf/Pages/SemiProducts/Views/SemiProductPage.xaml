@@ -158,7 +158,7 @@
                 <ColumnDefinition Width="2.5*" />
                 <!--  Content oyna (mahsulot va yarim tayyor)  -->
             </Grid.ColumnDefinitions>
-
+ 
             <!--  LEFT PANEL (Invoice + Supplier info)  -->
             <Border Panel.ZIndex="1"
                     Background="AliceBlue"
@@ -693,8 +693,9 @@
                                   ItemsSource="{Binding FilteredSemiProducts}"
                                   RowHeight="36">
 
-                            <DataGrid.Columns>
+                            <DataGrid.Columns> 
 
+                                
                                 <!-- Tartib raqami -->
                                 <DataGridTemplateColumn Width="Auto"
                                                         Header="#">
