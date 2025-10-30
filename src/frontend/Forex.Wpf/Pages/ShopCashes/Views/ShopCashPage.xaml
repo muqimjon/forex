@@ -294,23 +294,21 @@
                 </Border>
 
 
-                <Border
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Margin="0,2,10,2"
-                    BorderBrush="{DynamicResource PrimaryTextColor}"
-                    BorderThickness="1"
-                    CornerRadius="4">
-                    <TextBox
-                        x:Name="tbExchangeRate"
-                        Padding="3,0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        BorderThickness="0"
-                        FontSize="14"
-                        IsReadOnly="True"
-                        Text="{Binding Transaction.ExchangeRate, StringFormat={}{0:N2}}"
-                        TextAlignment="Right" />
+                <Border Grid.Column="1"
+                        Grid.Row="3"
+                        Margin="0,2,10,2"
+                        BorderBrush="{DynamicResource PrimaryTextColor}"
+                        BorderThickness="1"
+                        CornerRadius="4">
+                    <TextBox x:Name="tbExchangeRate"
+                             Padding="3,0"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             BorderThickness="0"
+                             FontSize="14"
+                             IsEnabled="{Binding Transaction.Currency.IsEditable}"
+                             Text="{Binding Transaction.ExchangeRate, StringFormat={}{0:N2}}"
+                             TextAlignment="Right" />
 
                 </Border>
 

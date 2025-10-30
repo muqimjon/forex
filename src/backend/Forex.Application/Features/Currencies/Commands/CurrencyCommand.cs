@@ -1,11 +1,9 @@
-﻿namespace Forex.Domain.Entities;
+﻿namespace Forex.Application.Features.Currencies.Commands;
 
-using Forex.Domain.Commons;
-
-public class Currency : Auditable
+public sealed record CurrencyCommand
 {
+    public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string? NormalizedName { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public string Symbol { get; set; } = string.Empty;
     public decimal ExchangeRate { get; set; }

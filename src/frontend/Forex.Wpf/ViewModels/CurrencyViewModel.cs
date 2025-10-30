@@ -11,5 +11,7 @@ public partial class CurrencyViewModel : ViewModelBase
     [ObservableProperty] private string symbol = string.Empty;
     [ObservableProperty] private decimal exchangeRate;
     [ObservableProperty] private bool isDefault;
-    [ObservableProperty] private bool isActive = true;
+    [ObservableProperty] private bool isActive;
+    [ObservableProperty] private bool isEditable;
+    [ObservableProperty] private int position;
 }
