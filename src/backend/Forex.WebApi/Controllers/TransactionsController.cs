@@ -2,7 +2,6 @@
 
 using Forex.Application.Features.Transactions.Commands;
 using Forex.Application.Features.Transactions.Queries;
-using Forex.Application.Features.Users.Queries;
 using Forex.WebApi.Controllers.Common;
 using Forex.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;

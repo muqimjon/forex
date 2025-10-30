@@ -16,6 +16,6 @@ public class CurrenciesController
                      DeleteCurrencyCommand>
 {
     [HttpPut("all")]
-    public async Task<IActionResult> Entry(UpdateAllCurrenciesCommand command)
-        => Ok(new Response { Data = await Mediator.Send(command) });
+    public async Task<IActionResult> UpdateAll(List<CurrencyCommand> items)
+        => Ok(new Response { Data = await Mediator.Send(new UpdateAllCurrenciesCommand(items)) });
 }
