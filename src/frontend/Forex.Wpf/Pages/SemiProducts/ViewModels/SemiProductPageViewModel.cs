@@ -195,7 +195,16 @@ public partial class SemiProductPageViewModel : ViewModelBase
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
+        {
             SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
+
+            semiProductsWindow?.Close();
+            semiProductsWindow = null;
+            SemiProducts = [];
+            Products = [];
+
+            await LoadPageAsync();
+        }
         else
             ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
     }

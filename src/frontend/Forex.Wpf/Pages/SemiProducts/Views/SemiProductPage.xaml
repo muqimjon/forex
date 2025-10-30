@@ -802,7 +802,7 @@
                                                      Background="Transparent"
                                                      BorderThickness="0"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding CostPrice, UpdateSourceTrigger=PropertyChanged}" />
+                                                     Text="{Binding CostPrice, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -821,7 +821,7 @@
                                                      Background="Transparent"
                                                      BorderThickness="0"
                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding TotalAmount, UpdateSourceTrigger=PropertyChanged}" />
+                                                     Text="{Binding TotalAmount, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
