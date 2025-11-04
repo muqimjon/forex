@@ -2,6 +2,7 @@
 using Forex.ClientService.Services;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Auth;
+using Forex.Wpf.Pages.Processes;
 using Forex.Wpf.Pages.Products;
 using Forex.Wpf.Pages.Reports;
 using Forex.Wpf.Pages.Sales;
@@ -59,4 +60,6 @@ public partial class HomePage : Page
         Main.NavigateTo(new LoginPage());
     }
 
+    private void btnProcess_Click(object sender, RoutedEventArgs e)
+          => Main.NavigateTo(new ProcessPage());
 }

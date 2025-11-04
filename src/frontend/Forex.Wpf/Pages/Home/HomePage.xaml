@@ -133,7 +133,33 @@
                 FontWeight="Medium"
                 Foreground="{DynamicResource MainMenuTextColor}"
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                👟 Mahsulot
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center">👟</TextBlock>
+                    <TextBlock TextAlignment="Center" TextWrapping="Wrap">
+                        Tayyor<LineBreak />
+                    mahsulot</TextBlock>
+                </StackPanel>
+            </Button>
+
+            <Button
+                x:Name="btnProcess"
+                Height="120"
+                MinWidth="220"
+                Margin="10"
+                md:ButtonAssist.CornerRadius="10"
+                md:ElevationAssist.Elevation="Dp24"
+                Background="Black"
+                Click="btnProcess_Click"
+                FontSize="24"
+                FontWeight="Medium"
+                Foreground="{DynamicResource MainMenuTextColor}"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center">🗜</TextBlock>
+                    <TextBlock TextAlignment="Center" TextWrapping="Wrap">
+                        Ishlab<LineBreak />
+                    chiqarish</TextBlock>
+                </StackPanel>
             </Button>
 
             <Button
@@ -153,7 +179,7 @@
                     <TextBlock VerticalAlignment="Center">📦</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
                         Yarim tayyor<LineBreak />
-                        mahsulot</TextBlock>
+                    mahsulot</TextBlock>
                 </StackPanel>
             </Button>
 

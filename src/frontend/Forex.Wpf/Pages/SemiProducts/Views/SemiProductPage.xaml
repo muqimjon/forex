@@ -80,18 +80,13 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
-        <!--== Data Grid Cell ==-->
-        <Style x:Key="TransparentFocusableCellStyle"
-               TargetType="DataGridCell">
-            <Setter Property="Focusable"
-                    Value="False" />
-            <Setter Property="Foreground"
-                    Value="{StaticResource PrimaryTextColor}" />
-            <Setter Property="Background"
-                    Value="Transparent" />
-            <Setter Property="BorderThickness"
-                    Value="0" />
+
+        <!--  == Data Grid Cell ==  -->
+        <Style x:Key="TransparentFocusableCellStyle" TargetType="DataGridCell">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
         </Style>
 
     </Page.Resources>
@@ -137,7 +132,7 @@
                 <ColumnDefinition Width="2.5*" />
                 <!--  Content oyna (mahsulot va yarim tayyor)  -->
             </Grid.ColumnDefinitions>
- 
+
             <!--  LEFT PANEL (Invoice + Supplier info)  -->
             <Border
                 Panel.ZIndex="1"
@@ -484,20 +479,20 @@
                         </Grid>
 
                         <!--  Products  -->
-                        <DataGrid Grid.Row="3"
-                                  x:Name="ProductTypes"
-                                  AlternationCount="1000"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  Foreground="{StaticResource PrimaryTextColor}"
-                                  HeadersVisibility="Column"
-                                  ItemsSource="{Binding ProductTypes}"
-                                  SelectedItem="{Binding SelectedProductType}">
+                        <DataGrid
+                            x:Name="ProductTypes"
+                            Grid.Row="3"
+                            AlternationCount="1000"
+                            AutoGenerateColumns="False"
+                            CanUserAddRows="False"
+                            Foreground="{StaticResource PrimaryTextColor}"
+                            HeadersVisibility="Column"
+                            ItemsSource="{Binding ProductTypes}"
+                            SelectedItem="{Binding SelectedProductType}">
 
                             <DataGrid.Columns>
                                 <!--  Tartib raqami  -->
-                                <DataGridTemplateColumn Width="Auto"
-                                                        Header="#">
+                                <DataGridTemplateColumn Width="Auto" Header="#">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource RowNumber}}" />
@@ -529,31 +524,30 @@
                                 </DataGridTemplateColumn>
 
                                 <!--  Code  -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="Kod">
+                                <DataGridTemplateColumn Width="*" Header="Kod">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox Padding="0"
-                                                      VerticalAlignment="Center"
-                                                      Background="Transparent"
-                                                      BorderThickness="0"
-                                                      DisplayMemberPath="Code"
-                                                      IsEditable="True"
-                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                      ItemsSource="{Binding DataContext.ExistProducts, ElementName=RootPage}"
-                                                      LostFocus="ComboBox_LostFocus"
-                                                      SelectedItem="{Binding Product}" />
+                                            <ComboBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                DisplayMemberPath="Code"
+                                                IsEditable="True"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                ItemsSource="{Binding DataContext.ExistProducts, ElementName=RootPage}"
+                                                LostFocus="ComboBox_LostFocus"
+                                                SelectedItem="{Binding Product}" />
 
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <!--  Name  -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="Nomi">
+                                <DataGridTemplateColumn Width="*" Header="Nomi">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
@@ -571,39 +565,39 @@
                                 </DataGridTemplateColumn>
 
                                 <!--  Turi  -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="O'lcham (размер)">
+                                <DataGridTemplateColumn Width="*" Header="O'lcham (размер)">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Padding="0"
-                                                     VerticalAlignment="Center"
-                                                     HorizontalContentAlignment="Center"
-                                                     Background="Transparent"
-                                                     BorderThickness="0"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
                                 <!--  To'plamdagi son  -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="To'plamdagi mahsulot soni">
+                                <DataGridTemplateColumn Width="*" Header="To'plamdagi mahsulot soni">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Padding="0"
-                                                     VerticalAlignment="Center"
-                                                     HorizontalContentAlignment="Center"
-                                                     Background="Transparent"
-                                                     BorderThickness="0"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding Count, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                Text="{Binding Count, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -615,11 +609,12 @@
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <controls:ActionButton CommandParameter="{Binding}"
-                                                                   DeleteCommand="{Binding DataContext.RemoveProductCommand, ElementName=RootPage}"
-                                                                   EditCommand="{Binding DataContext.EditProductCommand, ElementName=RootPage}"
-                                                                   SaveCommand="{Binding DataContext.SaveProductCommand, ElementName=RootPage}" 
-                                                                   IsEditing="{Binding IsEditing}"/>
+                                            <controls:ActionButton
+                                                CommandParameter="{Binding}"
+                                                DeleteCommand="{Binding DataContext.RemoveProductCommand, ElementName=RootPage}"
+                                                EditCommand="{Binding DataContext.EditProductCommand, ElementName=RootPage}"
+                                                IsEditing="{Binding IsEditing}"
+                                                SaveCommand="{Binding DataContext.SaveProductCommand, ElementName=RootPage}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -697,7 +692,7 @@
 
                         </Grid>
 
-                        
+
                         <!--  Yarim tayyor mahsulotlar  -->
                         <DataGrid
                             Grid.Row="3"
@@ -710,16 +705,14 @@
                             ItemsSource="{Binding FilteredSemiProducts}"
                             RowHeight="36">
 
-                            <DataGrid.Columns> 
+                            <DataGrid.Columns>
 
-                                
-                                <!-- Tartib raqami -->
-                                <DataGridTemplateColumn Width="Auto"
-                                                        Header="#">
+
+                                <!--  Tartib raqami  -->
+                                <DataGridTemplateColumn Width="Auto" Header="#">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock HorizontalAlignment="Center"
-                                                       Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource RowNumber}}" />
+                                            <TextBlock HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource RowNumber}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -731,13 +724,14 @@
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Width="30"
-                                                    Height="30"
-                                                    BorderThickness="0"
-                                                    Command="{Binding SelectImageCommand}"
-                                                    Focusable="{Binding IsEditing}"
-                                                    IsHitTestVisible="{Binding IsEditing}"
-                                                    ToolTip="Rasmni o‘zgartirish">
+                                            <Button
+                                                Width="30"
+                                                Height="30"
+                                                BorderThickness="0"
+                                                Command="{Binding SelectImageCommand}"
+                                                Focusable="{Binding IsEditing}"
+                                                IsHitTestVisible="{Binding IsEditing}"
+                                                ToolTip="Rasmni o‘zgartirish">
                                                 <Button.Background>
                                                     <ImageBrush ImageSource="{Binding Image, Converter={StaticResource ImageFallbackConverter}}" Stretch="UniformToFill" />
                                                 </Button.Background>
@@ -747,98 +741,98 @@
                                 </DataGridTemplateColumn>
 
                                 <!--  Name  -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="Nomi">
+                                <DataGridTemplateColumn Width="*" Header="Nomi">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Padding="0"
-                                                     VerticalAlignment="Center"
-                                                     HorizontalContentAlignment="Center"
-                                                     Background="Transparent"
-                                                     BorderThickness="0"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- Jami miqdori -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="Jami miqdori">
+                                <!--  Jami miqdori  -->
+                                <DataGridTemplateColumn Width="*" Header="Jami miqdori">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Padding="0"
-                                                     VerticalAlignment="Center"
-                                                     HorizontalContentAlignment="Center"
-                                                     Background="Transparent"
-                                                     BorderThickness="0"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- O‘lchov birligi -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="O‘lchov birligi">
+                                <!--  O‘lchov birligi  -->
+                                <DataGridTemplateColumn Width="*" Header="O‘lchov birligi">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox Padding="0"
-                                                      VerticalAlignment="Center"
-                                                      Background="Transparent"
-                                                      BorderThickness="0"
-                                                      DisplayMemberPath="Name"
-                                                      IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                      ItemsSource="{Binding DataContext.AvailableMeasures, ElementName=RootPage}"
-                                                      SelectedItem="{Binding UnitMeasure}" />
+                                            <ComboBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                DisplayMemberPath="Name"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                ItemsSource="{Binding DataContext.AvailableMeasures, ElementName=RootPage}"
+                                                SelectedItem="{Binding UnitMeasure}" />
 
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- Narxi -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="Narxi">
+                                <!--  Narxi  -->
+                                <DataGridTemplateColumn Width="*" Header="Narxi">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Padding="0"
-                                                     VerticalAlignment="Center"
-                                                     HorizontalContentAlignment="Center"
-                                                     Background="Transparent"
-                                                     BorderThickness="0"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding CostPrice, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}" />
+                                            <TextBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                Text="{Binding CostPrice, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <!-- Jami narxi -->
-                                <DataGridTemplateColumn Width="*"
-                                                        Header="Jami summa">
+                                <!--  Jami narxi  -->
+                                <DataGridTemplateColumn Width="*" Header="Jami summa">
                                     <DataGridTemplateColumn.CellStyle>
                                         <StaticResource ResourceKey="TransparentFocusableCellStyle" />
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Padding="0"
-                                                     VerticalAlignment="Center"
-                                                     HorizontalContentAlignment="Center"
-                                                     Background="Transparent"
-                                                     BorderThickness="0"
-                                                     IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
-                                                     Text="{Binding TotalAmount, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}" />
+                                            <TextBox
+                                                Padding="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                IsReadOnly="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                Text="{Binding TotalAmount, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N2}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -850,11 +844,12 @@
                                     </DataGridTemplateColumn.CellStyle>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <controls:ActionButton CommandParameter="{Binding}"
-                                                                   DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, ElementName=RootPage}"
-                                                                   EditCommand="{Binding DataContext.EditSemiProductCommand, ElementName=RootPage}"
-                                                                   SaveCommand="{Binding DataContext.SaveSemiProductCommand, ElementName=RootPage}"
-                                                                   IsEditing="{Binding IsEditing}" />
+                                            <controls:ActionButton
+                                                CommandParameter="{Binding}"
+                                                DeleteCommand="{Binding DataContext.RemoveSemiProductCommand, ElementName=RootPage}"
+                                                EditCommand="{Binding DataContext.EditSemiProductCommand, ElementName=RootPage}"
+                                                IsEditing="{Binding IsEditing}"
+                                                SaveCommand="{Binding DataContext.SaveSemiProductCommand, ElementName=RootPage}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
