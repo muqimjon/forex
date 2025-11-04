@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 public record CreateProductCommand(
     string Name,
-    int Code,
+    string Code,
     string Measure,
     Stream? Photo,
     string? ContentType,
@@ -36,7 +36,7 @@ public class CreateProductCommandHandler(
         return product.Id;
     }
 
-    private async Task EnsureCodeIsUnique(int code, CancellationToken ct)
+    private async Task EnsureCodeIsUnique(string code, CancellationToken ct)
     {
         var isExist = await context.Products.AnyAsync(p => p.Code == code, ct);
 

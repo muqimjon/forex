@@ -24,5 +24,4 @@ public interface IApiCurrency
 
     [Get("/currencies")]
     Task<Response<List<CurrencyResponse>>> GetAllAsync();
-
 }

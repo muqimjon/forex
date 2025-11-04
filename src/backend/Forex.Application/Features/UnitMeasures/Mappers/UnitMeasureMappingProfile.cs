@@ -10,6 +10,10 @@ public class UnitMeasureMappingProfile : Profile
 {
     public UnitMeasureMappingProfile()
     {
+        CreateMap<UnitMeasureCommand, UnitMeasure>()
+            .ForMember(dest => dest.NormalizedName,
+            opt => opt.MapFrom(src => src.Name.ToNormalized()));
+
         CreateMap<CreateUnitMeasureCommand, UnitMeasure>()
             .ForMember(dest => dest.NormalizedName,
             opt => opt.MapFrom(src => src.Name.ToNormalized()));

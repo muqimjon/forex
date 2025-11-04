@@ -73,22 +73,6 @@ public partial class InvoiceViewModel : ViewModelBase
     private async Task LoadPageAsync()
     {
         await LoadUsersAsync();
-        await LoadManufactoriesAsync();
-        await LoadCurrenciesAsync();
-    }
-
-    private async Task LoadManufactoriesAsync()
-    {
-        var response = await client.Manufactories.GetAll()
-            .Handle(isLoading => IsLoading = isLoading);
-        if (!response.IsSuccess)
-        {
-            ErrorMessage = response.Message ?? "Foydalanuvchilarni yuklashda noma'lum xatolik yuz berdi.";
-            return;
-        }
-
-        Manufactories = mapper.Map<ObservableCollection<ManufactoryViewModel>>(response.Data!);
-        Manufactory = Manufactories.FirstOrDefault() ?? new();
     }
 
     private async Task LoadUsersAsync()
@@ -114,21 +98,6 @@ public partial class InvoiceViewModel : ViewModelBase
         Agents = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Vositachi));
 
         Supplier = Suppliers.FirstOrDefault() ?? new();
-    }
-
-    private async Task LoadCurrenciesAsync()
-    {
-        var response = await client.Currencies.GetAllAsync().Handle();
-        if (!response.IsSuccess)
-        {
-            ErrorMessage = response.Message;
-            return;
-        }
-
-        Currencies = mapper.Map<ObservableCollection<CurrencyViewModel>>(response.Data!);
-        Currency = Currencies.FirstOrDefault(c => c.IsDefault)
-            ?? Currencies.FirstOrDefault()
-            ?? new();
     }
 
     #endregion Loading Data

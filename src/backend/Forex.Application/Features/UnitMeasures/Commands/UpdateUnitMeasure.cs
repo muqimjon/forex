@@ -13,6 +13,7 @@ public record UpdateUnitMeasureCommand(
     string Symbol,
     bool IsDefault,
     bool IsActive,
+    int Position,
     string Description)
     : IRequest<bool>;
 public class UpdateUnitMeasureCommandHandler(

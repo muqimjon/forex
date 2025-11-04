@@ -1,11 +1,15 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
-public class UnitMeasuerViewModel
+using CommunityToolkit.Mvvm.ComponentModel;
+using Forex.Wpf.Pages.Common;
+
+public partial class UnitMeasuerViewModel : ViewModelBase
 {
-    public long Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Symbol { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public bool IsDefault { get; set; }
-    public bool IsActive { get; set; }
+    [ObservableProperty] private long id;
+    [ObservableProperty] private string name = string.Empty;
+    [ObservableProperty] private string symbol = string.Empty;
+    [ObservableProperty] private string description = string.Empty;
+    [ObservableProperty] private bool isDefault;
+    [ObservableProperty] private bool isActive;
+    [ObservableProperty] private int position;
 }

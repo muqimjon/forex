@@ -25,19 +25,32 @@ public partial class SettingsPageViewModel : ViewModelBase
     }
 
     [ObservableProperty] private ObservableCollection<CurrencyViewModel> currencies = [];
+    [ObservableProperty] private ObservableCollection<UnitMeasuerViewModel> unitMeasures = [];
 
     #region Commands
 
     [RelayCommand]
     private void AddCurrency()
     {
-        Currencies.Add(new CurrencyViewModel());
+        Currencies.Add(new());
+    }
+
+    [RelayCommand]
+    private void AddUnitMeasure()
+    {
+        UnitMeasures.Add(new());
     }
 
     [RelayCommand]
     private void RemoveCurrency(CurrencyViewModel currency)
     {
         Currencies.Remove(currency);
+    }
+
+    [RelayCommand]
+    private void RemoveUnitMeasure(UnitMeasuerViewModel unitMeasure)
+    {
+        UnitMeasures.Remove(unitMeasure);
     }
 
     [RelayCommand]
@@ -59,6 +72,25 @@ public partial class SettingsPageViewModel : ViewModelBase
         else ErrorMessage = response.Message ?? "Valyutalarni saqlashda xatolik";
     }
 
+    [RelayCommand]
+    private async Task SaveUnitMeasures()
+    {
+        if (UnitMeasures is null || UnitMeasures.Count == 0)
+        {
+            WarningMessage = "Saqlash uchun valyuta yo‘q";
+            return;
+        }
+
+        var client = services.GetRequiredService<IApiUnitMeasures>();
+        var dtoList = mapper.Map<List<UnitMeasureRequest>>(UnitMeasures);
+
+        var response = await client.SaveAllAsync(dtoList)
+            .Handle(isLoading => IsSelected = isLoading);
+
+        if (response.IsSuccess) SuccessMessage = "O'zgarishlar muvaffaqiyatli saqlandi";
+        else ErrorMessage = response.Message ?? "O'lchov birliklarini saqlashda xatolik";
+    }
+
     #endregion Commands
 
     #region Load Data
@@ -66,6 +98,17 @@ public partial class SettingsPageViewModel : ViewModelBase
     private async Task LoadData()
     {
         await LoadCurrencies();
+        await LoadUnitMeasures();
+    }
+
+    private async Task LoadUnitMeasures()
+    {
+        var client = services.GetRequiredService<IApiUnitMeasures>();
+        var response = await client.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess)
+            UnitMeasures = mapper.Map<ObservableCollection<UnitMeasuerViewModel>>(response.Data);
+        else ErrorMessage = response.Message ?? "O'lchov birliklarini yuklashda xatolik";
     }
 
     private async Task LoadCurrencies()

@@ -10,4 +10,5 @@ public class UnitMeasure : Auditable
     public string Description { get; set; } = string.Empty;
     public bool IsDefault { get; set; }
     public bool IsActive { get; set; }
+    public int Position { get; set; }
 }
