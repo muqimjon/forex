@@ -102,7 +102,7 @@
                             FontSize="20"
                             FontWeight="SemiBold"
                             Foreground="{StaticResource PrimaryTextColor}"
-                            Text="Ishlab chiqarish jarayoniga olingan yarim tayyor mahsulotlar ro'yxati" />
+                            Text="Ishlab chiqarish jarayondagi yarim tayyor mahsulotlar ro'yxati" />
 
                         <Button
                             Grid.Column="2"

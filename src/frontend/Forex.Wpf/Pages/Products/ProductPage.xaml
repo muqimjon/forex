@@ -69,6 +69,7 @@
                 Click="BtnBack_Click"
                 Content="🔙 Orqaga"
                 DockPanel.Dock="Right"
+                Margin="0 0 0 5"
                 Foreground="{StaticResource BackButtonForeground}" />
         </DockPanel>
 
@@ -81,8 +82,8 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left StackPanel with DataGrid -->
-            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Stretch">
-
+            <!-- Left panel -->
+            <Grid Grid.Column="0">
                 <Border Background="AliceBlue" CornerRadius="4">
                     <Border.Effect>
                         <DropShadowEffect
@@ -95,14 +96,15 @@
 
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <!-- Header inside Border -->
-                            <RowDefinition Height="4" />
+                            <RowDefinition Height="Auto"/>
+                            <!-- Header -->
+                            <RowDefinition Height="4"/>
                             <!-- Spacer -->
-                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*"/>
                             <!-- DataGrid -->
                         </Grid.RowDefinitions>
 
+                        <!-- Header -->
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -116,19 +118,7 @@
                                 FontSize="20"
                                 FontWeight="SemiBold"
                                 Foreground="{StaticResource PrimaryTextColor}"
-                                Text="Mahsulotlar" />
-
-                            <Button
-                                Grid.Column="1"
-                                Height="28"
-                                Margin="10,0"
-                                Padding="4"
-                                Background="{DynamicResource PrimaryBackground}"
-                                BorderBrush="{StaticResource BackButtonBorder}"
-                                BorderThickness="0"
-                                Command="{Binding ShowAllProductsCommand}"
-                                Content="Barchasini ko'rsatish"
-                                Foreground="{StaticResource BackButtonForeground}" />
+                                Text="Tayyor mahsulotlar ro'yxati" />
 
                             <Button
                                 Grid.Column="2"
@@ -161,7 +151,8 @@
                             VirtualizingPanel.IsVirtualizing="True"
                             VirtualizingPanel.VirtualizationMode="Recycling"
                             VerticalAlignment="Stretch"
-                            MinHeight="500">
+                            HorizontalAlignment="Stretch"
+                            MinHeight="400">
 
                             <DataGrid.Resources>
                                 <Style TargetType="DataGridColumnHeader">
@@ -176,6 +167,7 @@
                                 </Style>
                             </DataGrid.Resources>
 
+                            <!-- Columns (o‘zgarmagan) -->
                             <DataGrid.Columns>
                                 <!-- Rasm -->
                                 <DataGridTemplateColumn Width="100" Header="Rasm">
@@ -250,7 +242,6 @@
                                     Header="Jami soni"
                                     IsReadOnly="True" />
 
-
                                 <!-- Actions -->
                                 <DataGridTemplateColumn Width="0.2*" Header="">
                                     <DataGridTemplateColumn.CellStyle>
@@ -269,12 +260,11 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
                 </Border>
-            </StackPanel>
+            </Grid>
 
             <!-- Right Panel (Supplier / Details) -->
             <Border Grid.Column="2"
@@ -305,6 +295,8 @@
                 BorderBrush="{StaticResource SuccessButtonBorder}"
                 Command="{Binding SubmitCommand}"
                 Content="Yuborish"
+                Margin="0,5,0,0"
+                md:ButtonAssist.CornerRadius="4"
                 Foreground="{StaticResource SuccessButtonForeground}" />
     </Grid>
 </Page>
