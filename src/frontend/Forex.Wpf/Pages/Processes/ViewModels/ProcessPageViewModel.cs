@@ -9,68 +9,58 @@ using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 public partial class ProcessPageViewModel : ViewModelBase
 {
     private readonly ForexClient Client;
     private readonly IMapper Mapper;
+
     public ProcessPageViewModel(ForexClient client, IMapper mapper)
     {
         Client = client;
         Mapper = mapper;
 
+        EntryToProcessByProduct = [];
+        EntryToProcessByProduct.CollectionChanged += EntryCollectionChanged;
+
         _ = InitialDate();
     }
+
+    [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
+    [ObservableProperty] private ObservableCollection<EntryToProcessByProductViewModel> entryToProcessByProduct;
+
+    #region Commands
+
+    [RelayCommand]
+    public void Submit()
+    {
+        var s = EntryToProcessByProduct;
+    }
+
+    #endregion Commands
+
+    #region Load Data
 
     private async Task InitialDate()
     {
         await LoadProductsAsync();
     }
 
-    [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
-
-    [ObservableProperty] private ObservableCollection<ProductEntryViewModel> filteredProducts = [];
-    [ObservableProperty] private ProductEntryViewModel? selectedProduct;
-
-    [RelayCommand]
-    private void AddProduct()
-    {
-        ProductEntryViewModel entry = new();
-        FilteredProducts.Add(entry);
-    }
-
     public async Task LoadProductsAsync()
     {
-
-        FilteringRequest request = new()
-        {
-            Filters = new()
-            {
-                ["unitMeasure"] = ["include"]
-            }
-        };
-
-        var response = await Client.Products.Filter(request)
+        var response = await Client.Products.GetAll()
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
             AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
-        else
-            WarningMessage = "Mahsulotlarni yuklashda xatolik.";
+        else WarningMessage = "Mahsulotlarni yuklashda xatolik.";
     }
 
-    partial void OnSelectedProductChanged(ProductEntryViewModel? value)
+    public async Task LoadTypesAsync(ProductViewModel product)
     {
-        if (value != null && value.Product != null)
-        {
-            _ = LoadTypesAsync(value);
-        }
-    }
-
-    private async Task LoadTypesAsync(ProductEntryViewModel model)
-    {
-        if (model?.Product == null)
+        if (product is null || product.Id == 0)
         {
             ErrorMessage = "Mahsulot tanlanmagan!";
             return;
@@ -80,34 +70,47 @@ public partial class ProcessPageViewModel : ViewModelBase
         {
             Filters = new()
             {
-                ["productid"] = [model.Product.Id.ToString()],
-                ["productResidue"] = ["include"]
+                ["productid"] = [product.Id.ToString()],
+                ["typeitem"] = ["include:semiproduct"]
             }
         };
 
-        var response = await Client.ProductTypes.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        var response = await Client.ProductTypes.Filter(request)
+            .Handle(isLoading => IsLoading = isLoading);
 
-        if (response.IsSuccess && response.Data != null)
-            model.AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
-        else
-            ErrorMessage = response.Message ?? "Mahsulot o‘lchamlarini yuklashda xatolik!";
-
+        if (response.IsSuccess)
+            product.ProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
+        else ErrorMessage = response.Message ?? "Mahsulot o‘lchamlarini yuklashda xatolik!";
     }
 
-    //private async Task LoadTypeItemsAsync(ProductEntryViewModel model)
-    //{
-    //    FilteringRequest request = new()
-    //    {
-    //        Filters = new()
-    //        {
-    //            ["productTypeId"] = [model.ProductType.Id.ToString()],
-    //            ["semiproduct"] = ["include:unitMeasure"]
-    //        }
-    //    };
+    #endregion
 
-    //    var response = await Client.ProductTypeItems.Filter(request).Handle(isLoading => IsLoading = isLoading);
-    //    if (response.IsSuccess)
-    //        model.ProductType.ProductTypeItems = Mapper.Map<ObservableCollection<ProductTypeItemViewModel>>(response.Data);
-    //    else ErrorMessage = response.Message ?? "Yarim tayyor mahsulotlarni yuklashda xatolik!";
-    //}
+    #region Tracking
+
+    private void EntryCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems is not null)
+        {
+            foreach (EntryToProcessByProductViewModel entry in e.NewItems)
+                entry.PropertyChanged += Entry_PropertyChanged;
+        }
+
+        if (e.OldItems is not null)
+        {
+            foreach (EntryToProcessByProductViewModel entry in e.OldItems)
+                entry.PropertyChanged -= Entry_PropertyChanged;
+        }
+    }
+
+    private void Entry_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not EntryToProcessByProductViewModel entry) return;
+
+        if (e.PropertyName == nameof(EntryToProcessByProductViewModel.Product))
+        {
+            _ = LoadTypesAsync(entry.Product);
+        }
+    }
+
+    #endregion
 }

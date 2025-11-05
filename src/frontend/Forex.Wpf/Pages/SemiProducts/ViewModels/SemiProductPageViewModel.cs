@@ -25,7 +25,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         this.services = services;
         this.mapper = mapper;
 
-        Products = new ObservableCollection<ProductViewModel> { new() };
+        Products = [new()];
         AttachProducts(Products);
 
         _ = LoadDataAsync();
