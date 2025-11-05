@@ -94,20 +94,20 @@ public partial class ProcessPageViewModel : ViewModelBase
 
     }
 
-    private async Task LoadTypeItemsAsync(ProductEntryViewModel model)
-    {
-        FilteringRequest request = new()
-        {
-            Filters = new()
-            {
-                ["productTypeId"] = [model.ProductType.Id.ToString()],
-                ["semiproduct"] = ["include:unitMeasure"]
-            }
-        };
+    //private async Task LoadTypeItemsAsync(ProductEntryViewModel model)
+    //{
+    //    FilteringRequest request = new()
+    //    {
+    //        Filters = new()
+    //        {
+    //            ["productTypeId"] = [model.ProductType.Id.ToString()],
+    //            ["semiproduct"] = ["include:unitMeasure"]
+    //        }
+    //    };
 
-        var response = await Client.ProductTypeItems.Filter(request).Handle(isLoading => IsLoading = isLoading);
-        if (response.IsSuccess)
-            model.ProductType.ProductTypeItems = Mapper.Map<ObservableCollection<ProductTypeItemViewModel>>(response.Data);
-        else ErrorMessage = response.Message ?? "Yarim tayyor mahsulotlarni yuklashda xatolik!";
-    }
+    //    var response = await Client.ProductTypeItems.Filter(request).Handle(isLoading => IsLoading = isLoading);
+    //    if (response.IsSuccess)
+    //        model.ProductType.ProductTypeItems = Mapper.Map<ObservableCollection<ProductTypeItemViewModel>>(response.Data);
+    //    else ErrorMessage = response.Message ?? "Yarim tayyor mahsulotlarni yuklashda xatolik!";
+    //}
 }
