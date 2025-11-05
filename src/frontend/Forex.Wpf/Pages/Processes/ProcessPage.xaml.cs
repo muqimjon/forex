@@ -2,7 +2,6 @@
 
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Processes.ViewModels;
-using Forex.Wpf.Pages.Products.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;

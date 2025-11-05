@@ -16,7 +16,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
-        // 🔸 1. Client servislari (API, Minio, Auth va h.k.)
+        // 🔸 1. services servislari (API, Minio, Auth va h.k.)
         AddClientLayer(services, config);
 
         // 🔸 2. ViewModel, Windows, Pages ro‘yxatdan o‘tkazish

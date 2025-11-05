@@ -54,6 +54,17 @@
             <Setter Property="VerticalAlignment"
                     Value="Center" />
         </Style>
+
+        <Style x:Key="CenteredComboBoxStyle"
+               TargetType="ComboBox">
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="ItemsSource"
+                    Value="{Binding DataContext.AvailableUnitMeasures, RelativeSource={RelativeSource AncestorType=Page}}" />
+        </Style>
+
     </Page.Resources>
 
 
@@ -66,6 +77,15 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
+            <Button x:Name="btnBack"
+                    HorizontalAlignment="Right"
+                    md:ButtonAssist.CornerRadius="5"
+                    Background="{DynamicResource OtherBackground}"
+                    BorderThickness="0"
+                    Click="BtnBack_Click"
+                    Content="🔙 Orqaga"
+                    ToolTip="Orqaga" />
 
             <!-- ==== TABLE WRAPPER ==== -->
             <Border Grid.Row="1"
@@ -252,9 +272,13 @@
                                                                             <DataGridTextColumn Width="*"
                                                                                                 Binding="{Binding SemiProduct.Quantity}"
                                                                                                 ElementStyle="{StaticResource CenteredTextBlockStyle}" />
-                                                                            <DataGridTextColumn Width="*"
-                                                                                                Binding="{Binding SemiProduct.UnitMeasure.Name}"
-                                                                                                ElementStyle="{StaticResource CenteredTextBlockStyle}" />
+
+                                                                            <DataGridComboBoxColumn Width="*"
+                                                                                                    SelectedItemBinding="{Binding SemiProduct.UnitMeasure, Mode=TwoWay}"
+                                                                                                    DisplayMemberPath="Name"
+                                                                                                    EditingElementStyle="{StaticResource CenteredComboBoxStyle}"
+                                                                                                    ElementStyle="{StaticResource CenteredComboBoxStyle}" />
+
                                                                             <DataGridTextColumn Width="*"
                                                                                                 Binding="{Binding SemiProduct.CostPrice, StringFormat={}{0:N2}}"
                                                                                                 ElementStyle="{StaticResource CenteredTextBlockStyle}" />

@@ -4,7 +4,7 @@ using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Responses;
 using Refit;
 
-public interface IApiSemiProduct
+public interface IApiSemiProducts
 {
     [Get("/semi-products")]
     Task<Response<List<SemiProductResponse>>> GetAll();
