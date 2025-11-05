@@ -4,7 +4,7 @@ public record ProductResponse
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public int Code { get; set; }
+    public string Code { get; set; } = string.Empty;
     public string PhotoPath { get; set; } = string.Empty;
 
     public long UnitMeasureId { get; set; }

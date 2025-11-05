@@ -12,6 +12,7 @@ public record CreateUnitMeasureCommand(
     string Symbol,
     bool IsDefault,
     bool IsActive,
+    int Position,
     string Description)
     : IRequest<long>;
 

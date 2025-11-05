@@ -7,6 +7,11 @@ using System.Collections.ObjectModel;
 
 public partial class ProductTypeViewModel : ViewModelBase
 {
+    public ProductTypeViewModel()
+    {
+        ProductTypeItems = [];
+    }
+
     public long Id { get; set; }
     [ObservableProperty] private string type = string.Empty;
     [ObservableProperty] private int? count;
@@ -18,7 +23,6 @@ public partial class ProductTypeViewModel : ViewModelBase
     // for UI only
     [ObservableProperty] private ProductViewModel product = default!;
     private ProductTypeViewModel? selected;
-
 
     #region Property Changes
 

@@ -88,7 +88,7 @@ public partial class UserWindow : Window
         ]
             };
 
-            // 🧩 Global client orqali ishlaymiz
+            // 🧩 Global services orqali ishlaymiz
             var response = await App.AppHost!.Services.GetRequiredService<ForexClient>().Users.Create(userRequest).Handle();
 
             if (response.IsSuccess)

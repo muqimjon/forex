@@ -2,25 +2,11 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Forex.ClientService;
-using Forex.ClientService.Enums;
-using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
-using MapsterMapper;
 using System.Collections.ObjectModel;
 
 public partial class InvoiceViewModel : ViewModelBase
 {
-    private readonly ForexClient client;
-    private readonly IMapper mapper;
-    public InvoiceViewModel(ForexClient client, IMapper mapper)
-    {
-        this.client = client;
-        this.mapper = mapper;
-        _ = LoadPageAsync();
-    }
-
     public long Id { get; set; }
     [ObservableProperty] private ManufactoryViewModel manufactory = default!;
     [ObservableProperty] private UserViewModel supplier = default!;
@@ -67,71 +53,6 @@ public partial class InvoiceViewModel : ViewModelBase
     partial void OnCurrencyChanged(CurrencyViewModel value) => RefreshAmount();
 
     #endregion Property Changes
-
-    #region Loading Data
-
-    private async Task LoadPageAsync()
-    {
-        await LoadUsersAsync();
-        await LoadManufactoriesAsync();
-        await LoadCurrenciesAsync();
-    }
-
-    private async Task LoadManufactoriesAsync()
-    {
-        var response = await client.Manufactories.GetAll()
-            .Handle(isLoading => IsLoading = isLoading);
-        if (!response.IsSuccess)
-        {
-            ErrorMessage = response.Message ?? "Foydalanuvchilarni yuklashda noma'lum xatolik yuz berdi.";
-            return;
-        }
-
-        Manufactories = mapper.Map<ObservableCollection<ManufactoryViewModel>>(response.Data!);
-        Manufactory = Manufactories.FirstOrDefault() ?? new();
-    }
-
-    private async Task LoadUsersAsync()
-    {
-        FilteringRequest request = new()
-        {
-            Filters = new()
-            {
-                ["role"] = ["in:Taminotchi,Vositachi"]
-            }
-        };
-
-        var response = await client.Users.Filter(request)
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (!response.IsSuccess)
-        {
-            ErrorMessage = response.Message ?? "Foydalanuvchilarni yuklashda noma'lum xatolik yuz berdi.";
-            return;
-        }
-
-        Suppliers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Taminotchi));
-        Agents = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Vositachi));
-
-        Supplier = Suppliers.FirstOrDefault() ?? new();
-    }
-
-    private async Task LoadCurrenciesAsync()
-    {
-        var response = await client.Currencies.GetAllAsync().Handle();
-        if (!response.IsSuccess)
-        {
-            ErrorMessage = response.Message;
-            return;
-        }
-
-        Currencies = mapper.Map<ObservableCollection<CurrencyViewModel>>(response.Data!);
-        Currency = Currencies.FirstOrDefault(c => c.IsDefault)
-            ?? Currencies.FirstOrDefault()
-            ?? new();
-    }
-
-    #endregion Loading Data
 
     #region Private Helpers
 

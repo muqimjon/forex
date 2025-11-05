@@ -1,6 +1,6 @@
-﻿namespace Forex.ClientService.Models.Responses;
+﻿namespace Forex.Application.Features.UnitMeasures.Commands;
 
-public record UnitMeasureResponse
+public sealed record UnitMeasureCommand
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;

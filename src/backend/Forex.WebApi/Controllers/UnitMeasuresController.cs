@@ -15,7 +15,7 @@ public class UnitMeasuresController
                      UpdateUnitMeasureCommand,
                      DeleteUnitMeasureCommand>
 {
-    [HttpPost("filter")]
-    public async Task<IActionResult> GetFiltered(UnitMeasureFilterQuery query)
-        => Ok(new Response { Data = await Mediator.Send(query) });
+    [HttpPut("all")]
+    public async Task<IActionResult> UpdateAll(List<UnitMeasureCommand> items)
+        => Ok(new Response { Data = await Mediator.Send(new UpdateAllUnitMeasuresCommand(items)) });
 }

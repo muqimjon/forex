@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 public record UpdateProductCommand(
     long Id,
     string Name,
-    int Code,
+    string Code,
     string Measure,
     Stream? Photo,
     string? Extension,

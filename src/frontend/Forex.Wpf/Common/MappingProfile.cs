@@ -31,7 +31,7 @@ public static class MappingProfile
             .Map(dest => dest.UnitMeasureId, src => src.UnitMeasure.Id)
             .Map(dest => dest.ImageBytes, src => ImageToBytes(src.Image));
 
-        // 🔹 UnitMeasure
+        // 🔹 UnitMeasures
         config.NewConfig<UnitMeasureResponse, UnitMeasuerViewModel>();
         config.NewConfig<UnitMeasuerViewModel, UnitMeasureRequest>();
 

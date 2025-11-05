@@ -6,7 +6,7 @@ public sealed record ProductForProductTypeDto
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public int Code { get; set; }  // mahsulot kodi 101 misol uchun
+    public string Code { get; set; } = string.Empty;
     public string? ImagePath { get; set; } = string.Empty;
 
     public long MeasureId { get; set; }
