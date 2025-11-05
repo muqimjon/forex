@@ -14,140 +14,139 @@ using System.Collections.ObjectModel;
 public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : ViewModelBase
 {
 
-[ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
+    [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
 
     [ObservableProperty] private ObservableCollection<ProductEntryViewModel> filteredProducts = [];
-        [ObservableProperty] private ProductEntryViewModel? selectedProduct;
+    [ObservableProperty] private ProductEntryViewModel? selectedProduct;
 
 
-        #region Commands
+    #region Commands
 
 
 
-        [RelayCommand]
-        private void DeleteEmployee(UserViewModel user)
-        {
+    [RelayCommand]
+    private void DeleteEmployee(UserViewModel user)
+    {
         if (user.PreparedProducts is not null && user.PreparedProducts.Any())
-        foreach (var type in user.PreparedProducts)
-        RemoveProductType(type);
+            foreach (var type in user.PreparedProducts)
+                RemoveProductType(type);
 
 
         UpdateProducts();
-        }
+    }
 
 
-        [RelayCommand]
-        private void AddProduct()
-        {
-
+    [RelayCommand]
+    private void AddProduct()
+    {
         ProductEntryViewModel entry = new();
         FilteredProducts.Add(entry);
-        }
+    }
 
-        [RelayCommand]
-        private void DeleteProduct(ProductEntryViewModel type)
-        {
+    [RelayCommand]
+    private void DeleteProduct(ProductEntryViewModel type)
+    {
         if (type is null)
-        return;
+            return;
 
         RemoveProductType(type);
-        }
-        [RelayCommand]
-        private async Task Submit()
-        {
+    }
+    [RelayCommand]
+    private async Task Submit()
+    {
         List<ProductEntryRequest> requests = [];
 
 
-            var response = await Client.ProductEntries.Create(new() { Command = requests });
+        var response = await Client.ProductEntries.Create(new() { Command = requests });
 
-            if (response.IsSuccess)
+        if (response.IsSuccess)
             SuccessMessage = "Mahsulotlar muvaffaqiyatli saqlandi.";
-            else
+        else
             ErrorMessage = response.Message ?? "Mahsulotlarni saqlashda xatolik yuz berdi.";
-            }
+    }
 
-            #endregion Commands
+    #endregion Commands
 
-            #region Load Data
+    #region Load Data
 
-            public async Task InitializeAsync()
-            {
-            await LoadProductsAsync();
+    public async Task InitializeAsync()
+    {
+        await LoadProductsAsync();
 
-            }
+    }
 
-            public async Task LoadProductsAsync()
-            {
+    public async Task LoadProductsAsync()
+    {
 
-            FilteringRequest request = new()
-            {
+        FilteringRequest request = new()
+        {
             Filters = new()
             {
-            ["unitMeasure"] = ["include"]
+                ["unitMeasure"] = ["include"]
             }
-            };
+        };
 
-            var response = await Client.Products.Filter(request)
-.Handle(isLoading => IsLoading = isLoading);
+        var response = await Client.Products.Filter(request)
+            .Handle(isLoading => IsLoading = isLoading);
 
-                if (response.IsSuccess)
-                AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
-                        else WarningMessage = "Mahsulotlarni yuklashda xatolik.";
-                        }
+        if (response.IsSuccess)
+            AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
+        else WarningMessage = "Mahsulotlarni yuklashda xatolik.";
+    }
 
-                        private async Task LoadTypesAsync(ProductEntryViewModel model)
-                        {
-                        FilteringRequest request = new()
-                        {
-                        Filters = new()
-                        {
-                        ["productid"] = [model.Product.Id.ToString()],
-                        ["productResidue"] = ["include"]
-                        }
-                        };
+    private async Task LoadTypesAsync(ProductEntryViewModel model)
+    {
+        FilteringRequest request = new()
+        {
+            Filters = new()
+            {
+                ["productid"] = [model.Product.Id.ToString()],
+                ["productResidue"] = ["include"]
+            }
+        };
 
-var response = await Client.ProductTypes.Filter(request).Handle(isLoading => IsLoading = isLoading);
-                            if (response.IsSuccess)
-                            model.AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
-                                    else ErrorMessage = response.Message ?? "Mahsulot o'lchamlarini yuklashda xatolik!";
-                                    }
+        var response = await Client.ProductTypes.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        if (response.IsSuccess)
+            model.AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
+        else ErrorMessage = response.Message ?? "Mahsulot o'lchamlarini yuklashda xatolik!";
+    }
 
-                                    private async Task LoadTypeItemssAsync(ProductEntryViewModel model)
-                                    {
-                                    FilteringRequest request = new()
-                                    {
-                                    Filters = new()
-                                    {
-                                    ["productTypeId"] = [model.ProductType.Id.ToString()],
-                                    ["semiproduct"] = ["include:unitMeasure"]
-                                    }
-                                    };
+    private async Task LoadTypeItemssAsync(ProductEntryViewModel model)
+    {
+        FilteringRequest request = new()
+        {
+            Filters = new()
+            {
+                ["productTypeId"] = [model.ProductType.Id.ToString()],
+                ["semiproduct"] = ["include:unitMeasure"]
+            }
+        };
 
-var response = await Client.ProductTypeItems.Filter(request).Handle(isLoading => IsLoading = isLoading);
-                                        if (response.IsSuccess)
-                                        model.ProductType.ProductTypeItems = Mapper.Map<ObservableCollection<ProductTypeItemViewModel>>(response.Data);
-                                                else ErrorMessage = response.Message ?? "Yarim tayyor mahsulotlarni yuklashda xatolik!";
-                                                }
+        var response = await Client.ProductTypeItems.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        if (response.IsSuccess)
+            model.ProductType.ProductTypeItems = Mapper.Map<ObservableCollection<ProductTypeItemViewModel>>(response.Data);
+        else ErrorMessage = response.Message ?? "Yarim tayyor mahsulotlarni yuklashda xatolik!";
+    }
 
-                                                #endregion Load Data
+    #endregion Load Data
 
-                                                #region Property Changes
+    #region Property Changes
 
 
-                                                #endregion Property Changes
+    #endregion Property Changes
 
-                                                #region Provate Helpers
+    #region Provate Helpers
 
-                                                private void UpdateProducts()
-                                                {
-                                                FilteredProducts.Clear();
-                                                }
+    private void UpdateProducts()
+    {
+        FilteredProducts.Clear();
+    }
 
-                                                private void RemoveProductType(ProductEntryViewModel model)
-                                                {
-                                                model.ProductType.Product.ProductTypes.Remove(model.ProductType);
-                                                FilteredProducts.Remove(model);
-                                                }
+    private void RemoveProductType(ProductEntryViewModel model)
+    {
+        model.ProductType.Product.ProductTypes.Remove(model.ProductType);
+        FilteredProducts.Remove(model);
+    }
 
-                                                #endregion Provate Helpers
-                                                }
+    #endregion Provate Helpers
+}
