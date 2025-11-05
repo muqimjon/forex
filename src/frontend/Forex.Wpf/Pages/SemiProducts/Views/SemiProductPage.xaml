@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
       xmlns:vm="clr-namespace:Forex.Wpf.Pages.SemiProducts.ViewModels"
       mc:Ignorable="d"
       Title="Kirim qilish"
@@ -74,6 +75,7 @@
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="80" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -87,8 +89,125 @@
                     Content="🔙 Orqaga"
                     ToolTip="Orqaga" />
 
+
+            <Grid Grid.Row="1"
+                  Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Invoice raqami:" />
+                <TextBox Grid.Column="1"
+                           Width="120"
+                           Background="White"
+                           Margin="5"
+                         Padding="0"
+                         FontSize="14"
+                           Text="{Binding Invoice.Number}" />
+
+                <TextBlock Grid.Row="1"
+                           Text="Sana:" />
+                <controls:UserCalendar x:Name="beginDate"
+                                       Grid.Column="1"
+                                       Grid.Row="1"
+                                       Width="120"
+                                       Height="30"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       SelectedDate="{Binding Invoice.Date, Mode=TwoWay}" />
+
+                <TextBlock Text="Ta'minotchi:" Grid.Column="2" />
+                <ComboBox x:Name="cbxSupplier"
+                          Grid.Column="3"
+                          Width="150"
+                          Padding="4,2"
+                          VerticalAlignment="Center"
+                          Background="White"
+                          BorderThickness="2"
+                          DisplayMemberPath="Name"
+                          FontSize="14"
+                          ItemsSource="{Binding AvailableSuppliers}"
+                          SelectedItem="{Binding Invoice.Supplier}" />
+
+                <TextBlock Grid.Row="1"
+                           Text="Vositachi orqali:"
+                           Grid.Column="2" />
+
+                <ToggleButton Grid.Row="1"
+                              Grid.Column="3"
+                              Margin="5"
+                              VerticalAlignment="Center"
+                              FontSize="14"
+                              IsChecked="{Binding Invoice.ViaMiddleman, Mode=TwoWay}" />
+
+                <TextBlock Text="Vositachi:"
+                           Grid.Column="4" />
+
+                <ComboBox x:Name="cbxBroker"
+                          Grid.Column="5"
+                          Width="150"
+                          Padding="4,2"
+                          VerticalAlignment="Center"
+                          Background="White"
+                          BorderThickness="2"
+                          DisplayMemberPath="Name"
+                          FontSize="14"
+                          ItemsSource="{Binding AvailableAgents}"
+                          SelectedItem="{Binding Invoice.Agent}" />
+
+                <TextBlock Text="Kontiner soni:"
+                           Grid.Row="1"
+                           Grid.Column="4" />
+
+                <TextBox Grid.Row="1"
+                         Grid.Column="5"
+                         Background="White"
+                         Margin="5"
+                         Padding="0"
+                         FontSize="14"
+                         Text="{Binding Invoice.ContainerCount}" />
+
+                <TextBlock Text="Valyuta:"
+                           Grid.Column="6" />
+
+                <TextBox Grid.Column="7"
+                         Background="White"
+                         Margin="5"
+                         Padding="0"
+                         IsHitTestVisible="False"
+                         IsReadOnly="True"
+                         FontSize="14"
+                         Text="USD" />
+
+                <TextBlock Grid.Row="1"
+                         Grid.Column="6"
+                         Text="Kursi:" />
+
+                <TextBox Grid.Row="1"
+                         Grid.Column="7"
+                         Width="100"
+                         Background="White"
+                         Margin="5"
+                         Padding="0"
+                         FontSize="14"
+                         Text="{Binding Invoice.Currency.ExchangeRate}" />
+
+            </Grid>
+
             <!-- ==== TABLE WRAPPER ==== -->
-            <Border Grid.Row="1"
+            <Border Grid.Row="2"
                     Background="#EEE"
                     BorderBrush="Gray"
                     BorderThickness="1"
@@ -197,7 +316,7 @@
                             <DataGrid AutoGenerateColumns="False"
                                       AlternationCount="100"
                                       CanUserAddRows="True"
-                                      CanUserDeleteRows="True"
+                                      
                                       HeadersVisibility="None"
                                       GridLinesVisibility="All"
                                       HorizontalGridLinesBrush="Black"
@@ -247,7 +366,7 @@
                                             <DataTemplate>
                                                 <DataGrid AutoGenerateColumns="False"
                                                           CanUserAddRows="True"
-                                                          CanUserDeleteRows="True"
+                                                          
                                                           HeadersVisibility="None"
                                                           GridLinesVisibility="All"
                                                           HorizontalGridLinesBrush="Gray"
@@ -270,20 +389,21 @@
                                                                               ItemsSource="{Binding ProductTypeItems}">
                                                                         <DataGrid.Columns>
                                                                             <DataGridTextColumn Width="*"
-                                                                                                Binding="{Binding SemiProduct.Quantity}"
+                                                                                                Binding="{Binding SemiProduct.Quantity, UpdateSourceTrigger=PropertyChanged}"
                                                                                                 ElementStyle="{StaticResource CenteredTextBlockStyle}" />
 
                                                                             <DataGridComboBoxColumn Width="*"
-                                                                                                    SelectedItemBinding="{Binding SemiProduct.UnitMeasure, Mode=TwoWay}"
+                                                                                                    SelectedItemBinding="{Binding SemiProduct.UnitMeasure, UpdateSourceTrigger=PropertyChanged}"
                                                                                                     DisplayMemberPath="Name"
                                                                                                     EditingElementStyle="{StaticResource CenteredComboBoxStyle}"
                                                                                                     ElementStyle="{StaticResource CenteredComboBoxStyle}" />
 
                                                                             <DataGridTextColumn Width="*"
-                                                                                                Binding="{Binding SemiProduct.CostPrice, StringFormat={}{0:N2}}"
+                                                                                                Binding="{Binding SemiProduct.CostPrice, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
                                                                                                 ElementStyle="{StaticResource CenteredTextBlockStyle}" />
                                                                             <DataGridTextColumn Width="*"
-                                                                                                Binding="{Binding SemiProduct.TotalAmount, StringFormat={}{0:N2}}"
+                                                                                                IsReadOnly="True"
+                                                                                                Binding="{Binding SemiProduct.TotalAmount, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
                                                                                                 ElementStyle="{StaticResource CenteredTextBlockStyle}" />
                                                                         </DataGrid.Columns>
                                                                     </DataGrid>
@@ -323,7 +443,7 @@
             </Border>
 
             <!-- ===== SUBMIT BUTTON ===== -->
-            <StackPanel Grid.Row="2"
+            <StackPanel Grid.Row="3"
                         Margin="0 10 0 0"
                         HorizontalAlignment="Right"
                         Orientation="Horizontal">

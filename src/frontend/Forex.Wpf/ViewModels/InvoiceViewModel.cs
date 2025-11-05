@@ -1,9 +1,7 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Forex.Wpf.Pages.Common;
-using System.Collections.ObjectModel;
 
 public partial class InvoiceViewModel : ViewModelBase
 {
@@ -24,22 +22,6 @@ public partial class InvoiceViewModel : ViewModelBase
     [ObservableProperty] private decimal? totalAmount;
     [ObservableProperty] private string totalAmountWithCurrency = string.Empty;
 
-    // For UI 
-    [ObservableProperty] private ObservableCollection<CurrencyViewModel> currencies = default!;
-    [ObservableProperty] private ObservableCollection<ManufactoryViewModel> manufactories = default!;
-    [ObservableProperty] private ObservableCollection<UserViewModel> suppliers = default!;
-    [ObservableProperty] private ObservableCollection<UserViewModel> agents = default!;
-
-
-    #region Commands
-
-    [RelayCommand]
-    private void GetMiddleman()
-    {
-        Agent = Agents.LastOrDefault();
-    }
-
-    #endregion
 
     #region Property Changes
 
@@ -58,7 +40,7 @@ public partial class InvoiceViewModel : ViewModelBase
 
     private void RefreshAmount()
     {
-        if (TotalAmount is not null)
+        if (TotalAmount is not null && Currency is not null)
             TotalAmountWithCurrency = $"{TotalAmount:N2} {Currency.Code}";
     }
 

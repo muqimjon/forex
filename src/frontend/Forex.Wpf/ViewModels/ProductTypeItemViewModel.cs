@@ -9,6 +9,7 @@ public partial class ProductTypeItemViewModel : ViewModelBase
     {
         SemiProduct = new();
     }
+
     public long Id { get; set; }
     [ObservableProperty] private decimal quantity = 1;
     [ObservableProperty] private SemiProductViewModel semiProduct = default!;

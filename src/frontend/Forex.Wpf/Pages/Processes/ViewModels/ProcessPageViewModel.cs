@@ -56,7 +56,7 @@ public partial class ProcessPageViewModel : ViewModelBase
 
         if (response.IsSuccess)
             AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
-        else 
+        else
             WarningMessage = "Mahsulotlarni yuklashda xatolik.";
     }
 

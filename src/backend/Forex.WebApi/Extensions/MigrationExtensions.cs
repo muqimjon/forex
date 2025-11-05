@@ -1,7 +1,6 @@
 ﻿namespace Forex.WebApi.Extensions;
 
 using Forex.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 public static class MigrationExtensions
 {

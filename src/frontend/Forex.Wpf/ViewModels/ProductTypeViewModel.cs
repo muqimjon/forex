@@ -10,6 +10,7 @@ public partial class ProductTypeViewModel : ViewModelBase
     public ProductTypeViewModel()
     {
         ProductTypeItems = [];
+
     }
 
     public long Id { get; set; }
