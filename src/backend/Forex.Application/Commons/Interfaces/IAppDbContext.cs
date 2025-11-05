@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Commons.Interfaces;
 
 using Forex.Domain.Entities;
+using Forex.Domain.Entities.Processes;
 using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.Sales;
 using Forex.Domain.Entities.SemiProducts;
@@ -30,6 +31,8 @@ public interface IAppDbContext
     DbSet<SemiProductEntry> SemiProductEntries { get; }
     DbSet<Shop> Shops { get; }
     DbSet<Transaction> Transactions { get; }
+    DbSet<InProcess> InProcess { get; }
+    DbSet<EntryToProcess> EntriesToProcess { get; }
 
     Task<bool> SaveAsync(CancellationToken cancellation);
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

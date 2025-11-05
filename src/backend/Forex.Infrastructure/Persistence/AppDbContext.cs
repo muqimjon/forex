@@ -2,6 +2,7 @@
 
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
+using Forex.Domain.Entities.Processes;
 using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.Sales;
 using Forex.Domain.Entities.SemiProducts;
@@ -33,6 +34,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ProductResidue> ProductResidues { get; set; }
     public DbSet<UnitMeasure> UnitMeasures { get; set; }
 
+    public DbSet<InProcess> InProcess { get; set; }
+
+    public DbSet<EntryToProcess> EntriesToProcess { get; set; }
 
     private IDbContextTransaction? currentTransaction;
 
