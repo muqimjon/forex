@@ -1,14 +1,14 @@
-﻿<Page x:Class="Forex.Wpf.Pages.Processes.ProcessPage" 
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:Forex.Wpf.Pages.Processes" 
-      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
-      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls" 
-      mc:Ignorable="d" 
-      Title="ProcessPage" 
-      d:DesignHeight="450" 
+﻿<Page x:Class="Forex.Wpf.Pages.Processes.ProcessPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Forex.Wpf.Pages.Processes"
+      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+      mc:Ignorable="d"
+      Title="ProcessPage"
+      d:DesignHeight="450"
       d:DesignWidth="800">
 
     <Page.Resources>
@@ -98,8 +98,16 @@
                   VirtualizingPanel.IsVirtualizing="True"
                   VirtualizingPanel.VirtualizationMode="Recycling">
 
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
             <DataGrid.Columns>
-                <!-- 🖼️ Surat -->
                 <DataGridTemplateColumn Width="100" Header="Rasm">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -110,19 +118,16 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <!-- 🔢 Kod -->
                 <DataGridComboBoxColumn Width="0.8*" Header="Kod"
                                         SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         ElementStyle="{StaticResource ProductCodeComboBoxStyle}"
                                         EditingElementStyle="{StaticResource ProductCodeComboBoxStyle}" />
 
-                <!-- 🧾 Nomi -->
                 <DataGridComboBoxColumn Width="1.5*" Header="Nomi"
                                         SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         ElementStyle="{StaticResource ProductNameComboBoxStyle}"
                                         EditingElementStyle="{StaticResource ProductNameComboBoxStyle}" />
 
-                <!-- 📏 O‘lcham -->
                 <DataGridTemplateColumn Width="*" Header="O'lcham">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -134,11 +139,17 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <!-- 🔢 Miqdori -->
                 <DataGridTemplateColumn Width="*" Header="Miqdori">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox x:Name="tbcQuantity"
+                                     Text="{Binding Quantity,
+                                     Mode=TwoWay,
+                                     UpdateSourceTrigger=PropertyChanged,
+                                     StringFormat={}{0:N0},
+                                     TargetNullValue=0,
+                                     FallbackValue=0}"
+                                     GotFocus="QuantityTextBox_GotFocus"
                                      Style="{StaticResource QuantityTextBoxStyle}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

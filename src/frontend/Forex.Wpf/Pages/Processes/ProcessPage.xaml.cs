@@ -31,4 +31,11 @@ public partial class ProcessPage : Page
             Main.NavigateTo(new HomePage());
     }
 
+    private void QuantityTextBox_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox tb)
+        {
+            tb.SelectAll(); 
+        }
+    }
 }
