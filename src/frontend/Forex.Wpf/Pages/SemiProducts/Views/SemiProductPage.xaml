@@ -7,6 +7,7 @@
       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
       xmlns:vm="clr-namespace:Forex.Wpf.Pages.SemiProducts.ViewModels"
+      xmlns:converters="clr-namespace:Forex.Wpf.Resources.Converters"
       mc:Ignorable="d"
       Title="Kirim qilish"
       d:DesignHeight="580"
@@ -15,6 +16,7 @@
     <!-- ======= STYLES ======= -->
     <Page.Resources>
         <!-- Umumiy DataGridCell style -->
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <Style x:Key="TransparentCellStyle"
                TargetType="DataGridCell">
             <Setter Property="Padding"
@@ -179,7 +181,8 @@
                 <TextBlock Text="Vositachi:"
                            Grid.Column="4"
                            FontSize="14"
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center"
+                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <Border Grid.Column="5"
                         Width="150"
@@ -188,7 +191,8 @@
                         CornerRadius="4"
                         BorderBrush="Black"
                         BorderThickness="1"
-                        VerticalAlignment="Center">
+                        VerticalAlignment="Center"
+                        Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ComboBox x:Name="cbxBroker"
                               Padding="4,2"
                               Background="Transparent"
@@ -204,7 +208,8 @@
                            Grid.Row="1"
                            Grid.Column="4"
                            FontSize="14"
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center"
+                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <Border Grid.Row="1"
                         Grid.Column="5"
@@ -212,7 +217,8 @@
                         Background="White"
                         CornerRadius="4"
                         BorderBrush="Black"
-                        BorderThickness="1">
+                        BorderThickness="1"
+                        Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBox
                         Background="Transparent"
                         Padding="4,0"
@@ -222,18 +228,19 @@
                         Text="{Binding Invoice.ContainerCount}" />
                 </Border>
 
-
                 <TextBlock Text="Valyuta:"
                            Grid.Column="6"
                            FontSize="14"
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center"
+                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <Border Grid.Column="7"
                         Margin="5 1"
                         Background="White"
                         CornerRadius="4"
                         BorderBrush="Black"
-                        BorderThickness="1">
+                        BorderThickness="1"
+                        Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBox
                         Background="Transparent"
                         Padding="2,0"
@@ -248,7 +255,8 @@
                            Grid.Column="6"
                            Text="Kursi:"
                            FontSize="14"
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center"
+                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <Border Grid.Row="1"
                         Grid.Column="7"
@@ -257,7 +265,8 @@
                         Background="White"
                         CornerRadius="4"
                         BorderBrush="Black"
-                        BorderThickness="1">
+                        BorderThickness="1"
+                        Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBox
                         Background="Transparent"
                         Padding="2,0"
