@@ -20,12 +20,12 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
         try
         {
             var entry = await GetEntryAsync(request.Id, cancellationToken);
-
             var oldProductType = await GetProductTypeAsync(entry.ProductTypeId, cancellationToken);
             await RevertEntryAsync(entry, oldProductType, cancellationToken);
 
             var newProductType = await GetProductTypeAsync(request.ProductTypeId, cancellationToken);
-            await ApplyNewEntryAsync(entry, request.ProductTypeId, request.NewQuantity, newProductType, cancellationToken);
+            var inProcess = await GetOrAttachInProcessAsync(request.ProductTypeId, cancellationToken);
+            await ApplyNewEntryAsync(entry, newProductType, inProcess, request.NewQuantity, cancellationToken);
 
             return await context.CommitTransactionAsync(cancellationToken);
         }
@@ -38,8 +38,11 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
 
     private async Task<EntryToProcess> GetEntryAsync(long id, CancellationToken ct)
     {
-        var entry = await context.EntryToProcesses.FirstOrDefaultAsync(e => e.Id == id, ct);
-        return entry is null ? throw new NotFoundException($"EntryToProcess not found. Id={id}") : entry;
+        var entry = await context.EntryToProcesses
+            .Include(e => e.InProcess)
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
+
+        return entry ?? throw new NotFoundException("EntryToProcess", "Id", id);
     }
 
     private async Task<ProductType> GetProductTypeAsync(long productTypeId, CancellationToken ct)
@@ -48,10 +51,7 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
             .Include(pt => pt.ProductTypeItems)
             .FirstOrDefaultAsync(pt => pt.Id == productTypeId, ct);
 
-        if (productType is null)
-            throw new NotFoundException($"ProductType not found. Id={productTypeId}");
-
-        return productType;
+        return productType ?? throw new NotFoundException("ProductType", "Id", productTypeId);
     }
 
     private async Task RevertEntryAsync(EntryToProcess entry, ProductType productType, CancellationToken ct)
@@ -67,11 +67,11 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
         {
             inProcess.Quantity -= entry.Quantity;
             if (inProcess.Quantity < 0)
-                throw new InvalidOperationException($"InProcess quantity cannot be negative. ProductTypeId={entry.ProductTypeId}");
+                throw new ForbiddenException($"InProcess qoldiq manfiy bo‘lishi mumkin emas. ProductTypeId={entry.ProductTypeId}");
         }
     }
 
-    private async Task ApplyNewEntryAsync(EntryToProcess entry, long newProductTypeId, decimal newQuantity, ProductType productType, CancellationToken ct)
+    private async Task ApplyNewEntryAsync(EntryToProcess entry, ProductType productType, InProcess inProcess, decimal newQuantity, CancellationToken ct)
     {
         foreach (var item in productType.ProductTypeItems)
         {
@@ -79,27 +79,39 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
             var required = item.Quantity * newQuantity;
 
             if (residue.Quantity < required)
-                throw new ForbiddenException($"Not enough residue. SemiProductId={item.SemiProductId}, Available={residue.Quantity}, Required={required}");
+                throw new ForbiddenException($"Yetarli qoldiq yo‘q. SemiProductId={item.SemiProductId}, Available={residue.Quantity}, Required={required}");
 
             residue.Quantity -= required;
         }
 
-        var inProcess = await context.InProcesses.FirstOrDefaultAsync(p => p.ProductTypeId == newProductTypeId, ct);
+        inProcess.Quantity += newQuantity;
+
+        entry.ProductTypeId = productType.Id;
+        entry.Quantity = newQuantity;
+        entry.InProcess = inProcess;
+    }
+
+    private async Task<InProcess> GetOrAttachInProcessAsync(long productTypeId, CancellationToken ct)
+    {
+        var inProcess = await context.InProcesses.FirstOrDefaultAsync(p => p.ProductTypeId == productTypeId, ct);
+
         if (inProcess is null)
         {
-            inProcess = new InProcess { ProductTypeId = newProductTypeId, Quantity = 0 };
+            inProcess = new InProcess
+            {
+                ProductTypeId = productTypeId,
+                Quantity = 0
+            };
+
             await context.InProcesses.AddAsync(inProcess, ct);
         }
 
-        inProcess.Quantity += newQuantity;
-
-        entry.ProductTypeId = newProductTypeId;
-        entry.Quantity = newQuantity;
+        return inProcess;
     }
 
     private async Task<SemiProductResidue> GetResidueAsync(long semiProductId, CancellationToken ct)
     {
         var residue = await context.SemiProductResidues.FirstOrDefaultAsync(r => r.SemiProductId == semiProductId, ct);
-        return residue is null ? throw new NotFoundException($"SemiProductResidue not found. SemiProductId={semiProductId}") : residue;
+        return residue ?? throw new NotFoundException("SemiProductResidue", "SemiProductId", semiProductId);
     }
 }

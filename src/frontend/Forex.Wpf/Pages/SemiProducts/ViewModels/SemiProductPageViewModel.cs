@@ -115,7 +115,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
             SemiProducts = []
         };
 
-        requestObject.Invoice.ManufactoryId = 1; // TODO: Make selectable
         requestObject.Invoice.CurrencyId = 1; // TODO: Make selectable
 
         var client = services.GetRequiredService<IApiSemiProductEntry>();

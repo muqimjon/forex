@@ -1,4 +1,4 @@
-﻿namespace Forex.Application.Features.Processes.InProcesses.DTOs;
+﻿namespace Forex.Application.Features.Processes.InProcess.DTOs;
 
 using Forex.Application.Features.Products.ProductTypes.DTOs;
 
@@ -9,4 +9,6 @@ public class InProcessDto
 
     public long ProductTypeId { get; set; }
     public ProductTypeDto ProductType { get; set; } = default!;
+
+    public ICollection<EntryToProcessDto> EntryToProcesses { get; set; } = default!;
 }

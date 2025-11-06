@@ -32,7 +32,7 @@ public class DeleteProductEntryCommandHandler(IAppDbContext context)
 
             context.ProductEntries.Remove(entry);
 
-           return await context.CommitTransactionAsync(cancellationToken);
+            return await context.CommitTransactionAsync(cancellationToken);
         }
         catch
         {

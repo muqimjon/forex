@@ -2,14 +2,12 @@
 
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Products.ViewModels;
+using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 
-/// <summary>
-/// Interaction logic for ProductPage.xaml
-/// </summary>
 public partial class ProductPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
@@ -33,5 +31,13 @@ public partial class ProductPage : Page
     private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
         await vm.InitializeAsync();
+    }
+
+    private void DeleteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is ProductEntryViewModel entry)
+        {
+            vm.DeleteProductCommand.Execute(entry);
+        }
     }
 }

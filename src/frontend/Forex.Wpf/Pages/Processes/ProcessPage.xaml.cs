@@ -35,7 +35,7 @@ public partial class ProcessPage : Page
     {
         if (sender is TextBox tb)
         {
-            tb.SelectAll(); 
+            tb.SelectAll();
         }
     }
 }

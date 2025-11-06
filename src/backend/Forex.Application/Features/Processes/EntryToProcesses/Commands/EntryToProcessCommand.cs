@@ -4,12 +4,10 @@ using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities.Processes;
 using Forex.Domain.Entities.Products;
-using Forex.Domain.Entities.SemiProducts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 public record EntryToProcessCommand(long ProductTypeId, decimal Quantity) : IRequest<long>;
-
 public record CreateEntryToProcessCommand(List<EntryToProcessCommand> Commands) : IRequest<long>;
 
 public class CreateEntryToProcessCommandHandler(IAppDbContext context)
@@ -24,20 +22,9 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
             foreach (var cmd in request.Commands)
             {
                 var productType = await GetProductTypeAsync(cmd.ProductTypeId, cancellationToken);
-
-                foreach (var item in productType.ProductTypeItems)
-                {
-                    var requiredQuantity = item.Quantity * cmd.Quantity;
-                    var semiResidue = await GetSemiProductResidueAsync(item.SemiProductId, cancellationToken);
-                    ValidateResidueQuantity(semiResidue, requiredQuantity);
-
-                    semiResidue.Quantity -= requiredQuantity;
-                }
-
-                var inProcess = await GetOrCreateInProcessAsync(cmd.ProductTypeId, cancellationToken);
-                inProcess.Quantity += cmd.Quantity;
-
-                await AddEntryToProcessAsync(cmd, cancellationToken);
+                await DeductSemiProductResiduesAsync(productType, cmd.Quantity, cancellationToken);
+                var inProcess = await GetOrAttachInProcessAsync(cmd.ProductTypeId, cmd.Quantity, cancellationToken);
+                await AddEntryToProcessAsync(cmd, inProcess, cancellationToken);
             }
 
             await context.CommitTransactionAsync(cancellationToken);
@@ -50,36 +37,33 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
         }
     }
 
-
-    private async Task<ProductType> GetProductTypeAsync(long id, CancellationToken ct)
+    private async Task<ProductType> GetProductTypeAsync(long productTypeId, CancellationToken ct)
     {
         var productType = await context.ProductTypes
             .Include(pt => pt.ProductTypeItems)
-            .ThenInclude(pti => pti.SemiProduct)
-            .FirstOrDefaultAsync(pt => pt.Id == id, ct)
-            ?? throw new NotFoundException($"ProductType not found. Id={id}");
-        return productType;
+            .FirstOrDefaultAsync(pt => pt.Id == productTypeId, ct);
+
+        return productType is null ? throw new NotFoundException(nameof(ProductType), nameof(productTypeId), productTypeId) : productType;
     }
 
-    private async Task<SemiProductResidue> GetSemiProductResidueAsync(long semiProductId, CancellationToken ct)
+    private async Task DeductSemiProductResiduesAsync(ProductType productType, decimal quantity, CancellationToken ct)
     {
-        var residue = await context.SemiProductResidues
-            .FirstOrDefaultAsync(r => r.SemiProductId == semiProductId, ct);
+        foreach (var item in productType.ProductTypeItems)
+        {
+            var required = item.Quantity * quantity;
 
-        if (residue is null)
-            throw new NotFoundException($"SemiProductResidue not found. SemiProductId={semiProductId}");
+            var residue = await context.SemiProductResidues
+                .FirstOrDefaultAsync(r => r.SemiProductId == item.SemiProductId, ct)
+                ?? throw new NotFoundException("SemiProductResidue", "SemiProductId", item.SemiProductId);
 
-        return residue;
+            if (residue.Quantity < required)
+                throw new ForbiddenException($"Yetarli qoldiq yo‘q. SemiProductId={item.SemiProductId}, Available={residue.Quantity}, Required={required}");
+
+            residue.Quantity -= required;
+        }
     }
 
-    private static void ValidateResidueQuantity(SemiProductResidue residue, decimal requiredQuantity)
-    {
-        if (residue.Quantity < requiredQuantity)
-            throw new ForbiddenException(
-                $"Not enough residue for SemiProductId={residue.SemiProductId}. Available={residue.Quantity}, Required={requiredQuantity}");
-    }
-
-    private async Task<InProcess> GetOrCreateInProcessAsync(long productTypeId, CancellationToken ct)
+    private async Task<InProcess> GetOrAttachInProcessAsync(long productTypeId, decimal quantity, CancellationToken ct)
     {
         var inProcess = await context.InProcesses
             .FirstOrDefaultAsync(p => p.ProductTypeId == productTypeId, ct);
@@ -89,21 +73,26 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
             inProcess = new InProcess
             {
                 ProductTypeId = productTypeId,
-                Quantity = 0
+                Quantity = quantity
             };
 
             await context.InProcesses.AddAsync(inProcess, ct);
+        }
+        else
+        {
+            inProcess.Quantity += quantity;
         }
 
         return inProcess;
     }
 
-    private async Task AddEntryToProcessAsync(EntryToProcessCommand cmd, CancellationToken ct)
+    private async Task AddEntryToProcessAsync(EntryToProcessCommand cmd, InProcess inProcess, CancellationToken ct)
     {
         var entry = new EntryToProcess
         {
             ProductTypeId = cmd.ProductTypeId,
-            Quantity = cmd.Quantity
+            Quantity = cmd.Quantity,
+            InProcess = inProcess
         };
 
         await context.EntryToProcesses.AddAsync(entry, ct);

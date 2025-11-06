@@ -185,13 +185,12 @@ public class CreateSemiProductIntakeCommandHandler(
     decimal transferRatio,
     CancellationToken ct)
     {
-        var manufactory = await context.Manufactories
-            .FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct);
+        var manufactory = await context.Manufactories.FirstOrDefaultAsync(m => m.Id == invoice.ManufactoryId, ct);
 
         if (manufactory is null)
             context.Manufactories.Add(manufactory = new() { Name = "Default" });
 
-
+        invoice.Manufactory = manufactory;
 
         foreach (var cmd in semiProductCommands)
         {

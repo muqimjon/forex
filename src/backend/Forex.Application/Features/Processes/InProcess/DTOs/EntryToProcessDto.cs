@@ -9,4 +9,7 @@ public class EntryToProcessDto
 
     public long ProductTypeId { get; set; }
     public ProductTypeDto ProductType { get; set; } = default!;
+
+    public long InProcessId { get; set; }
+    public InProcessDto InProcess { get; set; } = default!;
 }

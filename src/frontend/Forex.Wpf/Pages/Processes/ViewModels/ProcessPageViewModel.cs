@@ -12,6 +12,7 @@ using MapsterMapper;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 public partial class ProcessPageViewModel : ViewModelBase
 {
@@ -35,16 +36,17 @@ public partial class ProcessPageViewModel : ViewModelBase
     #region Commands
 
     [RelayCommand]
-    public void Submit()
+    public async Task Submit()
     {
         var entrys = Mapper.Map<List<EntryToProcessRequest>>(EntryToProcessByProduct);
-        var response = Client.Processes.CreateAsync(entrys)
-            .Handle(isLoading => IsLoading = isLoading).Result;
+
+        var response = await Client.Processes.CreateAsync(entrys)
+            .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {
             SuccessMessage = "Jarayon muvaffaqiyatli yaratildi.";
-            //EntryToProcessByProduct.Clear();
+            EntryToProcessByProduct.Clear();
         }
         else ErrorMessage = response.Message ?? "Jarayon yaratishda xatolik yuz berdi.";
     }

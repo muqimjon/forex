@@ -2,4 +2,5 @@
 
 public class ProductResidueResponse
 {
+    public decimal TotalCount { get; set; }
 }

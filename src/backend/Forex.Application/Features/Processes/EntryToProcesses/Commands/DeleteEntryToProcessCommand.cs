@@ -2,12 +2,14 @@
 
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
+using Forex.Domain.Entities.Processes;
+using Forex.Domain.Entities.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 public record DeleteEntryToProcessCommand(long EntryToProcessId) : IRequest<bool>;
 
-public class RevertEntryToProcessCommandHandler(IAppDbContext context)
+public class DeleteEntryToProcessCommandHandler(IAppDbContext context)
     : IRequestHandler<DeleteEntryToProcessCommand, bool>
 {
     public async Task<bool> Handle(DeleteEntryToProcessCommand request, CancellationToken cancellationToken)
@@ -16,35 +18,11 @@ public class RevertEntryToProcessCommandHandler(IAppDbContext context)
 
         try
         {
-            var entry = await context.EntryToProcesses
-                .FirstOrDefaultAsync(e => e.Id == request.EntryToProcessId, cancellationToken)
-                ?? throw new NotFoundException($"EntryToProcess not found. Id={request.EntryToProcessId}");
+            var entry = await GetEntryAsync(request.EntryToProcessId, cancellationToken);
+            var productType = await GetProductTypeAsync(entry.ProductTypeId, cancellationToken);
 
-            var productType = await context.ProductTypes
-                .Include(pt => pt.ProductTypeItems)
-                .FirstOrDefaultAsync(pt => pt.Id == entry.ProductTypeId, cancellationToken)
-                ?? throw new NotFoundException($"ProductType not found. Id={entry.ProductTypeId}");
-
-            foreach (var item in productType.ProductTypeItems)
-            {
-                var residue = await context.SemiProductResidues
-                    .FirstOrDefaultAsync(r => r.SemiProductId == item.SemiProductId, cancellationToken)
-                    ?? throw new NotFoundException($"SemiProductResidue not found. SemiProductId={item.SemiProductId}");
-
-                var restoreQuantity = item.Quantity * entry.Quantity;
-                residue.Quantity += restoreQuantity;
-            }
-
-            var inProcess = await context.InProcesses
-                .FirstOrDefaultAsync(p => p.ProductTypeId == entry.ProductTypeId, cancellationToken);
-
-            if (inProcess is not null)
-            {
-                inProcess.Quantity -= entry.Quantity;
-
-                if (inProcess.Quantity < 0)
-                    throw new InvalidOperationException($"InProcess quantity cannot be negative. ProductTypeId={entry.ProductTypeId}");
-            }
+            await RestoreSemiProductResiduesAsync(entry, productType, cancellationToken);
+            await RevertInProcessAsync(entry.ProductTypeId, entry.Quantity, cancellationToken);
 
             context.EntryToProcesses.Remove(entry);
 
@@ -55,5 +33,47 @@ public class RevertEntryToProcessCommandHandler(IAppDbContext context)
             await context.RollbackTransactionAsync(cancellationToken);
             throw;
         }
+    }
+
+    private async Task<EntryToProcess> GetEntryAsync(long id, CancellationToken ct)
+    {
+        var entry = await context.EntryToProcesses.FirstOrDefaultAsync(e => e.Id == id, ct);
+        return entry ?? throw new NotFoundException("EntryToProcess", "Id", id);
+    }
+
+    private async Task<ProductType> GetProductTypeAsync(long productTypeId, CancellationToken ct)
+    {
+        var productType = await context.ProductTypes
+            .Include(pt => pt.ProductTypeItems)
+            .FirstOrDefaultAsync(pt => pt.Id == productTypeId, ct);
+
+        return productType ?? throw new NotFoundException("ProductType", "Id", productTypeId);
+    }
+
+    private async Task RestoreSemiProductResiduesAsync(EntryToProcess entry, ProductType productType, CancellationToken ct)
+    {
+        foreach (var item in productType.ProductTypeItems)
+        {
+            var residue = await context.SemiProductResidues
+                .FirstOrDefaultAsync(r => r.SemiProductId == item.SemiProductId, ct);
+
+            if (residue is null)
+                throw new NotFoundException("SemiProductResidue", "SemiProductId", item.SemiProductId);
+
+            residue.Quantity += item.Quantity * entry.Quantity;
+        }
+    }
+
+    private async Task RevertInProcessAsync(long productTypeId, decimal quantity, CancellationToken ct)
+    {
+        var inProcess = await context.InProcesses.FirstOrDefaultAsync(p => p.ProductTypeId == productTypeId, ct);
+
+        if (inProcess is null)
+            return;
+
+        inProcess.Quantity -= quantity;
+
+        if (inProcess.Quantity < 0)
+            throw new ForbiddenException($"InProcess qoldiq manfiy bo‘lishi mumkin emas. ProductTypeId={productTypeId}");
     }
 }

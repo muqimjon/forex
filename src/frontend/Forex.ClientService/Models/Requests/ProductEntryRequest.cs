@@ -12,4 +12,5 @@ public sealed record ProductEntryRequest
     public decimal TotalAmount { get; set; }
     public long ProductTypeId { get; set; }
     public long EmployeeId { get; set; }
+    public decimal Quantity { get; set; }
 }

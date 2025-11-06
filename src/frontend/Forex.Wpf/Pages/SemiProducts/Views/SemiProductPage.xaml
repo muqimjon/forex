@@ -246,6 +246,8 @@
                         Padding="2,0"
                         FontSize="14"
                         IsReadOnly="True"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
                         IsHitTestVisible="False"
                         BorderThickness="0"
                         Text="USD" />
@@ -445,10 +447,12 @@
                                                           CellStyle="{StaticResource TransparentCellStyle}"
                                                           ItemsSource="{Binding ProductTypes}">
                                                     <DataGrid.Columns>
+                                                        
                                                         <DataGridTextColumn Header="Turi"
                                                                             Width="100"
                                                                             ElementStyle="{StaticResource CenteredTextBlockStyle}"
-                                                                            Binding="{Binding Type}" />
+                                                                            Binding="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                        
                                                         <DataGridTemplateColumn Width="*">
                                                             <DataGridTemplateColumn.CellTemplate>
                                                                 <DataTemplate>
