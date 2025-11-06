@@ -2,6 +2,7 @@
 
 using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
+using Forex.Wpf.Pages.Processes.ViewModels;
 using Forex.Wpf.ViewModels;
 using Mapster;
 using System.IO;
@@ -30,6 +31,16 @@ public static class MappingProfile
         config.NewConfig<SemiProductViewModel, SemiProductRequest>()
             .Map(dest => dest.UnitMeasureId, src => src.UnitMeasure.Id)
             .Map(dest => dest.ImageBytes, src => ImageToBytes(src.Image));
+
+        // 🔹 Processes
+        config.NewConfig<InProcessResponse, InProcessViewModel>();
+        config.NewConfig<InProcessViewModel, InProcessRequest>();
+
+        // 🔹 EntryToProcess
+        config.NewConfig<EntryToProcessResponse, EntryToProcessViewModel>();
+        config.NewConfig<EntryToProcessViewModel, EntryToProcessRequest>();
+        config.NewConfig<EntryToProcessByProductViewModel, EntryToProcessRequest>()
+            .Map(dest => dest.ProductTypeId, src => src.Product.SelectedType!.Id);
 
         // 🔹 UnitMeasures
         config.NewConfig<UnitMeasureResponse, UnitMeasuerViewModel>();

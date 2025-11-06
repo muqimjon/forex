@@ -1,10 +1,10 @@
 ﻿namespace Forex.ClientService.Models.Responses;
 
-public sealed record InProcessReponse
+public sealed record InProcessResponse
 {
     public long Id { get; set; }
     public decimal Quantity { get; set; }
 
-    public long SemiProductId { get; set; }
-    public SemiProductResponse SemiProduct { get; set; } = default!;
+    public long ProductTypeId { get; set; }
+    public ProductTypeResponse ProductType { get; set; } = default!;
 }

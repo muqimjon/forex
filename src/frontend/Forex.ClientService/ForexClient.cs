@@ -16,7 +16,8 @@ public class ForexClient(
     IApiProductEntries productEntries,
     IApiSales sales,
     IApiTransactions transactions,
-    IApiShops shops)
+    IApiShops shops,
+    IApiProcesses processes)
 {
     public IApiAuth Auth { get; } = auth;
     public IApiUser Users { get; } = users;
@@ -32,4 +33,5 @@ public class ForexClient(
     public IApiSales Sales { get; } = sales;
     public IApiTransactions Transactions { get; set; } = transactions;
     public IApiShops Shops { get; set; } = shops;
+    public IApiProcesses Processes { get; set; } = processes;
 }

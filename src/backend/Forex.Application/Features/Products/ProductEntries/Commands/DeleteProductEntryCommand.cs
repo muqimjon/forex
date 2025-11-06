@@ -2,12 +2,12 @@
 
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Domain.Entities;
+using Forex.Domain.Entities.Processes;
 using Forex.Domain.Entities.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public record DeleteProductEntryCommand(long ProductEntryId) : IRequest<bool>;
+public record DeleteProductEntryCommand(long Id) : IRequest<bool>;
 
 public class DeleteProductEntryCommandHandler(IAppDbContext context)
     : IRequestHandler<DeleteProductEntryCommand, bool>
@@ -18,29 +18,21 @@ public class DeleteProductEntryCommandHandler(IAppDbContext context)
 
         try
         {
-            var entry = await context.ProductEntries
-                .FirstOrDefaultAsync(e => e.Id == request.ProductEntryId, cancellationToken);
+            var entry = await GetEntryAsync(request.Id, cancellationToken);
+            var totalCount = entry.BundleCount * entry.BundleItemCount;
 
-            if (entry is null) return false;
+            var residue = await GetProductResidueAsync(entry.ProductTypeId, entry.ShopId, cancellationToken);
+            residue.Count -= entry.BundleCount;
 
-            var productType = await context.ProductTypes
-                .Include(pt => pt.ProductResidue)
-                .Include(pt => pt.ProductTypeItems)
-                .FirstOrDefaultAsync(pt => pt.Id == entry.ProductTypeId, cancellationToken)
-                ?? throw new NotFoundException(nameof(ProductType), nameof(entry.ProductTypeId), entry.ProductTypeId);
+            if (residue.Count < 0)
+                throw new ForbiddenException($"Mahsulot qoldig'i manfiy bo'lishi mumkin emas. ProductTypeId={entry.ProductTypeId}");
 
-            var employee = await context.Users
-                .Include(u => u.Accounts)
-                .FirstOrDefaultAsync(u => u.Id == entry.EmployeeId, cancellationToken)
-                ?? throw new NotFoundException(nameof(User), nameof(entry.EmployeeId), entry.EmployeeId);
-
-            await RevertProductResidueAsync(productType, entry.BundleCount, entry.ShopId, cancellationToken);
-            await RevertSemiProductResiduesAsync(productType, entry.BundleCount * entry.BundleItemCount, cancellationToken);
-            await RevertEmployeeBalanceAsync(employee, entry.TotalAmount);
+            var inProcess = await GetOrCreateInProcessAsync(entry.ProductTypeId, cancellationToken);
+            inProcess.Quantity += totalCount;
 
             context.ProductEntries.Remove(entry);
 
-            return await context.CommitTransactionAsync(cancellationToken);
+           return await context.CommitTransactionAsync(cancellationToken);
         }
         catch
         {
@@ -49,36 +41,38 @@ public class DeleteProductEntryCommandHandler(IAppDbContext context)
         }
     }
 
-    private async Task RevertProductResidueAsync(ProductType productType, int count, long shopId, CancellationToken ct)
+    private async Task<ProductEntry> GetEntryAsync(long id, CancellationToken ct)
+    {
+        var entry = await context.ProductEntries
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
+
+        return entry is null ? throw new NotFoundException("ProductEntry", "Id", id) : entry;
+    }
+
+    private async Task<ProductResidue> GetProductResidueAsync(long productTypeId, long shopId, CancellationToken ct)
     {
         var residue = await context.ProductResidues
-            .FirstOrDefaultAsync(r => r.ProductTypeId == productType.Id && r.ShopId == shopId, ct);
+            .FirstOrDefaultAsync(r => r.ProductTypeId == productTypeId && r.ShopId == shopId, ct);
 
-        if (residue is not null)
-            residue.Count -= count;
+        return residue is null ? throw new NotFoundException("ProductResidue", "ProductTypeId", productTypeId) : residue;
     }
 
-    private async Task RevertSemiProductResiduesAsync(ProductType productType, int countByType, CancellationToken ct)
+    private async Task<InProcess> GetOrCreateInProcessAsync(long productTypeId, CancellationToken ct)
     {
-        foreach (var item in productType.ProductTypeItems)
+        var inProcess = await context.InProcesses
+            .FirstOrDefaultAsync(p => p.ProductTypeId == productTypeId, ct);
+
+        if (inProcess is null)
         {
-            var semiResidue = await context.SemiProductResidues
-                .FirstOrDefaultAsync(r => r.SemiProductId == item.SemiProductId, ct);
+            inProcess = new InProcess
+            {
+                ProductTypeId = productTypeId,
+                Quantity = 0
+            };
 
-            if (semiResidue is not null)
-                semiResidue.Quantity += item.Quantity * countByType;
+            await context.InProcesses.AddAsync(inProcess, ct);
         }
-    }
 
-    private static Task RevertEmployeeBalanceAsync(User employee, decimal amount)
-    {
-        var account = employee.Accounts
-            .OfType<UserAccount>()
-            .FirstOrDefault(a => a.CurrencyId == 1);
-
-        if (account is not null)
-            account.Balance -= amount;
-
-        return Task.CompletedTask;
+        return inProcess;
     }
 }

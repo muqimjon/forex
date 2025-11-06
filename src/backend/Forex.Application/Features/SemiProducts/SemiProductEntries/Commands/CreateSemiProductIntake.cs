@@ -177,7 +177,7 @@ public class CreateSemiProductIntakeCommandHandler(
     }
 
 
-    // --- 2️⃣ Mustaqil SemiProduct’lar ---
+    // --- 2️⃣ Mustaqil ProductTypeId’lar ---
     private async Task AddIndependentSemiProductsAsync(
     IEnumerable<SemiProductCommand> semiProductCommands,
     Invoice invoice,

@@ -7,6 +7,6 @@ public partial class InProcessViewModel : ViewModelBase
 {
     [ObservableProperty] private long id;
     [ObservableProperty] private decimal quantity;
-    [ObservableProperty] private long semiProductId;
-    [ObservableProperty] private SemiProductViewModel semiProduct = default!;
+    [ObservableProperty] private long productTypeId;
+    [ObservableProperty] private ProductTypeViewModel productType = default!;
 }

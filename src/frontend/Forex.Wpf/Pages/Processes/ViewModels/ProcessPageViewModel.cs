@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
+using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
@@ -36,7 +37,16 @@ public partial class ProcessPageViewModel : ViewModelBase
     [RelayCommand]
     public void Submit()
     {
-        var s = EntryToProcessByProduct;
+        var entrys = Mapper.Map<List<EntryToProcessRequest>>(EntryToProcessByProduct);
+        var response = Client.Processes.CreateAsync(entrys)
+            .Handle(isLoading => IsLoading = isLoading).Result;
+
+        if (response.IsSuccess)
+        {
+            SuccessMessage = "Jarayon muvaffaqiyatli yaratildi.";
+            //EntryToProcessByProduct.Clear();
+        }
+        else ErrorMessage = response.Message ?? "Jarayon yaratishda xatolik yuz berdi.";
     }
 
     #endregion Commands

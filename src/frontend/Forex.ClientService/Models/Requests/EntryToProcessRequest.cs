@@ -1,6 +1,6 @@
 ﻿namespace Forex.ClientService.Models.Requests;
 
-public sealed record InProcessRequest
+public sealed record EntryToProcessRequest
 {
     public long Id { get; set; }
     public decimal Quantity { get; set; }

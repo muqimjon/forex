@@ -31,8 +31,8 @@ public interface IAppDbContext
     DbSet<SemiProductEntry> SemiProductEntries { get; }
     DbSet<Shop> Shops { get; }
     DbSet<Transaction> Transactions { get; }
-    DbSet<InProcess> InProcess { get; }
-    DbSet<EntryToProcess> EntriesToProcess { get; }
+    DbSet<InProcess> InProcesses { get; }
+    DbSet<EntryToProcess> EntryToProcesses { get; }
 
     Task<bool> SaveAsync(CancellationToken cancellation);
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

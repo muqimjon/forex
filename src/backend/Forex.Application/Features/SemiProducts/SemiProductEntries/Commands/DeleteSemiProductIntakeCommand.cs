@@ -132,7 +132,7 @@ public class DeleteSemiProductIntakeCommandHandler(
         account.Balance -= invoice.CostPrice;
     }
 
-    // 🔹 7. SemiProduct va Entry’larni o‘chirish
+    // 🔹 7. ProductTypeId va Entry’larni o‘chirish
     private Task RemoveSemiProductsAsync(Invoice invoice, CancellationToken ct)
     {
         var semiProducts = invoice.SemiProductEntries

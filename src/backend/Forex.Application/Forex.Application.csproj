@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Processes\Commands\" />
-    <Folder Include="Features\Processes\Queries\" />
+    <Folder Include="Features\Processes\InProcess\Commands\" />
+    <Folder Include="Features\Processes\InProcess\Queries\" />
   </ItemGroup>
 
 </Project>
