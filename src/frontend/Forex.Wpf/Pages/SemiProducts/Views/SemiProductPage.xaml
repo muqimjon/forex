@@ -108,42 +108,66 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Invoice raqami:" />
-                <TextBox Grid.Column="1"
-                           Width="120"
-                           Background="White"
-                           Margin="5"
-                         Padding="0"
-                         FontSize="14"
-                           Text="{Binding Invoice.Number}" />
+                <TextBlock Text="Invoice raqami:"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
+                <Border Grid.Column="1"
+                        Width="120"
+                        Margin="5 1"
+                        Background="White"
+                        CornerRadius="4"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                    <TextBox
+                        Background="Transparent"
+                        Padding="4,0"
+                        FontSize="14"
+                        BorderThickness="0"
+                        Text="{Binding Invoice.Number}" />
+                </Border>
+
 
                 <TextBlock Grid.Row="1"
-                           Text="Sana:" />
+                           Text="Sana:"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
                 <controls:UserCalendar x:Name="beginDate"
                                        Grid.Column="1"
                                        Grid.Row="1"
                                        Width="120"
-                                       Height="30"
+                                       Height="27"
                                        VerticalAlignment="Center"
                                        FontSize="14"
                                        SelectedDate="{Binding Invoice.Date, Mode=TwoWay}" />
 
-                <TextBlock Text="Ta'minotchi:" Grid.Column="2" />
-                <ComboBox x:Name="cbxSupplier"
-                          Grid.Column="3"
-                          Width="150"
-                          Padding="4,2"
-                          VerticalAlignment="Center"
-                          Background="White"
-                          BorderThickness="2"
-                          DisplayMemberPath="Name"
-                          FontSize="14"
-                          ItemsSource="{Binding AvailableSuppliers}"
-                          SelectedItem="{Binding Invoice.Supplier}" />
+                <TextBlock Text="Ta'minotchi:"
+                           Grid.Column="2"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
+                <Border Grid.Column="3"
+                        Width="150"
+                        Margin="5 0"
+                        Background="White"
+                        CornerRadius="4"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        VerticalAlignment="Center">
+                    <ComboBox x:Name="cbxSupplier"
+                              Padding="4,0"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              DisplayMemberPath="Name"
+                              Height="28"
+                              FontSize="14"
+                              ItemsSource="{Binding AvailableSuppliers}"
+                              SelectedItem="{Binding Invoice.Supplier}" />
+                </Border>
 
                 <TextBlock Grid.Row="1"
                            Text="Vositachi orqali:"
-                           Grid.Column="2" />
+                           Grid.Column="2"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
 
                 <ToggleButton Grid.Row="1"
                               Grid.Column="3"
@@ -153,56 +177,94 @@
                               IsChecked="{Binding Invoice.ViaMiddleman, Mode=TwoWay}" />
 
                 <TextBlock Text="Vositachi:"
-                           Grid.Column="4" />
+                           Grid.Column="4"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
 
-                <ComboBox x:Name="cbxBroker"
-                          Grid.Column="5"
-                          Width="150"
-                          Padding="4,2"
-                          VerticalAlignment="Center"
-                          Background="White"
-                          BorderThickness="2"
-                          DisplayMemberPath="Name"
-                          FontSize="14"
-                          ItemsSource="{Binding AvailableAgents}"
-                          SelectedItem="{Binding Invoice.Agent}" />
+                <Border Grid.Column="5"
+                        Width="150"
+                        Margin="5 1"
+                        Background="White"
+                        CornerRadius="4"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        VerticalAlignment="Center">
+                    <ComboBox x:Name="cbxBroker"
+                              Padding="4,2"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              DisplayMemberPath="Name"
+                              FontSize="14"
+                              Height="28"
+                              ItemsSource="{Binding AvailableAgents}"
+                              SelectedItem="{Binding Invoice.Agent}" />
+                </Border>
 
                 <TextBlock Text="Kontiner soni:"
                            Grid.Row="1"
-                           Grid.Column="4" />
+                           Grid.Column="4"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
 
-                <TextBox Grid.Row="1"
-                         Grid.Column="5"
-                         Background="White"
-                         Margin="5"
-                         Padding="0"
-                         FontSize="14"
-                         Text="{Binding Invoice.ContainerCount}" />
+                <Border Grid.Row="1"
+                        Grid.Column="5"
+                        Margin="5 1"
+                        Background="White"
+                        CornerRadius="4"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                    <TextBox
+                        Background="Transparent"
+                        Padding="4,0"
+                        FontSize="14"
+                        Height="28"
+                        BorderThickness="0"
+                        Text="{Binding Invoice.ContainerCount}" />
+                </Border>
+
 
                 <TextBlock Text="Valyuta:"
-                           Grid.Column="6" />
+                           Grid.Column="6"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
 
-                <TextBox Grid.Column="7"
-                         Background="White"
-                         Margin="5"
-                         Padding="0"
-                         IsHitTestVisible="False"
-                         IsReadOnly="True"
-                         FontSize="14"
-                         Text="USD" />
+                <Border Grid.Column="7"
+                        Margin="5 1"
+                        Background="White"
+                        CornerRadius="4"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                    <TextBox
+                        Background="Transparent"
+                        Padding="2,0"
+                        FontSize="14"
+                        IsReadOnly="True"
+                        IsHitTestVisible="False"
+                        BorderThickness="0"
+                        Text="USD" />
+                </Border>
 
                 <TextBlock Grid.Row="1"
-                         Grid.Column="6"
-                         Text="Kursi:" />
+                           Grid.Column="6"
+                           Text="Kursi:"
+                           FontSize="14"
+                           VerticalAlignment="Center"/>
 
-                <TextBox Grid.Row="1"
-                         Grid.Column="7"
-                         Width="100"
-                         Background="White"
-                         Margin="5"
-                         Padding="0"
-                         FontSize="14"
-                         Text="{Binding Invoice.Currency.ExchangeRate}" />
+                <Border Grid.Row="1"
+                        Grid.Column="7"
+                        Width="100"
+                        Margin="5 1"
+                        Background="White"
+                        CornerRadius="4"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                    <TextBox
+                        Background="Transparent"
+                        Padding="2,0"
+                        FontSize="14"
+                        BorderThickness="0"
+                        Text="{Binding Invoice.Currency.ExchangeRate}" />
+                </Border>
 
             </Grid>
 
@@ -316,7 +378,7 @@
                             <DataGrid AutoGenerateColumns="False"
                                       AlternationCount="100"
                                       CanUserAddRows="True"
-                                      
+                                      Margin="0 2"
                                       HeadersVisibility="None"
                                       GridLinesVisibility="All"
                                       HorizontalGridLinesBrush="Black"
@@ -328,8 +390,8 @@
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
-                                                              Path=(ItemsControl.AlternationIndex),
-                                                              Converter={StaticResource RowNumber}}" 
+                                                           Path=(ItemsControl.AlternationIndex),
+                                                           Converter={StaticResource RowNumber}}"
                                                            HorizontalAlignment="Center"
                                                            VerticalAlignment="Center"/>
                                             </DataTemplate>
@@ -366,7 +428,7 @@
                                             <DataTemplate>
                                                 <DataGrid AutoGenerateColumns="False"
                                                           CanUserAddRows="True"
-                                                          
+
                                                           HeadersVisibility="None"
                                                           GridLinesVisibility="All"
                                                           HorizontalGridLinesBrush="Gray"
