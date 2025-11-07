@@ -219,13 +219,13 @@
                         BorderBrush="Black"
                         BorderThickness="1"
                         Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBox
-                        Background="Transparent"
-                        Padding="4,0"
-                        FontSize="14"
-                        Height="28"
-                        BorderThickness="0"
-                        Text="{Binding Invoice.ContainerCount}" />
+                    <TextBox Background="Transparent"
+                             Padding="4,0"
+                             FontSize="14"
+                             VerticalAlignment="Center"
+                             Height="28"
+                             BorderThickness="0"
+                             Text="{Binding Invoice.ContainerCount}" />
                 </Border>
 
                 <TextBlock Text="Valyuta:"
@@ -241,16 +241,15 @@
                         BorderBrush="Black"
                         BorderThickness="1"
                         Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBox
-                        Background="Transparent"
-                        Padding="2,0"
-                        FontSize="14"
-                        IsReadOnly="True"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        IsHitTestVisible="False"
-                        BorderThickness="0"
-                        Text="USD" />
+                    <TextBox Background="Transparent"
+                             Padding="2,0"
+                             FontSize="14"
+                             IsReadOnly="True"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsHitTestVisible="False"
+                             BorderThickness="0"
+                             Text="USD" />
                 </Border>
 
                 <TextBlock Grid.Row="1"
@@ -273,6 +272,7 @@
                         Background="Transparent"
                         Padding="2,0"
                         FontSize="14"
+                        VerticalAlignment="Center"
                         BorderThickness="0"
                         Text="{Binding Invoice.Currency.ExchangeRate}" />
                 </Border>
@@ -447,12 +447,12 @@
                                                           CellStyle="{StaticResource TransparentCellStyle}"
                                                           ItemsSource="{Binding ProductTypes}">
                                                     <DataGrid.Columns>
-                                                        
+
                                                         <DataGridTextColumn Header="Turi"
                                                                             Width="100"
                                                                             ElementStyle="{StaticResource CenteredTextBlockStyle}"
                                                                             Binding="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                                        
+
                                                         <DataGridTemplateColumn Width="*">
                                                             <DataGridTemplateColumn.CellTemplate>
                                                                 <DataTemplate>

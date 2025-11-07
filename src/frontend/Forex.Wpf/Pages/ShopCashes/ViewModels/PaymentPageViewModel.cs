@@ -50,8 +50,17 @@ public partial class PaymentPageViewModel : ViewModelBase
     {
         var response = await client.Transactions.GetAll().Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
-            Transactions = mapper.Map<ObservableCollection<TransactionViewModel>>(response.Data);
-        else WarningMessage = response.Message ?? "Tranzaksiyalarni yuklashda xatolik.";
+        {
+            var ordered = response.Data
+                .OrderByDescending(t => t.Date)
+                .ToList();
+
+            Transactions = mapper.Map<ObservableCollection<TransactionViewModel>>(ordered);
+        }
+        else
+        {
+            WarningMessage = response.Message ?? "Tranzaksiyalarni yuklashda xatolik.";
+        }
     }
 
     private async Task LoadShopCashes()
