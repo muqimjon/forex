@@ -7,7 +7,7 @@ using Refit;
 public interface IApiProductEntries
 {
     [Post("/product-entries")]
-    Task<Response<long>> Create(CreateProductEntryCommandRequest request);
+    Task<Response<long?>> Create(CreateProductEntryCommandRequest request);
 
     [Delete("/product-entries/{id}")]
     Task<Response<bool>> Delete(long id);

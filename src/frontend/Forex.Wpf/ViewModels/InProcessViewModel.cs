@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 public partial class InProcessViewModel : ViewModelBase
 {
     public long Id { get; set; }
-    [ObservableProperty] private decimal quantity;
+    [ObservableProperty] private int count;
     [ObservableProperty] private long productTypeId;
     [ObservableProperty] private ProductTypeViewModel productType = default!;
 

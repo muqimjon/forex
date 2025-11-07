@@ -7,7 +7,7 @@ using Forex.Domain.Entities.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public record EntryToProcessCommand(long ProductTypeId, decimal Quantity) : IRequest<long>;
+public record EntryToProcessCommand(long ProductTypeId, int Count) : IRequest<long>;
 public record CreateEntryToProcessCommand(List<EntryToProcessCommand> Commands) : IRequest<long>;
 
 public class CreateEntryToProcessCommandHandler(IAppDbContext context)
@@ -22,8 +22,8 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
             foreach (var cmd in request.Commands)
             {
                 var productType = await GetProductTypeAsync(cmd.ProductTypeId, cancellationToken);
-                await DeductSemiProductResiduesAsync(productType, cmd.Quantity, cancellationToken);
-                var inProcess = await GetOrAttachInProcessAsync(cmd.ProductTypeId, cmd.Quantity, cancellationToken);
+                await DeductSemiProductResiduesAsync(productType, cmd.Count, cancellationToken);
+                var inProcess = await GetOrAttachInProcessAsync(cmd.ProductTypeId, cmd.Count, cancellationToken);
                 await AddEntryToProcessAsync(cmd, inProcess, cancellationToken);
             }
 
@@ -63,7 +63,7 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
         }
     }
 
-    private async Task<InProcess> GetOrAttachInProcessAsync(long productTypeId, decimal quantity, CancellationToken ct)
+    private async Task<InProcess> GetOrAttachInProcessAsync(long productTypeId, int count, CancellationToken ct)
     {
         var inProcess = await context.InProcesses
             .FirstOrDefaultAsync(p => p.ProductTypeId == productTypeId, ct);
@@ -73,14 +73,14 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
             inProcess = new InProcess
             {
                 ProductTypeId = productTypeId,
-                Quantity = quantity
+                Count = count
             };
 
             await context.InProcesses.AddAsync(inProcess, ct);
         }
         else
         {
-            inProcess.Quantity += quantity;
+            inProcess.Count += count;
         }
 
         return inProcess;
@@ -91,7 +91,7 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
         var entry = new EntryToProcess
         {
             ProductTypeId = cmd.ProductTypeId,
-            Quantity = cmd.Quantity,
+            Count = cmd.Count,
             InProcess = inProcess
         };
 

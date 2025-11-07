@@ -129,7 +129,10 @@ public class CreateSaleCommandHandler(IAppDbContext context, IMapper mapper)
         foreach (var cmd in commands)
         {
             var residue = residues.First(r => r.ProductTypeId == cmd.ProductTypeId);
-            residue.Count -= cmd.BundleCount;
+            var totalCount = cmd.BundleCount * residue.ProductType.BundleItemCount;
+            if (residue.Count < totalCount)
+                throw new ForbiddenException($"Do'konda yetarli mahsulot mavjud emas, jami mahsulot soni {residue.Count}");
+            residue.Count -= cmd.BundleCount * residue.ProductType.BundleItemCount;
         }
     }
 

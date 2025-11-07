@@ -17,7 +17,7 @@ public interface IApiUser
     Task<Response<UserResponse>> GetById(long id);
 
     [Post("/users")]
-    Task<Response<long>> Create([Body] UserRequest request);
+    Task<Response<long?>> Create([Body] UserRequest request);
 
     [Put("/users")]
     Task<Response<bool>> Update([Body] UserRequest request);

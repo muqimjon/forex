@@ -2,7 +2,7 @@
 
 public class SaleItemCommand
 {
-    public int BundleCount { get; set; }  // 1 ta razmer (6 ta ayoq kiyim) razmerlar soni sotildi
+    public int BundleCount { get; set; }  // 1 ta razmer (50 ta ayoq kiyim) razmerlar soni sotildi
     public decimal UnitPrice { get; set; }  // 1 ta mahsulotning narxi
     public decimal Amount { get; set; }  // 1 ta savdoning bir qatorining summasi
 

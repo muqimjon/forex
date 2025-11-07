@@ -59,7 +59,7 @@ public partial class SalePageViewModel : ViewModelBase
             }
         };
 
-        var response = await client.Users.Filter(request).Handle();
+        var response = await client.Users.Filter(request).Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
             AvailableCustomers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!);
         else ErrorMessage = response.Message ?? "Mahsulot turlarini yuklashda xatolik.";
@@ -67,26 +67,45 @@ public partial class SalePageViewModel : ViewModelBase
 
     public async Task LoadProductsAsync()
     {
-        var response = await client.Products.GetAll().Handle(isLoading => IsLoading = isLoading);
-        if (response.IsSuccess)
-            AvailableProducts = mapper.Map<ObservableCollection<ProductViewModel>>(response.Data!);
-        else ErrorMessage = response.Message ?? "Mahsulotlarni yuklashda xatolik.";
-    }
-
-    public async Task LoadProductTypessAsync(ProductViewModel product)
-    {
         FilteringRequest request = new()
         {
             Filters = new()
             {
-                ["productid"] = [product.Id.ToString()]
+                ["ProductResidues"] = ["include:ProductType.Product"]
             }
         };
 
-        var response = await client.ProductTypes.Filter(request).Handle(isLoading => IsLoading = isLoading);
-        if (response.IsSuccess)
-            CurrentSaleItem.Product.ProductTypes = mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data!);
-        else ErrorMessage = response.Message ?? "Mahsulot turlarini yuklashda xatolik.";
+        var response = await client.Shops.Filter(request).Handle(isLoading => IsLoading = isLoading);
+
+        if (!response.IsSuccess)
+        {
+            ErrorMessage = response.Message ?? "Mahsulotlarni yuklashda xatolik.";
+            return;
+        }
+
+        var shops = mapper.Map<ObservableCollection<ShopViewModel>>(response.Data!);
+
+        var allTypes = shops
+            .SelectMany(p => p.ProductResidues).Select(pr => pr.ProductType)
+            .Where(pt => pt is not null && pt.Product is not null)
+            .ToList();
+
+        var grouped = allTypes
+            .GroupBy(pt => pt.Product.Id);
+
+        var products = new ObservableCollection<ProductViewModel>();
+
+        foreach (var group in grouped)
+        {
+            var sampleType = group.First();
+            var product = sampleType.Product;
+
+            product.ProductTypes = new ObservableCollection<ProductTypeViewModel>(group);
+
+            products.Add(product);
+        }
+
+        AvailableProducts = products;
     }
 
     #endregion Load Data
@@ -96,7 +115,7 @@ public partial class SalePageViewModel : ViewModelBase
     [RelayCommand]
     private void Add()
     {
-        if (CurrentSaleItem is null || CurrentSaleItem.ProductType.Count <= 0)
+        if (CurrentSaleItem is null || CurrentSaleItem.BundleCount <= 0)
         {
             WarningMessage = "Mahsulot tanlanmagan yoki miqdor noto‘g‘ri!";
             return;
@@ -145,8 +164,21 @@ public partial class SalePageViewModel : ViewModelBase
 
         var response = await client.Sales.Create(request).Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
+        {
             SuccessMessage = $"Savdo muvaffaqiyatli yuborildi. Mahsulotlar soni: {SaleItems.Count}";
+            Clear();
+        }
         else ErrorMessage = response.Message ?? "Savdoni ro'yxatga olishda xatolik!";
+    }
+
+    private void Clear()
+    {
+        SaleItems = [];
+        Customer = null;
+        TotalAmount = null;
+        FinalAmount = null;
+        Note = string.Empty;
+        TotalAmountWithUserBalance = null;
     }
 
     #endregion Commands

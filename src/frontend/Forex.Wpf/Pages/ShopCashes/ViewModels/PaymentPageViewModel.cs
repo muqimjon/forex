@@ -99,6 +99,12 @@ public partial class PaymentPageViewModel : ViewModelBase
     [RelayCommand]
     private async Task Submit()
     {
+        if (Transaction.TotalAmountWithUserBalance < 0 && Transaction.DueDate is null || Transaction.DueDate < DateTime.Now)
+        {
+            WarningMessage = "To'lov muddati kiritilmagan yoki noto'g'ri formatda!";
+            return;
+        }
+
         var request = mapper.Map<TransactionRequest>(Transaction);
         var response = await client.Transactions.CreateAsync(request).Handle(isLoading => IsLoading = isLoading);
 

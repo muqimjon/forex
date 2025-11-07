@@ -11,6 +11,6 @@ public partial class EntryToProcessByProductViewModel : ViewModelBase
         Product = new();
     }
 
-    [ObservableProperty] private decimal quantity;
+    [ObservableProperty] private long count;
     [ObservableProperty] private ProductViewModel product = default!;
 }

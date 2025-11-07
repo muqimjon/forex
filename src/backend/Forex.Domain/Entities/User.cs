@@ -1,7 +1,6 @@
 ﻿namespace Forex.Domain.Entities;
 
 using Forex.Domain.Commons;
-using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.Sales;
 using Forex.Domain.Enums;
 using System.Collections.Generic;
@@ -21,5 +20,4 @@ public class User : Auditable
     public ICollection<UserAccount> Accounts { get; set; } = default!;
     public ICollection<Sale> Sales { get; set; } = default!;
     public ICollection<Transaction> Transactions { get; set; } = default!;
-    public ICollection<ProductEntry> ProductEntries { get; set; } = default!;
 }

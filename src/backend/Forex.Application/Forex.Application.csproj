@@ -18,9 +18,4 @@
     <ProjectReference Include="..\Forex.Domain\Forex.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Processes\InProcess\Commands\" />
-    <Folder Include="Features\Processes\InProcess\Queries\" />
-  </ItemGroup>
-
 </Project>

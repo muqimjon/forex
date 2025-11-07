@@ -70,6 +70,7 @@ public static class MappingProfile
 
         // 🔹 Transaction
         config.NewConfig<TransactionResponse, TransactionViewModel>()
+            .Map(dest => dest.Date, src => src.Date.ToLocalTime())
       .AfterMapping((src, dest) =>
       {
           if (src.IsIncome)

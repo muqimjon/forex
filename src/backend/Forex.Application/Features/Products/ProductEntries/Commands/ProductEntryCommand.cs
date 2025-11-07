@@ -2,9 +2,9 @@
 
 public record ProductEntryCommand
 {
-    public int BundleCount { get; set; }
+    public int Count { get; set; }
+    public int BundleItemCount { get; set; }
     public decimal PreparationCostPerUnit { get; set; }
     public decimal TotalAmount { get; set; }
-    public long EmployeeId { get; set; }
     public long ProductTypeId { get; set; }
 }

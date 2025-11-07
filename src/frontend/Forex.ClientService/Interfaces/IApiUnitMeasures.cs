@@ -8,7 +8,7 @@ using Refit;
 public interface IApiUnitMeasures
 {
     [Post("/unit-measures")]
-    Task<Response<long>> CreateAsync([Body] UnitMeasureRequest request);
+    Task<Response<long?>> CreateAsync([Body] UnitMeasureRequest request);
 
     [Put("/unit-measures​")]
     Task<Response<bool>> UpdateAsync([Body] UnitMeasureRequest request);

@@ -5,7 +5,7 @@ using Forex.Domain.Entities.Products;
 
 public class InProcess : Auditable
 {
-    public decimal Quantity { get; set; }
+    public int Count { get; set; }
 
     public long ProductTypeId { get; set; }
     public ProductType ProductType { get; set; } = default!;

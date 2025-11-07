@@ -11,6 +11,5 @@ public class ProductEntryMappingProfile : Profile
         CreateMap<ProductEntry, ProductEntryDto>();
         CreateMap<ProductEntry, ProductEntryForProductTypeDto>();
         CreateMap<ProductEntry, ProductEntryForShopDto>();
-        CreateMap<ProductEntry, ProductEntryForUserDto>();
     }
 }

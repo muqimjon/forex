@@ -2,12 +2,11 @@
 
 using Forex.Application.Features.Products.ProductTypes.DTOs;
 using Forex.Application.Features.Shops.DTOs;
-using Forex.Application.Features.Users.DTOs;
 
 public sealed record ProductEntryDto
 {
     public long Id { get; set; }
-    public int BundleCount { get; set; }
+    public int Count { get; set; }
     public int BundleItemCount { get; set; }
     public decimal CostPrice { get; set; }     // tannarxi
     public decimal PreparationCostPerUnit { get; set; }  // tayyorlashga ketgan xarajat summasi
@@ -19,7 +18,4 @@ public sealed record ProductEntryDto
 
     public long ShopId { get; set; }
     public ShopForProductEntryDto Shop { get; set; } = default!;
-
-    public long EmployeeId { get; set; }
-    public UserForProductEntryDto Employee { get; set; } = default!;
 }

@@ -3,7 +3,7 @@
 public sealed record InProcessResponse
 {
     public long Id { get; set; }
-    public decimal Quantity { get; set; }
+    public int Count { get; set; }
 
     public long ProductTypeId { get; set; }
     public ProductTypeResponse ProductType { get; set; } = default!;

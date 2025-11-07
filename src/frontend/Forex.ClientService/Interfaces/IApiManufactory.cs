@@ -13,7 +13,7 @@ public interface IApiManufactory
     Task<Response<ManufactoryResponse>> GetById(long id);
 
     [Post("/manufactories")]
-    Task<Response<long>> Create([Body] ManufactoryResponse dto);
+    Task<Response<long?>> Create([Body] ManufactoryResponse dto);
 
     [Put("/manufactories")]
     Task<Response<bool>> Update([Body] ManufactoryResponse dto);

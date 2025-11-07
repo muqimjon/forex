@@ -334,6 +334,7 @@
                         Padding="3,0"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
+                        IsEnabled="{Binding Transaction.IsIncome}"
                         BorderThickness="0"
                         FontSize="14"
                         Text="{Binding Transaction.Discount, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
@@ -448,6 +449,7 @@
                     Grid.RowSpan="2"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
+                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}"
                     FontSize="14"
                     Text="To'lash sana:" />
                 <controls:UserCalendar
@@ -457,6 +459,7 @@
                     Grid.Column="1"
                     Height="25"
                     Margin="10,0"
+                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     FontSize="14"

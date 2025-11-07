@@ -22,7 +22,7 @@ public class DeleteEntryToProcessCommandHandler(IAppDbContext context)
             var productType = await GetProductTypeAsync(entry.ProductTypeId, cancellationToken);
 
             await RestoreSemiProductResiduesAsync(entry, productType, cancellationToken);
-            await RevertInProcessAsync(entry.ProductTypeId, entry.Quantity, cancellationToken);
+            await RevertInProcessAsync(entry.ProductTypeId, entry.Count, cancellationToken);
 
             context.EntryToProcesses.Remove(entry);
 
@@ -60,20 +60,20 @@ public class DeleteEntryToProcessCommandHandler(IAppDbContext context)
             if (residue is null)
                 throw new NotFoundException("SemiProductResidue", "SemiProductId", item.SemiProductId);
 
-            residue.Quantity += item.Quantity * entry.Quantity;
+            residue.Quantity += item.Quantity * entry.Count;
         }
     }
 
-    private async Task RevertInProcessAsync(long productTypeId, decimal quantity, CancellationToken ct)
+    private async Task RevertInProcessAsync(long productTypeId, int count, CancellationToken ct)
     {
         var inProcess = await context.InProcesses.FirstOrDefaultAsync(p => p.ProductTypeId == productTypeId, ct);
 
         if (inProcess is null)
             return;
 
-        inProcess.Quantity -= quantity;
+        inProcess.Count -= count;
 
-        if (inProcess.Quantity < 0)
+        if (inProcess.Count < 0)
             throw new ForbiddenException($"InProcess qoldiq manfiy bo‘lishi mumkin emas. ProductTypeId={productTypeId}");
     }
 }

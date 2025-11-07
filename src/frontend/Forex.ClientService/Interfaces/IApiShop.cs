@@ -13,11 +13,14 @@ public interface IApiShops
     Task<Response<ShopResponse>> GetById(long id);
 
     [Post("/shops")]
-    Task<Response<long>> Create([Body] ShopResponse dto);
+    Task<Response<long?>> Create([Body] ShopResponse dto);
 
     [Put("/shops")]
     Task<Response<bool>> Update([Body] ShopResponse dto);
 
     [Delete("/shops/{id}")]
     Task<Response<bool>> Delete(long id);
+
+    [Post("/shops/filter")]
+    Task<Response<List<ShopResponse>>> Filter(FilteringRequest request);
 }

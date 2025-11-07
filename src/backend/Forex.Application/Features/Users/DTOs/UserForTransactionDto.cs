@@ -2,7 +2,6 @@
 
 using Forex.Application.Features.Accounts.DTOs;
 using Forex.Application.Features.Invoices.DTOs;
-using Forex.Application.Features.Products.ProductEntries.DTOs;
 using Forex.Application.Features.Sales.DTOs;
 using Forex.Domain.Enums;
 
@@ -21,6 +20,5 @@ public sealed record UserForTransactionDto
 
     public ICollection<UserAccountDto> Accounts { get; set; } = default!;
     public ICollection<SaleDto> Sales { get; set; } = default!;
-    public ICollection<ProductEntryForUserDto> ProductEntries { get; set; } = default!;
     public ICollection<InvoiceForUserDto> Invoices { get; set; } = default!;
 }

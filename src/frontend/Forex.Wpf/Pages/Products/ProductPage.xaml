@@ -1,4 +1,4 @@
-﻿<Page x:Class="Forex.Wpf.Pages.Products.ProductPage"
+﻿<Page x:Name="RootPage" x:Class="Forex.Wpf.Pages.Products.ProductPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -144,7 +144,6 @@
                 <DataGrid CellStyle="{StaticResource CellStyle}"
                           ColumnHeaderStyle="{StaticResource ColumnHeaderStyle}"
                           ItemsSource="{Binding ProductEntries}"
-                          SelectedItem="{Binding SelectedProductEntry, Mode=TwoWay}"
                           Style="{StaticResource DataGridStyle}">
 
                     <DataGrid.Columns>
@@ -159,29 +158,29 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridComboBoxColumn Width="0.8*" Header="Kod"
+                        <DataGridComboBoxColumn Width="0.5*" Header="Kod"
                                                 SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                 ElementStyle="{StaticResource ProductCodeComboBoxStyle}"
                                                 EditingElementStyle="{StaticResource ProductCodeComboBoxStyle}" />
 
-                        <DataGridComboBoxColumn Width="1.5*" Header="Nomi"
+                        <DataGridComboBoxColumn Width="*" Header="Nomi"
                                                 SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                 ElementStyle="{StaticResource ProductNameComboBoxStyle}"
                                                 EditingElementStyle="{StaticResource ProductNameComboBoxStyle}" />
 
-                        <DataGridTemplateColumn Width="*" Header="O'lcham">
+                        <DataGridTemplateColumn Width="0.7*" Header="O'lcham">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ComboBox ItemsSource="{Binding Product.ProductTypes}"
-                                              SelectedItem="{Binding Product.SelectedType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              SelectedItem="{Binding ProductType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               DisplayMemberPath="Type"
                                               Style="{StaticResource ProductNameComboBoxStyle}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <!-- Miqdori -->
-                        <DataGridTemplateColumn Width="0.7*" Header="Miqdori">
+                        <!-- To'plamdagi mahsulotlar soni -->
+                        <DataGridTemplateColumn Width="0.7*" Header="To'plamdagi mahsulotlar soni">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox Padding="8,0"
@@ -189,21 +188,36 @@
                                              Background="Transparent"
                                              Foreground="Black"
                                              BorderThickness="0"
-                                             Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}"
+                                             Text="{Binding BundleItemCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}"
                                              TextAlignment="Right" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <!-- Jami qoldiq -->
-                        <DataGridTemplateColumn Width="0.8*" Header="Jami qoldiq">
+                        <!-- Jami soni -->
+                        <DataGridTemplateColumn Width="0.7*" Header="Jami soni">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Style="{StaticResource TextStyle}"
-                                               Text="{Binding TotalCount, StringFormat=N0}" />
+                                    <TextBox Padding="8,0"
+                                             VerticalContentAlignment="Center"
+                                             Background="Transparent"
+                                             Foreground="Black"
+                                             BorderThickness="0"
+                                             Text="{Binding Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}"
+                                             TextAlignment="Right" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+
+                        <!-- Jarayondagi maxsulotlar -->
+                        <!--<DataGridTemplateColumn Width="0.7*" Header="Jarayondagi jami maxsulotlar">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Style="{StaticResource TextStyle}"
+                       Text="{Binding AvailableCount, StringFormat=N0}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>-->
 
                         <!-- Actions -->
                         <DataGridTemplateColumn Width="60" Header="">

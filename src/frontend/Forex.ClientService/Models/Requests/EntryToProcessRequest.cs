@@ -3,7 +3,7 @@
 public sealed record EntryToProcessRequest
 {
     public long Id { get; set; }
-    public decimal Quantity { get; set; }
+    public int Count { get; set; }
 
     public long ProductTypeId { get; set; }
 }

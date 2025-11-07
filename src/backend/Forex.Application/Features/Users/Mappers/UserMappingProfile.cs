@@ -29,7 +29,6 @@ public class UserMappingProfile : Profile
 
         CreateMap<User, UserForSaleDto>();
         CreateMap<User, UserForTransactionDto>();
-        CreateMap<User, UserForProductEntryDto>();
         CreateMap<User, UserForAccountDto>();
         CreateMap<User, UserForInvoiceDto>();
     }

@@ -8,7 +8,7 @@ using Forex.Domain.Entities.SemiProducts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public record EditEntryToProcessCommand(long Id, long ProductTypeId, decimal NewQuantity) : IRequest<bool>;
+public record EditEntryToProcessCommand(long Id, long ProductTypeId, int NewCount) : IRequest<bool>;
 
 public class EditEntryToProcessCommandHandler(IAppDbContext context)
     : IRequestHandler<EditEntryToProcessCommand, bool>
@@ -25,7 +25,7 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
 
             var newProductType = await GetProductTypeAsync(request.ProductTypeId, cancellationToken);
             var inProcess = await GetOrAttachInProcessAsync(request.ProductTypeId, cancellationToken);
-            await ApplyNewEntryAsync(entry, newProductType, inProcess, request.NewQuantity, cancellationToken);
+            await ApplyNewEntryAsync(entry, newProductType, inProcess, request.NewCount, cancellationToken);
 
             return await context.CommitTransactionAsync(cancellationToken);
         }
@@ -59,24 +59,24 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
         foreach (var item in productType.ProductTypeItems)
         {
             var residue = await GetResidueAsync(item.SemiProductId, ct);
-            residue.Quantity += item.Quantity * entry.Quantity;
+            residue.Quantity += item.Quantity * entry.Count;
         }
 
         var inProcess = await context.InProcesses.FirstOrDefaultAsync(p => p.ProductTypeId == entry.ProductTypeId, ct);
         if (inProcess is not null)
         {
-            inProcess.Quantity -= entry.Quantity;
-            if (inProcess.Quantity < 0)
+            inProcess.Count -= entry.Count;
+            if (inProcess.Count < 0)
                 throw new ForbiddenException($"InProcess qoldiq manfiy bo‘lishi mumkin emas. ProductTypeId={entry.ProductTypeId}");
         }
     }
 
-    private async Task ApplyNewEntryAsync(EntryToProcess entry, ProductType productType, InProcess inProcess, decimal newQuantity, CancellationToken ct)
+    private async Task ApplyNewEntryAsync(EntryToProcess entry, ProductType productType, InProcess inProcess, int newCount, CancellationToken ct)
     {
         foreach (var item in productType.ProductTypeItems)
         {
             var residue = await GetResidueAsync(item.SemiProductId, ct);
-            var required = item.Quantity * newQuantity;
+            var required = item.Quantity * newCount;
 
             if (residue.Quantity < required)
                 throw new ForbiddenException($"Yetarli qoldiq yo‘q. SemiProductId={item.SemiProductId}, Available={residue.Quantity}, Required={required}");
@@ -84,10 +84,10 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
             residue.Quantity -= required;
         }
 
-        inProcess.Quantity += newQuantity;
+        inProcess.Count += newCount;
 
         entry.ProductTypeId = productType.Id;
-        entry.Quantity = newQuantity;
+        entry.Count = newCount;
         entry.InProcess = inProcess;
     }
 
@@ -100,7 +100,7 @@ public class EditEntryToProcessCommandHandler(IAppDbContext context)
             inProcess = new InProcess
             {
                 ProductTypeId = productTypeId,
-                Quantity = 0
+                Count = 0
             };
 
             await context.InProcesses.AddAsync(inProcess, ct);

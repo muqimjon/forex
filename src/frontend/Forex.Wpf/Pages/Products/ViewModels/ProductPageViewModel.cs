@@ -15,7 +15,6 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
 {
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
     [ObservableProperty] private ObservableCollection<ProductEntryViewModel> productEntries = [];
-    [ObservableProperty] private ProductEntryViewModel? selectedProductEntry;
 
     #region Commands
 
@@ -25,8 +24,9 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         if (entry is null) return;
 
         ProductEntries.Remove(entry);
-        if (SelectedProductEntry == entry)
-            SelectedProductEntry = ProductEntries.FirstOrDefault();
+
+        if (ProductEntries.Count == 0)
+            ProductEntries = [];
     }
 
     [RelayCommand]
@@ -39,11 +39,12 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         }
 
         var requests = ProductEntries
-            .Where(p => p.Product is not null && p.ProductType is not null && p.Quantity > 0)
+            .Where(p => p.Product is not null && p.ProductType is not null && p.Count > 0)
             .Select(p => new ProductEntryRequest
             {
                 ProductTypeId = p.ProductType!.Id,
-                Quantity = p.Quantity
+                Count = p.Count,
+                BundleItemCount = p.BundleItemCount
             })
             .ToList();
 
@@ -82,115 +83,46 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
         {
             Filters = new()
             {
-                ["unitMeasure"] = ["include"],
-                ["productTypes"] = ["include"]
+                ["ProductType"] = ["include:product"],
+                ["bundleItemCount"] = [">1"]
             }
         };
 
-        var response = await Client.Products.Filter(request)
+        var response = await Client.Processes.Filter(request)
             .Handle(isLoading => IsLoading = isLoading);
 
-        if (response.IsSuccess)
-        {
-            AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
-        }
-        else
+        if (!response.IsSuccess)
         {
             ErrorMessage = response.Message ?? "Mahsulotlarni yuklashda xatolik.";
+            return;
         }
-    }
 
-    private async Task LoadProductTypesAsync(ProductEntryViewModel entry)
-    {
-        if (entry.Product is null) return;
+        var inProcesses = Mapper.Map<List<InProcessViewModel>>(response.Data);
 
-        FilteringRequest request = new()
+        //inProcesses.ForEach(p => p.ProductType.AvailableCount = p.Count);
+
+        var allTypes = inProcesses
+           .Select(p => p.ProductType)
+           .Where(pt => pt is not null && pt.Product is not null)
+           .ToList();
+
+        var grouped = allTypes
+            .GroupBy(pt => pt.Product.Id);
+
+        var products = new ObservableCollection<ProductViewModel>();
+
+        foreach (var group in grouped)
         {
-            Filters = new()
-            {
-                ["productid"] = [entry.Product.Id.ToString()],
-                ["productResidue"] = ["include"]
-            }
-        };
+            var sampleType = group.First();
+            var product = sampleType.Product;
 
-        var response = await Client.ProductTypes.Filter(request)
-            .Handle(isLoading => IsLoading = isLoading);
+            product.ProductTypes = new ObservableCollection<ProductTypeViewModel>(group);
 
-        if (response.IsSuccess)
-        {
-            entry.AvailableProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
+            products.Add(product);
         }
-        else
-        {
-            ErrorMessage = response.Message ?? "Mahsulot o'lchamlarini yuklashda xatolik!";
-        }
-    }
 
-    private async Task LoadTypeItemsAsync(ProductEntryViewModel entry)
-    {
-        if (entry.ProductType is null) return;
-
-        FilteringRequest request = new()
-        {
-            Filters = new()
-            {
-                ["productTypeId"] = [entry.ProductType.Id.ToString()],
-                ["semiproduct"] = ["include:unitMeasure"]
-            }
-        };
-
-        var response = await Client.ProductTypeItems.Filter(request)
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess)
-        {
-            entry.ProductType.ProductTypeItems = Mapper.Map<ObservableCollection<ProductTypeItemViewModel>>(response.Data);
-            entry.AvailableSemiProducts = new ObservableCollection<ProductTypeItemViewModel>(
-                entry.ProductType.ProductTypeItems);
-        }
-        else
-        {
-            ErrorMessage = response.Message ?? "Yarim tayyor mahsulotlarni yuklashda xatolik!";
-        }
+        AvailableProducts = products;
     }
 
     #endregion Load Data
-
-    #region Property Changes
-
-    partial void OnSelectedProductEntryChanged(ProductEntryViewModel? value)
-    {
-        if (value?.ProductType is not null)
-        {
-            _ = LoadTypeItemsAsync(value);
-        }
-    }
-
-    #endregion Property Changes
-
-    #region Internal Methods
-
-    internal async Task OnProductChanged(ProductEntryViewModel entry)
-    {
-        if (entry.Product is null) return;
-
-        entry.AvailableProductTypes.Clear();
-        entry.ProductType = null;
-        entry.AvailableSemiProducts.Clear();
-
-        await LoadProductTypesAsync(entry);
-    }
-
-    internal async Task OnProductTypeChanged(ProductEntryViewModel entry)
-    {
-        if (entry.ProductType is null) return;
-
-        entry.AvailableSemiProducts.Clear();
-        await LoadTypeItemsAsync(entry);
-
-        if (entry == SelectedProductEntry)
-            OnPropertyChanged(nameof(SelectedProductEntry));
-    }
-
-    #endregion Internal Methods
 }

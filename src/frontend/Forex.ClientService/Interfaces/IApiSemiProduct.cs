@@ -17,7 +17,7 @@ public interface IApiSemiProducts
 
     [Multipart]
     [Post("/semi-products")]
-    Task<Response<long>> Create([AliasAs("ManufactoryId")] int manufactoryId,
+    Task<Response<long?>> Create([AliasAs("ManufactoryId")] int manufactoryId,
                                 [AliasAs("Name")] string name,
                                 [AliasAs("Code")] int code,
                                 [AliasAs("Measure")] string measure,
@@ -25,7 +25,7 @@ public interface IApiSemiProducts
 
     [Multipart]
     [Put("/semi-products/{id}")]
-    Task<Response<long>> Update(long id,
+    Task<Response<long?>> Update(long id,
                                 [AliasAs("ManufactoryId")] int manufactoryId,
                                 [AliasAs("Name")] string name,
                                 [AliasAs("Code")] int code,

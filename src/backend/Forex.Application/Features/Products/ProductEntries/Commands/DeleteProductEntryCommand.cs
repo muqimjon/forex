@@ -19,16 +19,16 @@ public class DeleteProductEntryCommandHandler(IAppDbContext context)
         try
         {
             var entry = await GetEntryAsync(request.Id, cancellationToken);
-            var totalCount = entry.BundleCount * entry.BundleItemCount;
+            var totalCount = entry.Count * entry.BundleItemCount;
 
             var residue = await GetProductResidueAsync(entry.ProductTypeId, entry.ShopId, cancellationToken);
-            residue.Count -= entry.BundleCount;
+            residue.Count -= entry.Count;
 
             if (residue.Count < 0)
                 throw new ForbiddenException($"Mahsulot qoldig'i manfiy bo'lishi mumkin emas. ProductTypeId={entry.ProductTypeId}");
 
             var inProcess = await GetOrCreateInProcessAsync(entry.ProductTypeId, cancellationToken);
-            inProcess.Quantity += totalCount;
+            inProcess.Count += totalCount;
 
             context.ProductEntries.Remove(entry);
 
@@ -67,7 +67,7 @@ public class DeleteProductEntryCommandHandler(IAppDbContext context)
             inProcess = new InProcess
             {
                 ProductTypeId = productTypeId,
-                Quantity = 0
+                Count = 0
             };
 
             await context.InProcesses.AddAsync(inProcess, ct);

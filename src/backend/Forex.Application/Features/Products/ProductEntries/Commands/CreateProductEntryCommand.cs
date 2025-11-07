@@ -1,5 +1,6 @@
 ﻿namespace Forex.Application.Features.Products.ProductEntries.Commands;
 
+using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
@@ -22,11 +23,11 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
             foreach (var item in request.Command)
             {
                 var productType = await GetProductTypeAsync(item.ProductTypeId, cancellationToken);
-                var totalCount = item.BundleCount * productType.Count;
+                productType.BundleItemCount = item.BundleItemCount;
 
-                await DeductFromInProcessAsync(productType.Id, totalCount, cancellationToken);
-                var residue = await UpdateProductResidueAsync(productType.Id, item.BundleCount, shop.Id, cancellationToken);
-                await SaveProductEntryAsync(item, productType.Count, shop, residue, cancellationToken);
+                await DeductFromInProcessAsync(productType.Id, item.Count, cancellationToken);
+                var residue = await UpdateProductResidueAsync(productType.Id, item.Count, shop.Id, cancellationToken);
+                SaveProductEntryAsync(item, productType.BundleItemCount, shop, residue);
             }
 
             await context.CommitTransactionAsync(cancellationToken);
@@ -58,53 +59,45 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
             .Include(pt => pt.ProductResidue)
             .FirstOrDefaultAsync(pt => pt.Id == productTypeId, ct);
 
-        return productType ?? throw new InvalidOperationException($"ProductType not found. Id={productTypeId}");
+        return productType ?? throw new NotFoundException(nameof(ProductType), nameof(productTypeId), productTypeId);
     }
 
     private async Task DeductFromInProcessAsync(long productTypeId, int totalCount, CancellationToken ct)
     {
         var inProcess = await context.InProcesses.FirstOrDefaultAsync(p => p.ProductTypeId == productTypeId, ct);
 
-        if (inProcess is null || inProcess.Quantity < totalCount)
-            throw new InvalidOperationException($"Not enough in-process quantity. ProductTypeId={productTypeId}");
+        if (inProcess is null || inProcess.Count < totalCount)
+            throw new ForbiddenException($"Not enough in-process quantity. ProductTypeId={productTypeId}");
 
-        inProcess.Quantity -= totalCount;
+        inProcess.Count -= totalCount;
     }
 
-    private async Task<ProductResidue> UpdateProductResidueAsync(long productTypeId, int bundleCount, long shopId, CancellationToken ct)
+    private async Task<ProductResidue> UpdateProductResidueAsync(long productTypeId, int count, long shopId, CancellationToken ct)
     {
         var residue = await context.ProductResidues
             .FirstOrDefaultAsync(r => r.ProductTypeId == productTypeId && r.ShopId == shopId, ct);
 
         if (residue is null)
-        {
-            residue = new ProductResidue
+            context.ProductResidues.Add(residue = new ProductResidue
             {
                 ProductTypeId = productTypeId,
-                ShopId = shopId,
-                Count = bundleCount
-            };
+                ShopId = shopId
+            });
 
-            await context.ProductResidues.AddAsync(residue, ct);
-        }
-        else
-        {
-            residue.Count += bundleCount;
-        }
+        residue.Count += count;
 
         return residue;
     }
 
-    private async Task SaveProductEntryAsync(
+    private void SaveProductEntryAsync(
         ProductEntryCommand item,
         int countByType,
         Shop shop,
-        ProductResidue residue,
-        CancellationToken ct)
+        ProductResidue residue)
     {
         var entry = new ProductEntry
         {
-            BundleCount = item.BundleCount,
+            Count = item.Count,
             BundleItemCount = countByType,
             PreparationCostPerUnit = item.PreparationCostPerUnit,
             ProductTypeId = item.ProductTypeId,
@@ -114,6 +107,6 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
             ProductResidue = residue
         };
 
-        await context.ProductEntries.AddAsync(entry, ct);
+        context.ProductEntries.Add(entry);
     }
 }

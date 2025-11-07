@@ -14,7 +14,7 @@ public interface IApiProducts
     Task<Response<ProductResponse>> GetById(long id);
 
     [Post("/products")]
-    Task<Response<long>> Create([Body] ProductRequest request);
+    Task<Response<long?>> Create([Body] ProductRequest request);
 
     [Put("/products")]
     Task<Response<bool>> Update([Body] ProductRequest request);

@@ -27,14 +27,15 @@ public partial class TransactionViewModel : ViewModelBase
     [ObservableProperty] private decimal? expense;
     [ObservableProperty] private bool isExpense;
     [ObservableProperty] private decimal? totalAmountWithUserBalance;
-    [ObservableProperty] private DateTime dueDate = DateTime.Now.AddDays(1);
-
+    [ObservableProperty] private DateTime? dueDate;
+    [ObservableProperty] private bool isDebtor;
 
     #region Property Changes
 
     partial void OnAmountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
     partial void OnDiscountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
     partial void OnCurrencyChanged(CurrencyViewModel value) => ExchangeRate = value.ExchangeRate;
+    partial void OnExchangeRateChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
 
     partial void OnExpenseChanged(decimal? value)
     {
@@ -44,7 +45,8 @@ public partial class TransactionViewModel : ViewModelBase
             return;
         }
 
-        Amount = -value;
+        Amount = -value * Currency.ExchangeRate;
+        Discount = default;
         IsIncome = default;
         IsExpense = true;
     }
@@ -57,7 +59,7 @@ public partial class TransactionViewModel : ViewModelBase
             return;
         }
 
-        Amount = value;
+        Amount = value * Currency.ExchangeRate;
         IsExpense = default;
         IsIncome = true;
     }
@@ -78,7 +80,8 @@ public partial class TransactionViewModel : ViewModelBase
     {
         if (User is not null && (Amount is not null || Discount is not null))
         {
-            TotalAmountWithUserBalance = User.Balance + (Amount ?? 0) + (Discount ?? 0);
+            TotalAmountWithUserBalance = User.Balance + ((Amount ?? 0) + (Discount ?? 0)) * (ExchangeRate ?? 0);
+            IsDebtor = TotalAmountWithUserBalance < 0;
         }
         else
         {

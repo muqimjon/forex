@@ -8,7 +8,7 @@ using Refit;
 public interface IApiCurrency
 {
     [Post("/currencies")]
-    Task<Response<long>> CreateAsync([Body] CurrencyRequest request);
+    Task<Response<long?>> CreateAsync([Body] CurrencyRequest request);
 
     [Put("/currencies​")]
     Task<Response<bool>> UpdateAsync([Body] CurrencyRequest request);
