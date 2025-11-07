@@ -13,14 +13,13 @@
     mc:Ignorable="d">
 
     <StackPanel Background="{DynamicResource PrimaryBackground}">
-        <Border
-            x:Name="mainMenu"
-            Height="60"
-            Margin="10"
-            Padding="0,0,10,0"
-            md:ElevationAssist.Elevation="Dp8"
-            Background="#FF4FC3F7"
-            CornerRadius="10">
+        <Border x:Name="mainMenu"
+                Height="60"
+                Margin="10"
+                Padding="0,0,10,0"
+                md:ElevationAssist.Elevation="Dp8"
+                Background="#FF4FC3F7"
+                CornerRadius="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -28,14 +27,13 @@
                 </Grid.ColumnDefinitions>
 
                 <!--  LOGO  -->
-                <Border
-                    Width="120"
-                    Height="45"
-                    Margin="10,0,0,0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    md:ElevationAssist.Elevation="Dp2"
-                    CornerRadius="10">
+                <Border Width="120"
+                        Height="45"
+                        Margin="10,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        md:ElevationAssist.Elevation="Dp2"
+                        CornerRadius="10">
                     <Border.Background>
                         <ImageBrush ImageSource="/Resources/Assets/logo.png" Stretch="UniformToFill" />
                     </Border.Background>
@@ -49,90 +47,69 @@
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
 
-                    <TextBlock
-                        Margin="0,0,10,0"
-                        VerticalAlignment="Center"
-                        FontSize="16"
-                        Foreground="White"
-                        Text="{Binding FullName}" />
+                    <TextBlock Margin="0,0,10,0"
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                               Foreground="White"
+                               Text="{Binding FullName}" />
 
-                    <Button
-                        Padding="6,2"
-                        md:ButtonAssist.CornerRadius="6"
-                        Background="#FF1565C0"
-                        BorderThickness="0"
-                        Click="BtnLogout_Click"
-                        Content="🚪 Chiqish"
-                        FontWeight="SemiBold"
-                        Foreground="White"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}" />
+                    <Button Padding="6,2"
+                            md:ButtonAssist.CornerRadius="6"
+                            Background="#FF1565C0"
+                            BorderThickness="0"
+                            Click="BtnLogout_Click"
+                            Content="🚪 Chiqish"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}" />
                 </StackPanel>
             </Grid>
         </Border>
 
 
         <WrapPanel Margin="35,20">
-            <Button
-                x:Name="btnSale"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF00C9A7"
-                Click="BtnSale_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+            <Button x:Name="btnSale"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="#FF00C9A7"
+                    Click="BtnSale_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 🛒 Sotuv
             </Button>
 
-            <Button
-                x:Name="btnCash"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF005F73"
-                Click="BtnCash_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+            <Button x:Name="btnCash"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="#FF005F73"
+                    Click="BtnCash_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 💵 Kassa
             </Button>
 
-            <Button
-                x:Name="btnUser"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF1565C0"
-                Click="BtnUser_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                👤 User
-            </Button>
-
-            <Button
-                x:Name="btnProduct"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF2E7D32"
-                Click="BtnProduct_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+            <Button x:Name="btnProduct"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="#FF2E7D32"
+                    Click="BtnProduct_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock VerticalAlignment="Center">👟</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
@@ -141,19 +118,18 @@
                 </StackPanel>
             </Button>
 
-            <Button
-                x:Name="btnProcess"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="Black"
-                Click="btnProcess_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+            <Button x:Name="btnProcess"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="Black"
+                    Click="btnProcess_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock VerticalAlignment="Center">🗜</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
@@ -162,19 +138,18 @@
                 </StackPanel>
             </Button>
 
-            <Button
-                x:Name="btnSemiProductEntry"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF8E24AA"
-                Click="BtnSemiProduct_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+            <Button x:Name="btnSemiProductEntry"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="#FF8E24AA"
+                    Click="BtnSemiProduct_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock VerticalAlignment="Center">📦</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
@@ -183,35 +158,48 @@
                 </StackPanel>
             </Button>
 
-            <Button
-                x:Name="btnReports"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FF4527A0"
-                Click="btnReports_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+            <Button x:Name="btnUser"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="#FF1565C0"
+                    Click="BtnUser_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+                👤 User
+            </Button>
+
+            <Button x:Name="btnReports"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="#FF4527A0"
+                    Click="btnReports_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 📈 Hisobot
             </Button>
 
-            <Button
-                x:Name="btnSettings"
-                Height="120"
-                MinWidth="220"
-                Margin="10"
-                md:ButtonAssist.CornerRadius="10"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="#FFC62828"
-                Click="BtnSettings_Click"
-                FontSize="24"
-                FontWeight="Medium"
-                Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+            <Button x:Name="btnSettings"
+                    Height="120"
+                    MinWidth="220"
+                    Margin="10"
+                    md:ButtonAssist.CornerRadius="10"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="#FFC62828"
+                    Click="BtnSettings_Click"
+                    FontSize="24"
+                    FontWeight="Medium"
+                    Foreground="{DynamicResource MainMenuTextColor}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
                 ⚙️ Sozlash
             </Button>
 
