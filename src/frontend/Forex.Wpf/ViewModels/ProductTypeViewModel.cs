@@ -9,8 +9,7 @@ public partial class ProductTypeViewModel : ViewModelBase
 {
     public ProductTypeViewModel()
     {
-        ProductTypeItems = [];
-
+        ProductTypeItems = [new()];
     }
 
     public long Id { get; set; }

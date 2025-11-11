@@ -9,7 +9,6 @@ using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
-using System;
 using System.Collections.ObjectModel;
 
 public partial class PaymentPageViewModel : ViewModelBase

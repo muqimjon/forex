@@ -2,6 +2,7 @@
 
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.SemiProducts.ViewModels;
+using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 public partial class SemiProductPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
+
     public SemiProductPage()
     {
         InitializeComponent();
@@ -34,12 +36,58 @@ public partial class SemiProductPage : Page
         }
     }
 
-    private void DataGrid_LostFocus(object sender, RoutedEventArgs e)
+    private void DeleteProduct_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is DataGrid grid)
+        if (sender is Button button && button.Tag is ProductViewModel product)
         {
-            grid.CommitEdit(DataGridEditingUnit.Row, true);
-            grid.UnselectAll();
+            var vm = DataContext as SemiProductPageViewModel;
+            if (vm?.Products.Contains(product) == true)
+            {
+                vm.Products.Remove(product);
+            }
+        }
+    }
+
+    private void DeleteProductType_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is ProductTypeViewModel productType)
+        {
+            // Find parent Product
+            var vm = DataContext as SemiProductPageViewModel;
+            if (vm?.Products != null)
+            {
+                foreach (var product in vm.Products)
+                {
+                    if (product.ProductTypes.Contains(productType))
+                    {
+                        product.ProductTypes.Remove(productType);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void DeleteProductTypeItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is ProductTypeItemViewModel item)
+        {
+            // Find parent ProductType
+            var vm = DataContext as SemiProductPageViewModel;
+            if (vm?.Products != null)
+            {
+                foreach (var product in vm.Products)
+                {
+                    foreach (var productType in product.ProductTypes)
+                    {
+                        if (productType.ProductTypeItems.Contains(item))
+                        {
+                            productType.ProductTypeItems.Remove(item);
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 }

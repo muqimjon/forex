@@ -12,7 +12,7 @@ public partial class ProductViewModel : ViewModelBase
 {
     public ProductViewModel()
     {
-        ProductTypes = [];
+        ProductTypes = [new()];
         UnitMeasure = new();
         Image = null;
     }

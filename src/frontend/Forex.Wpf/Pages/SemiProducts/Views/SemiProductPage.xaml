@@ -15,8 +15,6 @@
 
     <!-- ======= STYLES ======= -->
     <Page.Resources>
-        <!-- Umumiy DataGridCell style -->
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <Style x:Key="TransparentCellStyle"
                TargetType="DataGridCell">
             <Setter Property="Padding"
@@ -66,6 +64,33 @@
                     Value="Center" />
             <Setter Property="ItemsSource"
                     Value="{Binding DataContext.AvailableUnitMeasures, RelativeSource={RelativeSource AncestorType=Page}}" />
+        </Style>
+
+        <!-- Delete Button Style -->
+        <Style x:Key="DeleteButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF5252"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E53935"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
     </Page.Resources>
@@ -310,6 +335,7 @@
                                 <ColumnDefinition Width="100" />
                                 <ColumnDefinition Width="100" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="50" />
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Text="#"
@@ -349,6 +375,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="40" />
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Soni"
                                                ToolTip="Olib kelingan shu turdagi yarim tayyor maxsulot soni"
@@ -375,6 +402,11 @@
                                                HorizontalAlignment="Center" />
                                 </Grid>
                             </Grid>
+                            <TextBlock Grid.Column="5"
+                                       Text="⚙"
+                                       FontWeight="Bold"
+                                       FontSize="16"
+                                       HorizontalAlignment="Center" />
                         </Grid>
                     </Border>
 
@@ -395,6 +427,7 @@
                                       HorizontalGridLinesBrush="Black"
                                       VerticalGridLinesBrush="LightGray"
                                       ItemsSource="{Binding Products}"
+                                      KeyboardNavigation.TabNavigation="Continue"
                                       CellStyle="{StaticResource TransparentCellStyle}">
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn Width="55">
@@ -414,6 +447,7 @@
                                             <DataTemplate>
                                                 <Button Height="150"
                                                         Width="150"
+                                                        KeyboardNavigation.IsTabStop="False"
                                                         Command="{Binding SelectImageCommand}">
                                                     <Button.Background>
                                                         <ImageBrush ImageSource="{Binding Image, Converter={StaticResource ImageFallbackConverter}}"
@@ -439,11 +473,11 @@
                                             <DataTemplate>
                                                 <DataGrid AutoGenerateColumns="False"
                                                           CanUserAddRows="True"
-
                                                           HeadersVisibility="None"
                                                           GridLinesVisibility="All"
                                                           HorizontalGridLinesBrush="Gray"
                                                           VerticalGridLinesBrush="LightGray"
+                                                          KeyboardNavigation.TabNavigation="Continue"
                                                           CellStyle="{StaticResource TransparentCellStyle}"
                                                           ItemsSource="{Binding ProductTypes}">
                                                     <DataGrid.Columns>
@@ -460,6 +494,7 @@
                                                                               CanUserAddRows="True"
                                                                               HeadersVisibility="None"
                                                                               CellStyle="{StaticResource TransparentCellStyle}"
+                                                                              KeyboardNavigation.TabNavigation="Continue"
                                                                               GridLinesVisibility="All"
                                                                               ItemsSource="{Binding ProductTypeItems}">
                                                                         <DataGrid.Columns>
@@ -480,13 +515,54 @@
                                                                                                 IsReadOnly="True"
                                                                                                 Binding="{Binding SemiProduct.TotalAmount, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
                                                                                                 ElementStyle="{StaticResource CenteredTextBlockStyle}" />
+                                                                            <DataGridTemplateColumn Width="30">
+                                                                                <DataGridTemplateColumn.CellTemplate>
+                                                                                    <DataTemplate>
+                                                                                        <Button Content="−"
+                                                                                                Style="{StaticResource DeleteButtonStyle}"
+                                                                                                ToolTip="O'chirish"
+                                                                                                KeyboardNavigation.IsTabStop="False"
+                                                                                                Click="DeleteProductTypeItem_Click"
+                                                                                                Tag="{Binding}"
+                                                                                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Item, Converter={StaticResource IsNotNewRowConverter}}"/>
+                                                                                    </DataTemplate>
+                                                                                </DataGridTemplateColumn.CellTemplate>
+                                                                            </DataGridTemplateColumn>
                                                                         </DataGrid.Columns>
                                                                     </DataGrid>
                                                                 </DataTemplate>
                                                             </DataGridTemplateColumn.CellTemplate>
                                                         </DataGridTemplateColumn>
+
+                                                        <DataGridTemplateColumn Width="35">
+                                                            <DataGridTemplateColumn.CellTemplate>
+                                                                <DataTemplate>
+                                                                    <Button Content="−"
+                                                                            Style="{StaticResource DeleteButtonStyle}"
+                                                                            ToolTip="O'chirish"
+                                                                            KeyboardNavigation.IsTabStop="False"
+                                                                            Click="DeleteProductType_Click"
+                                                                            Tag="{Binding}"
+                                                                            Visibility="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Item, Converter={StaticResource IsNotNewRowConverter}}"/>
+                                                                </DataTemplate>
+                                                            </DataGridTemplateColumn.CellTemplate>
+                                                        </DataGridTemplateColumn>
                                                     </DataGrid.Columns>
                                                 </DataGrid>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="−"
+                                                        Style="{StaticResource DeleteButtonStyle}"
+                                                        ToolTip="O'chirish"
+                                                        KeyboardNavigation.IsTabStop="False"
+                                                        Click="DeleteProduct_Click"
+                                                        Tag="{Binding}"
+                                                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Item, Converter={StaticResource IsNotNewRowConverter}}"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
