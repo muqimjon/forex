@@ -6,6 +6,7 @@ using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.Invoices.Commands;
 using Forex.Application.Features.Products.Products.Commands;
+using Forex.Application.Features.Products.ProductTypes.Commands;
 using Forex.Application.Features.SemiProducts.SemiProducts.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
@@ -31,24 +32,34 @@ public class CreateSemiProductIntakeCommandHandler(
         try
         {
             await HandleMiddlemanTransferAsync(request.Invoice, ct);
-            await EnsureSupplierExistsAsync(request.Invoice, ct);
+            await EnsureSupplierAccountAsync(request.Invoice, ct);
 
-            // 🔹 Invoice ni saqlaymiz
             var invoice = mapper.Map<Invoice>(request.Invoice);
             context.Invoices.Add(invoice);
 
-            // 🔹 Foiz nisbatlarini aniqlaymiz
-            if (request.Invoice.CostPrice == 0)
-                throw new ForbiddenException("Umumiy tannarx (CostPrice) 0 bo‘lishi mumkin emas.");
+            ValidateCostPrice(request.Invoice.CostPrice);
+            var (deliveryRatio, transferRatio) = CalculateRatios(request.Invoice);
 
-            var deliveryRatio = request.Invoice.CostDelivery / request.Invoice.CostPrice;
-            var transferRatio = (request.Invoice.TransferFee ?? 0) / request.Invoice.CostPrice;
+            // 🔹 Manufactory bir marta global yuklanadi
+            var manufactory = await GetOrCreateManufactoryAsync(ct);
+            invoice.Manufactory = manufactory;
 
-            // 🔹 Avvalo Productlar va ularga bog‘langan SemiProductlarni saqlaymiz
-            await AddProductsAsync(request.Products, invoice, deliveryRatio, transferRatio, ct);
+            var defaultMeasure = await GetDefaultMeasureAsync(ct);
 
-            // 🔹 Keyin mustaqil SemiProductlarni (productga bog‘liq bo‘lmagan)
-            await AddIndependentSemiProductsAsync(request.SemiProducts, invoice, deliveryRatio, transferRatio, ct);
+            ProcessProducts(
+                request.Products,
+                invoice,
+                manufactory,
+                defaultMeasure,
+                deliveryRatio,
+                transferRatio);
+
+            ProcessIndependentSemiProducts(
+                request.SemiProducts,
+                invoice,
+                manufactory,
+                deliveryRatio,
+                transferRatio);
 
             await context.CommitTransactionAsync(ct);
             return invoice.Id;
@@ -60,138 +71,130 @@ public class CreateSemiProductIntakeCommandHandler(
         }
     }
 
-    // --- Middleman Transfer ---
     private async Task HandleMiddlemanTransferAsync(InvoiceCommand invoice, CancellationToken ct)
     {
         if (!invoice.ViaMiddleman) return;
 
-        var user = await context.Users
-            .Include(u => u.Accounts)
-            .FirstOrDefaultAsync(u => u.Id == invoice.SenderId, ct)
-            ?? throw new NotFoundException(nameof(User), nameof(invoice.SenderId), invoice.SenderId!);
+        var user = await GetUserWithAccountsAsync(invoice.SenderId!.Value, ct);
+        var account = GetOrCreateAccount(user, invoice.CurrencyId, invoice.TransferFee!.Value);
 
-        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == invoice.CurrencyId);
+        account.Balance += invoice.TransferFee.Value;
+    }
+
+    private async Task EnsureSupplierAccountAsync(InvoiceCommand invoice, CancellationToken ct)
+    {
+        var user = await GetUserWithAccountsAsync(invoice.SupplierId, ct);
+        var account = GetOrCreateAccount(user, invoice.CurrencyId, invoice.CostPrice);
+
+        account.Balance += invoice.CostPrice;
+    }
+
+    private async Task<User> GetUserWithAccountsAsync(long userId, CancellationToken ct)
+    {
+        return await context.Users
+            .Include(u => u.Accounts)
+            .FirstOrDefaultAsync(u => u.Id == userId, ct)
+            ?? throw new NotFoundException(nameof(User), nameof(userId), userId);
+    }
+
+    private UserAccount GetOrCreateAccount(User user, long currencyId, decimal openingBalance)
+    {
+        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == currencyId);
+
         if (account is null)
         {
             account = new UserAccount
             {
-                OpeningBalance = (decimal)invoice.TransferFee!,
+                OpeningBalance = openingBalance,
                 User = user,
-                CurrencyId = invoice.CurrencyId
-            };
-
-            context.Accounts.Add(account);
-        }
-
-        account.Balance += (decimal)invoice.TransferFee!;
-    }
-
-    private async Task EnsureSupplierExistsAsync(InvoiceCommand invoice, CancellationToken ct)
-    {
-        var user = await context.Users
-            .Include(u => u.Accounts)
-            .FirstOrDefaultAsync(u => u.Id == invoice.SupplierId, ct)
-            ?? throw new NotFoundException(nameof(User), nameof(invoice.SupplierId), invoice.SupplierId);
-
-        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == invoice.CurrencyId);
-        if (account is null)
-        {
-            account = new UserAccount
-            {
-                OpeningBalance = invoice.CostPrice,
-                User = user,
-                CurrencyId = invoice.CurrencyId
+                CurrencyId = currencyId
             };
             context.Accounts.Add(account);
         }
 
-        account.Balance += invoice.CostPrice!;
+        return account;
     }
 
-    private async Task AddProductsAsync(
-        IEnumerable<ProductCommand> productCommands,
-        Invoice invoice,
-        decimal deliveryRatio,
-        decimal transferRatio,
-        CancellationToken ct)
+    private async Task<Manufactory> GetOrCreateManufactoryAsync(CancellationToken ct)
     {
-        var manufactory = await context.Manufactories
-            .FirstOrDefaultAsync(ct);
+        var manufactory = await context.Manufactories.FirstOrDefaultAsync(ct);
 
         if (manufactory is null)
-            context.Manufactories.Add(manufactory = new() { Name = "Default" });
+        {
+            manufactory = new Manufactory
+            {
+                Name = "Default",
+            };
+            context.Manufactories.Add(manufactory);
+        }
+        manufactory.SemiProductEntries = [];
+        manufactory.SemiProductResidues = [];
 
-        var defaultMeasure = await context.UnitMeasures
+        return manufactory;
+    }
+
+    private async Task<UnitMeasure> GetDefaultMeasureAsync(CancellationToken ct)
+    {
+        return await context.UnitMeasures
             .FirstOrDefaultAsync(um => um.NormalizedName == "Dona".ToNormalized(), ct)
             ?? await context.UnitMeasures.FirstOrDefaultAsync(um => um.IsDefault, ct)
             ?? await context.UnitMeasures.FirstOrDefaultAsync(ct)
             ?? throw new ForbiddenException("O'lchov birliklari mavjud emas");
+    }
 
+    private static void ValidateCostPrice(decimal costPrice)
+    {
+        if (costPrice == 0)
+            throw new ForbiddenException("Umumiy tannarx (CostPrice) 0 bo'lishi mumkin emas.");
+    }
+
+    private static (decimal deliveryRatio, decimal transferRatio) CalculateRatios(InvoiceCommand invoice)
+    {
+        var deliveryRatio = invoice.CostDelivery / invoice.CostPrice;
+        var transferRatio = (invoice.TransferFee ?? 0) / invoice.CostPrice;
+        return (deliveryRatio, transferRatio);
+    }
+
+    private void ProcessProducts(
+        IEnumerable<ProductCommand> productCommands,
+        Invoice invoice,
+        Manufactory manufactory,
+        UnitMeasure defaultMeasure,
+        decimal deliveryRatio,
+        decimal transferRatio)
+    {
         foreach (var pCmd in productCommands)
         {
-            var product = mapper.Map<Product>(pCmd);
-            product.UnitMeasure = defaultMeasure;
-            product.ProductTypes.Clear();
-            context.Products.Add(product);
+            var product = CreateProduct(pCmd, defaultMeasure);
 
             foreach (var typeCmd in pCmd.ProductTypes)
             {
-                var productType = mapper.Map<ProductType>(typeCmd);
-                productType.ProductTypeItems.Clear();
-                product.ProductTypes.Add(productType);
+                var productType = CreateProductType(typeCmd, product);
 
                 foreach (var itemCmd in typeCmd.ProductTypeItems)
                 {
                     var semi = mapper.Map<SemiProduct>(itemCmd.SemiProduct);
+                    var (costPrice, costDelivery, transferFee) = CalculateSemiProductCosts(
+                        itemCmd.SemiProduct.CostPrice,
+                        itemCmd.Quantity,
+                        deliveryRatio,
+                        transferRatio);
 
-                    var semiCost = itemCmd.SemiProduct.CostPrice / itemCmd.Quantity;
-                    var costDelivery = semiCost * deliveryRatio;
-                    var transferFee = semiCost * transferRatio;
-
-                    context.SemiProductEntries.Add(new SemiProductEntry
-                    {
-                        SemiProduct = semi,
-                        Quantity = itemCmd.SemiProduct.Quantity,
-                        Manufactory = manufactory!,
-                        Invoice = invoice,
-                        CostPrice = semiCost,
-                        CostDelivery = costDelivery,
-                        TransferFee = transferFee
-                    });
-
-                    context.SemiProductResidues.Add(new SemiProductResidue
-                    {
-                        SemiProduct = semi,
-                        Manufactory = manufactory,
-                        Quantity = itemCmd.SemiProduct.Quantity
-                    });
-
-                    productType.ProductTypeItems.Add(new ProductTypeItem
-                    {
-                        SemiProduct = semi,
-                        Quantity = itemCmd.Quantity
-                    });
+                    AddSemiProductEntry(manufactory, semi, itemCmd.SemiProduct.Quantity, invoice, costPrice, costDelivery, transferFee);
+                    AddSemiProductResidue(manufactory, semi, itemCmd.SemiProduct.Quantity);
+                    AddProductTypeItem(productType, semi, itemCmd.Quantity);
                 }
             }
         }
     }
 
-
-    // --- 2️⃣ Mustaqil ProductTypeId’lar ---
-    private async Task AddIndependentSemiProductsAsync(
-    IEnumerable<SemiProductCommand> semiProductCommands,
-    Invoice invoice,
-    decimal deliveryRatio,
-    decimal transferRatio,
-    CancellationToken ct)
+    private void ProcessIndependentSemiProducts(
+        IEnumerable<SemiProductCommand> semiProductCommands,
+        Invoice invoice,
+        Manufactory manufactory,
+        decimal deliveryRatio,
+        decimal transferRatio)
     {
-        var manufactory = await context.Manufactories.FirstOrDefaultAsync(ct);
-
-        if (manufactory is null)
-            context.Manufactories.Add(manufactory = new() { Name = "Default" });
-
-        invoice.Manufactory = manufactory;
-
         foreach (var cmd in semiProductCommands)
         {
             var semi = mapper.Map<SemiProduct>(cmd);
@@ -200,23 +203,75 @@ public class CreateSemiProductIntakeCommandHandler(
             var costDelivery = cmd.CostPrice * deliveryRatio;
             var transferFee = cmd.CostPrice * transferRatio;
 
-            context.SemiProductEntries.Add(new SemiProductEntry
-            {
-                SemiProduct = semi,
-                Quantity = cmd.Quantity,
-                Manufactory = manufactory!,
-                Invoice = invoice,
-                CostPrice = cmd.CostPrice,
-                CostDelivery = costDelivery,
-                TransferFee = transferFee
-            });
-
-            context.SemiProductResidues.Add(new SemiProductResidue
-            {
-                SemiProduct = semi,
-                Manufactory = manufactory,
-                Quantity = cmd.Quantity
-            });
+            AddSemiProductEntry(manufactory, semi, cmd.Quantity, invoice, cmd.CostPrice, costDelivery, transferFee);
+            AddSemiProductResidue(manufactory, semi, cmd.Quantity);
         }
+    }
+
+    private Product CreateProduct(ProductCommand pCmd, UnitMeasure defaultMeasure)
+    {
+        var product = mapper.Map<Product>(pCmd);
+        product.UnitMeasure = defaultMeasure;
+        product.ProductTypes.Clear();
+        context.Products.Add(product);
+        return product;
+    }
+
+    private ProductType CreateProductType(ProductTypeCommand typeCmd, Product product)
+    {
+        var productType = mapper.Map<ProductType>(typeCmd);
+        productType.ProductTypeItems.Clear();
+        product.ProductTypes.Add(productType);
+        return productType;
+    }
+
+    private static (decimal costPrice, decimal costDelivery, decimal transferFee) CalculateSemiProductCosts(
+        decimal totalCost,
+        decimal quantity,
+        decimal deliveryRatio,
+        decimal transferRatio)
+    {
+        var costPrice = totalCost / quantity;
+        var costDelivery = costPrice * deliveryRatio;
+        var transferFee = costPrice * transferRatio;
+        return (costPrice, costDelivery, transferFee);
+    }
+
+    private static void AddSemiProductEntry(
+        Manufactory manufactory,
+        SemiProduct semi,
+        decimal quantity,
+        Invoice invoice,
+        decimal costPrice,
+        decimal costDelivery,
+        decimal transferFee)
+    {
+        manufactory.SemiProductEntries.Add(new SemiProductEntry
+        {
+            SemiProduct = semi,
+            Quantity = quantity,
+            Invoice = invoice,
+            CostPrice = costPrice,
+            CostDelivery = costDelivery,
+            TransferFee = transferFee
+        });
+    }
+
+    private static void AddSemiProductResidue(Manufactory manufactory, SemiProduct semi, decimal quantity)
+    {
+        manufactory.SemiProductResidues.Add(new SemiProductResidue
+        {
+            SemiProduct = semi,
+            Quantity = quantity
+        });
+    }
+
+    private static void AddProductTypeItem(ProductType productType, SemiProduct semi, decimal quantity)
+    {
+        productType.ProductTypeItems.Add(new ProductTypeItem
+        {
+            SemiProduct = semi,
+            Quantity = quantity
+        });
     }
 }

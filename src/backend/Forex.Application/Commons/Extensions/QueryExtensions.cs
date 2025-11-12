@@ -2,7 +2,6 @@
 
 using Forex.Application.Commons.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 
@@ -27,7 +26,7 @@ public static class QueryExtensions
             if (prop == null) continue;
 
             var member = Expression.Property(param, prop.Name);
-            var filterExpr = BuildCombinedCondition(member, entry.Value, prop.PropertyType);
+            var filterExpr = BuildCombinedCondition(member, entry.Value, prop.PropertyType, request.Timezone);
 
             if (filterExpr != null)
                 query = query.Where(Expression.Lambda<Func<T, bool>>(filterExpr, param));
@@ -44,12 +43,12 @@ public static class QueryExtensions
 
     #region Condition Building
 
-    private static Expression? BuildCombinedCondition(Expression member, List<string> values, Type targetType)
+    private static Expression? BuildCombinedCondition(Expression member, List<string> values, Type targetType, double? timezone)
     {
         var logic = DetectLogicalOperator(values);
         var conditions = values
             .Where(v => !string.IsNullOrWhiteSpace(v) && !IsLogicalToken(v))
-            .Select(v => BuildCondition(member, v, targetType))
+            .Select(v => BuildCondition(member, v, targetType, timezone))
             .Where(c => c != null)
             .ToList();
 
@@ -62,7 +61,7 @@ public static class QueryExtensions
         return expr;
     }
 
-    private static Expression? BuildCondition(Expression member, string raw, Type targetType)
+    private static Expression? BuildCondition(Expression member, string raw, Type targetType, double? timezone)
     {
         string op = "=";
         string value = raw;
@@ -80,7 +79,7 @@ public static class QueryExtensions
 
         if (op == "not")
         {
-            var inner = BuildCondition(member, value, targetType);
+            var inner = BuildCondition(member, value, targetType, timezone);
             return inner != null ? Expression.Not(inner) : null;
         }
 
@@ -91,6 +90,7 @@ public static class QueryExtensions
                 .Select(v => ConversionHelper.TryConvert(v, targetType))
                 .ToList();
             var typedArray = Array.CreateInstance(targetType, listValues.Count);
+
             for (int i = 0; i < listValues.Count; i++)
                 typedArray.SetValue(listValues[i], i);
 
@@ -105,59 +105,13 @@ public static class QueryExtensions
         }
 
 
+        // DateTime / DateTimeOffset filtering with timezone support
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset))
         {
-            value = value.Trim().Replace("-", ".").Replace("/", ".").Replace(" ", ".");
-
-            DateTimeOffset parsedStart;
-            DateTimeOffset parsedEnd;
-
-            if (DateTimeOffset.TryParseExact(value, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtDay))
-            {
-                parsedStart = dtDay;
-                parsedEnd = parsedStart.AddDays(1);
-            }
-            else if (DateTimeOffset.TryParseExact(value, "MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtMonth))
-            {
-                parsedStart = new DateTimeOffset(dtMonth.Year, dtMonth.Month, 1, 0, 0, 0, TimeSpan.Zero);
-                parsedEnd = parsedStart.AddMonths(1);
-            }
-            else if (DateTimeOffset.TryParseExact(value, "yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtYear))
-            {
-                parsedStart = new DateTimeOffset(dtYear.Year, 1, 1, 0, 0, 0, TimeSpan.Zero);
-                parsedEnd = parsedStart.AddYears(1);
-            }
-            else
-            {
-                parsedStart = ConversionHelper.ParseFlexibleDateTimeOffset(value);
-                parsedEnd = parsedStart.AddSeconds(1);
-            }
-
-            Expression startConst;
-            Expression endConst;
-
-            if (targetType == typeof(DateTime))
-            {
-                startConst = Expression.Constant(parsedStart.DateTime, typeof(DateTime));
-                endConst = Expression.Constant(parsedEnd.DateTime, typeof(DateTime));
-            }
-            else
-            {
-                startConst = Expression.Constant(parsedStart, typeof(DateTimeOffset));
-                endConst = Expression.Constant(parsedEnd, typeof(DateTimeOffset));
-            }
-
-            return op switch
-            {
-                "<" => Expression.LessThan(member, startConst),
-                "<=" => Expression.LessThanOrEqual(member, startConst),
-                ">" => Expression.GreaterThan(member, endConst),
-                ">=" => Expression.GreaterThanOrEqual(member, endConst),
-                "=" or "equals" => Expression.AndAlso(Expression.GreaterThanOrEqual(member, startConst), Expression.LessThan(member, endConst)),
-                _ => Expression.AndAlso(Expression.GreaterThanOrEqual(member, startConst), Expression.LessThan(member, endConst))
-            };
+            return BuildDateTimeCondition(member, value, op, targetType, timezone);
         }
 
+        // Other types
         object? converted;
         try { converted = ConversionHelper.TryConvert(value, targetType); }
         catch { return null; }
@@ -186,6 +140,98 @@ public static class QueryExtensions
             "<" => Expression.LessThan(member, constant),
             "<=" => Expression.LessThanOrEqual(member, constant),
             _ => null
+        };
+    }
+
+    private static Expression BuildDateTimeCondition(Expression member, string value, string op, Type targetType, double? timezoneOffset)
+    {
+        // Normalize separators
+        value = value.Trim().Replace("-", ".").Replace("/", ".").Replace(" ", ".");
+
+        DateTimeOffset parsedStart;
+        DateTimeOffset parsedEnd;
+
+        // Check if input has explicit timezone (ISO 8601 format with Z or offset)
+        if (value.Contains('Z') || value.Contains('+') ||
+            value.Contains('-') && value.LastIndexOf('-') > 4) // offset like +05:00 or -05:00
+        {
+            if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dto))
+            {
+                parsedStart = dto;
+                parsedEnd = parsedStart.AddSeconds(1);
+            }
+            else
+            {
+                parsedStart = ConversionHelper.ParseFlexibleDateTimeOffset(value);
+                parsedEnd = parsedStart.AddSeconds(1);
+            }
+        }
+        else
+        {
+            // No explicit timezone in input - apply user's timezone if provided
+            TimeSpan offsetToApply = timezoneOffset.HasValue
+                ? TimeSpan.FromHours(timezoneOffset.Value)
+                : TimeSpan.Zero; // Default to UTC if no timezone provided
+
+            // Parse different date formats
+            if (DateTimeOffset.TryParseExact(value, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtDay))
+            {
+                // Full day: from 00:00:00 to 23:59:59 in user's timezone
+                parsedStart = new DateTimeOffset(dtDay.Year, dtDay.Month, dtDay.Day, 0, 0, 0, offsetToApply);
+                parsedEnd = parsedStart.AddDays(1);
+            }
+            else if (DateTimeOffset.TryParseExact(value, "MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtMonth))
+            {
+                // Full month: from first day 00:00:00 to last day 23:59:59 in user's timezone
+                parsedStart = new DateTimeOffset(dtMonth.Year, dtMonth.Month, 1, 0, 0, 0, offsetToApply);
+                parsedEnd = parsedStart.AddMonths(1);
+            }
+            else if (DateTimeOffset.TryParseExact(value, "yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtYear))
+            {
+                // Full year: from Jan 1 00:00:00 to Dec 31 23:59:59 in user's timezone
+                parsedStart = new DateTimeOffset(dtYear.Year, 1, 1, 0, 0, 0, offsetToApply);
+                parsedEnd = parsedStart.AddYears(1);
+            }
+            else
+            {
+                // Try flexible parsing and apply timezone
+                var flexDt = ConversionHelper.ParseFlexibleDate(value);
+                parsedStart = new DateTimeOffset(flexDt, offsetToApply);
+                parsedEnd = parsedStart.AddSeconds(1);
+            }
+        }
+
+        // Convert to UTC for database comparison (since DB stores in UTC)
+        parsedStart = parsedStart.ToUniversalTime();
+        parsedEnd = parsedEnd.ToUniversalTime();
+
+        // Build constants matching the property's actual CLR type
+        Expression startConst;
+        Expression endConst;
+
+        if (targetType == typeof(DateTime))
+        {
+            startConst = Expression.Constant(parsedStart.UtcDateTime, typeof(DateTime));
+            endConst = Expression.Constant(parsedEnd.UtcDateTime, typeof(DateTime));
+        }
+        else
+        {
+            startConst = Expression.Constant(parsedStart, typeof(DateTimeOffset));
+            endConst = Expression.Constant(parsedEnd, typeof(DateTimeOffset));
+        }
+
+        return op switch
+        {
+            "<" => Expression.LessThan(member, startConst),
+            "<=" => Expression.LessThanOrEqual(member, startConst),
+            ">" => Expression.GreaterThanOrEqual(member, endConst),
+            ">=" => Expression.GreaterThanOrEqual(member, startConst),
+            "=" or "equals" => Expression.AndAlso(
+                Expression.GreaterThanOrEqual(member, startConst),
+                Expression.LessThan(member, endConst)),
+            _ => Expression.AndAlso(
+                Expression.GreaterThanOrEqual(member, startConst),
+                Expression.LessThan(member, endConst))
         };
     }
 

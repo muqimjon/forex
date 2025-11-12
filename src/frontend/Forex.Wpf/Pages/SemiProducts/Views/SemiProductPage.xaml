@@ -128,6 +128,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -167,11 +169,54 @@
                                        FontSize="14"
                                        SelectedDate="{Binding Invoice.Date, Mode=TwoWay}" />
 
-                <TextBlock Text="Ta'minotchi:"
+                <TextBlock Text="Tan narxi:"
+                       FontSize="14"
                            Grid.Column="2"
+                       VerticalAlignment="Center"/>
+                            <Border Grid.Column="3"
+                    Width="120"
+                    Margin="5 1"
+                    Background="White"
+                    CornerRadius="4"
+                    BorderBrush="Black"
+                    BorderThickness="1">
+                                <TextBlock
+                    Background="Transparent"
+                                    HorizontalAlignment="Right"
+                    Padding="4,0"
+                                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="{Binding Invoice.CostPrice, StringFormat={}{0:N0}}" />
+                </Border>
+
+                <TextBlock Text="*Yo'l xarajati:"
+                       FontSize="14"
+                           Grid.Row="1"
+                           Grid.Column="2"
+                       VerticalAlignment="Center"/>
+                <Border Grid.Column="3"
+                           Grid.Row="1"
+                        Width="120"
+                        Margin="5 1"
+                        Background="White"
+                        CornerRadius="4"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                    <TextBox
+                        Background="Transparent"
+                        VerticalAlignment="Center"
+                        Padding="4,0"
+                        HorizontalContentAlignment="Right"
+                        FontSize="14"
+                        BorderThickness="0"
+                        Text="{Binding Invoice.CostDelivery, StringFormat={}{0:N0}}" />
+                </Border>
+
+                <TextBlock Text="Ta'minotchi:"
+                           Grid.Column="4"
                            FontSize="14"
                            VerticalAlignment="Center"/>
-                <Border Grid.Column="3"
+                <Border Grid.Column="5"
                         Width="150"
                         Margin="5 0"
                         Background="White"
@@ -192,24 +237,24 @@
 
                 <TextBlock Grid.Row="1"
                            Text="Vositachi orqali:"
-                           Grid.Column="2"
+                           Grid.Column="4"
                            FontSize="14"
                            VerticalAlignment="Center"/>
 
                 <ToggleButton Grid.Row="1"
-                              Grid.Column="3"
+                              Grid.Column="5"
                               Margin="5"
                               VerticalAlignment="Center"
                               FontSize="14"
                               IsChecked="{Binding Invoice.ViaMiddleman, Mode=TwoWay}" />
 
                 <TextBlock Text="Vositachi:"
-                           Grid.Column="4"
+                           Grid.Column="6"
                            FontSize="14"
                            VerticalAlignment="Center"
                            Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                <Border Grid.Column="5"
+                <Border Grid.Column="7"
                         Width="150"
                         Margin="5 1"
                         Background="White"
@@ -229,15 +274,15 @@
                               SelectedItem="{Binding Invoice.Agent}" />
                 </Border>
 
-                <TextBlock Text="Kontiner soni:"
+                <TextBlock Text="*Kontiner soni:"
                            Grid.Row="1"
-                           Grid.Column="4"
+                           Grid.Column="6"
                            FontSize="14"
                            VerticalAlignment="Center"
                            Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <Border Grid.Row="1"
-                        Grid.Column="5"
+                        Grid.Column="7"
                         Margin="5 1"
                         Background="White"
                         CornerRadius="4"
@@ -247,19 +292,19 @@
                     <TextBox Background="Transparent"
                              Padding="4,0"
                              FontSize="14"
-                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
                              Height="28"
                              BorderThickness="0"
                              Text="{Binding Invoice.ContainerCount}" />
                 </Border>
 
-                <TextBlock Text="Valyuta:"
-                           Grid.Column="6"
+                <TextBlock Text="*Dona kon. u-n to'lov:"
+                           Grid.Column="8"
                            FontSize="14"
                            VerticalAlignment="Center"
                            Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                <Border Grid.Column="7"
+                <Border Grid.Column="9"
                         Margin="5 1"
                         Background="White"
                         CornerRadius="4"
@@ -269,23 +314,22 @@
                     <TextBox Background="Transparent"
                              Padding="2,0"
                              FontSize="14"
-                             IsReadOnly="True"
-                             HorizontalAlignment="Center"
+                             HorizontalContentAlignment="Right"
+                             ToolTip="Bir dona kontiner uchun qilinadigan to'lov summasi"
+                             Text="{Binding Invoice.PricePerUnitContainer, StringFormat=C}"
                              VerticalAlignment="Center"
-                             IsHitTestVisible="False"
-                             BorderThickness="0"
-                             Text="USD" />
+                             BorderThickness="0"/>
                 </Border>
 
                 <TextBlock Grid.Row="1"
-                           Grid.Column="6"
-                           Text="Kursi:"
+                           Grid.Column="8"
+                           Text="*Kursi:"
                            FontSize="14"
                            VerticalAlignment="Center"
                            Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                 <Border Grid.Row="1"
-                        Grid.Column="7"
+                        Grid.Column="9"
                         Width="100"
                         Margin="5 1"
                         Background="White"
@@ -298,8 +342,9 @@
                         Padding="2,0"
                         FontSize="14"
                         VerticalAlignment="Center"
+                        HorizontalContentAlignment="Right"
                         BorderThickness="0"
-                        Text="{Binding Invoice.Currency.ExchangeRate}" />
+                        Text="{Binding Invoice.Currency.ExchangeRate, StringFormat={}{0:N0} so\'m}" />
                 </Border>
 
             </Grid>
@@ -583,11 +628,13 @@
                                        FontSize="16"
                                        Text="Jami: " />
                             <TextBlock FontWeight="Bold"
-                                       Text="{Binding Invoice.TotalAmount}" />
-                            <TextBlock Margin="20 0 0 0"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding Invoice.TotalAmount, StringFormat={}{0:N0}}" />
+                            <TextBlock Margin="10 0 20 0"
                                        FontSize="16"
                                        FontWeight="Bold"
-                                       Text="{Binding Invoice.Currency.Code}" />
+                                       Text="UZS" />
                         </StackPanel>
                     </Border>
                 </Grid>

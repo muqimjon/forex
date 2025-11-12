@@ -46,7 +46,7 @@ public partial class InvoiceViewModel : ViewModelBase
 
     private void ReCalculateTransferFee()
     {
-        TransferFee = ContainerCount * PricePerUnitContainer;
+        TransferFee = ContainerCount * PricePerUnitContainer * Currency.ExchangeRate;
     }
 
     private void ReCalculateTotal()
