@@ -114,24 +114,23 @@
 
                 <!--  Mijoz  -->
                 <Grid Grid.Row="1" Grid.Column="1">
-                    <Border
-                        Margin="0,2 0,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <ComboBox
-                            x:Name="customerComboBox"
-                            Padding="5,1"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
-                            BorderThickness="0"
-                            DisplayMemberPath="Name"
-                            FontSize="14"
-                            IsEditable="True"
-                            IsTextSearchEnabled="True"
-                            ItemsSource="{Binding AvailableCustomers}"
-                            SelectedItem="{Binding Customer}"
-                            Text="{Binding CustomerInput, Mode=TwoWay}" />
+                    <Border Margin="0,2 0,2"
+                            BorderBrush="{DynamicResource PrimaryTextColor}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <ComboBox x:Name="customerComboBox"
+                                  Padding="5,1" 
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  BorderThickness="0"
+                                  DisplayMemberPath="Name"
+                                  FontSize="14"
+                                  IsEditable="True"
+                                  LostFocus="CustomerComboBox_LostFocus"
+                                  IsTextSearchEnabled="True"
+                                  ItemsSource="{Binding AvailableCustomers}"
+                                  SelectedItem="{Binding Customer}"
+                                  Text="{Binding CustomerInput, Mode=TwoWay}" />
 
                     </Border>
                 </Grid>
@@ -144,69 +143,62 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Border
-                        Grid.Column="0"
-                        Margin="0,2,10,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="TotalSum"
-                            Padding="3 0"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            BorderThickness="0"
-                            FontSize="14"
-                            IsReadOnly="True"
-                            IsTabStop="False"
-                            Text="{Binding TotalAmount, StringFormat={}{0:N2}}"
-                            TextAlignment="Right" />
+                    <Border Grid.Column="0"
+                            Margin="0,2,10,2"
+                            BorderBrush="{DynamicResource PrimaryTextColor}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <TextBox x:Name="TotalSum"
+                                 Padding="3 0"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch"
+                                 BorderThickness="0"
+                                 FontSize="14"
+                                 IsReadOnly="True"
+                                 IsTabStop="False"
+                                 Text="{Binding TotalAmount, StringFormat={}{0:N2}}"
+                                 TextAlignment="Right" />
 
                     </Border>
 
-                    <Label
-                        Grid.Column="1"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Content="To'lashga:"
-                        FontSize="14" />
+                    <Label Grid.Column="1"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Content="To'lashga:"
+                           FontSize="14" />
 
-                    <Border
-                        Grid.Column="2"
-                        Margin="0,2 0,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="finalSumm"
-                            Padding="3 0"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            BorderThickness="0"
-                            FontSize="14"
-                            IsReadOnly="True"
-                            IsTabStop="False"
-                            Text="{Binding FinalAmount, StringFormat={}{0:N2}}"
-                            TextAlignment="Right" />
+                    <Border Grid.Column="2"
+                            Margin="0,2 0,2"
+                            BorderBrush="{DynamicResource PrimaryTextColor}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <TextBox x:Name="finalSumm"
+                                 Padding="3 0"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch"
+                                 BorderThickness="0"
+                                 FontSize="14"
+                                 IsReadOnly="True"
+                                 IsTabStop="False"
+                                 Text="{Binding FinalAmount, StringFormat={}{0:N2}}"
+                                 TextAlignment="Right" />
                     </Border>
                 </Grid>
 
                 <!--  Izox  -->
                 <Grid Grid.Row="3" Grid.Column="1">
-                    <Border
-                        Margin="0,2"
-                        BorderBrush="{DynamicResource PrimaryTextColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="noteTextBox"
-                            Padding="3 0"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            BorderThickness="0"
-                            FontSize="14"
-                            Text="{Binding Note}"
-                            TextAlignment="Left" />
+                    <Border Margin="0,2"
+                            BorderBrush="{DynamicResource PrimaryTextColor}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <TextBox x:Name="noteTextBox"
+                                 Padding="3 0"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch"
+                                 BorderThickness="0"
+                                 FontSize="14"
+                                 Text="{Binding Note}"
+                                 TextAlignment="Left" />
                     </Border>
                 </Grid>
             </Grid>
@@ -222,32 +214,29 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
-                <TextBlock
-                    Grid.Row="0"
-                    Padding="0"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    FontStyle="Italic"
-                    FontWeight="Bold"
-                    Text="Mijoz hisobi:" />
+                <TextBlock Grid.Row="0"
+                           Padding="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           FontStyle="Italic"
+                           FontWeight="Bold"
+                           Text="Mijoz hisobi:" />
 
-                <TextBlock
-                    Grid.Row="1"
-                    VerticalAlignment="Center"
-                    Text="Joriy:" />
-                <TextBox
-                    x:Name="beginBalans"
-                    Grid.Row="1"
-                    Margin="35,2,2,2"
-                    Padding="0"
-                    HorizontalAlignment="Right"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    FontSize="12"
-                    IsReadOnly="True"
-                    IsTabStop="False"
-                    Text="{Binding TotalAmountWithUserBalance, StringFormat={}{0:N2}}" />
+                <TextBlock Grid.Row="1"
+                           VerticalAlignment="Center"
+                           Text="Joriy:" />
+                <TextBox x:Name="beginBalans"
+                         Grid.Row="1"
+                         Margin="35,2,2,2"
+                         Padding="0"
+                         HorizontalAlignment="Right"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         FontSize="12"
+                         IsReadOnly="True"
+                         IsTabStop="False"
+                         Text="{Binding TotalAmountWithUserBalance, StringFormat={}{0:N2}}" />
 
                 <TextBlock
                     Grid.Row="2"
@@ -342,7 +331,7 @@
                 Margin="2 0"
                 Label="Razmer soni"
                 Text="{Binding CurrentSaleItem.BundleCount, UpdateSourceTrigger=PropertyChanged}" />
-            
+
             <!--  Jami soni  -->
             <controls:FloatingInput
                 x:Name="tbxQuantity"
