@@ -27,6 +27,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
         Products = [new()];
         AttachProducts(Products);
+        Invoice.PropertyChanged += InvoicePropertyChanged;
 
         _ = LoadDataAsync();
     }
@@ -115,7 +116,20 @@ public partial class SemiProductPageViewModel : ViewModelBase
             SemiProducts = []
         };
 
-        requestObject.Invoice.CurrencyId = 1; // TODO: Make selectable
+        var currency = AvailableCurrencies.FirstOrDefault(c => c.IsDefault);
+
+        if (currency is null)
+        {
+            WarningMessage = "Default valyuta tanlanmagan";
+            return;
+        }
+        else if (!currency.Code.Equals("UZS", StringComparison.InvariantCultureIgnoreCase))
+        {
+            WarningMessage = "Default valyuta UZS emas";
+            return;
+        }
+
+        requestObject.Invoice.CurrencyId = currency.Id;
 
         var client = services.GetRequiredService<IApiSemiProductEntry>();
         var response = await client.Create(requestObject).Handle(isLoading => IsLoading = isLoading);
@@ -273,6 +287,16 @@ public partial class SemiProductPageViewModel : ViewModelBase
                 t.ProductTypeItems?.Sum(i => i.SemiProduct.TotalAmount)
             ) ?? 0
         ) ?? 0;
+    }
+
+    #endregion
+
+    #region Property Changes
+
+    private void InvoicePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Invoice.ViaMiddleman))
+            Invoice.Currency = AvailableCurrencies.FirstOrDefault(c => c.Code.ToUpperInvariant() == "USD");
     }
 
     #endregion

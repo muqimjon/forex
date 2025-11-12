@@ -1,7 +1,6 @@
 ﻿namespace Forex.ClientService;
 
 using Forex.ClientService.Configuration;
-using Forex.ClientService.Extensions;
 using Forex.ClientService.Interfaces;
 using Forex.ClientService.Services;
 using Forex.ClientService.Services.FileStorage.Minio;
@@ -34,12 +33,6 @@ public static class DependencyInjection
         services.AddAllRefitClients(apiBaseUrl);
 
         services.AddSingleton<ForexClient>();
-
-        services.AddSingleton(provider =>
-        {
-            ApiExtensions.Configure(provider);
-            return provider;
-        });
 
         return services;
     }
