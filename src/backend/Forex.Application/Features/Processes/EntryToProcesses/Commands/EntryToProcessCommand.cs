@@ -48,6 +48,9 @@ public class CreateEntryToProcessCommandHandler(IAppDbContext context)
 
     private async Task DeductSemiProductResiduesAsync(ProductType productType, decimal quantity, CancellationToken ct)
     {
+        if (productType.ProductTypeItems.Count <= 0)
+            throw new ConflictException("Ushbu maxsulot uchun yarim tayyor maxsulot biriktirilmagan");
+
         foreach (var item in productType.ProductTypeItems)
         {
             var required = item.Quantity * quantity;

@@ -36,6 +36,7 @@ public class CreateSemiProductIntakeCommandHandler(
 
             var invoice = mapper.Map<Invoice>(request.Invoice);
             context.Invoices.Add(invoice);
+            await RefreshExchangeRate(invoice, ct);
 
             ValidateCostPrice(request.Invoice.CostPrice);
             var (deliveryRatio, transferRatio) = CalculateRatios(request.Invoice);
@@ -71,6 +72,15 @@ public class CreateSemiProductIntakeCommandHandler(
         }
     }
 
+    private async Task RefreshExchangeRate(Invoice invoice, CancellationToken ct)
+    {
+        var currency = await context.Currencies.FirstOrDefaultAsync(c => c.NormalizedName == "Dollar".ToNormalized(), ct)
+                        ?? throw new NotFoundException(nameof(Currency), nameof(invoice.CurrencyId), invoice.CurrencyId);
+
+        if (invoice.ExchangeRate is not null)
+            currency.ExchangeRate = (decimal)invoice.ExchangeRate;
+    }
+
     private async Task HandleMiddlemanTransferAsync(InvoiceCommand invoice, CancellationToken ct)
     {
         if (!invoice.ViaMiddleman) return;
@@ -78,7 +88,7 @@ public class CreateSemiProductIntakeCommandHandler(
         var user = await GetUserWithAccountsAsync(invoice.SenderId!.Value, ct);
         var account = GetOrCreateAccount(user, invoice.CurrencyId, invoice.TransferFee!.Value);
 
-        account.Balance += invoice.TransferFee.Value;
+        account.Balance += (decimal)(invoice.ContainerCount * invoice.PricePerUnitContainer)!;
     }
 
     private async Task EnsureSupplierAccountAsync(InvoiceCommand invoice, CancellationToken ct)
@@ -99,7 +109,7 @@ public class CreateSemiProductIntakeCommandHandler(
 
     private UserAccount GetOrCreateAccount(User user, long currencyId, decimal openingBalance)
     {
-        var account = user.Accounts.FirstOrDefault(a => a.CurrencyId == currencyId);
+        var account = user.Accounts.FirstOrDefault();
 
         if (account is null)
         {
@@ -151,7 +161,7 @@ public class CreateSemiProductIntakeCommandHandler(
     private static (decimal deliveryRatio, decimal transferRatio) CalculateRatios(InvoiceCommand invoice)
     {
         var deliveryRatio = invoice.CostDelivery / invoice.CostPrice;
-        var transferRatio = (invoice.TransferFee ?? 0) / invoice.CostPrice;
+        var transferRatio = ((invoice.TransferFee ?? 0) * (invoice.ExchangeRate ?? 0)) / invoice.CostPrice;
         return (deliveryRatio, transferRatio);
     }
 

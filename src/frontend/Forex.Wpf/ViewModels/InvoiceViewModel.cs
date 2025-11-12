@@ -18,6 +18,7 @@ public partial class InvoiceViewModel : ViewModelBase
     [ObservableProperty] private decimal? pricePerUnitContainer;
     [ObservableProperty] private decimal? transferFee;
     [ObservableProperty] private bool viaMiddleman;
+    [ObservableProperty] private decimal? exchangeRate;
 
     [ObservableProperty] private decimal? totalAmount;
     [ObservableProperty] private string totalAmountWithCurrency = string.Empty;
@@ -33,6 +34,8 @@ public partial class InvoiceViewModel : ViewModelBase
     partial void OnPricePerUnitContainerChanged(decimal? value) => ReCalculateTransferFee();
     partial void OnTotalAmountChanged(decimal? value) => RefreshAmount();
     partial void OnCurrencyChanged(CurrencyViewModel value) => RefreshAmount();
+    partial void OnCurrencyChanging(CurrencyViewModel value) => RefreshCurrencyInfo();
+    partial void OnExchangeRateChanged(decimal? value) => ReCalculateTransferFee();
 
     #endregion Property Changes
 
@@ -46,15 +49,17 @@ public partial class InvoiceViewModel : ViewModelBase
 
     private void ReCalculateTransferFee()
     {
-        TransferFee = ContainerCount * PricePerUnitContainer * Currency.ExchangeRate;
+        TransferFee = ContainerCount * PricePerUnitContainer;
     }
 
     private void ReCalculateTotal()
     {
         if (CostDelivery is not null || CostPrice is not null || TransferFee is not null)
-            if (ViaMiddleman) TotalAmount = (CostPrice ?? 0) + (CostDelivery ?? 0) + (TransferFee ?? 0);
+            if (ViaMiddleman) TotalAmount = (CostPrice ?? 0) + (CostDelivery ?? 0) + (TransferFee ?? 0) * (ExchangeRate ?? 0);
             else TotalAmount = (CostPrice ?? 0) + (CostDelivery ?? 0);
     }
+
+    private void RefreshCurrencyInfo() => ExchangeRate = Currency?.ExchangeRate;
 
     #endregion Private Helpers
 }

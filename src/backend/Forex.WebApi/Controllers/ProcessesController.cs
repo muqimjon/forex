@@ -16,9 +16,9 @@ public class ProcessesController : BaseController
     public async Task<IActionResult> Edit(EditEntryToProcessCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 
-    [HttpDelete]
-    public async Task<IActionResult> Delete(DeleteEntryToProcessCommand command)
-        => Ok(new Response { Data = await Mediator.Send(command) });
+    [HttpDelete("{id:long}")]
+    public async Task<IActionResult> Delete(long id)
+        => Ok(new Response { Data = await Mediator.Send(new DeleteEntryToProcessCommand(id)) });
 
     [HttpPost("filter")]
     public async Task<IActionResult> GetFiltered(InProcessFilterQuery query)

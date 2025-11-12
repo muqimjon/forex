@@ -103,7 +103,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Account>()
             .ToTable("Accounts")
             .HasDiscriminator<string>("AccountType")
-            .HasValue<UserAccount>("Customer")
+            .HasValue<UserAccount>("User")
             .HasValue<ShopAccount>("ShopCash");
 
         modelBuilder.Ignore<System.Transactions.Transaction>();

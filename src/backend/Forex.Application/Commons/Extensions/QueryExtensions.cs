@@ -23,17 +23,17 @@ public static class QueryExtensions
                 continue;
 
             var prop = props.FirstOrDefault(p => string.Equals(p.Name, entry.Key, StringComparison.OrdinalIgnoreCase));
-            if (prop == null) continue;
+            if (prop is null) continue;
 
             var member = Expression.Property(param, prop.Name);
             var filterExpr = BuildCombinedCondition(member, entry.Value, prop.PropertyType, request.Timezone);
 
-            if (filterExpr != null)
+            if (filterExpr is not null)
                 query = query.Where(Expression.Lambda<Func<T, bool>>(filterExpr, param));
         }
 
         var searchExpr = BuildGlobalSearchExpression<T>(request.Search, param);
-        if (searchExpr != null)
+        if (searchExpr is not null)
             query = query.Where(Expression.Lambda<Func<T, bool>>(searchExpr, param));
 
         return query.AsSortable(request);
@@ -49,7 +49,7 @@ public static class QueryExtensions
         var conditions = values
             .Where(v => !string.IsNullOrWhiteSpace(v) && !IsLogicalToken(v))
             .Select(v => BuildCondition(member, v, targetType, timezone))
-            .Where(c => c != null)
+            .Where(c => c is not null)
             .ToList();
 
         if (conditions.Count == 0) return null;
@@ -80,7 +80,7 @@ public static class QueryExtensions
         if (op == "not")
         {
             var inner = BuildCondition(member, value, targetType, timezone);
-            return inner != null ? Expression.Not(inner) : null;
+            return inner is not null ? Expression.Not(inner) : null;
         }
 
         if (op == "in")
@@ -89,6 +89,7 @@ public static class QueryExtensions
                 .Select(v => v.Trim())
                 .Select(v => ConversionHelper.TryConvert(v, targetType))
                 .ToList();
+
             var typedArray = Array.CreateInstance(targetType, listValues.Count);
 
             for (int i = 0; i < listValues.Count; i++)
@@ -104,14 +105,11 @@ public static class QueryExtensions
             return Expression.Call(containsMethod, arrayExpr, member);
         }
 
-
-        // DateTime / DateTimeOffset filtering with timezone support
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset))
         {
             return BuildDateTimeCondition(member, value, op, targetType, timezone);
         }
 
-        // Other types
         object? converted;
         try { converted = ConversionHelper.TryConvert(value, targetType); }
         catch { return null; }
@@ -145,15 +143,13 @@ public static class QueryExtensions
 
     private static Expression BuildDateTimeCondition(Expression member, string value, string op, Type targetType, double? timezoneOffset)
     {
-        // Normalize separators
         value = value.Trim().Replace("-", ".").Replace("/", ".").Replace(" ", ".");
 
         DateTimeOffset parsedStart;
         DateTimeOffset parsedEnd;
 
-        // Check if input has explicit timezone (ISO 8601 format with Z or offset)
         if (value.Contains('Z') || value.Contains('+') ||
-            value.Contains('-') && value.LastIndexOf('-') > 4) // offset like +05:00 or -05:00
+            value.Contains('-') && value.LastIndexOf('-') > 4)
         {
             if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dto))
             {
@@ -168,44 +164,36 @@ public static class QueryExtensions
         }
         else
         {
-            // No explicit timezone in input - apply user's timezone if provided
             TimeSpan offsetToApply = timezoneOffset.HasValue
                 ? TimeSpan.FromHours(timezoneOffset.Value)
-                : TimeSpan.Zero; // Default to UTC if no timezone provided
+                : TimeSpan.Zero;
 
-            // Parse different date formats
             if (DateTimeOffset.TryParseExact(value, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtDay))
             {
-                // Full day: from 00:00:00 to 23:59:59 in user's timezone
                 parsedStart = new DateTimeOffset(dtDay.Year, dtDay.Month, dtDay.Day, 0, 0, 0, offsetToApply);
                 parsedEnd = parsedStart.AddDays(1);
             }
             else if (DateTimeOffset.TryParseExact(value, "MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtMonth))
             {
-                // Full month: from first day 00:00:00 to last day 23:59:59 in user's timezone
                 parsedStart = new DateTimeOffset(dtMonth.Year, dtMonth.Month, 1, 0, 0, 0, offsetToApply);
                 parsedEnd = parsedStart.AddMonths(1);
             }
             else if (DateTimeOffset.TryParseExact(value, "yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtYear))
             {
-                // Full year: from Jan 1 00:00:00 to Dec 31 23:59:59 in user's timezone
                 parsedStart = new DateTimeOffset(dtYear.Year, 1, 1, 0, 0, 0, offsetToApply);
                 parsedEnd = parsedStart.AddYears(1);
             }
             else
             {
-                // Try flexible parsing and apply timezone
                 var flexDt = ConversionHelper.ParseFlexibleDate(value);
                 parsedStart = new DateTimeOffset(flexDt, offsetToApply);
                 parsedEnd = parsedStart.AddSeconds(1);
             }
         }
 
-        // Convert to UTC for database comparison (since DB stores in UTC)
         parsedStart = parsedStart.ToUniversalTime();
         parsedEnd = parsedEnd.ToUniversalTime();
 
-        // Build constants matching the property's actual CLR type
         Expression startConst;
         Expression endConst;
 
@@ -267,7 +255,7 @@ public static class QueryExtensions
             var contains = Expression.Call(memberToLower, nameof(string.Contains), Type.EmptyTypes, Expression.Constant(loweredSearch));
             var andExpr = Expression.AndAlso(notNull, contains);
 
-            expr = expr == null ? andExpr : Expression.OrElse(expr, andExpr);
+            expr = expr is null ? andExpr : Expression.OrElse(expr, andExpr);
         }
 
         return expr;
@@ -284,7 +272,7 @@ public static class QueryExtensions
         foreach (var entry in request.Filters ?? [])
         {
             var prop = props.FirstOrDefault(p => string.Equals(p.Name, entry.Key, StringComparison.OrdinalIgnoreCase));
-            if (prop == null) continue;
+            if (prop is null) continue;
 
             foreach (var val in entry.Value)
             {

@@ -34,6 +34,38 @@ public class CreateUserCommandHandler(
             throw new AlreadyExistException(nameof(User), nameof(request.Name), request.Name);
 
         var user = mapper.Map<User>(request);
+
+        if (request.Role == UserRole.Vositachi)
+        {
+            var currency = await context.Currencies.FirstOrDefaultAsync(c => c.NormalizedName == "Dollar".ToNormalized(), cancellationToken);
+
+            currency ??= new()
+            {
+                Name = "Dollar",
+                NormalizedName = "Dollar".ToNormalized(),
+                Code = "USD",
+                Symbol = "$",
+                IsEditable = true,
+                IsActive = true
+            };
+
+            if (user.Accounts.Count != 0)
+                user.Accounts.First().Currency = currency;
+            else user.Accounts.Add(new() { Currency = currency });
+        }
+        else
+        {
+            var currency = await context.Currencies.FirstOrDefaultAsync(c => c.IsDefault, cancellationToken)
+                ?? throw new AppException("Standart valyuta kiritilmagan");
+
+            if (currency.NormalizedName != "So'm".ToNormalized())
+                throw new AppException("So'm Standart valyuta sifatida tanlanishi shart!");
+
+            if (user.Accounts.Count != 0)
+                user.Accounts.First().Currency = currency;
+            else user.Accounts.Add(new() { Currency = currency });
+        }
+
         context.Users.Add(user);
 
         await context.SaveAsync(cancellationToken);
