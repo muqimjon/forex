@@ -34,209 +34,195 @@
         </Grid.RowDefinitions>
 
         <!--  🔎 Qidiruv  -->
-        <Border
-            Grid.Row="0"
-            Width="240"
-            Margin="0,5"
-            Padding="0"
-            HorizontalAlignment="Left"
-            Background="{DynamicResource SelectedBackground}"
-            BorderBrush="{DynamicResource SelectedBorderColor}"
-            BorderThickness="1"
-            CornerRadius="5">
-            <TextBox
-                x:Name="txtSearch"
-                Width="230"
-                Margin="5,1,2,1"
+        <Border Grid.Row="0"
+                Width="240"
+                Margin="0,5"
                 Padding="0"
-                md:HintAssist.Hint="Qidiruv.."
-                BorderBrush="Gray"
-                BorderThickness="0"
-                FontSize="16" />
+                HorizontalAlignment="Left"
+                Background="{DynamicResource SelectedBackground}"
+                BorderBrush="{DynamicResource SelectedBorderColor}"
+                BorderThickness="1"
+                CornerRadius="5">
+            <TextBox x:Name="txtSearch"
+                     Width="230"
+                     Margin="5,1,2,1"
+                     Padding="0"
+                     md:HintAssist.Hint="Qidiruv.."
+                     BorderBrush="Gray"
+                     BorderThickness="0"
+                     FontSize="16" />
         </Border>
 
-        <Button
-            x:Name="btnBack"
-            Grid.Row="0"
-            HorizontalAlignment="Right"
-            md:ButtonAssist.CornerRadius="5"
-            Background="{DynamicResource OtherBackground}"
-            BorderThickness="0"
-            Content="🔙 Orqaga"
-            ToolTip="Orqaga" />
+        <Button x:Name="btnBack"
+                Grid.Row="0"
+                HorizontalAlignment="Right"
+                md:ButtonAssist.CornerRadius="5"
+                Background="{DynamicResource OtherBackground}"
+                BorderThickness="0"
+                Content="🔙 Orqaga"
+                ToolTip="Orqaga" />
 
         <!--  ➕ Qo‘shish formasi  -->
         <WrapPanel Grid.Row="1" Orientation="Horizontal">
-            <Border
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <ComboBox
-                    x:Name="cbRole"
-                    Width="105"
-                    Padding="5,1,2,1"
-                    md:HintAssist.Hint="Tanlash"
-                    BorderThickness="0"
-                    FontSize="16"
-                    IsEditable="False"
-                    IsTextSearchEnabled="False"
-                    Loaded="CbRole_Loaded"
-                    StaysOpenOnEdit="True" />
+            <Border Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <ComboBox x:Name="cbRole"
+                          Width="105"
+                          Padding="5,1,2,1"
+                          md:HintAssist.Hint="Tanlash"
+                          BorderThickness="0"
+                          FontSize="16"
+                          IsEditable="False"
+                          IsTextSearchEnabled="False"
+                          Loaded="CbRole_Loaded"
+                          StaysOpenOnEdit="True" />
             </Border>
 
-            <Border
-                Width="115"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtName"
-                    Width="112"
+            <Border Width="115"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtName"
+                         Width="112"
+                         Padding="3,1,2,1"
+                         md:HintAssist.Hint="Nomi"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Border Width="145"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtPhone"
+                         Width="143"
+                         Padding="3,1,2,1"
+                         md:HintAssist.Hint="Telefon"
+                         BorderThickness="0"
+                         FontSize="16"
+                         TextChanged="TxtPhone_TextChanged" />
+            </Border>
+
+            <Border Width="200"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtAddress"
+                         Width="195"
+                         Padding="3,1,2,1"
+                         md:HintAssist.Hint="Manzil"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Border Width="200"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                <TextBox x:Name="txtDescription"
+                         Width="195"
+                         Padding="3,1,2,1"
+                         md:HintAssist.Hint="Izoh"
+                         BorderThickness="0"
+                         FontSize="16" />
+            </Border>
+
+            <Border x:Name="brValutaType"
+                    Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="Collapsed">
+                <ComboBox x:Name="cbxValutaType"
+                          Width="105"
+                          Padding="3,1,2,1"
+                          md:HintAssist.Hint="Valyuta turi"
+                          BorderThickness="0"
+                          FontSize="16"
+                          IsEditable="False"
+                          IsTextSearchEnabled="False"
+                          StaysOpenOnEdit="True" />
+            </Border>
+
+
+            <Border x:Name="brDebt"
+                    Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="Collapsed">
+                <TextBox x:Name="tbDebt"
+                         Width="115"
+                         Foreground="Red"
+                         Padding="3,1,2,1"
+                         md:HintAssist.Hint="Qarzdorlik"
+                         BorderThickness="0"
+                         FontSize="16"
+                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                         DataObject.Pasting="NumericTextBox_Pasting"
+                         TextChanged="TbDebt_TextChanged" />
+            </Border>
+
+            <Border x:Name="brAccount"
+                    Width="120"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="Collapsed">
+                <TextBox x:Name="tbAccount"
+                         Width="115"
+                         Foreground="Green"
+                         Padding="3,1,2,1"
+                         md:HintAssist.Hint="Haqdorlik"
+                         BorderThickness="0"
+                         FontSize="16"
+                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                         DataObject.Pasting="NumericTextBox_Pasting"
+                         TextChanged="TbAccount_TextChanged" />
+            </Border>
+            <Button x:Name="btnSave"
+                    MinWidth="50"
+                    Margin="3,0,0,3"
                     Padding="3,1,2,1"
-                    md:HintAssist.Hint="Nomi"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="{DynamicResource OtherBackground}"
                     BorderThickness="0"
-                    FontSize="16" />
-            </Border>
+                    Content="💾 Saqlash"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    ToolTip="Saqlash"
+                    Visibility="Collapsed" />
 
-            <Border
-                Width="142"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtPhone"
-                    Width="140"
+            <Button x:Name="btnUpdate"
+                    MinWidth="50"
+                    Margin="3,0,0,3"
                     Padding="3,1,2,1"
-                    md:HintAssist.Hint="Telefon"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="{DynamicResource OtherBackground}"
                     BorderThickness="0"
-                    FontSize="16"
-                    TextChanged="TxtPhone_TextChanged" />
-            </Border>
-
-            <Border
-                Width="200"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtAddress"
-                    Width="195"
-                    Padding="3,1,2,1"
-                    md:HintAssist.Hint="Manzil"
-                    BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Border
-                Width="200"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4">
-                <TextBox
-                    x:Name="txtDescription"
-                    Width="195"
-                    Padding="3,1,2,1"
-                    md:HintAssist.Hint="Izoh"
-                    BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Border
-                x:Name="brValutaType"
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Visibility="Collapsed">
-                <ComboBox
-                    x:Name="cbxValutaType"
-                    Width="105"
-                    Padding="3,1,2,1"
-                    md:HintAssist.Hint="Valyuta turi"
-                    BorderThickness="0"
-                    FontSize="16"
-                    IsEditable="False"
-                    IsTextSearchEnabled="False"
-                    StaysOpenOnEdit="True" />
-            </Border>
-
-
-            <Border
-                x:Name="brDiscount"
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Visibility="Collapsed">
-                <TextBox
-                    x:Name="tbDiscount"
-                    Width="115"
-                    Padding="3,1,2,1"
-                    md:HintAssist.Hint="Bonus"
-                    BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Border
-                x:Name="brAccount"
-                Width="120"
-                Margin="1,0,1,2"
-                Background="{DynamicResource SelectedBackground}"
-                BorderBrush="{DynamicResource SelectedBorderColor}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Visibility="Collapsed">
-                <TextBox
-                    x:Name="tbAccount"
-                    Width="115"
-                    Padding="3,1,2,1"
-                    md:HintAssist.Hint="Hisob qoldiq"
-                    BorderThickness="0"
-                    FontSize="16" />
-            </Border>
-
-            <Button
-                x:Name="btnSave"
-                MinWidth="50"
-                Margin="3,0,0,3"
-                Padding="3,1,2,1"
-                md:ButtonAssist.CornerRadius="4"
-                Background="{DynamicResource OtherBackground}"
-                BorderThickness="0"
-                Content="💾 Saqlash"
-                FontWeight="Bold"
-                Foreground="{DynamicResource PrimaryTextColor}"
-                ToolTip="Saqlash"
-                Visibility="Collapsed" />
-
-            <Button
-                x:Name="btnUpdate"
-                MinWidth="50"
-                Margin="3,0,0,3"
-                Padding="3,1,2,1"
-                md:ButtonAssist.CornerRadius="4"
-                Background="{DynamicResource OtherBackground}"
-                BorderThickness="0"
-                Content="🔄 Yangilash"
-                FontWeight="Bold"
-                Foreground="{DynamicResource PrimaryTextColor}"
-                ToolTip="Yangilash"
-                Visibility="Collapsed" />
+                    Content="🔄 Yangilash"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource PrimaryTextColor}"
+                    ToolTip="Yangilash"
+                    Visibility="Collapsed" />
         </WrapPanel>
 
         <!--  📋 Jadval  -->
