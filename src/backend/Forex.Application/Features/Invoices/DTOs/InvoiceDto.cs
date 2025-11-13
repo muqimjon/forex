@@ -14,8 +14,9 @@ public sealed record InvoiceDto
     public decimal CostDelivery { get; set; }
     public bool ViaMiddleman { get; set; }
     public int? ContainerCount { get; set; }
-    public decimal? PricePerUnit { get; set; }
+    public decimal? PricePerUnitContainer { get; set; }
     public decimal? TransferFee { get; set; }
+    public decimal? ExchangeRate { get; set; }
     public decimal TotalAmount { get; set; }
 
     public long CurrencyId { get; set; }

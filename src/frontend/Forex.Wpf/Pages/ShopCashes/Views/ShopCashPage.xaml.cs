@@ -5,29 +5,35 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.ShopCashes.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
-/// <summary>
-/// Interaction logic for ShopCashPage.xaml
-/// </summary>
 public partial class ShopCashPage : Page
 {
+    private static readonly Regex NumericRegex = new(@"^[0-9]+$", RegexOptions.Compiled);
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
 
     public ShopCashPage()
     {
         InitializeComponent();
-
         DataContext = App.AppHost!.Services.GetRequiredService<PaymentPageViewModel>();
+        SetupFocusNavigation();
+    }
 
+    private void SetupFocusNavigation()
+    {
         FocusNavigator.AttachEnterNavigation(
         [
-            beginDate.dateTextBox,
-            endDate.dateTextBox,
-            btnShow
+            tbKirim,
+            tbChiqim
         ]);
+    }
 
+    private void NumericTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        e.Handled = !NumericRegex.IsMatch(e.Text);
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

@@ -22,7 +22,7 @@ public partial class SalePageViewModel : ViewModelBase
         this.client = client;
         this.mapper = mapper;
 
-        _ = LoadData();
+        _ = LoadDataAsync();
     }
 
     // 🗓 Sana
@@ -42,7 +42,7 @@ public partial class SalePageViewModel : ViewModelBase
 
     #region Load Data
 
-    private async Task LoadData()
+    private async Task LoadDataAsync()
     {
         await LoadUsersAsync();
         await LoadProductsAsync();
@@ -71,11 +71,12 @@ public partial class SalePageViewModel : ViewModelBase
         {
             Filters = new()
             {
-                ["ProductResidues"] = ["include:ProductType.Product"]
+                ["ProductType"] = ["include:Product"],
+                ["Count"] = [">0"]
             }
         };
 
-        var response = await client.Shops.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        var response = await client.ProductResidues.Filter(request).Handle(isLoading => IsLoading = isLoading);
 
         if (!response.IsSuccess)
         {
@@ -83,10 +84,9 @@ public partial class SalePageViewModel : ViewModelBase
             return;
         }
 
-        var shops = mapper.Map<ObservableCollection<ShopViewModel>>(response.Data!);
+        var productResidues = mapper.Map<ObservableCollection<ProductResidueViewModel>>(response.Data!);
 
-        var allTypes = shops
-            .SelectMany(p => p.ProductResidues).Select(pr => pr.ProductType)
+        var allTypes = productResidues.Select(pr => pr.ProductType)
             .Where(pt => pt is not null && pt.Product is not null)
             .ToList();
 
@@ -169,6 +169,8 @@ public partial class SalePageViewModel : ViewModelBase
             Clear();
         }
         else ErrorMessage = response.Message ?? "Savdoni ro'yxatga olishda xatolik!";
+
+        await LoadDataAsync();
     }
 
     private void Clear()

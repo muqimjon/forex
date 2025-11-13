@@ -1,4 +1,5 @@
 ﻿namespace Forex.Wpf.ViewModels;
+
 public sealed record ShopAccountViewModel
 {
     public long Id { get; set; }

@@ -237,16 +237,15 @@
                         <DataGridTemplateColumn Width="60" Header="">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button
-                                        Padding="6"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Click="DeleteButton_Click"
-                                        Content="🗑"
-                                        FontSize="16"
-                                        Foreground="Black"
-                                        Tag="{Binding}"
-                                        ToolTip="O'chirish" />
+                                    <Button Padding="6"
+                                            Background="Transparent"
+                                            Foreground="Black"
+                                            BorderThickness="0"
+                                            Click="DeleteButton_Click"
+                                            Content="🗑" 
+                                            FontSize="16"
+                                            Tag="{Binding}"
+                                            ToolTip="O'chirish" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

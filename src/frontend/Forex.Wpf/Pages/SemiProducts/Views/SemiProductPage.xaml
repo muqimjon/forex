@@ -348,8 +348,7 @@
                         HorizontalContentAlignment="Right"
                         Background="Transparent"
                         BorderThickness="0"
-                        FontSize="14"
-                        Text="{Binding Invoice.Currency.ExchangeRate, StringFormat={}{0:N0} so\'m}" />
+                        Text="{Binding Invoice.ExchangeRate, StringFormat={}{0:N0} so\'m}" />
                 </Border>
 
             </Grid>
