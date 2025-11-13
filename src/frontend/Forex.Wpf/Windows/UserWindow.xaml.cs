@@ -3,25 +3,30 @@
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
+using Forex.ClientService.Interfaces;
 using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Services;
+using Forex.Wpf.Pages.Sales.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-/// <summary>
-/// Interaction logic for UserWindow.xaml
-/// </summary>
 public partial class UserWindow : Window
 {
+    private long somId;
+    private readonly ForexClient client;
     public UserWindow()
     {
         InitializeComponent();
+
+        client = App.AppHost!.Services.GetRequiredService<ForexClient>();
+
         txtName.Focus();
 
-        FocusNavigator.AttachEnterNavigation(
-[
+        // Enter bosilganda navbatdagi elementga o'tish
+        FocusNavigator.AttachEnterNavigation([
             txtName,
             txtPhone,
             txtAddress,
@@ -29,23 +34,25 @@ public partial class UserWindow : Window
             txtBeginningSum2,
             txtDescription,
             btnSave
-]);
+        ]);
 
+        // Valyuta turlarini yuklash
+        _ = LoadValyutaTypeAsync();
     }
-    long somId;
-    private async void LoadValyutaType()
+
+    private async Task LoadValyutaTypeAsync()
     {
         try
         {
-
-            var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
             var valyutaTypes = await client.Currencies.GetAllAsync().Handle();
-            somId = valyutaTypes.Data!.FirstOrDefault(v =>
+
+            somId = valyutaTypes.Data?.FirstOrDefault(v =>
                 v.Symbol.Equals("UZS", StringComparison.OrdinalIgnoreCase))?.Id ?? 0;
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Valyuta turlarini yuklashda xatolik:\n" + ex.Message);
+            MessageBox.Show($"Valyuta turlarini yuklashda xatolik:\n{ex.Message}",
+                "Xatolik", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -53,7 +60,9 @@ public partial class UserWindow : Window
     {
         try
         {
-            LoadValyutaType();
+            if (somId == 0)
+                await LoadValyutaTypeAsync();
+
             // 💰 Qarzdorlik yoki haqdorlikni aniqlaymiz
             decimal balance = 0;
 
@@ -68,40 +77,41 @@ public partial class UserWindow : Window
                 balance = haq; // Haqdorlik — musbat
             }
 
-
-
             var userRequest = new UserRequest
             {
-                Name = txtName.Text,
-                Phone = txtPhone.Text,
-                Address = txtAddress.Text,
-                Description = txtDescription.Text,
+                Name = txtName.Text.Trim(),
+                Phone = txtPhone.Text.Trim(),
+                Address = txtAddress.Text.Trim(),
+                Description = txtDescription.Text.Trim(),
                 Role = UserRole.Mijoz,
                 Accounts =
-        [
-            new UserAccount
-            {
-                CurrencyId = somId,
-                OpeningBalance = balance,
-                Discount = 0
-            }
-        ]
+                [
+                    new UserAccount
+                    {
+                        CurrencyId = somId,
+                        OpeningBalance = balance,
+                        Discount = 0
+                    }
+                ]
             };
 
-            // 🧩 Global services orqali ishlaymiz
-            var response = await App.AppHost!.Services.GetRequiredService<ForexClient>().Users.Create(userRequest).Handle();
+            var response = await client.Users.Create(userRequest).Handle();
 
             if (response.IsSuccess)
             {
                 DialogResult = true;
                 Close();
             }
+            else
+            {
+                MessageBox.Show("Mijozni yaratib bo‘lmadi.", "Xatolik", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Xatolik yuz berdi: {ex.Message}", "Xatolik", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Xatolik yuz berdi: {ex.Message}",
+                "Xatolik", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-
     }
 
     private void TxtPhone_TextChanged(object sender, TextChangedEventArgs e)
@@ -118,11 +128,10 @@ public partial class UserWindow : Window
                 tb.Text = "+998 ";
             }
 
-            // Fokus paytida matn tanlanib qolmasligi uchun:
             tb.Dispatcher.BeginInvoke(new Action(() =>
             {
-                tb.SelectionStart = tb.Text.Length;   // kursorni oxiriga qo‘yish
-                tb.SelectionLength = 0;               // tanlovni olib tashlash
+                tb.SelectionStart = tb.Text.Length;
+                tb.SelectionLength = 0;
             }), System.Windows.Threading.DispatcherPriority.Input);
         }
     }
@@ -130,29 +139,25 @@ public partial class UserWindow : Window
     private void FormatPhoneNumber(TextBox textBox)
     {
         if (textBox == null) return;
+
         string text = textBox.Text?.Trim() ?? string.Empty;
         string digits = Digits().Replace(text, "");
+
         textBox.TextChanged -= TxtPhone_TextChanged;
+
         try
         {
-
             string formatted = "+998 ";
+
             if (digits.Length > 3)
-            {
                 formatted += digits.Substring(3, Math.Min(2, digits.Length - 3));
-            }
             if (digits.Length > 5)
-            {
-                formatted += string.Concat(" ", digits.AsSpan(5, Math.Min(3, digits.Length - 5)));
-            }
+                formatted += " " + digits.Substring(5, Math.Min(3, digits.Length - 5));
             if (digits.Length > 8)
-            {
-                formatted += string.Concat(" ", digits.AsSpan(8, Math.Min(2, digits.Length - 8)));
-            }
+                formatted += " " + digits.Substring(8, Math.Min(2, digits.Length - 8));
             if (digits.Length > 10)
-            {
-                formatted += string.Concat(" ", digits.AsSpan(10, Math.Min(2, digits.Length - 10)));
-            }
+                formatted += " " + digits.Substring(10, Math.Min(2, digits.Length - 10));
+
             textBox.Text = formatted.TrimEnd();
             textBox.SelectionStart = textBox.Text.Length;
         }

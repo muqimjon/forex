@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 public partial class UserPage : Page
 {
@@ -40,9 +41,9 @@ public partial class UserPage : Page
         txtPhone.GotFocus += TxtPhone_GotFocus;
         btnUpdate.Click += BtnUpdate_Click;
         tbAccount.LostFocus += TbNumeric_LostFocus;
-        tbDiscount.LostFocus += TbNumeric_LostFocus;
+        tbDebt.LostFocus += TbNumeric_LostFocus;
         tbAccount.GotFocus += TextBox_GotFocus_SelectAll;
-        tbDiscount.GotFocus += TextBox_GotFocus_SelectAll;
+        tbDebt.GotFocus += TextBox_GotFocus_SelectAll;
         dgUsers.SelectionChanged += DgUsers_SelectionChanged;
         LoadValyutaType();
         LoadUsers();
@@ -57,7 +58,7 @@ public partial class UserPage : Page
             txtAddress,
             txtDescription,
             cbxValutaType,
-            tbDiscount,
+            tbDebt,
             tbAccount,
             btnSave
         ]);
@@ -80,7 +81,7 @@ public partial class UserPage : Page
             txtPhone.Text = null;
             txtAddress.Text = "";
             txtDescription.Text = "";
-            tbDiscount.Text = "";
+            tbDebt.Text = "";
             tbAccount.Text = "";
         }
     }
@@ -124,13 +125,13 @@ public partial class UserPage : Page
 
             // Agar account fieldlari mavjud bo‘lsa
             if (decimal.TryParse(tbAccount.Text, out decimal accountBalance) &&
-                decimal.TryParse(tbDiscount.Text, out decimal discount))
+                decimal.TryParse(tbDebt.Text, out decimal discount))
             {
                 updateUser.Accounts.Add(new UserAccount
                 {
                     CurrencyId = (long)cbxValutaType.SelectedValue,
-                    OpeningBalance = accountBalance,
-                    Discount = discount
+                    OpeningBalance = GetOpeningBalance(),  // Yangi metod
+                    Discount = 0
                 });
             }
 
@@ -259,18 +260,26 @@ public partial class UserPage : Page
     {
         ApplyFilters();
 
+        // Rol tanlanmagan bo'lsa — hammasi yashirilsin
         if (cbRole.SelectedItem is not string role || string.IsNullOrWhiteSpace(role))
         {
-            brValutaType.Visibility = brDiscount.Visibility = brAccount.Visibility = btnSave.Visibility = Visibility.Collapsed;
+            brValutaType.Visibility = Visibility.Collapsed;
+            brDebt.Visibility = Visibility.Collapsed;
+            brAccount.Visibility = Visibility.Collapsed;
+            btnSave.Visibility = Visibility.Collapsed;
             return;
         }
 
-        brDiscount.Visibility = role == "Mijoz" ? Visibility.Visible : Visibility.Collapsed;
-        brAccount.Visibility = btnSave.Visibility = role == "User" ? Visibility.Collapsed : Visibility.Visible;
-        brValutaType.Visibility = role != "User" ? Visibility.Visible : Visibility.Collapsed;
+        bool isUser = role.Equals("User", StringComparison.OrdinalIgnoreCase);
+
+        // Qarzdorlik: faqat "User" bo'lmaganda ko'rinsin
+        brDebt.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
+
+        // Qolgan elementlar ham "User" bo'lmaganda ko'rinsin
+        brValutaType.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
+        brAccount.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
+        btnSave.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
     }
-
-
     private void CbRole_GotFocus(object sender, RoutedEventArgs e)
     {
         LoadUsers();
@@ -287,8 +296,6 @@ public partial class UserPage : Page
                 return;
             }
 
-
-
             var request = new UserRequest
             {
                 Name = txtName.Text.Trim(),
@@ -298,13 +305,12 @@ public partial class UserPage : Page
                 Role = role,
                 Accounts =
                 [
-                    new UserAccount
-                    {
-                        CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
-                        OpeningBalance = decimal.TryParse(tbAccount.Text, out var bal) ? bal : 0,
-                        Discount = decimal.TryParse(tbDiscount.Text, out var disc) ? disc : 0,
-
-                    }
+                   new UserAccount
+                   {
+        CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
+        OpeningBalance = GetOpeningBalance(),  // Yangi metod
+        Discount = 0  // Endi ishlatilmaydi
+                   }
                 ]
             };
 
@@ -332,7 +338,7 @@ public partial class UserPage : Page
         txtPhone.Text = "";
         txtAddress.Text = "";
         txtDescription.Text = "";
-        tbDiscount.Text = "";
+        tbDebt.Text = "";
         tbAccount.Text = "";
     }
 
@@ -447,14 +453,28 @@ public partial class UserPage : Page
         {
             var account = user.Accounts[0];
             cbxValutaType.SelectedValue = account.CurrencyId;
-            tbAccount.Text = account.Balance.ToString("N2");
-            tbDiscount.Text = account.Discount.ToString("N2");
+
+            if (account.OpeningBalance < 0)
+            {
+                tbDebt.Text = Math.Abs(account.OpeningBalance).ToString("N2");
+                tbAccount.Text = "";
+            }
+            else if (account.OpeningBalance > 0)
+            {
+                tbAccount.Text = account.OpeningBalance.ToString("N2");
+                tbDebt.Text = "";
+            }
+            else
+            {
+                tbDebt.Text = "";
+                tbAccount.Text = "";
+            }
         }
         else
         {
             cbxValutaType.SelectedIndex = 0;
-            tbAccount.Text = "0";
-            tbDiscount.Text = "0";
+            tbDebt.Text = "";
+            tbAccount.Text = "";
         }
 
         btnSave.Visibility = Visibility.Collapsed;
@@ -485,5 +505,66 @@ public partial class UserPage : Page
 
     [GeneratedRegex(@"[^\d]")]
     private static partial Regex Digits();
+
+    private void NumericTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        e.Handled = !Regex.IsMatch(e.Text, @"^[0-9.,]+$");
+    }
+
+    private void NumericTextBox_Pasting(object sender, DataObjectPastingEventArgs e)
+    {
+        if (e.DataObject.GetDataPresent(typeof(string)))
+        {
+            string text = (string)e.DataObject.GetData(typeof(string));
+            if (!Regex.IsMatch(text, @"^[0-9.,]+$"))
+                e.CancelCommand();
+        }
+        else
+        {
+            e.CancelCommand();
+        }
+    }
+
+    private void TbDebt_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace(tbDebt.Text) && tbDebt.Text.Trim() != "0" && tbDebt.Text.Trim() != "," && tbDebt.Text.Trim() != ".")
+        {
+            tbAccount.Text = "";
+        }
+    }
+
+    private void TbAccount_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!string.IsNullOrWhiteSpace(tbAccount.Text) && tbAccount.Text.Trim() != "0" && tbAccount.Text.Trim() != "," && tbAccount.Text.Trim() != ".")
+        {
+            tbDebt.Text = "";
+        }
+    }
+    private decimal GetOpeningBalance()
+    {
+        string debtText = tbDebt.Text?.Trim();
+        string accountText = tbAccount.Text?.Trim();
+
+        // 1. Qarzdorlikni tekshirish
+        if (!string.IsNullOrWhiteSpace(debtText) &&
+            decimal.TryParse(debtText,
+                out decimal debt) &&
+            debt > 0)
+        {
+            return -debt; // Qarzdorlik → minus
+        }
+
+        // 2. Haqdorlikni tekshirish
+        if (!string.IsNullOrWhiteSpace(accountText) &&
+            decimal.TryParse(accountText,
+                out decimal balance) &&
+            balance > 0)
+        {
+            return balance; // Haqdorlik → plus
+        }
+
+        // 3. Hech narsa kiritilmagan yoki 0
+        return 0;
+    }
 }
 

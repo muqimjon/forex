@@ -101,4 +101,5 @@ public partial class SalePage : Page
         return all.Data.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 
+
 }
