@@ -334,9 +334,9 @@
                         Padding="3,0"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
-                        IsEnabled="{Binding Transaction.IsIncome}"
                         BorderThickness="0"
                         FontSize="14"
+                        IsEnabled="{Binding Transaction.IsIncome}"
                         Text="{Binding Transaction.Discount, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged}"
                         TextAlignment="Right" />
                 </Border>
@@ -449,9 +449,9 @@
                     Grid.RowSpan="2"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}"
                     FontSize="14"
-                    Text="To'lash sana:" />
+                    Text="To'lash sana:"
+                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
                 <controls:UserCalendar
                     x:Name="dueDate"
                     Grid.Row="4"
@@ -459,11 +459,11 @@
                     Grid.Column="1"
                     Height="25"
                     Margin="10,0"
-                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     FontSize="14"
-                    SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay}" />
+                    SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay}"
+                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <Button
                     Grid.Row="4"

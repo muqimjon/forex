@@ -3,21 +3,26 @@
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
+using Forex.ClientService.Interfaces;
 using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Services;
+using Forex.Wpf.Pages.Sales.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Threading.Tasks;
 
 public partial class UserWindow : Window
 {
     private long somId;
-
+    private readonly ForexClient client;
     public UserWindow()
     {
         InitializeComponent();
+
+        client = App.AppHost!.Services.GetRequiredService<ForexClient>();
+
         txtName.Focus();
 
         // Enter bosilganda navbatdagi elementga o'tish
@@ -39,7 +44,6 @@ public partial class UserWindow : Window
     {
         try
         {
-            var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
             var valyutaTypes = await client.Currencies.GetAllAsync().Handle();
 
             somId = valyutaTypes.Data?.FirstOrDefault(v =>
@@ -91,7 +95,6 @@ public partial class UserWindow : Window
                 ]
             };
 
-            var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
             var response = await client.Users.Create(userRequest).Handle();
 
             if (response.IsSuccess)

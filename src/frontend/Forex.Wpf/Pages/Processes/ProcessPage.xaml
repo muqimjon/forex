@@ -1,15 +1,16 @@
-﻿<Page x:Class="Forex.Wpf.Pages.Processes.ProcessPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Forex.Wpf.Pages.Processes"
-      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
-      mc:Ignorable="d"
-      Title="ProcessPage"
-      d:DesignHeight="450"
-      d:DesignWidth="800">
+﻿<Page
+    x:Class="Forex.Wpf.Pages.Processes.ProcessPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Forex.Wpf.Pages.Processes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="ProcessPage"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
 
     <Page.Resources>
         <Style x:Key="TransparentCellStyle" TargetType="DataGridCell">
@@ -23,7 +24,7 @@
 
         <Style x:Key="RightAlignedText" TargetType="TextBlock">
             <Setter Property="TextAlignment" Value="Right" />
-            <Setter Property="Margin" Value="0 0 5 0" />
+            <Setter Property="Margin" Value="0,0,5,0" />
         </Style>
 
         <Style x:Key="ProductNameComboBoxStyle" TargetType="ComboBox">
@@ -48,7 +49,7 @@
             <Setter Property="Foreground" Value="Black" />
         </Style>
 
-        <!-- 🎯 Miqdori uchun TextBox style -->
+        <!--  🎯 Miqdori uchun TextBox style  -->
         <Style x:Key="QuantityTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontSize" Value="15" />
             <Setter Property="Foreground" Value="Black" />
@@ -66,37 +67,40 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- 🔙 Back Button -->
+        <!--  🔙 Back Button  -->
         <DockPanel Grid.Row="0" LastChildFill="False">
-            <Label Content="Ishlab chiqarish jarayoni oynasi"
-                   FontSize="18"
-                   FontWeight="Bold"
-                   Foreground="{StaticResource SecondaryTextColor}" />
-            <Button x:Name="btnBack"
-                    Padding="8 0"
-                    Margin="5 0 10 0"
-                    md:ButtonAssist.CornerRadius="4"
-                    md:ElevationAssist.Elevation="Dp24"
-                    Background="{DynamicResource BackButtonBackground}"
-                    BorderBrush="{StaticResource BackButtonBorder}"
-                    Click="BtnBack_Click"
-                    Content="🔙 Orqaga"
-                    DockPanel.Dock="Right"
-                    Foreground="{StaticResource BackButtonForeground}" />
+            <Label
+                Content="Ishlab chiqarish jarayoni oynasi"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="{StaticResource SecondaryTextColor}" />
+            <Button
+                x:Name="btnBack"
+                Margin="5,0,10,0"
+                Padding="8,0"
+                md:ButtonAssist.CornerRadius="4"
+                md:ElevationAssist.Elevation="Dp24"
+                Background="{DynamicResource BackButtonBackground}"
+                BorderBrush="{StaticResource BackButtonBorder}"
+                Click="BtnBack_Click"
+                Content="🔙 Orqaga"
+                DockPanel.Dock="Right"
+                Foreground="{StaticResource BackButtonForeground}" />
         </DockPanel>
 
-        <!-- 📋 DataGrid -->
-        <DataGrid Grid.Row="1"
-                  Margin="10"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="True"
-                  BorderThickness="2"
-                  HeadersVisibility="Column"
-                  ItemsSource="{Binding EntryToProcessByProduct}"
-                  RowHeight="50"
-                  CellStyle="{StaticResource TransparentCellStyle}"
-                  VirtualizingPanel.IsVirtualizing="True"
-                  VirtualizingPanel.VirtualizationMode="Recycling">
+        <!--  📋 DataGrid  -->
+        <DataGrid
+            Grid.Row="1"
+            Margin="10"
+            AutoGenerateColumns="False"
+            BorderThickness="2"
+            CanUserAddRows="True"
+            CellStyle="{StaticResource TransparentCellStyle}"
+            HeadersVisibility="Column"
+            ItemsSource="{Binding EntryToProcessByProduct}"
+            RowHeight="50"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.VirtualizationMode="Recycling">
 
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
@@ -111,30 +115,36 @@
                 <DataGridTemplateColumn Width="100" Header="Rasm">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image Width="80"
-                                   Height="80"
-                                   Source="{Binding Product.Image, Converter={StaticResource ImageFallbackConverter}}" />
+                            <Image
+                                Width="80"
+                                Height="80"
+                                Source="{Binding Product.Image, Converter={StaticResource ImageFallbackConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridComboBoxColumn Width="0.8*" Header="Kod"
-                                        SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        ElementStyle="{StaticResource ProductCodeComboBoxStyle}"
-                                        EditingElementStyle="{StaticResource ProductCodeComboBoxStyle}" />
+                <DataGridComboBoxColumn
+                    Width="0.8*"
+                    EditingElementStyle="{StaticResource ProductCodeComboBoxStyle}"
+                    ElementStyle="{StaticResource ProductCodeComboBoxStyle}"
+                    Header="Kod"
+                    SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <DataGridComboBoxColumn Width="1.5*" Header="Nomi"
-                                        SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        ElementStyle="{StaticResource ProductNameComboBoxStyle}"
-                                        EditingElementStyle="{StaticResource ProductNameComboBoxStyle}" />
+                <DataGridComboBoxColumn
+                    Width="1.5*"
+                    EditingElementStyle="{StaticResource ProductNameComboBoxStyle}"
+                    ElementStyle="{StaticResource ProductNameComboBoxStyle}"
+                    Header="Nomi"
+                    SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <DataGridTemplateColumn Width="*" Header="O'lcham">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding Product.ProductTypes}"
-                                      SelectedItem="{Binding Product.SelectedType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      DisplayMemberPath="Type"
-                                      Style="{StaticResource ProductNameComboBoxStyle}" />
+                            <ComboBox
+                                DisplayMemberPath="Type"
+                                ItemsSource="{Binding Product.ProductTypes}"
+                                SelectedItem="{Binding Product.SelectedType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource ProductNameComboBoxStyle}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -142,34 +152,31 @@
                 <DataGridTemplateColumn Width="*" Header="Miqdori">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBox x:Name="tbcQuantity"
-                                     Text="{Binding Count,
-                                     Mode=TwoWay,
-                                     UpdateSourceTrigger=PropertyChanged,
-                                     StringFormat={}{0:N0},
-                                     TargetNullValue=0,
-                                     FallbackValue=0}"
-                                     GotFocus="QuantityTextBox_GotFocus"
-                                     Style="{StaticResource QuantityTextBoxStyle}" />
+                            <TextBox
+                                x:Name="tbcQuantity"
+                                GotFocus="QuantityTextBox_GotFocus"
+                                Style="{StaticResource QuantityTextBoxStyle}"
+                                Text="{Binding Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}, TargetNullValue=0, FallbackValue=0}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- ✅ Submit Button -->
-        <Button Grid.Row="2"
-                Margin="5 0 10 0"
-                Height="28"
-                Width="120"
-                md:ButtonAssist.CornerRadius="4"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Right"
-                md:ElevationAssist.Elevation="Dp24"
-                Background="{StaticResource SuccessButtonBackground}"
-                BorderBrush="{StaticResource SuccessButtonBorder}"
-                Command="{Binding SubmitCommand}"
-                Content="Yuborish"
-                Foreground="{StaticResource SuccessButtonForeground}" />
+        <!--  ✅ Submit Button  -->
+        <Button
+            Grid.Row="2"
+            Width="120"
+            Height="28"
+            Margin="5,0,10,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            md:ButtonAssist.CornerRadius="4"
+            md:ElevationAssist.Elevation="Dp24"
+            Background="{StaticResource SuccessButtonBackground}"
+            BorderBrush="{StaticResource SuccessButtonBorder}"
+            Command="{Binding SubmitCommand}"
+            Content="Yuborish"
+            Foreground="{StaticResource SuccessButtonForeground}" />
     </Grid>
 </Page>
