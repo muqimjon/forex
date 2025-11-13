@@ -228,7 +228,7 @@
                                             Foreground="Black"
                                             BorderThickness="0"
                                             Click="DeleteButton_Click"
-                                            Content="🗑"
+                                            Content="🗑" 
                                             FontSize="16"
                                             Tag="{Binding}"
                                             ToolTip="O'chirish" />

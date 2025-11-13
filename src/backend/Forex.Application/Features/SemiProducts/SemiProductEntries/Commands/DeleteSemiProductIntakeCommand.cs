@@ -80,7 +80,7 @@ public class DeleteSemiProductIntakeCommandHandler(
                 .FirstOrDefaultAsync(u => u.Id == invoice.SenderId, ct)
                 ?? throw new NotFoundException(nameof(User), nameof(invoice.SenderId), invoice.SenderId!);
 
-            var senderAccount = sender.Accounts.FirstOrDefault(a => a.CurrencyId == invoice.CurrencyId)
+            var senderAccount = sender.Accounts.FirstOrDefault()
                 ?? throw new ForbiddenException("Vositachi hisob topilmadi.");
 
             if (senderAccount.Balance < invoice.TransferFee)
@@ -120,7 +120,7 @@ public class DeleteSemiProductIntakeCommandHandler(
                 .Include(u => u.Accounts)
                 .FirstOrDefaultAsync(u => u.Id == invoice.SenderId, ct);
 
-            var senderAccount = sender!.Accounts.First(a => a.CurrencyId == invoice.CurrencyId);
+            var senderAccount = sender!.Accounts.First();
             senderAccount.Balance -= (decimal)invoice.TransferFee!;
         }
 

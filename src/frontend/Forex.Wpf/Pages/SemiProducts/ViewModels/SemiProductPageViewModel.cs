@@ -296,7 +296,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private void InvoicePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Invoice.ViaMiddleman))
-            Invoice.Currency = AvailableCurrencies.FirstOrDefault(c => c.Code.ToUpperInvariant() == "USD");
+            Invoice.Currency = AvailableCurrencies.FirstOrDefault(c => c.Code.Equals("USD", StringComparison.InvariantCultureIgnoreCase))!;
     }
 
     #endregion

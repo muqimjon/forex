@@ -13,8 +13,8 @@ using System.Collections.ObjectModel;
 
 public partial class PaymentPageViewModel : ViewModelBase
 {
-    public ForexClient client;
-    public IMapper mapper;
+    private readonly ForexClient client;
+    private readonly IMapper mapper;
 
     public PaymentPageViewModel(ForexClient client, IMapper mapper)
     {
@@ -25,35 +25,32 @@ public partial class PaymentPageViewModel : ViewModelBase
     }
 
     [ObservableProperty] private ObservableCollection<TransactionViewModel> transactions = [];
-
-
     [ObservableProperty] private ObservableCollection<UserViewModel> availableUsers = [];
     [ObservableProperty] private ObservableCollection<CurrencyViewModel> availableCurrencies = [];
     [ObservableProperty] private ObservableCollection<ShopAccountViewModel> availableShopAccounts = [];
-    public static IEnumerable<PaymentMethod> AvailablePaymentMethods => Enum.GetValues<PaymentMethod>().Cast<PaymentMethod>();
-
     [ObservableProperty] private TransactionViewModel transaction = new();
 
+    public static IEnumerable<PaymentMethod> AvailablePaymentMethods => Enum.GetValues<PaymentMethod>();
 
     #region Load Data
 
     private async Task LoadDataAsync()
     {
-        await LoadShopCashes();
-        await LoadUsersAsync();
-        await LoadCurrenciesAsync();
-        await LoadTransactionsAsync();
+        await Task.WhenAll(
+            LoadShopCashes(),
+            LoadUsersAsync(),
+            LoadCurrenciesAsync(),
+            LoadTransactionsAsync()
+        );
     }
 
     private async Task LoadTransactionsAsync()
     {
         var response = await client.Transactions.GetAll().Handle(isLoading => IsLoading = isLoading);
+
         if (response.IsSuccess)
         {
-            var ordered = response.Data
-                .OrderByDescending(t => t.Date)
-                .ToList();
-
+            var ordered = response.Data.OrderByDescending(t => t.Date).ToList();
             Transactions = mapper.Map<ObservableCollection<TransactionViewModel>>(ordered);
         }
         else
@@ -65,9 +62,16 @@ public partial class PaymentPageViewModel : ViewModelBase
     private async Task LoadShopCashes()
     {
         var response = await client.Shops.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
+
         if (response.IsSuccess)
-            AvailableShopAccounts = mapper.Map<ObservableCollection<ShopAccountViewModel>>(response.Data.SelectMany(sh => sh.ShopAccounts));
-        else WarningMessage = response.Message ?? "Do'kon kassalarini yuklashda xatolik.";
+        {
+            var accounts = response.Data.SelectMany(sh => sh.ShopAccounts);
+            AvailableShopAccounts = mapper.Map<ObservableCollection<ShopAccountViewModel>>(accounts);
+        }
+        else
+        {
+            WarningMessage = response.Message ?? "Do'kon kassalarini yuklashda xatolik.";
+        }
     }
 
     private async Task LoadCurrenciesAsync()
@@ -79,7 +83,10 @@ public partial class PaymentPageViewModel : ViewModelBase
             AvailableCurrencies = mapper.Map<ObservableCollection<CurrencyViewModel>>(response.Data);
             Transaction.Currency = AvailableCurrencies.FirstOrDefault(c => c.IsDefault)!;
         }
-        else WarningMessage = response.Message ?? "Valyuta turlarini yuklashda xatolik.";
+        else
+        {
+            WarningMessage = response.Message ?? "Valyuta turlarini yuklashda xatolik.";
+        }
     }
 
     private async Task LoadUsersAsync()
@@ -87,22 +94,24 @@ public partial class PaymentPageViewModel : ViewModelBase
         var response = await client.Users.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
+        {
             AvailableUsers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data);
-        else WarningMessage = response.Message ?? "Foydalanuvchilarni yuklashda xatolik.";
+        }
+        else
+        {
+            WarningMessage = response.Message ?? "Foydalanuvchilarni yuklashda xatolik.";
+        }
     }
 
-    #endregion Load Data
+    #endregion
 
     #region Commands
 
     [RelayCommand]
     private async Task Submit()
     {
-        if (Transaction.TotalAmountWithUserBalance < 0 && Transaction.DueDate is null || Transaction.DueDate < DateTime.Now)
-        {
-            WarningMessage = "To'lov muddati kiritilmagan yoki noto'g'ri formatda!";
+        if (!ValidateTransaction())
             return;
-        }
 
         var request = mapper.Map<TransactionRequest>(Transaction);
         var response = await client.Transactions.CreateAsync(request).Handle(isLoading => IsLoading = isLoading);
@@ -113,8 +122,23 @@ public partial class PaymentPageViewModel : ViewModelBase
             Transaction = new();
             await LoadDataAsync();
         }
-        else WarningMessage = response.Message ?? "To'lovni amalga oshirishda xatolik yuz berdi.";
-
-        #endregion Commands
+        else
+        {
+            WarningMessage = response.Message ?? "To'lovni amalga oshirishda xatolik yuz berdi.";
+        }
     }
+
+    private bool ValidateTransaction()
+    {
+        if (Transaction.TotalAmountWithUserBalance < 0 &&
+            (!Transaction.DueDate.HasValue || Transaction.DueDate < DateTime.Now))
+        {
+            WarningMessage = "To'lov muddati kiritilmagan yoki noto'g'ri formatda!";
+            return false;
+        }
+
+        return true;
+    }
+
+    #endregion
 }
