@@ -112,25 +112,29 @@ public partial class UserCalendar : UserControl
                 SelectedDate = null;
                 return;
             }
+
             if (!IsValidDateFormat(textBox.Text))
             {
                 MessageBox.Show("Неверный формат даты. Используйте формат dd.MM.yyyy.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                e.Handled = true; // Предотвращаем потерю фокуса
+                e.Handled = true;
+                return;
+            }
+
+            var parts = textBox.Text.Split('.');
+            if (parts.Length == 3 && parts[2].Length == 2)
+            {
+                parts[2] = "20" + parts[2];
+                textBox.Text = string.Join(".", parts);
+            }
+
+            if (!DateTime.TryParseExact(textBox.Text, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+            {
+                MessageBox.Show("Неверная дата. Пожалуйста, введите корректную дату.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                e.Handled = true;
             }
             else
             {
-                var parts = textBox.Text.Split('.');
-                if (parts.Length == 3 && parts[2].Length == 2)
-                {
-                    parts[2] = "20" + parts[2];
-                    textBox.Text = string.Join(".", parts);
-                }
-
-                if (!DateTime.TryParseExact(textBox.Text, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.None, out _))
-                {
-                    MessageBox.Show("Неверная дата. Пожалуйста, введите корректную дату.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    e.Handled = true; // Предотвращаем потерю фокуса
-                }
+                SelectedDate = parsedDate;
             }
         }
     }
