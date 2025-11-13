@@ -2,9 +2,9 @@
     x:Class="Forex.Wpf.Windows.UserWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:Forex.Wpf.Resources.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Forex.Wpf.Windows"
-    xmlns:conv="clr-namespace:Forex.Wpf.Resources.Converters"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Yangi mijoz qo'shish oynasi"
     Width="400"
@@ -15,7 +15,7 @@
     WindowStyle="SingleBorderWindow"
     mc:Ignorable="d">
 
-    <!-- ✅ Converter qo‘shildi -->
+    <!--  ✅ Converter qo‘shildi  -->
     <Window.Resources>
         <conv:BoolToVisibilityConverter x:Key="BooleanToVisibility" />
     </Window.Resources>
