@@ -30,18 +30,16 @@ public partial class TransactionViewModel : ViewModelBase
     [ObservableProperty] private decimal? expense;
     [ObservableProperty] private bool isExpense;
     [ObservableProperty] private decimal? totalAmountWithUserBalance;
+    [ObservableProperty] private decimal? netAmount;
 
     #region Property Changes
 
     partial void OnAmountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
-
     partial void OnDiscountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
-
     partial void OnCurrencyChanged(CurrencyViewModel value) => ExchangeRate = value?.ExchangeRate;
-
     partial void OnExchangeRateChanged(decimal? value) => RecalculateAmount();
-
     partial void OnUserChanged(UserViewModel value) => RecalculateTotalAmountWithUserBalance();
+    partial void OnAmountChanging(decimal? value) => ReCalculateNetAmount();
 
     partial void OnExpenseChanged(decimal? value)
     {
@@ -79,9 +77,9 @@ public partial class TransactionViewModel : ViewModelBase
     private void RecalculateAmount()
     {
         if (IsIncome)
-            Amount = (Income ?? 0) * (ExchangeRate ?? 0);
+            Amount = Income;
         else
-            Amount = -(Expense ?? 0) * (ExchangeRate ?? 0);
+            Amount = -Expense;
 
         RecalculateTotalAmountWithUserBalance();
     }
@@ -95,10 +93,12 @@ public partial class TransactionViewModel : ViewModelBase
             return;
         }
 
-        var total = User.Balance + (Amount ?? 0) + (Discount ?? 0);
+        var total = User.Balance + (NetAmount ?? 0) + (Discount ?? 0);
         TotalAmountWithUserBalance = total;
         IsDebtor = total < 0;
     }
+
+    private void ReCalculateNetAmount() => NetAmount = Amount * ExchangeRate;
 
     #endregion
 }
