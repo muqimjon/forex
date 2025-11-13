@@ -25,8 +25,10 @@ public partial class SemiProductPageViewModel : ViewModelBase
         this.services = services;
         this.mapper = mapper;
 
-        Products = [new()];
-        AttachProducts(Products);
+        Products = new ObservableCollection<ProductViewModel>();
+        Products.CollectionChanged += Products_CollectionChanged;
+        AddNewProduct(); // Birinchi default product qo'shamiz
+
         Invoice.PropertyChanged += InvoicePropertyChanged;
 
         _ = LoadDataAsync();
@@ -43,9 +45,11 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     private async Task LoadDataAsync()
     {
-        await LoadUnitMeasures();
-        await LoadUsersAsync();
-        await LoadCurrenciesAsync();
+        await Task.WhenAll(
+            LoadUnitMeasures(),
+            LoadUsersAsync(),
+            LoadCurrenciesAsync()
+        );
     }
 
     private async Task LoadCurrenciesAsync()
@@ -58,7 +62,10 @@ public partial class SemiProductPageViewModel : ViewModelBase
             AvailableCurrencies = mapper.Map<ObservableCollection<CurrencyViewModel>>(response.Data);
             Invoice.Currency = AvailableCurrencies.FirstOrDefault()!;
         }
-        else ErrorMessage = response.Message ?? "Valyuta turlarini yuklashda xatolik";
+        else
+        {
+            ErrorMessage = response.Message ?? "Valyuta turlarini yuklashda xatolik";
+        }
     }
 
     private async Task LoadUnitMeasures()
@@ -67,13 +74,18 @@ public partial class SemiProductPageViewModel : ViewModelBase
         var response = await client.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
+        {
             AvailableUnitMeasures = mapper.Map<ObservableCollection<UnitMeasuerViewModel>>(response.Data);
-        else ErrorMessage = response.Message ?? "O'lchov birliklarini yuklashda xatolik";
+        }
+        else
+        {
+            ErrorMessage = response.Message ?? "O'lchov birliklarini yuklashda xatolik";
+        }
     }
 
     private async Task LoadUsersAsync()
     {
-        FilteringRequest request = new()
+        var request = new FilteringRequest
         {
             Filters = new()
             {
@@ -90,10 +102,107 @@ public partial class SemiProductPageViewModel : ViewModelBase
             return;
         }
 
-        AvailableSuppliers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Taminotchi));
-        AvailableAgents = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!.Where(u => u.Role == UserRole.Vositachi));
+        var suppliers = response.Data!.Where(u => u.Role == UserRole.Taminotchi);
+        var agents = response.Data!.Where(u => u.Role == UserRole.Vositachi);
+
+        AvailableSuppliers = mapper.Map<ObservableCollection<UserViewModel>>(suppliers);
+        AvailableAgents = mapper.Map<ObservableCollection<UserViewModel>>(agents);
 
         Invoice.Supplier = AvailableSuppliers.FirstOrDefault() ?? new();
+    }
+
+    #endregion
+
+    #region Product Management
+
+    [RelayCommand]
+    private void AddNewProduct()
+    {
+        var product = new ProductViewModel();
+        product.PropertyChanged += Product_PropertyChanged;
+        product.ProductTypes.CollectionChanged += (s, e) => HandleProductTypesChanged(product, e);
+
+        // Birinchi default type qo'shamiz
+        AddNewProductType(product);
+
+        Products.Add(product);
+    }
+
+    [RelayCommand]
+    private void RemoveProduct(ProductViewModel product)
+    {
+        if (Products.Count <= 1)
+        {
+            WarningMessage = "Kamida bitta mahsulot bo'lishi kerak!";
+            return;
+        }
+
+        DetachProduct(product);
+        Products.Remove(product);
+    }
+
+    [RelayCommand]
+    private void AddNewProductType(ProductViewModel product)
+    {
+        var productType = new ProductTypeViewModel();
+        productType.ProductTypeItems.CollectionChanged += (s, e) => HandleProductTypeItemsChanged(productType, e);
+
+        // Birinchi default item qo'shamiz
+        AddNewProductTypeItem(productType);
+
+        product.ProductTypes.Add(productType);
+    }
+
+    [RelayCommand]
+    private void RemoveProductType(object[] parameters)
+    {
+        if (parameters?.Length != 2) return;
+
+        var product = parameters[0] as ProductViewModel;
+        var productType = parameters[1] as ProductTypeViewModel;
+
+        if (product == null || productType == null) return;
+
+        if (product.ProductTypes.Count <= 1)
+        {
+            WarningMessage = "Kamida bitta o'lcham bo'lishi kerak!";
+            return;
+        }
+
+        DetachProductType(productType);
+        product.ProductTypes.Remove(productType);
+    }
+
+    [RelayCommand]
+    private void AddNewProductTypeItem(ProductTypeViewModel productType)
+    {
+        var item = new ProductTypeItemViewModel
+        {
+            SemiProduct = new SemiProductViewModel()
+        };
+        item.SemiProduct.PropertyChanged += SemiProduct_PropertyChanged;
+
+        productType.ProductTypeItems.Add(item);
+    }
+
+    [RelayCommand]
+    private void RemoveProductTypeItem(object[] parameters)
+    {
+        if (parameters?.Length != 2) return;
+
+        var productType = parameters[0] as ProductTypeViewModel;
+        var item = parameters[1] as ProductTypeItemViewModel;
+
+        if (productType == null || item == null) return;
+
+        if (productType.ProductTypeItems.Count <= 1)
+        {
+            WarningMessage = "Kamida bitta element bo'lishi kerak!";
+            return;
+        }
+
+        DetachSemiProduct(item.SemiProduct);
+        productType.ProductTypeItems.Remove(item);
     }
 
     #endregion
@@ -103,11 +212,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
     [RelayCommand]
     private async Task SubmitAsync()
     {
-        if (Products.Count == 0)
-        {
-            ErrorMessage = "Hech qanday yarim tayyor mahsulot kiritilmadi.";
+        if (!ValidateProducts())
             return;
-        }
 
         var requestObject = new SemiProductIntakeRequest
         {
@@ -123,7 +229,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
             WarningMessage = "Default valyuta tanlanmagan";
             return;
         }
-        else if (!currency.Code.Equals("UZS", StringComparison.InvariantCultureIgnoreCase))
+
+        if (!currency.Code.Equals("UZS", StringComparison.InvariantCultureIgnoreCase))
         {
             WarningMessage = "Default valyuta UZS emas";
             return;
@@ -137,111 +244,218 @@ public partial class SemiProductPageViewModel : ViewModelBase
         if (response.IsSuccess)
         {
             SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
-            Products.Clear();
+            ResetForm();
         }
-        else ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
+        else
+        {
+            ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
+        }
+    }
+
+    private bool ValidateProducts()
+    {
+        var validProducts = Products.Where(p => !string.IsNullOrWhiteSpace(p.Name)).ToList();
+
+        if (validProducts.Count == 0)
+        {
+            ErrorMessage = "Hech qanday yarim tayyor mahsulot kiritilmadi.";
+            return false;
+        }
+
+        return true;
+    }
+
+    private void ResetForm()
+    {
+        foreach (var product in Products.ToList())
+        {
+            DetachProduct(product);
+        }
+
+        Products.Clear();
+        Invoice = new InvoiceViewModel();
+        Invoice.PropertyChanged += InvoicePropertyChanged;
+
+        AddNewProduct();
     }
 
     #endregion
 
-    #region Total Calculation
-
-    partial void OnProductsChanged(ObservableCollection<ProductViewModel> value)
-    {
-        AttachProducts(value);
-    }
-
-    private void AttachProducts(ObservableCollection<ProductViewModel> collection)
-    {
-        collection.CollectionChanged += Products_CollectionChanged;
-
-        foreach (var product in collection)
-            AttachProduct(product);
-    }
+    #region Event Handlers
 
     private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.NewItems is not null)
+        if (e.NewItems != null)
         {
             foreach (ProductViewModel product in e.NewItems)
-                AttachProduct(product);
+            {
+                product.PropertyChanged += Product_PropertyChanged;
+            }
         }
 
-        if (e.OldItems is not null)
+        UpdateInvoiceTotal();
+        CheckAndAddNewProduct();
+    }
+
+    private void HandleProductTypesChanged(ProductViewModel product, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
         {
-            foreach (ProductViewModel product in e.OldItems)
-                DetachProduct(product);
+            foreach (ProductTypeViewModel type in e.NewItems)
+            {
+                AttachProductType(type);
+            }
+        }
+
+        UpdateInvoiceTotal();
+        CheckAndAddNewProductType(product);
+    }
+
+    private void HandleProductTypeItemsChanged(ProductTypeViewModel productType, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (ProductTypeItemViewModel item in e.NewItems)
+            {
+                AttachSemiProduct(item.SemiProduct);
+            }
+        }
+
+        UpdateInvoiceTotal();
+        CheckAndAddNewProductTypeItem(productType);
+    }
+
+    private void Product_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ProductViewModel.Name) ||
+            e.PropertyName == nameof(ProductViewModel.Code))
+        {
+            CheckAndAddNewProduct();
         }
 
         UpdateInvoiceTotal();
     }
 
+    private void SemiProduct_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(SemiProductViewModel.Quantity) or
+            nameof(SemiProductViewModel.CostPrice))
+        {
+            var semi = sender as SemiProductViewModel;
+            if (semi != null)
+            {
+                CheckAndAddNewProductTypeItemForSemi(semi);
+            }
+
+            UpdateInvoiceTotal();
+        }
+    }
+
+    private void InvoicePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Invoice.ViaMiddleman))
+        {
+            var usdCurrency = AvailableCurrencies.FirstOrDefault(c =>
+                c.Code.Equals("USD", StringComparison.InvariantCultureIgnoreCase));
+
+            if (usdCurrency != null)
+            {
+                Invoice.Currency = usdCurrency;
+            }
+        }
+    }
+
+    #endregion
+
+    #region Auto Add Logic
+
+    private void CheckAndAddNewProduct()
+    {
+        var lastProduct = Products.LastOrDefault();
+        if (lastProduct != null && !string.IsNullOrWhiteSpace(lastProduct.Name))
+        {
+            AddNewProduct();
+        }
+    }
+
+    private void CheckAndAddNewProductType(ProductViewModel product)
+    {
+        var lastType = product.ProductTypes.LastOrDefault();
+        if (lastType != null && !string.IsNullOrWhiteSpace(lastType.Type))
+        {
+            AddNewProductType(product);
+        }
+    }
+
+    private void CheckAndAddNewProductTypeItem(ProductTypeViewModel productType)
+    {
+        var lastItem = productType.ProductTypeItems.LastOrDefault();
+        if (lastItem?.SemiProduct != null &&
+            lastItem.SemiProduct.Quantity > 0 &&
+            lastItem.SemiProduct.CostPrice > 0)
+        {
+            AddNewProductTypeItem(productType);
+        }
+    }
+
+    private void CheckAndAddNewProductTypeItemForSemi(SemiProductViewModel semi)
+    {
+        foreach (var product in Products)
+        {
+            foreach (var productType in product.ProductTypes)
+            {
+                var item = productType.ProductTypeItems.FirstOrDefault(i => i.SemiProduct == semi);
+                if (item != null && semi.Quantity > 0 && semi.CostPrice > 0)
+                {
+                    var lastItem = productType.ProductTypeItems.LastOrDefault();
+                    if (lastItem == item)
+                    {
+                        AddNewProductTypeItem(productType);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Attach/Detach
+
     private void AttachProduct(ProductViewModel product)
     {
         product.PropertyChanged += Product_PropertyChanged;
-        product.ProductTypes.CollectionChanged += ProductTypes_CollectionChanged;
 
         foreach (var type in product.ProductTypes)
+        {
             AttachProductType(type);
+        }
     }
 
     private void DetachProduct(ProductViewModel product)
     {
         product.PropertyChanged -= Product_PropertyChanged;
-        product.ProductTypes.CollectionChanged -= ProductTypes_CollectionChanged;
 
-        foreach (var type in product.ProductTypes)
+        foreach (var type in product.ProductTypes.ToList())
+        {
             DetachProductType(type);
-    }
-
-    private void ProductTypes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.NewItems is not null)
-        {
-            foreach (ProductTypeViewModel type in e.NewItems)
-                AttachProductType(type);
         }
-
-        if (e.OldItems is not null)
-        {
-            foreach (ProductTypeViewModel type in e.OldItems)
-                DetachProductType(type);
-        }
-
-        UpdateInvoiceTotal();
     }
 
     private void AttachProductType(ProductTypeViewModel type)
     {
-        type.ProductTypeItems.CollectionChanged += ProductTypeItems_CollectionChanged;
-
         foreach (var item in type.ProductTypeItems)
+        {
             AttachSemiProduct(item.SemiProduct);
+        }
     }
 
     private void DetachProductType(ProductTypeViewModel type)
     {
-        type.ProductTypeItems.CollectionChanged -= ProductTypeItems_CollectionChanged;
-
-        foreach (var item in type.ProductTypeItems)
+        foreach (var item in type.ProductTypeItems.ToList())
+        {
             DetachSemiProduct(item.SemiProduct);
-    }
-
-    private void ProductTypeItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.NewItems is not null)
-        {
-            foreach (ProductTypeItemViewModel item in e.NewItems)
-                AttachSemiProduct(item.SemiProduct);
         }
-
-        if (e.OldItems is not null)
-        {
-            foreach (ProductTypeItemViewModel item in e.OldItems)
-                DetachSemiProduct(item.SemiProduct);
-        }
-
-        UpdateInvoiceTotal();
     }
 
     private void AttachSemiProduct(SemiProductViewModel semi)
@@ -254,49 +468,18 @@ public partial class SemiProductPageViewModel : ViewModelBase
         semi.PropertyChanged -= SemiProduct_PropertyChanged;
     }
 
-    private void Product_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(ProductViewModel.ProductTypes))
-        {
-            var product = sender as ProductViewModel;
-            if (product is not null)
-            {
-                product.ProductTypes.CollectionChanged += ProductTypes_CollectionChanged;
-                foreach (var type in product.ProductTypes)
-                    AttachProductType(type);
-            }
-        }
+    #endregion
 
-        UpdateInvoiceTotal();
-    }
-
-    private void SemiProduct_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(SemiProductViewModel.Quantity)
-            or nameof(SemiProductViewModel.CostPrice)
-            or nameof(SemiProductViewModel.TotalAmount))
-        {
-            UpdateInvoiceTotal();
-        }
-    }
+    #region Total Calculation
 
     private void UpdateInvoiceTotal()
     {
-        Invoice.CostPrice = Products?.Sum(p =>
-            p.ProductTypes?.Sum(t =>
-                t.ProductTypeItems?.Sum(i => i.SemiProduct.TotalAmount)
-            ) ?? 0
-        ) ?? 0;
-    }
-
-    #endregion
-
-    #region Property Changes
-
-    private void InvoicePropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(Invoice.ViaMiddleman))
-            Invoice.Currency = AvailableCurrencies.FirstOrDefault(c => c.Code.Equals("USD", StringComparison.InvariantCultureIgnoreCase))!;
+        Invoice.CostPrice = Products?
+            .Where(p => !string.IsNullOrWhiteSpace(p.Name))
+            .Sum(p => p.ProductTypes?
+                .Where(t => !string.IsNullOrWhiteSpace(t.Type))
+                .Sum(t => t.ProductTypeItems?
+                    .Sum(i => i.SemiProduct?.TotalAmount ?? 0) ?? 0) ?? 0) ?? 0;
     }
 
     #endregion
