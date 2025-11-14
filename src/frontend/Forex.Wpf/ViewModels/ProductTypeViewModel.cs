@@ -7,11 +7,6 @@ using System.Collections.ObjectModel;
 
 public partial class ProductTypeViewModel : ViewModelBase
 {
-    public ProductTypeViewModel()
-    {
-        ProductTypeItems = [new()];
-    }
-
     public long Id { get; set; }
     public long ProductId { get; set; }
     [ObservableProperty] private string type = string.Empty;

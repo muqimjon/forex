@@ -228,7 +228,7 @@
                                         <Button Grid.Column="7" Style="{StaticResource DeleteButtonStyle}"
                                                 Content="×" ToolTip="Mahsulotni o'chirish"
                                                 VerticalAlignment="Top"
-                                                Command="{Binding DataContext.RemoveProductCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                Command="{Binding DataContext.RemoveProductCommand, ElementName=RootPage}"
                                                 CommandParameter="{Binding}"/>
                                     </Grid>
 
@@ -261,13 +261,11 @@
 
                                                             <!-- Delete Type Button -->
                                                             <Button Grid.Column="3" Style="{StaticResource DeleteButtonStyle}"
-                                                                    Content="×" ToolTip="O'lchamni o'chirish" Margin="5">
-                                                                <Button.Command>
-                                                                    <Binding Path="DataContext.RemoveProductTypeCommand" RelativeSource="{RelativeSource AncestorType=Page}"/>
-                                                                </Button.Command>
+                                                                    Content="×" ToolTip="O'lchamni o'chirish" Margin="5"
+                                                                    Command="{Binding DataContext.RemoveProductTypeCommand, ElementName=RootPage}">
                                                                 <Button.CommandParameter>
                                                                     <MultiBinding Converter="{StaticResource ArrayMultiValueConverter}">
-                                                                        <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" Path="DataContext"/>
+                                                                        <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=Border, AncestorLevel=2}"/>
                                                                         <Binding/>
                                                                     </MultiBinding>
                                                                 </Button.CommandParameter>
@@ -297,7 +295,7 @@
                                                                         <!-- Unit Measure -->
                                                                         <ComboBox Grid.Column="1" Margin="2" Height="28" FontSize="14"
                                                                                   DisplayMemberPath="Name"
-                                                                                  ItemsSource="{Binding DataContext.AvailableUnitMeasures, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                                  ItemsSource="{Binding DataContext.AvailableUnitMeasures, ElementName=RootPage}"
                                                                                   SelectedItem="{Binding SemiProduct.UnitMeasure}"
                                                                                   ToolTip="O'lchov birligi" />
 
@@ -316,13 +314,11 @@
 
                                                                         <!-- Delete Item Button -->
                                                                         <Button Grid.Column="5" Style="{StaticResource DeleteButtonStyle}"
-                                                                                Content="×" ToolTip="Elementni o'chirish" Margin="2">
-                                                                            <Button.Command>
-                                                                                <Binding Path="DataContext.RemoveProductTypeItemCommand" RelativeSource="{RelativeSource AncestorType=Page}"/>
-                                                                            </Button.Command>
+                                                                                Content="×" ToolTip="Elementni o'chirish" Margin="2"
+                                                                                Command="{Binding DataContext.RemoveProductTypeItemCommand, ElementName=RootPage}">
                                                                             <Button.CommandParameter>
                                                                                 <MultiBinding Converter="{StaticResource ArrayMultiValueConverter}">
-                                                                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl, AncestorLevel=2}" Path="DataContext"/>
+                                                                                    <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=Border, AncestorLevel=2}"/>
                                                                                     <Binding/>
                                                                                 </MultiBinding>
                                                                             </Button.CommandParameter>
