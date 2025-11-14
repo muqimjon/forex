@@ -34,54 +34,27 @@ public partial class TransactionViewModel : ViewModelBase
 
     #region Property Changes
 
-    partial void OnAmountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
+    partial void OnNetAmountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
     partial void OnDiscountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
-    partial void OnCurrencyChanged(CurrencyViewModel value) => ExchangeRate = value?.ExchangeRate;
-    partial void OnExchangeRateChanged(decimal? value) => RecalculateAmount();
+    partial void OnCurrencyChanged(CurrencyViewModel value) => RefreshExchangeRate();
     partial void OnUserChanged(UserViewModel value) => RecalculateTotalAmountWithUserBalance();
-    partial void OnAmountChanging(decimal? value) => ReCalculateNetAmount();
-
-    partial void OnExpenseChanged(decimal? value)
-    {
-        if (!value.HasValue || value <= 0)
-        {
-            IsExpense = false;
-            RecalculateAmount();
-            return;
-        }
-
-        Discount = null;
-        IsIncome = false;
-        IsExpense = true;
-        RecalculateAmount();
-    }
-
-    partial void OnIncomeChanged(decimal? value)
-    {
-        if (!value.HasValue || value <= 0)
-        {
-            IsIncome = false;
-            RecalculateAmount();
-            return;
-        }
-
-        IsExpense = false;
-        IsIncome = true;
-        RecalculateAmount();
-    }
+    partial void OnAmountChanged(decimal? value) => ReCalculateNetAmount();
+    partial void OnExchangeRateChanged(decimal? value) => ReCalculateNetAmount();
+    partial void OnExpenseChanged(decimal? value) => ChangeTansactionType(-Expense);
+    partial void OnIncomeChanged(decimal? value) => ChangeTansactionType(Income);
 
     #endregion
 
     #region Private Helpers
 
-    private void RecalculateAmount()
+    private void ChangeTansactionType(decimal? value)
     {
-        if (IsIncome)
-            Amount = Income;
-        else
-            Amount = -Expense;
+        if (value is null || value == 0) IsIncome = IsExpense = false;
+        else IsExpense = !(IsIncome = value > 0);
 
-        RecalculateTotalAmountWithUserBalance();
+        if (IsExpense) Discount = default;
+
+        Amount = value;
     }
 
     private void RecalculateTotalAmountWithUserBalance()
@@ -99,6 +72,8 @@ public partial class TransactionViewModel : ViewModelBase
     }
 
     private void ReCalculateNetAmount() => NetAmount = Amount * ExchangeRate;
+
+    private void RefreshExchangeRate() => ExchangeRate = Currency?.ExchangeRate;
 
     #endregion
 }

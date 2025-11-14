@@ -25,7 +25,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         this.services = services;
         this.mapper = mapper;
 
-        Products = new ObservableCollection<ProductViewModel>();
+        Products = [];
         Products.CollectionChanged += Products_CollectionChanged;
         AddNewProduct(); // Birinchi default product qo'shamiz
 
@@ -122,9 +122,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
         product.PropertyChanged += Product_PropertyChanged;
         product.ProductTypes.CollectionChanged += (s, e) => HandleProductTypesChanged(product, e);
 
-        // Birinchi default type qo'shamiz
-        AddNewProductType(product);
-
         Products.Add(product);
     }
 
@@ -147,8 +144,8 @@ public partial class SemiProductPageViewModel : ViewModelBase
         var productType = new ProductTypeViewModel();
         productType.ProductTypeItems.CollectionChanged += (s, e) => HandleProductTypeItemsChanged(productType, e);
 
-        // Birinchi default item qo'shamiz
-        AddNewProductTypeItem(productType);
+        //// Birinchi default item qo'shamiz
+        //AddNewProductTypeItem(productType);
 
         product.ProductTypes.Add(productType);
     }
@@ -190,10 +187,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
     {
         if (parameters?.Length != 2) return;
 
-        var productType = parameters[0] as ProductTypeViewModel;
-        var item = parameters[1] as ProductTypeItemViewModel;
 
-        if (productType == null || item == null) return;
+        if (parameters[0] is not ProductTypeViewModel productType
+            || parameters[1] is not ProductTypeItemViewModel item) return;
 
         if (productType.ProductTypeItems.Count <= 1)
         {
@@ -341,8 +337,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         if (e.PropertyName is nameof(SemiProductViewModel.Quantity) or
             nameof(SemiProductViewModel.CostPrice))
         {
-            var semi = sender as SemiProductViewModel;
-            if (semi != null)
+            if (sender is SemiProductViewModel semi)
             {
                 CheckAndAddNewProductTypeItemForSemi(semi);
             }
@@ -372,9 +367,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private void CheckAndAddNewProduct()
     {
         var lastProduct = Products.LastOrDefault();
-        if (lastProduct != null && !string.IsNullOrWhiteSpace(lastProduct.Name))
+        if (lastProduct is not null && !string.IsNullOrWhiteSpace(lastProduct.Name))
         {
-            AddNewProduct();
+            AddNewProductType(lastProduct);
         }
     }
 
@@ -383,7 +378,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         var lastType = product.ProductTypes.LastOrDefault();
         if (lastType != null && !string.IsNullOrWhiteSpace(lastType.Type))
         {
-            AddNewProductType(product);
+            AddNewProductTypeItem(lastType);
         }
     }
 
@@ -395,6 +390,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             lastItem.SemiProduct.CostPrice > 0)
         {
             AddNewProductTypeItem(productType);
+            AddNewProduct();
         }
     }
 

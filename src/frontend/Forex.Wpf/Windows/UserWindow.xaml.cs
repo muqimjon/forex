@@ -3,10 +3,8 @@
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
-using Forex.ClientService.Interfaces;
 using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Services;
-using Forex.Wpf.Pages.Sales.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;

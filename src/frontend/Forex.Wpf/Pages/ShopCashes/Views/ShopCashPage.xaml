@@ -203,7 +203,7 @@
                         FontSize="14"
                         IsEnabled="{Binding Transaction.Currency.IsEditable}"
                         PreviewTextInput="NumericTextBox_PreviewTextInput"
-                        Text="{Binding Transaction.ExchangeRate, StringFormat={}{0:N0}, TargetNullValue=''}"
+                        Text="{Binding Transaction.ExchangeRate, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged}"
                         TextAlignment="Right" />
                 </Border>
 
