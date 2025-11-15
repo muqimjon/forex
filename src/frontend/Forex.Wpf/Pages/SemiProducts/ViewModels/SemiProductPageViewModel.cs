@@ -129,9 +129,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     private bool IsSemiProductModified(SemiProductViewModel semi)
     {
-        return !string.IsNullOrWhiteSpace(semi.Name) ||
-               semi.Quantity != 0 ||
-               semi.CostPrice != 0;
+        return semi.Quantity != 0 || semi.CostPrice != 0;
     }
 
     private bool IsProductEmpty(ProductViewModel product)
@@ -147,9 +145,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     private bool IsSemiProductEmpty(SemiProductViewModel semi)
     {
-        return string.IsNullOrWhiteSpace(semi.Name) &&
-               semi.Quantity == 0 &&
-               semi.CostPrice == 0;
+        return semi.Quantity == 0 && semi.CostPrice == 0;
     }
 
     private bool IsLastProduct(ProductViewModel product)
@@ -180,6 +176,27 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private int CountEmptyItems(ProductTypeViewModel type)
     {
         return type.ProductTypeItems.Count(i => IsSemiProductEmpty(i.SemiProduct));
+    }
+
+    // ✅ TO'LIQ VALIDATSIYA - Kod va Name majburiy
+    private bool IsProductCompleted(ProductViewModel product)
+    {
+        return !string.IsNullOrWhiteSpace(product.Code) &&
+               !string.IsNullOrWhiteSpace(product.Name);
+    }
+
+    // ✅ TO'LIQ VALIDATSIYA - Type majburiy
+    private bool IsProductTypeCompleted(ProductTypeViewModel type)
+    {
+        return !string.IsNullOrWhiteSpace(type.Type);
+    }
+
+    // ✅ TO'LIQ VALIDATSIYA - Name EMAS, faqat Quantity, UnitMeasure, CostPrice
+    private bool IsSemiProductCompleted(SemiProductViewModel semi)
+    {
+        return semi.Quantity > 0 &&
+               semi.UnitMeasure is not null &&
+               semi.CostPrice > 0;
     }
 
     #endregion
@@ -371,57 +388,100 @@ public partial class SemiProductPageViewModel : ViewModelBase
     [RelayCommand]
     private async Task SubmitAsync()
     {
-        if (!ValidateProducts())
-            return;
-
-        var requestObject = new SemiProductIntakeRequest
+        try
         {
-            Invoice = mapper.Map<InvoiceRequest>(Invoice),
-            Products = mapper.Map<ICollection<ProductRequest>>(Products),
-            SemiProducts = []
-        };
+            var validProducts = Products
+                .Where(IsProductCompleted)
+                .Select(p =>
+                {
+                    var validTypes = p.ProductTypes
+                        .Where(IsProductTypeCompleted)
+                        .Select(t =>
+                        {
+                            var validItems = t.ProductTypeItems
+                                .Where(i => IsSemiProductCompleted(i.SemiProduct))
+                                .ToList();
 
-        var currency = AvailableCurrencies.FirstOrDefault(c => c.IsDefault);
+                            if (validItems.Count == 0)
+                                return null;
 
-        if (currency is null)
-        {
-            WarningMessage = "Default valyuta tanlanmagan";
-            return;
+                            return new ProductTypeViewModel
+                            {
+                                Id = t.Id,
+                                Type = t.Type,
+                                BundleItemCount = t.BundleItemCount,
+                                Cost = t.Cost,
+                                ProductTypeItems = new ObservableCollection<ProductTypeItemViewModel>(validItems)
+                            };
+                        })
+                        .Where(t => t is not null)
+                        .ToList();
+
+                    if (validTypes.Count == 0)
+                        return null;
+
+                    return new ProductViewModel
+                    {
+                        Id = p.Id,
+                        Code = p.Code,
+                        Name = p.Name,
+                        UnitMeasure = p.UnitMeasure,
+                        Image = p.Image,
+                        ProductTypes = new ObservableCollection<ProductTypeViewModel>(validTypes!)
+                    };
+                })
+                .Where(p => p is not null)
+                .ToList();
+
+            if (validProducts.Count == 0)
+            {
+                ErrorMessage = "Hech qanday to'liq ma'lumot kiritilmagan. Kamida: 1 tadan qiymat to'ldirilishi kerak!";
+                return;
+            }
+
+            var requestObject = new SemiProductIntakeRequest
+            {
+                Invoice = mapper.Map<InvoiceRequest>(Invoice),
+                Products = mapper.Map<ICollection<ProductRequest>>(validProducts),
+                SemiProducts = []
+            };
+
+            var currency = AvailableCurrencies.FirstOrDefault(c => c.IsDefault);
+
+            if (currency is null)
+            {
+                WarningMessage = "Default valyuta tanlanmagan";
+                return;
+            }
+
+            if (!currency.Code.Equals("UZS", StringComparison.InvariantCultureIgnoreCase))
+            {
+                WarningMessage = "Default valyuta UZS bo'lishi kerak";
+                return;
+            }
+
+            requestObject.Invoice.CurrencyId = currency.Id;
+
+            var client = services.GetRequiredService<IApiSemiProductEntry>();
+            var response = await client.Create(requestObject).Handle(isLoading => IsLoading = isLoading);
+
+            if (response.IsSuccess)
+            {
+                SuccessMessage = $"Muvaffaqiyatli yuklandi!\n" +
+                               $"- {validProducts.Count} ta mahsulot\n" +
+                               $"- {validProducts.Sum(p => p.ProductTypes.Count)} ta o'lcham\n" +
+                               $"- {validProducts.Sum(p => p.ProductTypes.Sum(t => t.ProductTypeItems.Count))} ta element";
+                ResetForm();
+            }
+            else
+            {
+                ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
+            }
         }
-
-        if (!currency.Code.Equals("UZS", StringComparison.InvariantCultureIgnoreCase))
+        catch (Exception ex)
         {
-            WarningMessage = "Default valyuta UZS emas";
-            return;
+            ErrorMessage = $"Xatolik yuz berdi: {ex.Message}";
         }
-
-        requestObject.Invoice.CurrencyId = currency.Id;
-
-        var client = services.GetRequiredService<IApiSemiProductEntry>();
-        var response = await client.Create(requestObject).Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess)
-        {
-            SuccessMessage = "Yarim tayyor mahsulot muvaffaqiyatli yuklandi.";
-            ResetForm();
-        }
-        else
-        {
-            ErrorMessage = response.Message ?? "Yuklashda xatolik yuz berdi.";
-        }
-    }
-
-    private bool ValidateProducts()
-    {
-        var validProducts = Products.Where(p => !string.IsNullOrWhiteSpace(p.Name)).ToList();
-
-        if (validProducts.Count == 0)
-        {
-            ErrorMessage = "Hech qanday yarim tayyor mahsulot kiritilmadi.";
-            return false;
-        }
-
-        return true;
     }
 
     private void ResetForm()
@@ -523,7 +583,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
         if (e.PropertyName == nameof(ProductTypeViewModel.Type))
         {
             var product = FindProductByType(type);
-            if (product != null)
+            if (product is not null)
             {
                 CheckAndAutoAdd(product, type);
             }
@@ -541,7 +601,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             e.PropertyName == nameof(SemiProductViewModel.CostPrice))
         {
             var (product, type, item) = FindHierarchyBySemiProduct(semi);
-            if (product != null && type != null && item != null)
+            if (product is not null && type is not null && item is not null)
             {
                 CheckAndAutoAdd(product, type, item);
             }
@@ -557,7 +617,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             var usdCurrency = AvailableCurrencies.FirstOrDefault(c =>
                 c.Code.Equals("USD", StringComparison.InvariantCultureIgnoreCase));
 
-            if (usdCurrency != null)
+            if (usdCurrency is not null)
             {
                 Invoice.Currency = usdCurrency;
             }
@@ -581,7 +641,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             foreach (var type in product.ProductTypes)
             {
                 var item = type.ProductTypeItems.FirstOrDefault(i => i.SemiProduct == semi);
-                if (item != null)
+                if (item is not null)
                 {
                     return (product, type, item);
                 }

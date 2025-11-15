@@ -34,9 +34,7 @@ public abstract partial class ViewModelBase : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(message)) return;
 
-        int duration = Math.Clamp(3 + message.Length / 20, 3, 10);
-
-        NotificationService.Show(message, type, durationSeconds: duration);
+        NotificationService.Show(message, type);
 
         ErrorMessage = WarningMessage = InfoMessage = SuccessMessage = string.Empty;
     }
