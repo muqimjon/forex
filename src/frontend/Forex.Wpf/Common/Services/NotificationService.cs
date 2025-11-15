@@ -23,7 +23,7 @@ public static class NotificationService
             return;
 
         var rootGrid = TryFindRootGrid(mainWindow);
-        if (rootGrid == null)
+        if (rootGrid is null)
             return;
 
         // 📏 Calculate duration based on message length
@@ -170,8 +170,8 @@ public static class NotificationService
     }
 
     /// <summary>
-    /// Calculates reading duration based on message length
-    /// Average reading speed: 200-250 words per minute (3-4 words per second)
+    /// Matn uzunligini hisobga olgan holda ko'rinib turish vaqtini hisoblash
+    /// O'rtacha o'qishd tezligi: minutiga 200-250 ta so'z (soniyasiga 3-4 so'z)
     /// </summary>
     private static double CalculateReadingDuration(string message, double speedMultiplier)
     {
@@ -181,7 +181,7 @@ public static class NotificationService
         // Count words
         var wordCount = message.Split([' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries).Length;
 
-        // Base reading speed: 3.5 words per second (average comfortable reading)
+        // Xabar kutilmaganda chiqishini hisobga olib maksimumni olamiz: 4
         var wordsPerSecond = 4d;
 
         // Calculate base duration
