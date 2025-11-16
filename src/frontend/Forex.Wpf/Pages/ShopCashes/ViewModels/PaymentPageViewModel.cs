@@ -113,6 +113,9 @@ public partial class PaymentPageViewModel : ViewModelBase
         if (!ValidateTransaction())
             return;
 
+        if (Transaction.Date.Date == DateTime.Today)
+            Transaction.Date = DateTime.Now;
+
         var request = mapper.Map<TransactionRequest>(Transaction);
         var response = await client.Transactions.CreateAsync(request).Handle(isLoading => IsLoading = isLoading);
 
@@ -122,10 +125,7 @@ public partial class PaymentPageViewModel : ViewModelBase
             Transaction = new();
             await LoadDataAsync();
         }
-        else
-        {
-            WarningMessage = response.Message ?? "To'lovni amalga oshirishda xatolik yuz berdi.";
-        }
+        else WarningMessage = response.Message ?? "To'lovni amalga oshirishda xatolik yuz berdi.";
     }
 
     private bool ValidateTransaction()
