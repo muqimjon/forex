@@ -63,23 +63,64 @@ public partial class ReportsPageViewModel : ViewModelBase
         else ErrorMessage = response.Message ?? "Mahsulotlarni yuklashda xatolik.";
     }
 
+    //public async Task LoadSaleAsynce()
+    //{
+    //    FilteringRequest request = new()
+    //    {
+    //        Filters = new()
+    //        {
+    //            ["SaleItems"] = ["include:productType.product"],
+    //            ["SaleItems"] = ["include:productType.ProductTypeItems"],
+    //        }
+    //    };
+
+    //    var response = await client.Sales.Filter(request).Handle(isLoading => IsLoading = isLoading);
+    //    if (!response.IsSuccess)
+    //    {
+    //        ErrorMessage = response.Message ?? "Savdo ma'lumotlarini yuklashda xatolik.";
+    //        return;
+    //    }
+    //}
+
     public async Task LoadSaleAsynce()
     {
-        FilteringRequest request = new()
-        {
-            Filters = new()
-            {
-                ["SaleItems"] = ["include:productType.product"],
-                ["SaleItems"] = ["include:productType.ProductTypeItems"],
-            }
-        };
+        //FilteringRequest request = new()
+        //{
+        //    Filters = new()
+        //    {
+        //        ["SaleItems"] = ["include:productType.product"],
+        //        ["SaleItems"] = ["include:productType.ProductTypeItems"],
+        //        ["User"] = ["include:"]
+        //    }
+        //};
 
-        var response = await client.Sales.Filter(request).Handle(isLoading => IsLoading = isLoading);
+        var response = await client.Sales.GetAll().Handle(isLoading => IsLoading = isLoading);
+
         if (!response.IsSuccess)
         {
             ErrorMessage = response.Message ?? "Savdo ma'lumotlarini yuklashda xatolik.";
             return;
         }
+
+        var items = new ObservableCollection<SaleItemForReportViewModel>();
+
+        foreach (var sale in response.Data)
+        {
+            foreach (var item in sale.SaleItems)
+            {
+                items.Add(new SaleItemForReportViewModel
+                {
+                    Date = sale.Date,
+                    Customer = sale.User?.Name,
+                    BundleCount = item.ProductType.BundleItemCount,
+                    TotalCount = item.TotalCount,
+                    Amount = item.TotalAmount
+                });
+            }
+        }
+
+        SaleItems = items;
+        FilteredSaleItems = items; // agar filtirdan foydalanmoqchi bo‘lsangiz
     }
 
 }
