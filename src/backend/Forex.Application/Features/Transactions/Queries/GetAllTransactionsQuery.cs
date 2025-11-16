@@ -20,5 +20,6 @@ public class GetAllTransactionsQueryHandler(
             .Include(t => t.User)
             .Include(t => t.Currency)
             .AsNoTracking()
+            .OrderByDescending(t => t.Id)
             .ToListAsync(cancellationToken));
 }
