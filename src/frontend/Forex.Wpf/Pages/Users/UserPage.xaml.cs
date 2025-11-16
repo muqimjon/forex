@@ -307,9 +307,9 @@ public partial class UserPage : Page
                 [
                    new UserAccount
                    {
-        CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
-        OpeningBalance = GetOpeningBalance(),  // Yangi metod
-        Discount = 0  // Endi ishlatilmaydi
+                        CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
+                        OpeningBalance = GetOpeningBalance(),
+                        Discount = 0 
                    }
                 ]
             };

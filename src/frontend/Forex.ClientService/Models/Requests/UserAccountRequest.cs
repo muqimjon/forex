@@ -1,8 +1,6 @@
-﻿namespace Forex.Application.Features.Accounts.DTOs;
+﻿namespace Forex.ClientService.Models.Requests;
 
-using Forex.Application.Features.Currencies.DTOs;
-
-public sealed record UserAccountDto
+public sealed record UserAccountRequest
 {
     public long Id { get; set; }
     public decimal OpeningBalance { get; set; }
@@ -15,5 +13,5 @@ public sealed record UserAccountDto
     public long UserId { get; set; }
 
     public long CurrencyId { get; set; }
-    public CurrencyDto Currency { get; set; } = default!;
+    public CurrencyRequest Currency { get; set; } = default!;
 }

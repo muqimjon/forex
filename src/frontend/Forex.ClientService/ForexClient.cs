@@ -5,6 +5,7 @@ using Forex.ClientService.Interfaces;
 public class ForexClient(
     IApiAuth auth,
     IApiUser users,
+    IApiUserAccount userAccounts,
     IApiSemiProducts semiProduct,
     IApiManufactory manufactory,
     IApiProductTypes productType,
@@ -22,6 +23,7 @@ public class ForexClient(
 {
     public IApiAuth Auth { get; } = auth;
     public IApiUser Users { get; } = users;
+    public IApiUserAccount UserAccounts { get; } = userAccounts;
     public IApiSemiProducts SemiProduct { get; } = semiProduct;
     public IApiManufactory Manufactories { get; } = manufactory;
     public IApiCurrency Currencies { get; } = currency;
