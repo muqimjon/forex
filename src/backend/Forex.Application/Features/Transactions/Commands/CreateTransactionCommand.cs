@@ -2,7 +2,6 @@
 
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Enums;

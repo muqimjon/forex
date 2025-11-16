@@ -10,9 +10,9 @@ public class UserAccountController : BaseController
 {
     [HttpPut]
     public async Task<IActionResult> Update(UpdateForDebtUserAccountCommand request)
-        => Ok(new Response{ Data = await Mediator.Send(request)});
+        => Ok(new Response { Data = await Mediator.Send(request) });
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() 
+    public async Task<IActionResult> GetAll()
         => Ok(new Response { Data = await Mediator.Send(new GetAllAccountsQuery()) });
 }

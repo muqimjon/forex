@@ -46,7 +46,7 @@ public static class MappingProfile
         config.NewConfig<UnitMeasureResponse, UnitMeasuerViewModel>();
         config.NewConfig<UnitMeasuerViewModel, UnitMeasureRequest>();
 
-        // 🔹 User
+        // 🔹 Customer
         config.NewConfig<UserResponse, UserViewModel>();
         config.NewConfig<UserViewModel, UserRequest>();
 

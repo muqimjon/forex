@@ -90,7 +90,7 @@ public partial class ReportsPageViewModel : ViewModelBase
         //    {
         //        ["SaleItems"] = ["include:productType.product"],
         //        ["SaleItems"] = ["include:productType.ProductTypeItems"],
-        //        ["User"] = ["include:"]
+        //        ["Customer"] = ["include:"]
         //    }
         //};
 
@@ -111,7 +111,7 @@ public partial class ReportsPageViewModel : ViewModelBase
                 items.Add(new SaleItemForReportViewModel
                 {
                     Date = sale.Date,
-                    Customer = sale.User?.Name,
+                    Customer = sale.Customer?.Name,
                     BundleCount = item.ProductType.BundleItemCount,
                     TotalCount = item.TotalCount,
                     Amount = item.TotalAmount

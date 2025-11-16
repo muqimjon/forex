@@ -13,8 +13,8 @@ public sealed record SaleForSaleItemDto
     public decimal TotalAmount { get; set; }   // 1 ta savdoda jami summa
     public string? Note { get; set; }
 
-    public long UserId { get; set; }
-    public UserForSaleDto User { get; set; } = default!;
+    public long CustomerId { get; set; }
+    public UserForSaleDto Customer { get; set; } = default!;
 
     public long ProductTypeId { get; set; }   // 24-29, 30-35, 36-41 razmeri idsi
     public ProductType ProductType { get; set; } = default!;

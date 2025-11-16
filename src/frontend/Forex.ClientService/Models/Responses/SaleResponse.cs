@@ -10,8 +10,8 @@ public sealed record SaleResponse
     public decimal TotalAmount { get; set; }
     public string? Note { get; set; }
 
-    public long UserId { get; set; }
-    public UserResponse User { get; set; } = default!;
+    public long CustomerId { get; set; }
+    public UserResponse Customer { get; set; } = default!;
 
     public ICollection<SaleItemResponse> SaleItems { get; set; } = default!;
 }

@@ -2,19 +2,17 @@
 
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Accounts.DTOs;
-using Forex.Application.Features.Currencies.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 public record UpdateForDebtUserAccountCommand(
     long Id,
-  //  decimal OpeningBalance,
+    //  decimal OpeningBalance,
     //decimal Discount,
-   // decimal Balance,
+    // decimal Balance,
     string? Description,
     DateTime? DueDate
-   // long UserId,
+    // long CustomerId,
     //long CurrencyId
     )
     : IRequest<bool>;

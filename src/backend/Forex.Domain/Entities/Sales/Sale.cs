@@ -13,7 +13,7 @@ public class Sale : Auditable
     public string? Note { get; set; }
 
     public long CustomerId { get; set; }
-    public User User { get; set; } = default!;
+    public User Customer { get; set; } = default!;
 
     public ICollection<SaleItem> SaleItems { get; set; } = default!;
 }

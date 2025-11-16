@@ -17,8 +17,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.Windows.Input;
-using Forex.Wpf.Windows;
 
 public partial class SalePageViewModel : ViewModelBase
 {
@@ -45,8 +43,8 @@ public partial class SalePageViewModel : ViewModelBase
     [ObservableProperty] private UserViewModel? customer;
     [ObservableProperty] private ObservableCollection<UserViewModel> availableCustomers = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
-    
-    
+
+
     #region Load Data
 
     private async Task LoadDataAsync()
@@ -407,6 +405,7 @@ public partial class SalePageViewModel : ViewModelBase
         border.Child = tb;
         return border;
     }
+
     private void Clear()
     {
         SaleItems = [];

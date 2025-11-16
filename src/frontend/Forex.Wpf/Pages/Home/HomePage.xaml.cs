@@ -1,7 +1,4 @@
 ﻿namespace Forex.Wpf.Pages.Home;
-
-using System.Windows.Media;
-using Forex.ClientService.Interfaces;
 using Forex.ClientService.Services;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Auth;
@@ -15,10 +12,8 @@ using Forex.Wpf.Pages.ShopCashes;
 using Forex.Wpf.Pages.Users;
 using Forex.Wpf.Windows;
 using Forex.Wpf.Windows.OverdueAccountsWindow;
-using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Interaction logic for HomePage.xaml

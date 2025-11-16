@@ -36,8 +36,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<InvoicePayment> InvoicePayments { get; set; }
     public DbSet<InProcess> InProcesses { get; set; }
     public DbSet<UserNotification> UserNotifications { get; set; }
-
+    public DbSet<ProductionBatch> ProductionBatches { get; set; }
+    public DbSet<WorkerPayment> WorkerPayments { get; set; }
+    public DbSet<ProductionStage> ProductionStages { get; set; }
     public DbSet<EntryToProcess> EntryToProcesses { get; set; }
+    public DbSet<CompanyInfo> CompanyInfo { get; set; }
+    public DbSet<SocialLink> SocialLinks { get; set; }
 
     private IDbContextTransaction? currentTransaction;
 
@@ -104,7 +108,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Account>()
             .ToTable("Accounts")
             .HasDiscriminator<string>("AccountType")
-            .HasValue<UserAccount>("User")
+            .HasValue<UserAccount>("Customer")
             .HasValue<ShopAccount>("ShopCash");
 
         modelBuilder.Ignore<System.Transactions.Transaction>();

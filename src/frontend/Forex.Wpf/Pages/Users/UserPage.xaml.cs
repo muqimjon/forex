@@ -232,11 +232,11 @@ public partial class UserPage : Page
         var filtered = rawUsers.AsEnumerable();
 
         // 🔹 UserRole bo‘yicha filter
-        if (!string.IsNullOrWhiteSpace(selectedRole) && selectedRole != "User")
+        if (!string.IsNullOrWhiteSpace(selectedRole) && selectedRole != "Customer")
         {
             filtered = filtered.Where(u => u.Role.ToString() == selectedRole);
         }
-        // Agar User bo‘lsa → hech qanday filter ishlamaydi (hammasi chiqadi)
+        // Agar Customer bo‘lsa → hech qanday filter ishlamaydi (hammasi chiqadi)
 
         // 🔹 Search bo‘yicha filter
         if (!string.IsNullOrWhiteSpace(query))
@@ -270,12 +270,12 @@ public partial class UserPage : Page
             return;
         }
 
-        bool isUser = role.Equals("User", StringComparison.OrdinalIgnoreCase);
+        bool isUser = role.Equals("Customer", StringComparison.OrdinalIgnoreCase);
 
-        // Qarzdorlik: faqat "User" bo'lmaganda ko'rinsin
+        // Qarzdorlik: faqat "Customer" bo'lmaganda ko'rinsin
         brDebt.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
 
-        // Qolgan elementlar ham "User" bo'lmaganda ko'rinsin
+        // Qolgan elementlar ham "Customer" bo'lmaganda ko'rinsin
         brValutaType.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         brAccount.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         btnSave.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
@@ -309,7 +309,7 @@ public partial class UserPage : Page
                    {
                         CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
                         OpeningBalance = GetOpeningBalance(),
-                        Discount = 0 
+                        Discount = 0
                    }
                 ]
             };

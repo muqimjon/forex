@@ -35,6 +35,11 @@ public interface IAppDbContext
     DbSet<EntryToProcess> EntryToProcesses { get; }
     DbSet<InvoicePayment> InvoicePayments { get; set; }
     DbSet<UserNotification> UserNotifications { get; set; }
+    DbSet<ProductionBatch> ProductionBatches { get; set; }
+    DbSet<WorkerPayment> WorkerPayments { get; set; }
+    DbSet<ProductionStage> ProductionStages { get; set; }
+    DbSet<CompanyInfo> CompanyInfo { get; set; }
+    DbSet<SocialLink> SocialLinks { get; set; }
 
     Task<bool> SaveAsync(CancellationToken cancellation);
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

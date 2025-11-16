@@ -1,9 +1,9 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
+using CommunityToolkit.Mvvm.ComponentModel; // ObservableProperty/NotifyPropertyChanged uchun
 using Forex.Wpf.Pages.Common;
 using System; // DateTime uchun
 using System.Globalization; // TryParseExact uchun
-using CommunityToolkit.Mvvm.ComponentModel; // ObservableProperty/NotifyPropertyChanged uchun
 
 public partial class UserAccountViewModel : ViewModelBase
 {
@@ -49,7 +49,7 @@ public partial class UserAccountViewModel : ViewModelBase
         }
     }
 
-    // ... (UserId, User, CurrencyId, Currency o'zgarishsiz)
+    // ... (CustomerId, Customer, CurrencyId, Currency o'zgarishsiz)
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DueDate))]

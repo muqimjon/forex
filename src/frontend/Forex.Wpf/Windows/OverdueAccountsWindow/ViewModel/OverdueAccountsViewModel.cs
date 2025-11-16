@@ -1,4 +1,5 @@
 ﻿namespace Forex.Wpf.Windows.OverdueAccountsWindow.ViewModel;
+using ClosedXML.Excel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
@@ -7,6 +8,7 @@ using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,8 +16,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
-using ClosedXML.Excel;
-using Microsoft.Win32;
 using System.Windows.Media;
 
 public partial class OverdueAccountsViewModel : ViewModelBase
@@ -41,7 +41,7 @@ public partial class OverdueAccountsViewModel : ViewModelBase
     {
         ApplyFilter();
     }
-  
+
     private async Task LoadAccountsAsync()
     {
         var allAccountsResult = await client.UserAccounts.GetAllAsync()
@@ -232,7 +232,7 @@ public partial class OverdueAccountsViewModel : ViewModelBase
     [RelayCommand]
     private void ClearFilter()
     {
-        SelectedCustomer = null; 
+        SelectedCustomer = null;
     }
 
     [RelayCommand]

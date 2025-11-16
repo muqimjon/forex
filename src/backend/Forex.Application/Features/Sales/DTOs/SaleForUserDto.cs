@@ -12,7 +12,7 @@ public sealed record SaleForUserDto
     public decimal TotalAmount { get; set; }   // 1 ta savdoda jami summa
     public string? Note { get; set; }
 
-    public long UserId { get; set; }
+    public long CustomerId { get; set; }
 
     public ICollection<SaleItemForSaleDto> SaleItems { get; set; } = default!;
 }

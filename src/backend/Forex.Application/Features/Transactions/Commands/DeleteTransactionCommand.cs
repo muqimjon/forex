@@ -47,7 +47,7 @@ public class DeleteTransactionCommandHandler(
 
         var userAccount = await context.UserAccounts
             .FirstOrDefaultAsync(a => a.UserId == transaction.UserId && a.CurrencyId == uzsCurrency.Id, cancellationToken)
-            ?? throw new NotFoundException("User account not found");
+            ?? throw new NotFoundException("Customer account not found");
 
         var amountInUZS = transaction.Amount * transaction.ExchangeRate;
         var delta = amountInUZS + transaction.Discount;

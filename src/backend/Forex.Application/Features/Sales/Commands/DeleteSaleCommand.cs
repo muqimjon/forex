@@ -21,7 +21,7 @@ public class DeleteSaleCommandHandler(
         try
         {
             var sale = await LoadSaleAsync(request.SaleId, ct);
-            var userAccount = sale.User.Accounts.FirstOrDefault()
+            var userAccount = sale.Customer.Accounts.FirstOrDefault()
                 ?? throw new NotFoundException(nameof(UserAccount), nameof(sale.CustomerId), sale.CustomerId);
 
             userAccount.Balance += sale.TotalAmount;
@@ -47,7 +47,7 @@ public class DeleteSaleCommandHandler(
     {
         var sale = await context.Sales
             .Include(s => s.SaleItems)
-            .Include(s => s.User)
+            .Include(s => s.Customer)
                 .ThenInclude(u => u.Accounts)
             .FirstOrDefaultAsync(s => s.Id == saleId, ct);
 

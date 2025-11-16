@@ -27,7 +27,7 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
 
                 await DeductFromInProcessAsync(productType.Id, item.Count, cancellationToken);
                 var residue = await UpdateProductResidueAsync(productType.Id, item.Count, shop.Id, cancellationToken);
-                SaveProductEntryAsync(item, productType.BundleItemCount, shop, residue);
+                SaveProductEntryAsync(item, productType, shop, residue);
             }
 
             await context.CommitTransactionAsync(cancellationToken);
@@ -57,6 +57,9 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
     {
         var productType = await context.ProductTypes
             .Include(pt => pt.ProductResidue)
+            .Include(pt => pt.ProductTypeItems)
+                .ThenInclude(ti => ti.SemiProduct)
+                    .ThenInclude(sp => sp.SemiProductEntries)
             .FirstOrDefaultAsync(pt => pt.Id == productTypeId, ct);
 
         return productType ?? throw new NotFoundException(nameof(ProductType), nameof(productTypeId), productTypeId);
@@ -91,18 +94,20 @@ public class CreateProductEntryCommandHandler(IAppDbContext context)
 
     private void SaveProductEntryAsync(
         ProductEntryCommand item,
-        int countByType,
+        ProductType productType,
         Shop shop,
         ProductResidue residue)
     {
+        var costPrice = productType.ProductTypeItems.Sum(ti => ti.SemiProduct.SemiProductEntries.Last().CostPrice);
+
         var entry = new ProductEntry
         {
             Count = item.Count,
-            BundleItemCount = countByType,
+            BundleItemCount = productType.BundleItemCount,
             PreparationCostPerUnit = item.PreparationCostPerUnit,
             ProductTypeId = item.ProductTypeId,
             Shop = shop,
-            UnitPrice = 0,
+            CostPrice = costPrice,
             TotalAmount = item.TotalAmount,
             ProductResidue = residue
         };

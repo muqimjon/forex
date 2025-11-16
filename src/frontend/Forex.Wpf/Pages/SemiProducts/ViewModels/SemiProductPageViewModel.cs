@@ -162,8 +162,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     private bool IsProductEmpty(ProductViewModel product)
     {
-        return string.IsNullOrWhiteSpace(product.Name) &&
-               string.IsNullOrWhiteSpace(product.Code);
+        return string.IsNullOrWhiteSpace(product.Name);
     }
 
     private bool IsProductTypeEmpty(ProductTypeViewModel type)
@@ -816,9 +815,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
     {
         // 1. Calculate CostPrice (total cost of all products) -> goes to PaymentToSupplier
         Invoice.CostPrice = Products?
-            .Where(p => !string.IsNullOrWhiteSpace(p.Name))
+            .Where(p => !IsProductEmpty(p))
             .Sum(p => p.ProductTypes?
-                .Where(t => !string.IsNullOrWhiteSpace(t.Type))
+                .Where(t => !IsProductTypeEmpty(t))
                 .Sum(t => t.ProductTypeItems?
                     .Sum(i => i.SemiProduct?.TotalAmount ?? 0) ?? 0) ?? 0) ?? 0;
 
