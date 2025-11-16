@@ -60,10 +60,13 @@ public static class MappingProfile
         // 🔹 Invoice
         config.NewConfig<InvoiceResponse, InvoiceViewModel>();
         config.NewConfig<InvoiceViewModel, InvoiceRequest>()
-            .Map(dest => dest.CurrencyId, src => src.Currency.Id)
-            .Map(dest => dest.SupplierId, src => src.Supplier.Id)
-            .Map(dest => dest.SenderId, src => src.Agent != null ? src.Agent.Id : (long?)null)
             .Map(dest => dest.ManufactoryId, src => src.Manufactory.Id);
+
+        // Invoice payment
+        config.NewConfig<InvoicePaymentResponse, InvoicePaymentViewModel>();
+        config.NewConfig<InvoicePaymentViewModel, InvoicePaymentRequest>()
+            .Map(dest => dest.UserId, src => src.User.Id)
+            .Map(dest => dest.CurrencyId, src => src.Currency.Id);
 
         config.NewConfig<CurrencyResponse, CurrencyViewModel>();
         config.NewConfig<UserAccountResponse, UserAccountViewModel>();

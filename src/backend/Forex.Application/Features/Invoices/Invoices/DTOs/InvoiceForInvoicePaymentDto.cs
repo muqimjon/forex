@@ -1,6 +1,9 @@
-﻿namespace Forex.ClientService.Models.Requests;
+﻿namespace Forex.Application.Features.Invoices.Invoices.DTOs;
 
-public sealed record InvoiceRequest
+using Forex.Application.Features.Manufactories.DTOs;
+using Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
+
+public sealed record InvoiceForInvoicePaymentDto
 {
     public long Id { get; set; }
     public DateTime Date { get; set; }
@@ -12,6 +15,9 @@ public sealed record InvoiceRequest
     public decimal? PricePerUnitContainer { get; set; }
     public decimal? ConsolidatorFee { get; set; }
     public decimal TotalAmount { get; set; }
+
     public long ManufactoryId { get; set; }
-    public ICollection<InvoicePaymentRequest> Payments { get; set; } = default!;
+    public ManufactoryForInvoiceDto Manufactory { get; set; } = default!;
+
+    public ICollection<SemiProductEntryForInvoiceDto> SemiProductEntries { get; set; } = default!;
 }

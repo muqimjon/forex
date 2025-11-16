@@ -10,14 +10,6 @@ public class SemiProductMappingProfile : Profile
 {
     public SemiProductMappingProfile()
     {
-        CreateMap<CreateSemiProductCommand, SemiProduct>()
-            .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name!.ToNormalized()));
-
-        CreateMap<UpdateSemiProductCommand, SemiProduct>()
-            .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name!.ToNormalized()));
-
         CreateMap<SemiProductCommand, SemiProduct>()
             .ForMember(dest => dest.NormalizedName,
                 opt => opt.MapFrom(src => src.Name!.ToNormalized()));

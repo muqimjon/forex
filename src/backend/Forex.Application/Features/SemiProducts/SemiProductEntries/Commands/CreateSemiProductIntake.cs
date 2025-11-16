@@ -4,13 +4,14 @@ using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
-using Forex.Application.Features.Invoices.Commands;
+using Forex.Application.Features.Invoices.Invoices.Commands;
 using Forex.Application.Features.Products.Products.Commands;
 using Forex.Application.Features.Products.ProductTypes.Commands;
 using Forex.Application.Features.SemiProducts.SemiProducts.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.SemiProducts;
+using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,17 +32,44 @@ public class CreateSemiProductIntakeCommandHandler(
 
         try
         {
-            await HandleMiddlemanTransferAsync(request.Invoice, ct);
-            await EnsureSupplierAccountAsync(request.Invoice, ct);
-
+            // 🔹 Invoice yaratish
             var invoice = mapper.Map<Invoice>(request.Invoice);
             context.Invoices.Add(invoice);
-            await RefreshExchangeRate(invoice, ct);
 
+            foreach (var payment in invoice.Payments)
+            {
+                if (!request.Invoice.ViaConsolidator && payment.Target == PaymentTarget.Consolidator)
+                {
+                    invoice.Payments.Remove(payment);
+                    continue;
+                }
+
+                // Supplier uchun CostPrice
+                if (payment.Target == PaymentTarget.Supplier)
+                    payment.Amount = request.Invoice.CostPrice;
+
+                // Consolidator uchun ContainerCount * PricePerUnitContainer
+                else if (payment.Target == PaymentTarget.Consolidator)
+                    payment.Amount = (request.Invoice.ContainerCount ?? 0) * (request.Invoice.PricePerUnitContainer ?? 0);
+
+                var userAccount = await context.UserAccounts.FirstOrDefaultAsync(ua => ua.UserId == payment.UserId && ua.CurrencyId == payment.CurrencyId, ct);
+                if (userAccount is null)
+                    context.UserAccounts.Add(userAccount = new()
+                    {
+                        UserId = payment.UserId,
+                        CurrencyId = payment.CurrencyId,
+                        OpeningBalance = payment.Amount,
+                    });
+
+                userAccount.Balance += payment.Amount;
+            }
+
+            await RefreshExchangeRate(invoice, ct);
             ValidateCostPrice(request.Invoice.CostPrice);
+
             var (deliveryRatio, transferRatio) = CalculateRatios(request.Invoice);
 
-            // 🔹 Manufactory bir marta global yuklanadi
+            // 🔹 Manufactory
             var manufactory = await GetOrCreateManufactoryAsync(ct);
             invoice.Manufactory = manufactory;
 
@@ -74,55 +102,15 @@ public class CreateSemiProductIntakeCommandHandler(
 
     private async Task RefreshExchangeRate(Invoice invoice, CancellationToken ct)
     {
-        var currency = await context.Currencies.FirstOrDefaultAsync(c => c.NormalizedName == "Dollar".ToNormalized(), ct)
-                        ?? throw new NotFoundException(nameof(Currency), nameof(invoice.CurrencyId), invoice.CurrencyId);
-
-        if (invoice.ExchangeRate is not null)
-            currency.ExchangeRate = (decimal)invoice.ExchangeRate;
-    }
-
-    private async Task HandleMiddlemanTransferAsync(InvoiceCommand invoice, CancellationToken ct)
-    {
-        if (!invoice.ViaMiddleman) return;
-
-        var user = await GetUserWithAccountsAsync(invoice.SenderId!.Value, ct);
-        var account = GetOrCreateAccount(user, invoice.CurrencyId, invoice.TransferFee!.Value);
-
-        account.Balance += (decimal)(invoice.ContainerCount * invoice.PricePerUnitContainer)!;
-    }
-
-    private async Task EnsureSupplierAccountAsync(InvoiceCommand invoice, CancellationToken ct)
-    {
-        var user = await GetUserWithAccountsAsync(invoice.SupplierId, ct);
-        var account = GetOrCreateAccount(user, invoice.CurrencyId, invoice.CostPrice);
-
-        account.Balance += invoice.CostPrice;
-    }
-
-    private async Task<User> GetUserWithAccountsAsync(long userId, CancellationToken ct)
-    {
-        return await context.Users
-            .Include(u => u.Accounts)
-            .FirstOrDefaultAsync(u => u.Id == userId, ct)
-            ?? throw new NotFoundException(nameof(User), nameof(userId), userId);
-    }
-
-    private UserAccount GetOrCreateAccount(User user, long currencyId, decimal openingBalance)
-    {
-        var account = user.Accounts.FirstOrDefault();
-
-        if (account is null)
+        foreach (var payment in invoice.Payments)
         {
-            account = new UserAccount
-            {
-                OpeningBalance = openingBalance,
-                User = user,
-                CurrencyId = currencyId
-            };
-            context.Accounts.Add(account);
-        }
+            var currency = await context.Currencies
+                .FirstOrDefaultAsync(c => c.Id == payment.CurrencyId, ct)
+                ?? throw new NotFoundException(nameof(Currency), nameof(payment.CurrencyId), payment.CurrencyId);
 
-        return account;
+            if (currency.NormalizedName != "So'm".ToNormalized() && payment.ExchangeRate != 0)
+                currency.ExchangeRate = payment.ExchangeRate;
+        }
     }
 
     private async Task<Manufactory> GetOrCreateManufactoryAsync(CancellationToken ct)
@@ -131,10 +119,7 @@ public class CreateSemiProductIntakeCommandHandler(
 
         if (manufactory is null)
         {
-            manufactory = new Manufactory
-            {
-                Name = "Default",
-            };
+            manufactory = new Manufactory { Name = "Default" };
             context.Manufactories.Add(manufactory);
         }
         manufactory.SemiProductEntries = [];
@@ -161,10 +146,13 @@ public class CreateSemiProductIntakeCommandHandler(
     private static (decimal deliveryRatio, decimal transferRatio) CalculateRatios(InvoiceCommand invoice)
     {
         var deliveryRatio = invoice.CostDelivery / invoice.CostPrice;
-        var transferRatio = ((invoice.TransferFee ?? 0) * (invoice.ExchangeRate ?? 0)) / invoice.CostPrice;
+
+        var transferRatio = (invoice.ConsolidatorFee ?? 0) / invoice.CostPrice;
+
         return (deliveryRatio, transferRatio);
     }
 
+    // 🔹 Qolgan product va semi-product processing metodlari o‘zgarmaydi
     private void ProcessProducts(
         IEnumerable<ProductCommand> productCommands,
         Invoice invoice,
@@ -263,7 +251,7 @@ public class CreateSemiProductIntakeCommandHandler(
             Invoice = invoice,
             CostPrice = costPrice,
             CostDelivery = costDelivery,
-            TransferFee = transferFee
+            ConsolidatorFee = transferFee
         });
     }
 

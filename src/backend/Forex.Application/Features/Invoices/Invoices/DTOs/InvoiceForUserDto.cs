@@ -1,6 +1,6 @@
-﻿namespace Forex.Application.Features.Invoices.DTOs;
+﻿namespace Forex.Application.Features.Invoices.Invoices.DTOs;
 
-using Forex.Application.Features.Currencies.DTOs;
+using Forex.Application.Features.Invoices.InvoicePayments.DTOs;
 using Forex.Application.Features.Manufactories.DTOs;
 using Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
 
@@ -11,22 +11,15 @@ public sealed record InvoiceForUserDto
     public string? Number { get; set; }
     public decimal CostPrice { get; set; }
     public decimal CostDelivery { get; set; }
-    public bool ViaMiddleman { get; set; }
+    public bool ViaConsolidator { get; set; }
     public int? ContainerCount { get; set; }
     public decimal? PricePerUnitContainer { get; set; }
-    public decimal? TransferFee { get; set; }
+    public decimal? ConsolidatorFee { get; set; }
     public decimal TotalAmount { get; set; }
-    public decimal? ExchangeRate { get; set; }
-
-    public long CurrencyId { get; set; }
-    public CurrencyDto Currency { get; set; } = default!;
 
     public long ManufactoryId { get; set; }
     public ManufactoryForInvoiceDto Manufactory { get; set; } = default!;
 
-    public long SupplierId { get; set; }
-
-    public long? SenderId { get; set; }
-
+    public ICollection<InvoicePaymentForUserDto> Payments { get; set; } = default!;
     public ICollection<SemiProductEntryForInvoiceDto> SemiProductEntries { get; set; } = default!;
 }

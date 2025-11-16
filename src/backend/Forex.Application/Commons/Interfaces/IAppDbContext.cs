@@ -33,6 +33,8 @@ public interface IAppDbContext
     DbSet<Transaction> Transactions { get; }
     DbSet<InProcess> InProcesses { get; }
     DbSet<EntryToProcess> EntryToProcesses { get; }
+    DbSet<InvoicePayment> InvoicePayments { get; set; }
+    DbSet<UserNotification> UserNotifications { get; set; }
 
     Task<bool> SaveAsync(CancellationToken cancellation);
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

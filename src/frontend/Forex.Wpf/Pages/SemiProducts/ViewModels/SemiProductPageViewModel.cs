@@ -32,14 +32,17 @@ public partial class SemiProductPageViewModel : ViewModelBase
         AddEmptyProduct();
 
         Invoice.PropertyChanged += InvoicePropertyChanged;
+        Invoice.Payments.CollectionChanged += Payments_CollectionChanged;
+
         _ = LoadDataAsync();
     }
 
     [ObservableProperty] private InvoiceViewModel invoice = new();
+
     [ObservableProperty] private ObservableCollection<ProductViewModel> products;
     [ObservableProperty] private ObservableCollection<UnitMeasuerViewModel> availableUnitMeasures = [];
     [ObservableProperty] private ObservableCollection<UserViewModel> availableSuppliers = [];
-    [ObservableProperty] private ObservableCollection<UserViewModel> availableAgents = [];
+    [ObservableProperty] private ObservableCollection<UserViewModel> availableConsolidators = [];
     [ObservableProperty] private ObservableCollection<CurrencyViewModel> availableCurrencies = [];
 
     #region Load Data
@@ -47,9 +50,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
     private async Task LoadDataAsync()
     {
         await Task.WhenAll(
+            LoadCurrenciesAsync(),
             LoadUnitMeasures(),
-            LoadUsersAsync(),
-            LoadCurrenciesAsync()
+            LoadUsersAsync()
         );
     }
 
@@ -61,7 +64,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
         if (response.IsSuccess)
         {
             AvailableCurrencies = mapper.Map<ObservableCollection<CurrencyViewModel>>(response.Data);
-            Invoice.Currency = AvailableCurrencies.FirstOrDefault()!;
         }
         else
         {
@@ -104,12 +106,39 @@ public partial class SemiProductPageViewModel : ViewModelBase
         }
 
         var suppliers = response.Data!.Where(u => u.Role == UserRole.Taminotchi);
-        var agents = response.Data!.Where(u => u.Role == UserRole.Vositachi);
+        var consolidators = response.Data!.Where(u => u.Role == UserRole.Vositachi);
 
         AvailableSuppliers = mapper.Map<ObservableCollection<UserViewModel>>(suppliers);
-        AvailableAgents = mapper.Map<ObservableCollection<UserViewModel>>(agents);
+        AvailableConsolidators = mapper.Map<ObservableCollection<UserViewModel>>(consolidators);
 
-        Invoice.Supplier = AvailableSuppliers.FirstOrDefault() ?? new();
+        var currency = AvailableCurrencies.FirstOrDefault(c => c.IsDefault);
+
+        if (currency is null)
+        {
+            WarningMessage = "Default valyuta tanlanmagan";
+            return;
+        }
+
+        if (!currency.Code.Equals("UZS", StringComparison.InvariantCultureIgnoreCase))
+        {
+            WarningMessage = "Default valyuta UZS bo'lishi kerak";
+            return;
+        }
+
+        // Initialize PaymentToSupplier with UZS currency
+        var supplierPayment = new InvoicePaymentViewModel
+        {
+            User = AvailableSuppliers.FirstOrDefault() ?? new(),
+            Currency = currency,
+            CurrencyId = currency.Id,
+            ExchangeRate = currency.ExchangeRate,
+            Target = PaymentTarget.Supplier
+        };
+
+        Invoice.Payments.Add(supplierPayment);
+
+        // ✅ Yangi qo'shilgan: property yangilash
+        Invoice.PaymentToSupplier = supplierPayment;
     }
 
     #endregion
@@ -118,8 +147,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     private bool IsProductModified(ProductViewModel product)
     {
-        return !string.IsNullOrWhiteSpace(product.Name) ||
-               !string.IsNullOrWhiteSpace(product.Code);
+        return !string.IsNullOrWhiteSpace(product.Code);
     }
 
     private bool IsProductTypeModified(ProductTypeViewModel type)
@@ -181,8 +209,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
     // ✅ TO'LIQ VALIDATSIYA - Kod va Name majburiy
     private bool IsProductCompleted(ProductViewModel product)
     {
-        return !string.IsNullOrWhiteSpace(product.Code) &&
-               !string.IsNullOrWhiteSpace(product.Name);
+        return !string.IsNullOrWhiteSpace(product.Code);
     }
 
     // ✅ TO'LIQ VALIDATSIYA - Type majburiy
@@ -328,7 +355,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
         DetachProduct(product);
         Products.Remove(product);
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
     }
 
     [RelayCommand]
@@ -353,7 +380,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
         DetachProductType(productType);
         product.ProductTypes.Remove(productType);
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
     }
 
     [RelayCommand]
@@ -378,7 +405,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
         DetachSemiProduct(item.SemiProduct);
         productType.ProductTypeItems.Remove(item);
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
     }
 
     #endregion
@@ -446,22 +473,6 @@ public partial class SemiProductPageViewModel : ViewModelBase
                 SemiProducts = []
             };
 
-            var currency = AvailableCurrencies.FirstOrDefault(c => c.IsDefault);
-
-            if (currency is null)
-            {
-                WarningMessage = "Default valyuta tanlanmagan";
-                return;
-            }
-
-            if (!currency.Code.Equals("UZS", StringComparison.InvariantCultureIgnoreCase))
-            {
-                WarningMessage = "Default valyuta UZS bo'lishi kerak";
-                return;
-            }
-
-            requestObject.Invoice.CurrencyId = currency.Id;
-
             var client = services.GetRequiredService<IApiSemiProductEntry>();
             var response = await client.Create(requestObject).Handle(isLoading => IsLoading = isLoading);
 
@@ -494,8 +505,28 @@ public partial class SemiProductPageViewModel : ViewModelBase
         Products.Clear();
         Invoice = new InvoiceViewModel();
         Invoice.PropertyChanged += InvoicePropertyChanged;
+        Invoice.Payments.CollectionChanged += Payments_CollectionChanged;
 
         AddEmptyProduct();
+
+        // Reinitialize default payment
+        var currency = AvailableCurrencies.FirstOrDefault(c => c.IsDefault);
+        if (currency is not null)
+        {
+            var supplierPayment = new InvoicePaymentViewModel
+            {
+                User = AvailableSuppliers.FirstOrDefault() ?? new(),
+                Currency = currency,
+                CurrencyId = currency.Id,
+                ExchangeRate = currency.ExchangeRate,
+                Target = PaymentTarget.Supplier
+            };
+
+            Invoice.Payments.Add(supplierPayment);
+
+            // ✅ Yangi qo'shilgan: property yangilash
+            Invoice.PaymentToSupplier = supplierPayment;
+        }
     }
 
     #endregion
@@ -539,7 +570,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             }
         }
 
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
     }
 
     private void ProductTypeItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -560,7 +591,33 @@ public partial class SemiProductPageViewModel : ViewModelBase
             }
         }
 
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
+    }
+
+    private void Payments_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems is not null)
+        {
+            foreach (InvoicePaymentViewModel payment in e.NewItems)
+            {
+                payment.PropertyChanged += Payment_PropertyChanged;
+            }
+        }
+
+        if (e.OldItems is not null)
+        {
+            foreach (InvoicePaymentViewModel payment in e.OldItems)
+            {
+                payment.PropertyChanged -= Payment_PropertyChanged;
+            }
+        }
+
+        CalculateInvoiceAmounts();
+    }
+
+    private void Payment_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        CalculateInvoiceAmounts();
     }
 
     private void Product_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -573,7 +630,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             CheckAndAutoAdd(product);
         }
 
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
     }
 
     private void ProductType_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -589,7 +646,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
             }
         }
 
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
     }
 
     private void SemiProduct_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -607,21 +664,64 @@ public partial class SemiProductPageViewModel : ViewModelBase
             }
         }
 
-        UpdateInvoiceTotal();
+        CalculateInvoiceAmounts();
     }
 
     private void InvoicePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(Invoice.ViaMiddleman))
+        if (e.PropertyName == nameof(Invoice.ViaConsolidator))
         {
-            var usdCurrency = AvailableCurrencies.FirstOrDefault(c =>
-                c.Code.Equals("USD", StringComparison.InvariantCultureIgnoreCase));
+            var consolidator = AvailableConsolidators.FirstOrDefault();
 
-            if (usdCurrency is not null)
+            if (consolidator is null)
             {
-                Invoice.Currency = usdCurrency;
+                ErrorMessage = "Hech qanday vositachi ro'yxatdan o'tkazilmagan!";
+                Invoice.ViaConsolidator = false;
+                return;
+            }
+
+            if (Invoice.ViaConsolidator)
+            {
+                // Add consolidator payment with USD currency
+                var currency = AvailableCurrencies.FirstOrDefault(c =>
+                    c.Code.Equals("USD", StringComparison.InvariantCultureIgnoreCase));
+
+                if (currency is null)
+                {
+                    ErrorMessage = "Vositachiga to'lov hisoblanishi kerak bo'lgan valyuta hali yaratilmagan. Iltimos avval sozlamalar sahifasi orqali USD valyutasini qo'shing";
+                    Invoice.ViaConsolidator = false;
+                    return;
+                }
+
+                var consolidatorPayment = new InvoicePaymentViewModel
+                {
+                    User = consolidator,
+                    Currency = currency,
+                    CurrencyId = currency.Id,
+                    ExchangeRate = currency.ExchangeRate,
+                    Target = PaymentTarget.Consolidator
+                };
+
+                Invoice.Payments.Add(consolidatorPayment);
+
+                // ✅ Yangi qo'shilgan: property yangilash
+                Invoice.PaymentToConsolidator = consolidatorPayment;
+            }
+            else
+            {
+                // Remove consolidator payment
+                var payment = Invoice.Payments.FirstOrDefault(p => p.Target == PaymentTarget.Consolidator);
+                if (payment is not null)
+                {
+                    Invoice.Payments.Remove(payment);
+
+                    // ✅ Yangi qo'shilgan: property yangilash
+                    Invoice.PaymentToConsolidator = null;
+                }
             }
         }
+
+        CalculateInvoiceAmounts();
     }
 
     #endregion
@@ -710,16 +810,44 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     #endregion
 
-    #region Total Calculation
+    #region Amount Calculations
 
-    private void UpdateInvoiceTotal()
+    private void CalculateInvoiceAmounts()
     {
+        // 1. Calculate CostPrice (total cost of all products) -> goes to PaymentToSupplier
         Invoice.CostPrice = Products?
             .Where(p => !string.IsNullOrWhiteSpace(p.Name))
             .Sum(p => p.ProductTypes?
                 .Where(t => !string.IsNullOrWhiteSpace(t.Type))
                 .Sum(t => t.ProductTypeItems?
                     .Sum(i => i.SemiProduct?.TotalAmount ?? 0) ?? 0) ?? 0) ?? 0;
+
+        // Update PaymentToSupplier amount
+        if (Invoice.PaymentToSupplier is not null)
+        {
+            Invoice.PaymentToSupplier.Amount = Invoice.CostPrice ?? 0;
+        }
+
+        // 2. Calculate Consolidator payment if ViaConsolidator is enabled
+        if (Invoice.ViaConsolidator && Invoice.PaymentToConsolidator is not null)
+        {
+            // Consolidator payment in USD = ContainerCount * PricePerUnitContainer
+            var consolidatorAmountUSD = (Invoice.ContainerCount ?? 0) * (Invoice.PricePerUnitContainer ?? 0);
+            Invoice.PaymentToConsolidator.Amount = consolidatorAmountUSD;
+
+            // ForwardingFee in UZS = ConsolidatorAmount * ExchangeRate
+            Invoice.ConsolidatorFee = consolidatorAmountUSD * (Invoice.PaymentToConsolidator.ExchangeRate);
+        }
+        else
+        {
+            Invoice.ConsolidatorFee = 0;
+        }
+
+        // 3. Calculate TotalAmount (all payments in UZS)
+        // = CostPrice + CostDelivery + ForwardingFee
+        Invoice.TotalAmount = (Invoice.CostPrice ?? 0)
+                            + (Invoice.CostDelivery ?? 0)
+                            + (Invoice.ConsolidatorFee ?? 0);
     }
 
     #endregion

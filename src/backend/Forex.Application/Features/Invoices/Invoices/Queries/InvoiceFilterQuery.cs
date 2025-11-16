@@ -1,10 +1,10 @@
-﻿namespace Forex.Application.Features.Invoices.Queries;
+﻿namespace Forex.Application.Features.Invoices.Invoices.Queries;
 
 using AutoMapper;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Commons.Models;
-using Forex.Application.Features.Invoices.DTOs;
+using Forex.Application.Features.Invoices.Invoices.DTOs;
 using MediatR;
 
 public record InvoiceFilterQuery : FilteringRequest, IRequest<IReadOnlyCollection<InvoiceDto>>;

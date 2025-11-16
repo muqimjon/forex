@@ -1,6 +1,6 @@
 ﻿namespace Forex.Application.Features.Manufactories.DTOs;
 
-using Forex.Application.Features.Invoices.DTOs;
+using Forex.Application.Features.Invoices.Invoices.DTOs;
 using Forex.Application.Features.SemiProducts.SemiProductEntries.DTOs;
 using Forex.Application.Features.SemiProducts.SemiProductResidues.DTOs;
 

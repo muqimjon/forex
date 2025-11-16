@@ -9,8 +9,8 @@ public record FilteringRequest : PagingRequest
     public string? Search { get; set; }
 
     /// <summary>
-    /// Timezone offset in hours (e.g., +5 for Uzbekistan, -5 for EST)
+    /// TimeZone offset in hours (e.g., +5 for Uzbekistan, -5 for EST)
     /// Used when filtering DateTime/DateTimeOffset fields without explicit timezone
     /// </summary>
-    public double? Timezone { get; set; }
+    public double? TimeZone { get; set; }
 }

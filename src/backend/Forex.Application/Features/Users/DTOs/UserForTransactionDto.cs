@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Users.DTOs;
 
 using Forex.Application.Features.Accounts.DTOs;
-using Forex.Application.Features.Invoices.DTOs;
+using Forex.Application.Features.Invoices.Invoices.DTOs;
 using Forex.Application.Features.Sales.DTOs;
 using Forex.Domain.Enums;
 

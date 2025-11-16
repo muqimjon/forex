@@ -9,7 +9,7 @@ public sealed record SemiProductEntryForInvoiceDto
     public decimal Quantity { get; set; }
     public decimal CostPrice { get; set; }
     public decimal CostDelivery { get; set; }
-    public decimal TransferFee { get; set; }
+    public decimal ConsolidatorFee { get; set; }
 
     public long InvoiceId { get; set; }
 

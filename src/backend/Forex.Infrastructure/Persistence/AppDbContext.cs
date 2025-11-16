@@ -33,8 +33,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<ProductResidue> ProductResidues { get; set; }
     public DbSet<UnitMeasure> UnitMeasures { get; set; }
-
+    public DbSet<InvoicePayment> InvoicePayments { get; set; }
     public DbSet<InProcess> InProcesses { get; set; }
+    public DbSet<UserNotification> UserNotifications { get; set; }
 
     public DbSet<EntryToProcess> EntryToProcesses { get; set; }
 

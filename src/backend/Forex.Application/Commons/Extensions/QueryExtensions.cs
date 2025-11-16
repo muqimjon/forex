@@ -26,7 +26,7 @@ public static class QueryExtensions
             if (prop is null) continue;
 
             var member = Expression.Property(param, prop.Name);
-            var filterExpr = BuildCombinedCondition(member, entry.Value, prop.PropertyType, request.Timezone);
+            var filterExpr = BuildCombinedCondition(member, entry.Value, prop.PropertyType, request.TimeZone);
 
             if (filterExpr is not null)
                 query = query.Where(Expression.Lambda<Func<T, bool>>(filterExpr, param));

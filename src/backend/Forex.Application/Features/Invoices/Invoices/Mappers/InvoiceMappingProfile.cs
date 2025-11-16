@@ -1,9 +1,9 @@
-﻿namespace Forex.Application.Features.Invoices.Mappers;
+﻿namespace Forex.Application.Features.Invoices.Invoices.Mappers;
 
 using AutoMapper;
 using Forex.Application.Commons.Extensions;
-using Forex.Application.Features.Invoices.Commands;
-using Forex.Application.Features.Invoices.DTOs;
+using Forex.Application.Features.Invoices.Invoices.Commands;
+using Forex.Application.Features.Invoices.Invoices.DTOs;
 using Forex.Domain.Entities;
 
 public class InvoiceMappingProfile : Profile

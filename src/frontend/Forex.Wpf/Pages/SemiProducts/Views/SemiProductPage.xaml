@@ -118,60 +118,74 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Invoice raqami:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <TextBox Grid.Column="1" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
-                         Text="{Binding Invoice.Number, UpdateSourceTrigger=PropertyChanged}" />
-
-                <TextBlock Grid.Row="1" Text="Sana:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <controls:UserCalendar Grid.Column="1" Grid.Row="1" Width="120" Height="28" Margin="5"
+                <!-- Sana -->
+                <TextBlock Text="Sana:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
+                <controls:UserCalendar Grid.Column="1" Width="120" Height="28" Margin="5"
                                        FontSize="14" SelectedDate="{Binding Invoice.Date, Mode=TwoWay}" />
 
-                <TextBlock Grid.Column="2" Text="Tan narxi:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <TextBlock Grid.Column="3" Width="120" Margin="5" Padding="8,4"
-                           Background="White" TextAlignment="Right" VerticalAlignment="Center"
-                           Text="{Binding Invoice.CostPrice, StringFormat={}{0:N0}}" />
+                <!-- Invoys raqami -->
+                <TextBlock Grid.Row="1" Text="Invoice raqami:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
+                <TextBox Grid.Column="1" Grid.Row="1" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
+                         Text="{Binding Invoice.Number, UpdateSourceTrigger=PropertyChanged}" />
 
+                <!-- Tan narxi -->
+                <TextBlock Grid.Column="2" Text="Tan narxi:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
+                <Border Grid.Column="3" CornerRadius="4" BorderBrush="Black" BorderThickness="1" Margin="5" Width="120"  Padding="8,4">
+                <TextBlock TextAlignment="Right" VerticalAlignment="Center" 
+                           Text="{Binding Invoice.CostPrice, StringFormat={}{0:N0}}" />
+                </Border>
+
+                <!-- Yo'l xarajati -->
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="*Yo'l xarajati:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
                 <TextBox Grid.Column="3" Grid.Row="1" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
                          PreviewTextInput="NumericTextBox_PreviewTextInput"
                          Text="{Binding Invoice.CostDelivery, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" />
 
+                <!-- Ta'minotchi -->
                 <TextBlock Grid.Column="4" Text="Ta'minotchi:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <ComboBox Grid.Column="5" Width="150" Margin="5" Height="28" FontSize="14"
+                <Border Grid.Column="5" Width="150" Margin="5" Height="28" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="8 0">
+                <ComboBox  FontSize="14" BorderThickness="0"
                           DisplayMemberPath="Name" ItemsSource="{Binding AvailableSuppliers}"
-                          SelectedItem="{Binding Invoice.Supplier}" />
+                          SelectedItem="{Binding Invoice.PaymentToSupplier.User}" />
+                </Border>
 
+                <!-- Vositachi orqali ekanligini aniqlash -->
                 <TextBlock Grid.Row="1" Grid.Column="4" Text="Vositachi orqali:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
                 <ToggleButton Grid.Row="1" Grid.Column="5" Margin="5" VerticalAlignment="Center"
-                              IsChecked="{Binding Invoice.ViaMiddleman, Mode=TwoWay}" />
+                              IsChecked="{Binding Invoice.ViaConsolidator, Mode=TwoWay}" />
 
+                <!-- Vositachi -->
                 <TextBlock Grid.Column="6" Text="Vositachi:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <ComboBox Grid.Column="7" Width="150" Margin="5" Height="28" FontSize="14"
-                          DisplayMemberPath="Name" ItemsSource="{Binding AvailableAgents}"
-                          SelectedItem="{Binding Invoice.Agent}"
-                          Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <Border Grid.Column="7" Width="150" Margin="5" Height="28" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="8 0"
+                        Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ComboBox FontSize="14" BorderThickness="0" DisplayMemberPath="Name" 
+                              ItemsSource="{Binding AvailableConsolidators}" SelectedItem="{Binding Invoice.PaymentToConsolidator.User}"/>
+                </Border>
 
+                <!-- Kontiner soni -->
                 <TextBlock Grid.Row="1" Grid.Column="6" Text="*Kontiner soni:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBox Grid.Row="1" Grid.Column="7" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
                          PreviewTextInput="NumericTextBox_PreviewTextInput"
                          Text="{Binding Invoice.ContainerCount, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                         Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                         Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
+                <!-- Dona kontiner uchun to'lov -->
                 <TextBlock Grid.Column="8" Text="*Dona kon. u-n to'lov:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBox Grid.Column="9" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
                          PreviewTextInput="NumericTextBox_PreviewTextInput"
                          Text="{Binding Invoice.PricePerUnitContainer, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                         Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                         Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
+                <!-- Tanlangan valyuta ayirboshlash qiymati (so'mga nisbatan) -->
                 <TextBlock Grid.Row="1" Grid.Column="8" Text="*Kursi:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBox Grid.Row="1" Grid.Column="9" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
                          PreviewTextInput="NumericTextBox_PreviewTextInput"
-                         Text="{Binding Invoice.ExchangeRate, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                         Visibility="{Binding Invoice.ViaMiddleman, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                         Text="{Binding Invoice.PaymentToConsolidator.ExchangeRate, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                         Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
             </Grid>
 
             <!-- Products List -->
@@ -242,6 +256,7 @@
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="Auto"/>
                                                             <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
 
                                                         <!-- Type Header -->
@@ -273,11 +288,20 @@
                                                         </Grid>
 
                                                         <!-- Type Items -->
-                                                        <ItemsControl Grid.Row="1" ItemsSource="{Binding ProductTypeItems}" Margin="10,5,0,0">
+                                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,5,0,0">
+                                                            <TextBlock Text="Nomi" Width="152"/>
+                                                            <TextBlock Text="Soni" Width="102"/>
+                                                            <TextBlock Text="O'lchov birligi" Width="152"/>
+                                                            <TextBlock Text="Tan narxi" Width="122"/>
+                                                            <TextBlock Text="Jami narxi" Width="122"/>
+                                                        </StackPanel>
+
+                                                        <ItemsControl  Grid.Row="2" ItemsSource="{Binding ProductTypeItems}" Margin="10,5,0,0">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate>
                                                                     <Grid Margin="0,0,0,5">
                                                                         <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="150"/>
                                                                             <ColumnDefinition Width="100"/>
                                                                             <ColumnDefinition Width="150"/>
                                                                             <ColumnDefinition Width="120"/>
@@ -286,34 +310,41 @@
                                                                             <ColumnDefinition Width="Auto"/>
                                                                         </Grid.ColumnDefinitions>
 
-                                                                        <!-- Quantity -->
+                                                                        <!-- Nome -->
                                                                         <TextBox Style="{StaticResource InputTextBoxStyle}" Margin="2"
+                                                                                 Text="{Binding SemiProduct.Name, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                                                                 ToolTip="Nomi" />
+                                                                        
+                                                                        <!-- Quantity -->
+                                                                        <TextBox Grid.Column="1" Style="{StaticResource InputTextBoxStyle}" Margin="2"
                                                                                  PreviewTextInput="NumericTextBox_PreviewTextInput"
                                                                                  Text="{Binding SemiProduct.Quantity, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
                                                                                  ToolTip="Soni" />
 
                                                                         <!-- Unit Measure -->
-                                                                        <ComboBox Grid.Column="1" Margin="2" Height="28" FontSize="14"
+                                                                        <Border Grid.Column="2" Margin="2" Height="31" BorderBrush="LightGray" BorderThickness="1" Padding="10 0">
+                                                                            <ComboBox FontSize="14" BorderThickness="0"
                                                                                   DisplayMemberPath="Name"
                                                                                   ItemsSource="{Binding DataContext.AvailableUnitMeasures, ElementName=RootPage}"
                                                                                   SelectedItem="{Binding SemiProduct.UnitMeasure}"
                                                                                   ToolTip="O'lchov birligi" />
+                                                                        </Border>
 
                                                                         <!-- Cost Price -->
-                                                                        <TextBox Grid.Column="2" Style="{StaticResource InputTextBoxStyle}" Margin="2"
+                                                                        <TextBox Grid.Column="3" Margin="2" Padding="8,4" Style="{StaticResource InputTextBoxStyle}"
                                                                                  PreviewTextInput="NumericTextBox_PreviewTextInput"
                                                                                  Text="{Binding SemiProduct.CostPrice, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
                                                                                  ToolTip="Bir maxsulot narxi" />
 
                                                                         <!-- Total Amount -->
-                                                                        <TextBlock Grid.Column="3" Margin="2" Padding="8,4"
+                                                                        <TextBlock Grid.Column="4" Margin="2" Padding="8,4"
                                                                                   Background="#E8F5E9" TextAlignment="Right"
                                                                                   VerticalAlignment="Center" FontWeight="Bold"
                                                                                   Text="{Binding SemiProduct.TotalAmount, StringFormat={}{0:N2}}"
                                                                                   ToolTip="Jami summa" />
 
                                                                         <!-- Delete Item Button -->
-                                                                        <Button Grid.Column="5" Style="{StaticResource DeleteButtonStyle}"
+                                                                        <Button Grid.Column="6" Style="{StaticResource DeleteButtonStyle}"
                                                                                 Content="×" ToolTip="Elementni o'chirish" Margin="2"
                                                                                 Command="{Binding DataContext.RemoveProductTypeItemCommand, ElementName=RootPage}">
                                                                             <Button.CommandParameter>
