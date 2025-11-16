@@ -32,5 +32,15 @@ public class AccountMappingProfile : Profile
 
         CreateMap<ShopAccount, ShopAccountDto>();
         CreateMap<ShopAccount, AccountForShopDto>();
+        CreateMap<UserAccount, UserAccountDto>()
+             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+             .ForMember(dest => dest.OpeningBalance, opt => opt.MapFrom(src => src.OpeningBalance))
+             .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Discount))
+             .ForMember(dest => dest.Balance, opt => opt.MapFrom(src => src.Balance))
+             .ForMember(dest => dest.CurrencyId, opt => opt.MapFrom(src => src.CurrencyId))
+             .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Currency))
+             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+             .ForMember(dest => dest.DueDate, opt => opt.MapFrom(src => src.DueDate));
     }
 }

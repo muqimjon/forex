@@ -19,7 +19,7 @@ public class GetSaleByIdQueryHandler(
         var sale = await context.Sales
             .Include(s => s.SaleItems)
                 .ThenInclude(i => i.ProductType)
-            .Include(s => s.Customer)
+            .Include(s => s.User)
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(Sale), nameof(request.Id), request.Id);

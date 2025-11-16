@@ -1,0 +1,248 @@
+﻿<Window x:Class="Forex.Wpf.Windows.OverdueAccountsWindow.OverdueAccountsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Qarzdor Mijozlar"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Width="700" Height="450"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="8" Background="{DynamicResource PrimaryBackground}">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="90" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 🔍 Filter panel -->
+        <Grid Grid.Row="0" Margin="10,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Mijoz ComboBox -->
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Margin="15,0,5,0"
+                           VerticalAlignment="Center"
+                           FontSize="13"
+                           Text="Mijoz" />
+
+                <Border Grid.Row="0"
+                        Grid.Column="1"
+                        Height="30"
+                        VerticalAlignment="Center"
+                        BorderBrush="#CCCCCC"
+                        BorderThickness="2"
+                        CornerRadius="4">
+                    <ComboBox x:Name="cbxCustomer"
+                              Width="250"
+                              Margin="0"
+                              Padding="4,2"
+                              VerticalAlignment="Center"
+                              Background="White"
+                              BorderThickness="0"
+                              DisplayMemberPath="Name"
+                              FontSize="14"
+                              IsEditable="True"
+                              ItemsSource="{Binding AviableUsers}"
+                              SelectedItem="{Binding SelectedCustomer}"/>
+                </Border>
+            </Grid>
+
+            <!-- 🔘 Tugmalar -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0"
+                        Height="29"
+                        Margin="10,2,5,2"
+                        Padding="10,3"
+                        Background="#DDDDDD"
+                        VerticalAlignment="Center"
+                        md:ButtonAssist.CornerRadius="4"
+                        Command="{Binding PreviewCommand}"
+                        Content="📄 Ko‘rish"
+                        FontSize="13" />
+                <Button Grid.Row="1"
+                        Height="29"
+                        Margin="10,2,5,2"
+                        Padding="10,3"
+                        Background="#DDDDDD"
+                        VerticalAlignment="Center"
+                        md:ButtonAssist.CornerRadius="4"
+                        Command="{Binding ClearFilterCommand}"
+                        Content="🧹 Tozalash"
+                        FontSize="13" />
+            </Grid>
+
+            <Grid Grid.Column="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0"
+                        Height="29"
+                        Margin="5,2"
+                        Padding="10,3"
+                        Background="#DDDDDD"
+                        VerticalAlignment="Center"
+                        md:ButtonAssist.CornerRadius="4"
+                        Command="{Binding PrintCommand}"
+                        Content="🖨 Pechat"
+                        FontSize="13" />
+                <Button Grid.Row="1"
+                        Height="29"
+                        Margin="5,2"
+                        Padding="10,3"
+                        Background="#DDDDDD"
+                        VerticalAlignment="Center"
+                        md:ButtonAssist.CornerRadius="4"
+                        Command="{Binding ExportToExcelCommand}"
+                        Content="📊 Excel"
+                        FontSize="13" />
+            </Grid>
+        </Grid>
+
+        <!-- 📋 DataGrid -->
+        <DataGrid Grid.Row="1"
+                  Margin="10,5,10,-5"
+                  AlternatingRowBackground="#F5F5F5"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  FontSize="14"
+                  HeadersVisibility="Column"
+                  ItemsSource="{Binding AviableUserAccounts}"
+                  RowHeaderWidth="0"
+                  SelectionMode="Single">
+
+            <DataGrid.Resources>
+                <!-- Headerlarni o'rtaga qo'yish -->
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.Resources>
+
+            <DataGrid.Columns>
+
+                <!-- Mijoz (o'zgarmas, chapda) -->
+                <DataGridTextColumn Header="Mijoz"
+                                    Binding="{Binding User.Name}"
+                                    Width="*"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Telefon (o'zgarmas, chapda) -->
+                <DataGridTextColumn Header="Telefon"
+                                    Binding="{Binding User.Phone}"
+                                    Width="0.6*"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Qarzdorlik summasi (o'zgarmas, o'ngda) -->
+                <DataGridTextColumn Header="Qarzdorlik summasi"
+                                    Binding="{Binding Balance, StringFormat=N2}"
+                                    Width="0.8*"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- DueDate (tahrirlanadigan, o'rtada) -->
+                <DataGridTemplateColumn Header="DueDate" Width="0.8*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DueDate, StringFormat=dd.MM.yyyy}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding DueDateString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     PreviewTextInput="DueDate_PreviewTextInput"
+
+                                     GotFocus="DueDate_GotFocus"
+                                     BorderThickness="0"
+                                     VerticalContentAlignment="Center"
+                                     HorizontalContentAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <!-- Izoh (tahrirlanadigan, chapda) -->
+                <DataGridTemplateColumn Header="Izoh" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Description}"
+                                       TextWrapping="Wrap"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     HorizontalContentAlignment="Left"
+                                     VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Saqlash tugmasi -->
+                <DataGridTemplateColumn Header="Saqlash" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="💾"
+                                    Command="{Binding DataContext.SaveCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Width="50"
+                                    Height="30"
+                                    BorderThickness="0"
+                                    Background="{DynamicResource SecondaryBackground}"
+                                    md:ButtonAssist.CornerRadius="4"
+                                    Padding="0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+
+</Window>

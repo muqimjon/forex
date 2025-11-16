@@ -1,4 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Home;
+
+using System.Windows.Media;
+using Forex.ClientService.Interfaces;
 using Forex.ClientService.Services;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Auth;
@@ -11,8 +14,11 @@ using Forex.Wpf.Pages.Settings;
 using Forex.Wpf.Pages.ShopCashes;
 using Forex.Wpf.Pages.Users;
 using Forex.Wpf.Windows;
+using Forex.Wpf.Windows.OverdueAccountsWindow;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Interaction logic for HomePage.xaml
@@ -20,11 +26,9 @@ using System.Windows.Controls;
 public partial class HomePage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-
     public HomePage()
     {
         InitializeComponent();
-
         DataContext = AuthStore.Instance;
     }
 
@@ -32,8 +36,32 @@ public partial class HomePage : Page
     {
         if (Application.Current.MainWindow is Window mainWindow)
             WindowResizer.AnimateToSize(mainWindow, 810, 580);
-    }
 
+        //var userAccountService = App.AppHost!.Services.GetRequiredService<IApiUserAccount>();
+        //var allAccountsResult = await userAccountService.GetAllAsync();
+
+        //if (allAccountsResult.Data == null)
+        //{
+        //    if (Application.Current.MainWindow is Window defaultWindow)
+        //        defaultWindow.Background = Brushes.Green;
+        //    return;
+        //}
+
+        //var filteredData = allAccountsResult.Data
+        //   //.Where(a =>
+        //   //    a.DueDate.HasValue &&
+        //   //    a.DueDate.Value.Date <= DateTime.Today)
+        //   .ToList();
+
+        //if (filteredData.Count > 0)
+        //{
+        //    tbWarning.Foreground = Brushes.Red;
+        //}
+        //else
+        //{
+        //    tbWarning.Foreground = Brushes.Green;
+        //}
+    }
     private void BtnUser_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new UserPage());
 
@@ -62,4 +90,10 @@ public partial class HomePage : Page
 
     private void btnProcess_Click(object sender, RoutedEventArgs e)
           => Main.NavigateTo(new ProcessPage());
+
+    private void BtnOverdue_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new OverdueAccountsWindow();
+        window.ShowDialog();
+    }
 }

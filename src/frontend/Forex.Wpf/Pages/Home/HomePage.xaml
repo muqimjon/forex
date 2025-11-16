@@ -55,6 +55,26 @@
                         FontSize="16"
                         Foreground="White"
                         Text="{Binding FullName}" />
+                    <Button
+                        Margin="5,0"
+                        Padding="6,2"
+                        md:ButtonAssist.CornerRadius="6"
+                        Background="Snow"
+                        BorderThickness="0"
+                        Click="BtnOverdue_Click"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        ToolTip="Mijozlar qarzini to'lash muddatidan kechikayotganligi to'g'risida ogohlantirish!">
+
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock
+                                x:Name="tbWarning"
+                                FontSize="20"
+                                Foreground="Red"
+                                Text="🚨" />
+                        </StackPanel>
+                    </Button>
 
                     <Button
                         Padding="6,2"
@@ -62,10 +82,12 @@
                         Background="#FF1565C0"
                         BorderThickness="0"
                         Click="BtnLogout_Click"
-                        Content="🚪 Chiqish"
+                        Content="🔚"
+                        FontSize="20"
                         FontWeight="SemiBold"
                         Foreground="White"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}" />
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}"
+                        ToolTip="Chiqish" />
                 </StackPanel>
             </Grid>
         </Border>

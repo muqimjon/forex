@@ -15,4 +15,6 @@ public interface IApiSales
 
     [Post("/sales/filter")]
     Task<Response<List<SaleResponse>>> Filter(FilteringRequest request);
+    [Get("/sales")]
+    Task<Response<List<SaleResponse>>> GetAll();
 }

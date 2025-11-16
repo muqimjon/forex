@@ -105,7 +105,7 @@ public class CreateTransactionCommandHandler(
         var amountInUZS = request.Amount * request.ExchangeRate;
         var delta = amountInUZS + request.Discount;
 
-        userAccount.DueDate = request.DueDate.ToUtcSafe();
+        userAccount.DueDate = DateTime.SpecifyKind(request.DueDate, DateTimeKind.Utc);
         userAccount.Balance += delta;
     }
 
