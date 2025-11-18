@@ -294,56 +294,73 @@
                         FontSize="14"
                         HeadersVisibility="Column"
                         IsReadOnly="True"
-                        ItemsSource="{Binding SaleItems, Mode=TwoWay}"
+                        ItemsSource="{Binding SalesHistory, Mode=TwoWay}"
                         RowHeaderWidth="0"
                         SelectionMode="Single">
 
                         <!--  🧱 Ustunlar  -->
                         <DataGrid.Columns>
+
+                            <!-- Sana -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
-                                Header="Sana" />
+            Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
+            Width="*"
+            Header="Sana" />
+
+                            <!-- Mijoz -->
                             <DataGridTextColumn
-                                Width="1.5*"
-                                Binding="{Binding Customer}"
-                                Header="Mijoz" />
+            Binding="{Binding Customer}"
+            Width="1.5*"
+            Header="Mijoz" />
+
+                            <!-- Kodi -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding ProductTypeViewModel.Product.Code}"
-                                Header="Kodi" />
+            Binding="{Binding Code}"
+            Width="*"
+            Header="Kodi" />
+
+                            <!-- Produkt nomi -->
                             <DataGridTextColumn
-                                Width="1.5*"
-                                Binding="{Binding ProductTypeViewModel.Product.Name}"
-                                Header="Nomi" />
+            Binding="{Binding ProductName}"
+            Width="1.5*"
+            Header="Nomi" />
+
+                            <!-- Razmer -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding ProductTypeViewModel.Type, StringFormat={}{0:N0}}"
-                                Header="O'lcham" />
+            Binding="{Binding Type}"
+            Width="*"
+            Header="Razmer" />
+
+                            <!-- Qopdagi mahsulotlar soni -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding ProductTypeViewModel.Count, StringFormat={}{0:N0}}"
-                                Header="Bir o'lchamdagi ayoq kiyimlar soni" />
+            Binding="{Binding BundleItemCount, StringFormat={}{0:N0}}"
+            Width="*"
+            Header="Qopdagi mahsulotlar soni" />
+
+                            <!-- Jami -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding BundleCount, StringFormat={}{0:N0}}"
-                                Header="O'lcham soni" />
+            Binding="{Binding TotalCount, StringFormat={}{0:N0}}"
+            Width="*"
+            Header="Jami" />
+
+                            <!-- O‘lchov birligi -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding TotalCount, StringFormat={}{0:N0}}"
-                                Header="Jami" />
+            Binding="{Binding UnitMeasure}"
+            Width="*"
+            Header="O‘lchov birligi" />
+
+                            <!-- Narxi -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding ProductTypeViewModel.Product.UnitMeasure}"
-                                Header="O‘lchov birligi" />
+            Binding="{Binding UnitPrice, StringFormat={}{0:N2}}"
+            Width="*"
+            Header="Narxi" />
+
+                            <!-- Umumiy summa -->
                             <DataGridTextColumn
-                                Width="*"
-                                Binding="{Binding UnitPrice, StringFormat={}{0:N2}}"
-                                Header="Narxi" />
-                            <DataGridTextColumn
-                                Width="1.5*"
-                                Binding="{Binding Amount, StringFormat={}{0:N2}}"
-                                Header="Umumiy summa" />
+            Binding="{Binding Amount, StringFormat={}{0:N2}}"
+            Width="1.5*"
+            Header="Umumiy summa" />
+
                         </DataGrid.Columns>
                     </DataGrid>
 

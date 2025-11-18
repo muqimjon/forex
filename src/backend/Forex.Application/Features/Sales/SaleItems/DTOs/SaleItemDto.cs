@@ -10,6 +10,7 @@ public sealed record SaleItemDto
     public int Count { get; set; }    // (1 ta oyoq kiyim) 1 qatorda jami 50 ta ayoq kiyim sotildi
     public decimal CostPrice { get; set; }    // 1 ta savdoning bir qatorining tannarxi
     public decimal Benifit { get; set; } // 1 ta savdoning bir qatorining foydasi
+    public decimal UnitPrice { get; set; }
     public decimal Amount { get; set; }   // 1 ta savdoning bir qatorining summasi
 
     public long SaleId { get; set; }

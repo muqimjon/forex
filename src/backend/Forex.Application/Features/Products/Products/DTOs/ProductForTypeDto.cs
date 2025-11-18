@@ -9,6 +9,6 @@ public sealed record ProductForProductTypeDto
     public string Code { get; set; } = string.Empty;
     public string? ImagePath { get; set; } = string.Empty;
 
-    public long MeasureId { get; set; }
-    public UnitMeasureDto Measure { get; set; } = default!;
+    public long UnitMeasureId { get; set; }
+    public UnitMeasureDto UnitMeasure { get; set; } = default!;
 }

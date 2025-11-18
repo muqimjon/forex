@@ -4,7 +4,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
+using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
@@ -20,8 +22,13 @@ public partial class ReportsPageViewModel : ViewModelBase
         _ = LoadDataAsync();
     }
 
+    public ObservableCollection<SaleHistoryItemViewModel> SalesHistory { get; set; }
+    = new ObservableCollection<SaleHistoryItemViewModel>();
+
+
     [ObservableProperty] private ObservableCollection<SaleItemForReportViewModel> saleItems = [];
     [ObservableProperty] private ObservableCollection<SaleItemForReportViewModel> filteredSaleItems = [];
+    
 
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
     private ProductViewModel? selectedProduct;
@@ -34,7 +41,53 @@ public partial class ReportsPageViewModel : ViewModelBase
     {
         await LoadCustomersAsync();
         await LoadProductsAsync();
-        await LoadSaleAsynce();
+        await LoadSaleHistoryAsync();
+    }
+    public async Task LoadSaleHistoryAsync()
+    {
+        var response = await client.Sales.GetAll().Handle(isLoading => IsLoading = isLoading);
+
+        if (!response.IsSuccess)
+        {
+            ErrorMessage = response.Message ?? "Savdo ma'lumotlarini yuklashda xatolik.";
+            return;
+        }
+
+        SalesHistory.Clear();
+
+        LoadSales(response.Data);
+    }
+
+    public void LoadSales(IEnumerable<SaleResponse> sales)
+    {
+        SalesHistory.Clear();
+
+        foreach (var sale in sales)
+        {
+            if (sale.SaleItems == null) continue;
+
+            foreach (var item in sale.SaleItems)
+            {
+                var productType = item.ProductType;
+                var product = productType?.Product;
+
+                SalesHistory.Add(new SaleHistoryItemViewModel
+                {
+                    Date = sale.Date,
+                    Customer = sale.Customer?.Name ?? "-",
+
+                    Code = product?.Code ?? "-",
+                    ProductName = product?.Name ?? "-",
+                    Type = productType?.Type ?? "-",
+                    BundleItemCount = productType?.BundleItemCount ?? 0,
+
+                    TotalCount = item.TotalCount,
+                    UnitMeasure = product?.UnitMeasure?.Name ?? "-",
+                    UnitPrice = item.UnitPrice,
+                    Amount = item.Amount
+                });
+            }
+        }
     }
 
     private async Task LoadCustomersAsync()
@@ -63,37 +116,8 @@ public partial class ReportsPageViewModel : ViewModelBase
         else ErrorMessage = response.Message ?? "Mahsulotlarni yuklashda xatolik.";
     }
 
-    //public async Task LoadSaleAsynce()
-    //{
-    //    FilteringRequest request = new()
-    //    {
-    //        Filters = new()
-    //        {
-    //            ["SaleItems"] = ["include:productType.product"],
-    //            ["SaleItems"] = ["include:productType.ProductTypeItems"],
-    //        }
-    //    };
-
-    //    var response = await client.Sales.Filter(request).Handle(isLoading => IsLoading = isLoading);
-    //    if (!response.IsSuccess)
-    //    {
-    //        ErrorMessage = response.Message ?? "Savdo ma'lumotlarini yuklashda xatolik.";
-    //        return;
-    //    }
-    //}
-
-    public async Task LoadSaleAsynce()
+    public async Task LoadSaleHistoryAsynce()
     {
-        //FilteringRequest request = new()
-        //{
-        //    Filters = new()
-        //    {
-        //        ["SaleItems"] = ["include:productType.product"],
-        //        ["SaleItems"] = ["include:productType.ProductTypeItems"],
-        //        ["Customer"] = ["include:"]
-        //    }
-        //};
-
         var response = await client.Sales.GetAll().Handle(isLoading => IsLoading = isLoading);
 
         if (!response.IsSuccess)
@@ -102,25 +126,7 @@ public partial class ReportsPageViewModel : ViewModelBase
             return;
         }
 
-        var items = new ObservableCollection<SaleItemForReportViewModel>();
 
-        foreach (var sale in response.Data)
-        {
-            foreach (var item in sale.SaleItems)
-            {
-                items.Add(new SaleItemForReportViewModel
-                {
-                    Date = sale.Date,
-                    Customer = sale.Customer?.Name,
-                    BundleCount = item.ProductType.BundleItemCount,
-                    TotalCount = item.TotalCount,
-                    Amount = item.TotalAmount
-                });
-            }
-        }
-
-        SaleItems = items;
-        FilteredSaleItems = items; // agar filtirdan foydalanmoqchi bo‘lsangiz
     }
 
 }
