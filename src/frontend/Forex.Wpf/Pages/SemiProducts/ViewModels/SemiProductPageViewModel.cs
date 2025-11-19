@@ -49,11 +49,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     private async Task LoadDataAsync()
     {
-        await Task.WhenAll(
-            LoadCurrenciesAsync(),
-            LoadUnitMeasures(),
-            LoadUsersAsync()
-        );
+        await LoadCurrenciesAsync();
+        await LoadUnitMeasures();
+        await LoadUsersAsync();
     }
 
     private async Task LoadCurrenciesAsync()

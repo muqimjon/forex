@@ -8,7 +8,7 @@ using Refit;
 public interface IApiProducts
 {
     [Get("/products")]
-    Task<Response<List<ProductResponse>>> GetAll();
+    Task<Response<List<ProductResponse>>> GetAllAsync();
 
     [Get("/products/{id}")]
     Task<Response<ProductResponse>> GetById(long id);

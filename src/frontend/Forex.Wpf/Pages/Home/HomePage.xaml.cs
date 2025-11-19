@@ -3,7 +3,7 @@ using Forex.ClientService.Services;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Processes;
-using Forex.Wpf.Pages.Products;
+using Forex.Wpf.Pages.Products.Views;
 using Forex.Wpf.Pages.Reports;
 using Forex.Wpf.Pages.Sales;
 using Forex.Wpf.Pages.SemiProducts.Views;
@@ -61,7 +61,7 @@ public partial class HomePage : Page
         => Main.NavigateTo(new UserPage());
 
     private void BtnProduct_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new ProductPage());
+        => Main.NavigateTo(new ProductEntryPage());
 
     private void BtnCash_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new ShopCashPage());

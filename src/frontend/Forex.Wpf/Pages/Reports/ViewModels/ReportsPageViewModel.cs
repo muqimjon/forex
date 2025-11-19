@@ -57,7 +57,7 @@ public partial class ReportsPageViewModel : ViewModelBase
 
     public async Task LoadProductsAsync()
     {
-        var response = await client.Products.GetAll().Handle(isLoading => IsLoading = isLoading);
+        var response = await client.Products.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
             AvailableProducts = mapper.Map<ObservableCollection<ProductViewModel>>(response.Data!);
         else ErrorMessage = response.Message ?? "Mahsulotlarni yuklashda xatolik.";
