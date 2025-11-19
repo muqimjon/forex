@@ -179,7 +179,7 @@
                             Header="Nomi"
                             SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <DataGridTemplateColumn Width="0.7*" Header="O'lcham">
+                        <DataGridTemplateColumn Width="0.7*" Header="Razmer">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ComboBox
@@ -192,7 +192,7 @@
                         </DataGridTemplateColumn>
 
                         <!--  To'plamdagi mahsulotlar soni  -->
-                        <DataGridTemplateColumn Width="0.7*" Header="To'plamdagi mahsulotlar soni">
+                        <DataGridTemplateColumn Width="0.7*" Header="Qopdagi mahsulotlar soni">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox

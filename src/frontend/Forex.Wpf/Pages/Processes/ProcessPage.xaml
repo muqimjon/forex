@@ -137,7 +137,7 @@
                     Header="Nomi"
                     SelectedItemBinding="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <DataGridTemplateColumn Width="*" Header="O'lcham">
+                <DataGridTemplateColumn Width="*" Header="Razmer">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox
