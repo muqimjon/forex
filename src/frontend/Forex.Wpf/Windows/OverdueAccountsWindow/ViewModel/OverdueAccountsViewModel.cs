@@ -55,28 +55,44 @@ public partial class OverdueAccountsViewModel : ViewModelBase
             return;
         }
 
-        var filteredData = allAccountsResult.Data
+        var excludedUserRoles = new ClientService.Enums.UserRole[]
+        {
+        ClientService.Enums.UserRole.Hodim,
+        };
+
+        var allowedUserIds = allUsersResult.Data
+            .Where(u => !excludedUserRoles.Contains(u.Role))
+            .Select(u => u.Id)
+            .ToHashSet();
+
+
+        var finalFilteredAccountsDto = allAccountsResult.Data
             .Where(a =>
+                allowedUserIds.Contains(a.UserId) &&
                 a.DueDate.HasValue &&
                 a.DueDate.Value.Date <= DateTime.Today)
             .ToList();
 
-        var accountsVm = mapper.Map<List<UserAccountViewModel>>(filteredData);
+        var accountsVm = mapper.Map<List<UserAccountViewModel>>(finalFilteredAccountsDto);
 
-        var usersList = mapper.Map<List<UserViewModel>>(allUsersResult
-            .Data.Where(a => a.Role == ClientService.Enums.UserRole.Mijoz));
-        AviableUsers = new ObservableCollection<UserViewModel>(usersList);
+        var uniqueUserIdsInAccounts = accountsVm.Select(a => a.UserId).Distinct().ToList();
+
+        var availableUsersList = allUsersResult.Data
+            .Where(u => uniqueUserIdsInAccounts.Contains(u.Id))
+            .ToList();
+
+        var aviableUsersVm = mapper.Map<List<UserViewModel>>(availableUsersList);
 
         foreach (var acc in accountsVm)
         {
-            var usr = AviableUsers.FirstOrDefault(u => u.Id == acc.UserId);
-            acc.User = usr ?? new UserViewModel { Id = acc.UserId, Name = "Noma'lum mijoz" };
+            var usr = aviableUsersVm.FirstOrDefault(u => u.Id == acc.UserId);
+            acc.User = usr ?? new UserViewModel { Id = acc.UserId, Name = "Noma'lum foydalanuvchi" };
         }
 
+        AviableUsers = new ObservableCollection<UserViewModel>(aviableUsersVm);
         AllAccountsSource = new ObservableCollection<UserAccountViewModel>(accountsVm);
         AviableUserAccounts = AllAccountsSource;
     }
-
     private void ApplyFilter()
     {
         IEnumerable<UserAccountViewModel> query = AllAccountsSource;
