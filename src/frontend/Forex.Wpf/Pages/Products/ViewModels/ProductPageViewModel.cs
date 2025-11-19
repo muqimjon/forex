@@ -44,7 +44,7 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             {
                 ProductTypeId = p.ProductType!.Id,
                 Count = p.Count,
-                BundleItemCount = p.BundleItemCount
+                BundleItemCount = (int)p.BundleItemCount!
             })
             .ToList();
 

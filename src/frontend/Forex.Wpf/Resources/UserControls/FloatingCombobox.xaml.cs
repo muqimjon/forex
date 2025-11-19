@@ -67,7 +67,6 @@ public partial class FloatingComboBox : UserControl
         set => SetValue(SelectedItemProperty, value);
     }
 
-
     // IsEditable
     public static readonly DependencyProperty IsEditableProperty =
         DependencyProperty.Register(nameof(IsEditable), typeof(object), typeof(FloatingComboBox),
@@ -90,7 +89,7 @@ public partial class FloatingComboBox : UserControl
         set => SetValue(IsTextSearchEnabledProperty, value);
     }
 
-    // SelectedValue/SelectedValuePath passthrough — kerak bo‘lsa yoqing
+    // SelectedValue/SelectedValuePath passthrough — kerak bo'lsa yoqing
     public static readonly DependencyProperty SelectedValuePathProperty =
         DependencyProperty.Register(nameof(SelectedValuePath), typeof(string), typeof(FloatingComboBox),
             new PropertyMetadata(string.Empty));
@@ -124,14 +123,34 @@ public partial class FloatingComboBox : UserControl
         set => SetValue(DropDownOpenedCommandProperty, value);
     }
 
-    // Ichki ComboBox’ning DropDownOpened voqeasida command’ni chaqiramiz
+    // LostFocus Command uchun DependencyProperty
+    public static readonly DependencyProperty LostFocusCommandProperty =
+        DependencyProperty.Register(
+            nameof(LostFocusCommand),
+            typeof(ICommand),
+            typeof(FloatingComboBox),
+            new PropertyMetadata(null));
+
+    public ICommand? LostFocusCommand
+    {
+        get => (ICommand?)GetValue(LostFocusCommandProperty);
+        set => SetValue(LostFocusCommandProperty, value);
+    }
+
+    // Ichki ComboBox'ning DropDownOpened voqeasida command'ni chaqiramiz
     private void ComboBox_DropDownOpened(object sender, EventArgs e)
     {
         if (DropDownOpenedCommand?.CanExecute(null) == true)
             DropDownOpenedCommand.Execute(null);
     }
 
+    // Ichki ComboBox'ning LostFocus voqeasida command'ni chaqiramiz
+    private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (LostFocusCommand?.CanExecute(Text) == true)
+            LostFocusCommand.Execute(Text);
+    }
 
-    // Ichki ComboBox’ga to‘g‘ridan-to‘g‘ri kirish kerak bo‘lsa
+    // Ichki ComboBox'ga to'g'ridan-to'g'ri kirish kerak bo'lsa
     public ComboBox ComboBox => comboBox;
 }

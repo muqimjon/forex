@@ -28,22 +28,22 @@
             BorderThickness="1"
             CornerRadius="4">
 
-            <ComboBox
-                x:Name="comboBox"
-                VerticalAlignment="Center"
-                VerticalContentAlignment="Center"
-                Background="Transparent"
-                BorderThickness="0"
-                DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                DropDownOpened="ComboBox_DropDownOpened"
-                FontSize="14"
-                IsEditable="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                IsTextSearchEnabled="{Binding IsTextSearchEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                SelectedValue="{Binding SelectedValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                SelectedValuePath="{Binding SelectedValuePath, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox x:Name="comboBox"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    DropDownOpened="ComboBox_DropDownOpened"
+                    LostFocus="ComboBox_LostFocus"
+                    FontSize="14"
+                    IsEditable="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    IsTextSearchEnabled="{Binding IsTextSearchEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    SelectedValue="{Binding SelectedValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    SelectedValuePath="{Binding SelectedValuePath, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" />
         </Border>
     </Grid>
 </UserControl>
