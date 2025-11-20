@@ -72,4 +72,9 @@ public partial class ProductEntryPage : Page
         else
             Main.NavigateTo(new HomePage());
     }
+
+    private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        vm.Edit();
+    }
 }

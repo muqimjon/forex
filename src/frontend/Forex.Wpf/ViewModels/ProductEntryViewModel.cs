@@ -2,19 +2,17 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.Wpf.Pages.Common;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 public partial class ProductEntryViewModel : ViewModelBase
 {
     [ObservableProperty] private ProductViewModel? product;
     [ObservableProperty] private ProductTypeViewModel? productType;
     [ObservableProperty] private int count;
-    [ObservableProperty] private int? bundleItemCount;
     [ObservableProperty] private int availableCount;
 
-    [ObservableProperty] private int? totalCount;
+    [ObservableProperty] private uint? totalCount;
     [ObservableProperty] private int? bundleCount;
-    [ObservableProperty] private ObservableCollection<ProductTypeViewModel> availableProductTypes = [];
 
     [ObservableProperty] private decimal? unitPrice;
 
@@ -22,10 +20,10 @@ public partial class ProductEntryViewModel : ViewModelBase
 
     partial void OnProductTypeChanged(ProductTypeViewModel? value)
     {
-        BundleItemCount = value?.BundleItemCount ?? 0;
+        if (value is not null)
+            value.PropertyChanged += OnProductTypePropertyChanged;
     }
 
-    partial void OnBundleItemCountChanged(int? value) => RecalculateTotalCount();
     partial void OnBundleCountChanged(int? value) => RecalculateTotalCount();
 
     #endregion Property Changes
@@ -34,7 +32,14 @@ public partial class ProductEntryViewModel : ViewModelBase
 
     private void RecalculateTotalCount()
     {
-        TotalCount = BundleCount * BundleItemCount;
+        if (BundleCount is not null && ProductType is not null && ProductType.BundleItemCount is not null)
+            TotalCount = (uint)(BundleCount * ProductType.BundleItemCount);
+    }
+
+    private void OnProductTypePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ProductType.BundleItemCount))
+            RecalculateTotalCount();
     }
 
     #endregion

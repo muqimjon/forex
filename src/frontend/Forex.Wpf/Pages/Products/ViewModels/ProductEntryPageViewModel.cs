@@ -3,6 +3,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
+using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
@@ -11,6 +12,7 @@ using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.Json;
 using System.Windows;
 
 public partial class ProductEntryPageViewModel : ViewModelBase
@@ -27,10 +29,13 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
     [ObservableProperty] private DateTime date = DateTime.Now;
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
+    public string[] ProductionOrigins { get; set; } = Enum.GetNames<ProductionOrigin>();
     [ObservableProperty] private ObservableCollection<ProductEntryViewModel> productEntries = [];
     [ObservableProperty] private ProductEntryViewModel currentProductEntry = new();
+    [ObservableProperty] private ProductEntryViewModel? selectedProductEntry = new();
 
     #region Load Data
+
     public async Task LoadDataAsync()
     {
         await LoadProductsAsync();
@@ -49,65 +54,59 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
     private async Task LoadProductTypesAsync(long productId)
     {
-        FilteringRequest request = new();
+        if (CurrentProductEntry.Product!.ProductTypes.Any())
+            return;
+
+        FilteringRequest request = new()
+        {
+            Filters = new()
+            {
+                ["productid"] = [productId.ToString()]
+            }
+        };
 
         var response = await Client.ProductTypes.Filter(request)
             .Handle(isLoading => IsLoading = isLoading);
 
-        if (response.IsSuccess && response.Data is not null)
-        {
-            CurrentProductEntry.AvailableProductTypes =
-                Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
-        }
-        else
-        {
-            CurrentProductEntry.AvailableProductTypes = [];
-        }
+        if (response.IsSuccess)
+            CurrentProductEntry.Product!.ProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
+        else ErrorMessage = response.Message ?? "Maxsulot turlarini yuklashda xatolik";
     }
+
     #endregion
 
     #region Property Change Handlers
+
     private async void OnCurrentProductEntryPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ProductEntryViewModel.Product))
         {
-            // Faqat combobox selection o'zgarganda ishga tushadi
             if (CurrentProductEntry.Product is not null &&
-                AvailableProducts.Any(p => p.Id == CurrentProductEntry.Product.Id))
+                CurrentProductEntry.Product.ProductTypes.Any())
             {
+                CurrentProductEntry.IsSelected = false;
                 await LoadProductTypesAsync(CurrentProductEntry.Product.Id);
             }
         }
     }
 
-    /// <summary>
-    /// LostFocus event'dan chaqiriladigan metod - qo'lda kiritilgan kodni tekshiradi
-    /// </summary>
     public async Task ValidateProductCodeAsync(string productCode)
     {
         if (string.IsNullOrWhiteSpace(productCode))
-        {
-            CurrentProductEntry.AvailableProductTypes = [];
             return;
-        }
 
         productCode = productCode.Trim();
 
-        // Mahsulot mavjudligini tekshirish
         var existingProduct = AvailableProducts.FirstOrDefault(p =>
             p.Code?.Trim().Equals(productCode, StringComparison.OrdinalIgnoreCase) == true);
 
         if (existingProduct is not null)
         {
-            // Mavjud mahsulot - to'liq ma'lumotlarni o'rnatish
             CurrentProductEntry.Product = existingProduct;
-
-            // Typelarni yuklash
             await LoadProductTypesAsync(existingProduct.Id);
         }
         else
         {
-            // Yangi mahsulot - tasdiqlash so'rash
             var result = MessageBox.Show(
                 $"'{productCode}' kodli mahsulot topilmadi. Yangi mahsulot qo'shmoqchimisiz?",
                 "Tasdiqlash",
@@ -116,28 +115,21 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
             if (result == MessageBoxResult.No)
             {
-                // Foydalanuvchi rad etdi - ma'lumotlarni tozalash
                 ClearCurrentEntry();
                 return;
             }
 
-            // Foydalanuvchi tasdiqladi - yangi mahsulot yaratish
             var newProduct = new ProductViewModel
             {
                 Code = productCode,
-                Name = string.Empty // Foydalanuvchi nomni keyinroq kiritadi
+                Name = string.Empty
             };
 
             CurrentProductEntry.Product = newProduct;
-
-            // Yangi mahsulot uchun bo'sh type kolleksiyasi
-            CurrentProductEntry.AvailableProductTypes = [];
+            CurrentProductEntry.IsSelected = true;
         }
     }
 
-    /// <summary>
-    /// LostFocus event'dan chaqiriladigan metod - qo'lda kiritilgan type ni tekshiradi
-    /// </summary>
     public void ValidateProductType(string productType)
     {
         if (string.IsNullOrWhiteSpace(productType))
@@ -147,18 +139,15 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
         productType = productType.Trim();
 
-        // ProductType mavjudligini tekshirish
-        var existingType = CurrentProductEntry.AvailableProductTypes.FirstOrDefault(t =>
+        var existingType = CurrentProductEntry.Product!.ProductTypes.FirstOrDefault(t =>
             t.Type?.Trim().Equals(productType, StringComparison.OrdinalIgnoreCase) == true);
 
         if (existingType is not null)
         {
-            // Mavjud type - o'rnatish
             CurrentProductEntry.ProductType = existingType;
         }
         else
         {
-            // Yangi type - tasdiqlash so'rash
             var result = MessageBox.Show(
                 $"'{productType}' razmeri topilmadi. Yangi razmer qo'shmoqchimisiz?",
                 "Tasdiqlash",
@@ -167,21 +156,20 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
             if (result == MessageBoxResult.No)
             {
-                // Foydalanuvchi rad etdi - type ni tozalash
                 CurrentProductEntry.ProductType = null;
                 return;
             }
 
-            // Foydalanuvchi tasdiqladi - yangi type yaratish
             var newType = new ProductTypeViewModel
             {
-                Type = productType,
-                BundleItemCount = 0 // Default qiymat, foydalanuvchi keyinroq kiritadi
+                Type = productType
             };
 
+            CurrentProductEntry.Product!.ProductTypes.Add(newType);
             CurrentProductEntry.ProductType = newType;
         }
     }
+
     #endregion
 
     #region Commands
@@ -189,13 +177,13 @@ public partial class ProductEntryPageViewModel : ViewModelBase
     [RelayCommand]
     private void Add()
     {
-        if (CurrentProductEntry.Product == null || string.IsNullOrWhiteSpace(CurrentProductEntry.Product.Code))
+        if (CurrentProductEntry.Product is null || string.IsNullOrWhiteSpace(CurrentProductEntry.Product.Code))
         {
             ErrorMessage = "Mahsulot kodini kiriting!";
             return;
         }
 
-        if (CurrentProductEntry.ProductType == null || string.IsNullOrWhiteSpace(CurrentProductEntry.ProductType.Type))
+        if (CurrentProductEntry.ProductType is null || string.IsNullOrWhiteSpace(CurrentProductEntry.ProductType.Type))
         {
             ErrorMessage = "Razmerni kiriting!";
             return;
@@ -213,11 +201,22 @@ public partial class ProductEntryPageViewModel : ViewModelBase
             return;
         }
 
-        var item = new ProductEntryViewModel
+        var item = ProductEntries.FirstOrDefault(pe => pe.IsEditing);
+        if (item is not null)
+        {
+            item.Product = CurrentProductEntry.Product;
+            item.ProductType = CurrentProductEntry.ProductType;
+            item.BundleCount = CurrentProductEntry.BundleCount;
+            item.TotalCount = CurrentProductEntry.TotalCount;
+            item.UnitPrice = CurrentProductEntry.UnitPrice;
+            item.IsEditing = default;
+            return;
+        }
+
+        item = new ProductEntryViewModel
         {
             Product = CurrentProductEntry.Product,
             ProductType = CurrentProductEntry.ProductType,
-            BundleItemCount = CurrentProductEntry.BundleItemCount,
             BundleCount = CurrentProductEntry.BundleCount,
             TotalCount = CurrentProductEntry.TotalCount,
             UnitPrice = CurrentProductEntry.UnitPrice
@@ -225,7 +224,9 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
         ProductEntries.Add(item);
 
-        // Formani tozalash
+        if (!AvailableProducts.Contains(item.Product))
+            AvailableProducts.Add(item.Product);
+
         ClearCurrentEntry();
     }
 
@@ -238,7 +239,6 @@ public partial class ProductEntryPageViewModel : ViewModelBase
             return;
         }
 
-        // Bu yerda ma'lumotlarni serverga yuborish logikasi bo'ladi
         var result = MessageBox.Show(
             $"{ProductEntries.Count} ta mahsulotni saqlashni tasdiqlaysizmi?",
             "Tasdiqlash",
@@ -247,9 +247,6 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
         if (result == MessageBoxResult.Yes)
         {
-            // Serverga yuborish
-            // await SaveToServerAsync();
-
             SuccessMessage = "Ma'lumotlar muvaffaqiyatli saqlandi!";
             ProductEntries.Clear();
             ClearCurrentEntry();
@@ -260,11 +257,30 @@ public partial class ProductEntryPageViewModel : ViewModelBase
     {
         CurrentProductEntry.Product = null;
         CurrentProductEntry.ProductType = null;
-        CurrentProductEntry.BundleCount =
-        CurrentProductEntry.BundleItemCount =
+        CurrentProductEntry.BundleCount = null;
         CurrentProductEntry.TotalCount = null;
         CurrentProductEntry.UnitPrice = null;
-        CurrentProductEntry.AvailableProductTypes = [];
     }
+
+    #endregion
+
+    #region Private Helpers
+
+    public void Edit()
+    {
+        if (SelectedProductEntry is null)
+            return;
+
+        SelectedProductEntry.IsEditing = true;
+        var copiedEntry = JsonSerializer.Deserialize<ProductEntryViewModel>(JsonSerializer.Serialize(SelectedProductEntry));
+
+        if (copiedEntry is null)
+            return;
+
+        CurrentProductEntry.PropertyChanged -= OnCurrentProductEntryPropertyChanged;
+        CurrentProductEntry = copiedEntry;
+        CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
+    }
+
     #endregion
 }
