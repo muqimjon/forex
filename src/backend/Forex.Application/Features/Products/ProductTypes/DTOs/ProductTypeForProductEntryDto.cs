@@ -9,6 +9,7 @@ public sealed record ProductTypeForProductEntryDto
     public long Id { get; set; }
     public string Type { get; set; } = string.Empty;    //24-29, 30-35 , 36-41 razmeri
     public int BundleItemCount { get; set; }     // 24-29 to'plamda nechtadan mahsulot borligi
+    public decimal UnitPrice { get; set; }
 
     public long ProductId { get; set; }
     public ProductForProductTypeDto Product { get; set; } = default!;

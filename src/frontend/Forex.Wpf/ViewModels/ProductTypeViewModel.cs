@@ -10,8 +10,8 @@ public partial class ProductTypeViewModel : ViewModelBase
     public long Id { get; set; }
     public long ProductId { get; set; }
     [ObservableProperty] private string type = string.Empty;
-    [ObservableProperty] private int? bundleItemCount;
-    [ObservableProperty] private decimal? cost;
+    [ObservableProperty] private uint? bundleItemCount;
+    [ObservableProperty] private decimal? unitPrice;
     [ObservableProperty] private ObservableCollection<ProductTypeItemViewModel> productTypeItems = [];
     [ObservableProperty] private ProductResidueResponse productResidue = default!;
     [ObservableProperty] private ICollection<SemiProductEntryResponse> productEntries = default!;
@@ -39,8 +39,8 @@ public partial class ProductTypeViewModel : ViewModelBase
                 Id = value.Id;
                 Type = value.Type;
                 BundleItemCount = value.BundleItemCount;
-                Cost = value.Cost;
                 ProductTypeItems = value.ProductTypeItems;
+                UnitPrice = value.UnitPrice;
             }
         }
     }

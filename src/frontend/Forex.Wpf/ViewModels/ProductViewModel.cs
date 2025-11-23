@@ -12,9 +12,9 @@ using System.Windows.Media.Imaging;
 public partial class ProductViewModel : ViewModelBase
 {
     public long Id { get; set; }
+    public long UnitMeasureId { get; set; }
     [ObservableProperty] private string code = string.Empty;
     [ObservableProperty] private string name = string.Empty;
-    [ObservableProperty] private string productionOriginName = string.Empty;
     [ObservableProperty] private ProductionOrigin productionOrigin;
     [ObservableProperty] private UnitMeasuerViewModel unitMeasure = default!;
     [ObservableProperty] private ImageSource? image;
@@ -70,11 +70,6 @@ public partial class ProductViewModel : ViewModelBase
                 ProductTypes = new ObservableCollection<ProductTypeViewModel>(value.ProductTypes ?? []);
             }
         }
-    }
-
-    partial void OnProductionOriginNameChanged(string value)
-    {
-        ProductionOrigin = Enum.TryParse<ProductionOrigin>(ProductionOriginName, out var role) ? role : ProductionOrigin.Eva;
     }
 
     #endregion Property Changes

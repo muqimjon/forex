@@ -434,7 +434,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
                                 Id = t.Id,
                                 Type = t.Type,
                                 BundleItemCount = t.BundleItemCount,
-                                Cost = t.Cost,
+                                UnitPrice = t.UnitPrice,
                                 ProductTypeItems = new ObservableCollection<ProductTypeItemViewModel>(validItems)
                             };
                         })

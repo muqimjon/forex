@@ -10,14 +10,6 @@ public class ProductMappingProfile : Profile
 {
     public ProductMappingProfile()
     {
-        CreateMap<CreateProductCommand, Product>()
-            .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name.ToNormalized()));
-
-        CreateMap<UpdateProductCommand, Product>()
-            .ForMember(dest => dest.NormalizedName,
-                opt => opt.MapFrom(src => src.Name.ToNormalized()));
-
         CreateMap<ProductCommand, Product>()
             .ForMember(dest => dest.NormalizedName,
                 opt => opt.MapFrom(src => src.Name.ToNormalized()));

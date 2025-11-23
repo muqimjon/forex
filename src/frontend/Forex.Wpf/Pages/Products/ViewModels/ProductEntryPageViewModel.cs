@@ -6,13 +6,12 @@ using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
+using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text.Json;
 using System.Windows;
 
 public partial class ProductEntryPageViewModel : ViewModelBase
@@ -81,10 +80,8 @@ public partial class ProductEntryPageViewModel : ViewModelBase
     {
         if (e.PropertyName == nameof(ProductEntryViewModel.Product))
         {
-            if (CurrentProductEntry.Product is not null &&
-                CurrentProductEntry.Product.ProductTypes.Any())
+            if (CurrentProductEntry.Product is not null && CurrentProductEntry.Product.Id > 0)
             {
-                CurrentProductEntry.IsSelected = false;
                 await LoadProductTypesAsync(CurrentProductEntry.Product.Id);
             }
         }
@@ -122,29 +119,28 @@ public partial class ProductEntryPageViewModel : ViewModelBase
             var newProduct = new ProductViewModel
             {
                 Code = productCode,
-                Name = string.Empty
+                Name = string.Empty,
+                ProductTypes = []
             };
 
             CurrentProductEntry.Product = newProduct;
-            CurrentProductEntry.IsSelected = true;
+            CurrentProductEntry.IsEditing = true;
         }
     }
 
     public void ValidateProductType(string productType)
     {
-        if (string.IsNullOrWhiteSpace(productType))
-        {
+        if (string.IsNullOrWhiteSpace(productType) || CurrentProductEntry.Product is null)
             return;
-        }
 
         productType = productType.Trim();
 
-        var existingType = CurrentProductEntry.Product!.ProductTypes.FirstOrDefault(t =>
+        var existingType = CurrentProductEntry.Product.ProductTypes?.FirstOrDefault(t =>
             t.Type?.Trim().Equals(productType, StringComparison.OrdinalIgnoreCase) == true);
 
         if (existingType is not null)
         {
-            CurrentProductEntry.ProductType = existingType;
+            CurrentProductEntry.Product.SelectedType = existingType;
         }
         else
         {
@@ -156,17 +152,19 @@ public partial class ProductEntryPageViewModel : ViewModelBase
 
             if (result == MessageBoxResult.No)
             {
-                CurrentProductEntry.ProductType = null;
+                CurrentProductEntry.Product.SelectedType = null;
                 return;
             }
 
             var newType = new ProductTypeViewModel
             {
-                Type = productType
+                Type = productType,
+                ProductTypeItems = []
             };
 
-            CurrentProductEntry.Product!.ProductTypes.Add(newType);
-            CurrentProductEntry.ProductType = newType;
+            CurrentProductEntry.Product.ProductTypes ??= [];
+            CurrentProductEntry.Product.ProductTypes.Add(newType);
+            CurrentProductEntry.Product.SelectedType = newType;
         }
     }
 
@@ -179,53 +177,101 @@ public partial class ProductEntryPageViewModel : ViewModelBase
     {
         if (CurrentProductEntry.Product is null || string.IsNullOrWhiteSpace(CurrentProductEntry.Product.Code))
         {
-            ErrorMessage = "Mahsulot kodini kiriting!";
+            WarningMessage = "Mahsulot kodini kiriting!";
             return;
         }
-
-        if (CurrentProductEntry.ProductType is null || string.IsNullOrWhiteSpace(CurrentProductEntry.ProductType.Type))
+        if (string.IsNullOrWhiteSpace(CurrentProductEntry.Product.Name))
         {
-            ErrorMessage = "Razmerni kiriting!";
+            WarningMessage = "Mahsulot nomini kiriting!";
             return;
         }
-
+        if (CurrentProductEntry.Product.SelectedType is null || string.IsNullOrWhiteSpace(CurrentProductEntry.Product.SelectedType.Type))
+        {
+            WarningMessage = "Razmerni kiriting!";
+            return;
+        }
         if (CurrentProductEntry.BundleCount <= 0)
         {
-            ErrorMessage = "Qop sonini kiriting!";
+            WarningMessage = "Qop sonini kiriting!";
+            return;
+        }
+        if (CurrentProductEntry.Product.SelectedType.BundleItemCount <= 0)
+        {
+            WarningMessage = "Qopdagi sonni kiriting!";
+            return;
+        }
+        if (CurrentProductEntry.Product.SelectedType.UnitPrice <= 0)
+        {
+            WarningMessage = "Tannarxni kiriting!";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(CurrentProductEntry.ProductionOriginName))
+        {
+            WarningMessage = "Tayyorlanish usulini tanlang!";
             return;
         }
 
-        if (CurrentProductEntry.UnitPrice <= 0)
+        // Mavjud yozuvni tekshirish
+        var existingItem = ProductEntries.FirstOrDefault(pe =>
+            pe.Product?.Code == CurrentProductEntry.Product.Code &&
+            pe.Product?.SelectedType?.Type == CurrentProductEntry.Product.SelectedType.Type);
+
+        if (existingItem is not null)
         {
-            ErrorMessage = "Tannarxni kiriting!";
-            return;
+            var result = MessageBox.Show(
+                $"Ushbu mahsulot ro'yxatda mavjud. Ma'lumotlarni yangilashni tasdiqlaysizmi?",
+                "Tasdiqlash",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.No)
+                return;
+
+            // Mavjud yozuvni yangilash
+            existingItem.Product = CurrentProductEntry.Product;
+            existingItem.BundleCount = CurrentProductEntry.BundleCount;
+            existingItem.Count = CurrentProductEntry.Count;
+            existingItem.ProductionOrigin = CurrentProductEntry.ProductionOrigin;
+            existingItem.ProductionOriginName = CurrentProductEntry.ProductionOriginName;
+
+            SuccessMessage = "Ma'lumotlar muvaffaqiyatli yangilandi!";
         }
-
-        var item = ProductEntries.FirstOrDefault(pe => pe.IsEditing);
-        if (item is not null)
+        else
         {
-            item.Product = CurrentProductEntry.Product;
-            item.ProductType = CurrentProductEntry.ProductType;
-            item.BundleCount = CurrentProductEntry.BundleCount;
-            item.TotalCount = CurrentProductEntry.TotalCount;
-            item.UnitPrice = CurrentProductEntry.UnitPrice;
-            item.IsEditing = default;
-            return;
+            // Yangi entry yaratish - Product obyektini klon qilish
+            var clonedProduct = new ProductViewModel
+            {
+                Id = CurrentProductEntry.Product.Id,
+                Code = CurrentProductEntry.Product.Code,
+                Name = CurrentProductEntry.Product.Name,
+                UnitMeasureId = CurrentProductEntry.Product.UnitMeasureId,
+                ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+                SelectedType = new ProductTypeViewModel
+                {
+                    Id = CurrentProductEntry.Product.SelectedType.Id,
+                    Type = CurrentProductEntry.Product.SelectedType.Type,
+                    BundleItemCount = CurrentProductEntry.Product.SelectedType.BundleItemCount,
+                    UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice,
+                    ProductTypeItems = new ObservableCollection<ProductTypeItemViewModel>(
+                        CurrentProductEntry.Product.SelectedType.ProductTypeItems ?? []
+                    )
+                }
+            };
+
+            var item = new ProductEntryViewModel
+            {
+                Product = clonedProduct,
+                BundleCount = CurrentProductEntry.BundleCount,
+                Count = CurrentProductEntry.Count,
+                ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+                ProductionOriginName = CurrentProductEntry.ProductionOriginName
+            };
+
+            ProductEntries.Insert(0, item);
+
+            if (!AvailableProducts.Any(p => p.Code == CurrentProductEntry.Product.Code))
+                AvailableProducts.Add(CurrentProductEntry.Product);
         }
-
-        item = new ProductEntryViewModel
-        {
-            Product = CurrentProductEntry.Product,
-            ProductType = CurrentProductEntry.ProductType,
-            BundleCount = CurrentProductEntry.BundleCount,
-            TotalCount = CurrentProductEntry.TotalCount,
-            UnitPrice = CurrentProductEntry.UnitPrice
-        };
-
-        ProductEntries.Add(item);
-
-        if (!AvailableProducts.Contains(item.Product))
-            AvailableProducts.Add(item.Product);
 
         ClearCurrentEntry();
     }
@@ -245,21 +291,63 @@ public partial class ProductEntryPageViewModel : ViewModelBase
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
-        if (result == MessageBoxResult.Yes)
+        if (result == MessageBoxResult.No)
+            return;
+
+        var requests = ProductEntries
+            .Where(p => p.Product is not null &&
+                       p.Product.SelectedType is not null &&
+                       p.Count > 0)
+            .Select(p => new ProductEntryRequest
+            {
+                Date = Date,
+                Count = p.Count,
+                BundleItemCount = p.Product!.SelectedType!.BundleItemCount!.Value,
+                PreparationCostPerUnit = 0,
+                UnitPrice = p.Product!.SelectedType!.UnitPrice!.Value,
+                ProductionOrigin = p.ProductionOrigin,
+                Product = new ProductRequest
+                {
+                    Id = p.Product!.Id,
+                    Code = p.Product.Code,
+                    Name = p.Product.Name,
+                    UnitMeasureId = p.Product.UnitMeasureId > 0 ? p.Product.UnitMeasureId : 1,
+                    ProductionOrigin = p.ProductionOrigin,
+                    ProductTypes =
+                    [
+                        new ProductTypeRequest
+                        {
+                            Id = p.Product.SelectedType!.Id,
+                            Type = p.Product.SelectedType.Type,
+                            BundleItemCount = (int)p.Product.SelectedType.BundleItemCount!.Value,
+                            UnitPrice = p.Product.SelectedType.UnitPrice!.Value,
+                            ProductTypeItems = []
+                        }
+                    ]
+                }
+            })
+            .ToList();
+
+        if (requests.Count == 0)
         {
-            SuccessMessage = "Ma'lumotlar muvaffaqiyatli saqlandi!";
+            WarningMessage = "Hech qanday to'g'ri mahsulot kiritilmagan!";
+            return;
+        }
+
+        var response = await Client.ProductEntries.Create(new CreateProductEntryCommandRequest { Command = requests })
+            .Handle(isLoading => IsLoading = isLoading);
+
+        if (response.IsSuccess)
+        {
+            SuccessMessage = "Mahsulotlar muvaffaqiyatli saqlandi.";
             ProductEntries.Clear();
             ClearCurrentEntry();
+            await LoadProductsAsync();
         }
-    }
-
-    private void ClearCurrentEntry()
-    {
-        CurrentProductEntry.Product = null;
-        CurrentProductEntry.ProductType = null;
-        CurrentProductEntry.BundleCount = null;
-        CurrentProductEntry.TotalCount = null;
-        CurrentProductEntry.UnitPrice = null;
+        else
+        {
+            ErrorMessage = response.Message ?? "Mahsulotlarni saqlashda xatolik yuz berdi.";
+        }
     }
 
     #endregion
@@ -271,15 +359,36 @@ public partial class ProductEntryPageViewModel : ViewModelBase
         if (SelectedProductEntry is null)
             return;
 
-        SelectedProductEntry.IsEditing = true;
-        var copiedEntry = JsonSerializer.Deserialize<ProductEntryViewModel>(JsonSerializer.Serialize(SelectedProductEntry));
+        bool hasCurrentData = CurrentProductEntry.Product is not null ||
+                             CurrentProductEntry.BundleCount.HasValue ||
+                             CurrentProductEntry.Count.HasValue;
 
-        if (copiedEntry is null)
-            return;
+        if (hasCurrentData)
+        {
+            var result = MessageBox.Show(
+                "Hozirgi kiritilgan ma'lumotlar o'chib ketadi. Davom etmoqchimisiz?",
+                "Ogohlantirish",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.No)
+                return;
+        }
 
         CurrentProductEntry.PropertyChanged -= OnCurrentProductEntryPropertyChanged;
-        CurrentProductEntry = copiedEntry;
+        CurrentProductEntry = SelectedProductEntry;
         CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
+        ProductEntries.Remove(SelectedProductEntry);
+        SelectedProductEntry = null;
+        SuccessMessage = "Ma'lumotlar tahrirlash uchun yuklandi!";
+    }
+
+    private void ClearCurrentEntry()
+    {
+        CurrentProductEntry.Product = null;
+        CurrentProductEntry.BundleCount = null;
+        CurrentProductEntry.Count = null;
+        CurrentProductEntry.ProductionOriginName = null!;
     }
 
     #endregion
