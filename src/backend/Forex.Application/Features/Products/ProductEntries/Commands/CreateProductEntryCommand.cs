@@ -23,31 +23,44 @@ public class CreateProductEntryCommandHandler(
             var shop = await GetOrCreateDefaultShopAsync(cancellationToken);
             var defaultUnitMeasure = await GetOrCreateDefaultUnitMeasureAsync(cancellationToken);
 
-            foreach (var item in request.Command)
+            // Product Code bo'yicha guruhlash
+            var groupedByProduct = request.Command
+                .GroupBy(cmd => cmd.Product.Code)
+                .ToList();
+
+            foreach (var productGroup in groupedByProduct)
             {
-                // Product ni olish yoki yaratish
-                var product = await GetOrCreateProductAsync(item, defaultUnitMeasure, cancellationToken);
+                // Birinchi elementdan Product ma'lumotlarini olish
+                var firstCommand = productGroup.First();
 
-                // ProductType ni olish yoki yaratish
-                var productType = await GetOrCreateProductTypeAsync(item, product, cancellationToken);
+                // Product ni olish yoki yaratish (bir marta)
+                var product = await GetOrCreateProductAsync(firstCommand, defaultUnitMeasure, cancellationToken);
 
-                // BundleItemCount ni yangilash
-                productType.BundleItemCount = item.BundleItemCount;
+                // Har bir ProductType uchun (har bir entry aslida bitta ProductType)
+                foreach (var item in productGroup)
+                {
+                    // ProductType ni olish yoki yaratish
+                    var productType = await GetOrCreateProductTypeAsync(item, product, cancellationToken);
 
-                // ProductionOrigin ni yangilash
-                product.ProductionOrigin = item.ProductionOrigin;
+                    // BundleItemCount va UnitPrice ni yangilash
+                    productType.BundleItemCount = item.BundleItemCount;
+                    productType.UnitPrice = item.UnitPrice;
 
-                // InProcess dan ayirish (agar mavjud bo'lsa)
-                await TryDeductFromInProcessAsync(productType, item.Count, cancellationToken);
+                    // ProductionOrigin ni yangilash
+                    product.ProductionOrigin = item.ProductionOrigin;
 
-                // ProductResidue ni yangilash
-                var residue = await UpdateProductResidueAsync(productType, item.Count, shop, cancellationToken);
+                    // InProcess dan ayirish (agar mavjud bo'lsa)
+                    await TryDeductFromInProcessAsync(productType, item.Count, cancellationToken);
 
-                // CostPrice ni hisoblash
-                var costPrice = CalculateCostPrice(productType);
+                    // ProductResidue ni yangilash
+                    var residue = await UpdateProductResidueAsync(productType, item.Count, shop, cancellationToken);
 
-                // ProductEntry ni saqlash
-                SaveProductEntry(item, productType, shop, residue, costPrice);
+                    // CostPrice ni hisoblash
+                    var costPrice = CalculateCostPrice(productType);
+
+                    // ProductEntry ni saqlash
+                    SaveProductEntry(item, productType, shop, residue, costPrice);
+                }
             }
 
             await context.CommitTransactionAsync(cancellationToken);
@@ -131,6 +144,7 @@ public class CreateProductEntryCommandHandler(
                 NormalizedName = item.Product.Name.ToUpper(),
                 ProductionOrigin = item.ProductionOrigin,
                 UnitMeasure = defaultUnitMeasure,
+                ImagePath = item.Product.ImagePath,
                 ProductTypes = []
             };
 
@@ -146,6 +160,12 @@ public class CreateProductEntryCommandHandler(
             }
 
             product.ProductionOrigin = item.ProductionOrigin;
+
+            // ImagePath ni yangilash (agar kiritilgan bo'lsa)
+            if (!string.IsNullOrWhiteSpace(item.Product.ImagePath))
+            {
+                product.ImagePath = item.Product.ImagePath;
+            }
         }
 
         return product;
@@ -158,11 +178,8 @@ public class CreateProductEntryCommandHandler(
     {
         ProductType? productType = null;
 
-        var productTypeCommand = item.Product.ProductTypes.FirstOrDefault();
-        if (productTypeCommand is null)
-        {
-            throw new AppException("ProductType ma'lumotlari topilmadi!");
-        }
+        var productTypeCommand = item.Product.ProductTypes.FirstOrDefault()
+            ?? throw new AppException("ProductType ma'lumotlari topilmadi!");
 
         // ProductTypeId bo'yicha qidirish
         if (productTypeCommand.Id > 0)
@@ -209,7 +226,6 @@ public class CreateProductEntryCommandHandler(
             context.ProductTypes.Add(productType);
 
             product.ProductTypes ??= [];
-
             product.ProductTypes.Add(productType);
         }
 
@@ -251,8 +267,8 @@ public class CreateProductEntryCommandHandler(
         {
             residue = new ProductResidue
             {
-                ProductType = productType,  // Navigation property orqali bog'lash
-                Shop = shop,  // Navigation property orqali bog'lash
+                ProductType = productType,
+                Shop = shop,
                 Count = count,
                 ProductEntries = new List<ProductEntry>()
             };
@@ -314,9 +330,9 @@ public class CreateProductEntryCommandHandler(
             UnitPrice = item.UnitPrice,
             TotalAmount = totalAmount,
             ProductionOrigin = item.ProductionOrigin,
-            ProductType = productType,  // Navigation property
-            Shop = shop,  // Navigation property
-            ProductResidue = residue  // Navigation property
+            ProductType = productType,
+            Shop = shop,
+            ProductResidue = residue
         };
 
         context.ProductEntries.Add(entry);

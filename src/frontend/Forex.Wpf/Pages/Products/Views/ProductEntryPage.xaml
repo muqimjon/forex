@@ -125,11 +125,11 @@
 
             <!--  Tannarxi  -->
             <controls:FloatingInput
-                x:Name="tbxCostPrice"
-                Grid.Column="7"
-                Margin="2,0"
-                Label="Tan narxi"
-                Text="{Binding Product.SelectedType.UnitPrice, UpdateSourceTrigger=PropertyChanged}" />
+                    x:Name="tbxCostPrice"
+                    Grid.Column="7"
+                    Margin="2,0"
+                    Label="Tan narxi"
+                    Text="{Binding Product.SelectedType.UnitPrice, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}" />
 
             <Button x:Name="addButton"
                     Grid.Column="8"

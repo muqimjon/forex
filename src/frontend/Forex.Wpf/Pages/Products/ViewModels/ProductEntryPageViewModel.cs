@@ -294,46 +294,57 @@ public partial class ProductEntryPageViewModel : ViewModelBase
         if (result == MessageBoxResult.No)
             return;
 
-        var requests = ProductEntries
+        // Product Code bo'yicha guruhlash
+        var groupedByProduct = ProductEntries
             .Where(p => p.Product is not null &&
                        p.Product.SelectedType is not null &&
                        p.Count > 0)
-            .Select(p => new ProductEntryRequest
+            .GroupBy(p => p.Product!.Code)
+            .Select(group =>
             {
-                Date = Date,
-                Count = p.Count,
-                BundleItemCount = p.Product!.SelectedType!.BundleItemCount!.Value,
-                PreparationCostPerUnit = 0,
-                UnitPrice = p.Product!.SelectedType!.UnitPrice!.Value,
-                ProductionOrigin = p.ProductionOrigin,
-                Product = new ProductRequest
+                var firstEntry = group.First();
+
+                // Har bir ProductType uchun alohida ProductEntryRequest
+                var productTypeRequests = group.Select(entry => new ProductEntryRequest
                 {
-                    Id = p.Product!.Id,
-                    Code = p.Product.Code,
-                    Name = p.Product.Name,
-                    ProductionOrigin = p.ProductionOrigin,
-                    ProductTypes =
-                    [
-                        new ProductTypeRequest
-                        {
-                            Id = p.Product.SelectedType!.Id,
-                            Type = p.Product.SelectedType.Type,
-                            BundleItemCount = (int)p.Product.SelectedType.BundleItemCount!.Value,
-                            UnitPrice = p.Product.SelectedType.UnitPrice!.Value,
-                            ProductTypeItems = []
-                        }
-                    ]
-                }
+                    Date = Date,
+                    Count = entry.Count,
+                    BundleItemCount = (uint)entry.Product!.SelectedType!.BundleItemCount!.Value,
+                    PreparationCostPerUnit = 0,
+                    UnitPrice = entry.Product.SelectedType.UnitPrice!.Value,
+                    ProductionOrigin = entry.ProductionOrigin,
+                    Product = new ProductRequest
+                    {
+                        Id = entry.Product.Id,
+                        Code = entry.Product.Code,
+                        Name = entry.Product.Name,
+                        ProductionOrigin = entry.ProductionOrigin,
+                        ProductTypes =
+                        [
+                            new ProductTypeRequest
+                            {
+                                Id = entry.Product.SelectedType.Id,
+                                Type = entry.Product.SelectedType.Type,
+                                BundleItemCount = (int)entry.Product.SelectedType.BundleItemCount.Value,
+                                UnitPrice = entry.Product.SelectedType.UnitPrice.Value,
+                                ProductTypeItems = []
+                            }
+                        ]
+                    }
+                }).ToList();
+
+                return productTypeRequests;
             })
+            .SelectMany(x => x)
             .ToList();
 
-        if (requests.Count == 0)
+        if (groupedByProduct.Count == 0)
         {
             WarningMessage = "Hech qanday to'g'ri mahsulot kiritilmagan!";
             return;
         }
 
-        var response = await Client.ProductEntries.Create(new CreateProductEntryCommandRequest { Command = requests })
+        var response = await Client.ProductEntries.Create(new CreateProductEntryCommandRequest { Command = groupedByProduct })
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
