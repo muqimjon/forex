@@ -120,7 +120,10 @@ public partial class SalePageViewModel : ViewModelBase
     [RelayCommand]
     private void Add()
     {
-        if (CurrentSaleItem is null || CurrentSaleItem.BundleCount <= 0)
+        if (CurrentSaleItem.Product is null || 
+            CurrentSaleItem.BundleCount == null || 
+            CurrentSaleItem.ProductType is null || 
+            CurrentSaleItem.UnitPrice is null)
         {
             WarningMessage = "Mahsulot tanlanmagan yoki miqdor noto‘g‘ri!";
             return;
