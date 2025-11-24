@@ -11,6 +11,6 @@ public sealed record ProductForProductTypeDto
     public string? ImagePath { get; set; } = string.Empty;
     public ProductionOrigin ProductionOrigin { get; set; }
 
-    public long MeasureId { get; set; }
-    public UnitMeasureDto Measure { get; set; } = default!;
+    public long UnitMeasureId { get; set; }
+    public UnitMeasureDto UnitMeasure { get; set; } = default!;
 }
