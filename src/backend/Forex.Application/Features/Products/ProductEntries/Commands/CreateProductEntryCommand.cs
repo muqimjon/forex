@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Features.Products.ProductEntries.Commands;
 
 using Forex.Application.Commons.Exceptions;
+    using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
@@ -25,7 +26,7 @@ public class CreateProductEntryCommandHandler(
             foreach (var item in request.Command)
             {
                 // Product ni olish yoki yaratish
-                var product = await GetOrCreateProductAsync(item, defaultUnitMeasure.Id, cancellationToken);
+                var product = await GetOrCreateProductAsync(item, defaultUnitMeasure, cancellationToken);
 
                 // ProductType ni olish yoki yaratish
                 var productType = await GetOrCreateProductTypeAsync(item, product, cancellationToken);
@@ -75,7 +76,7 @@ public class CreateProductEntryCommandHandler(
     private async Task<UnitMeasure> GetOrCreateDefaultUnitMeasureAsync(CancellationToken ct)
     {
         var unitMeasure = await context.UnitMeasures
-            .FirstOrDefaultAsync(u => u.IsDefault || u.Name == "Dona", ct);
+            .FirstOrDefaultAsync(u => u.IsDefault || u.NormalizedName == "Dona".ToNormalized(), ct);
 
         if (unitMeasure is null)
         {
@@ -95,7 +96,7 @@ public class CreateProductEntryCommandHandler(
         return unitMeasure;
     }
 
-    private async Task<Product> GetOrCreateProductAsync(ProductEntryCommand item, long defaultUnitMeasureId, CancellationToken ct)
+    private async Task<Product> GetOrCreateProductAsync(ProductEntryCommand item, UnitMeasure defaultUnitMeasure, CancellationToken ct)
     {
         Product? product = null;
 
@@ -129,8 +130,8 @@ public class CreateProductEntryCommandHandler(
                 Name = item.Product.Name,
                 NormalizedName = item.Product.Name.ToUpper(),
                 ProductionOrigin = item.ProductionOrigin,
-                UnitMeasureId = item.Product.UnitMeasureId > 0 ? item.Product.UnitMeasureId : defaultUnitMeasureId,
-                ProductTypes = new List<ProductType>()
+                UnitMeasure = defaultUnitMeasure,
+                ProductTypes = []
             };
 
             context.Products.Add(product);

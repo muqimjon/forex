@@ -311,7 +311,6 @@ public partial class ProductEntryPageViewModel : ViewModelBase
                     Id = p.Product!.Id,
                     Code = p.Product.Code,
                     Name = p.Product.Name,
-                    UnitMeasureId = p.Product.UnitMeasureId > 0 ? p.Product.UnitMeasureId : 1,
                     ProductionOrigin = p.ProductionOrigin,
                     ProductTypes =
                     [
