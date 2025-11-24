@@ -55,7 +55,7 @@ public partial class CommonReportDataService : ViewModelBase
 
     private async Task LoadProductsAsync()
     {
-        var response = await _client.Products.GetAll().Handle(isLoading => IsLoading = isLoading);
+        var response = await _client.Products.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
         {
             var products = _mapper.Map<List<ProductViewModel>>(response.Data!);

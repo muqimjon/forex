@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Products.ProductEntries.Commands;
 
 using Forex.Application.Commons.Exceptions;
-    using Forex.Application.Commons.Extensions;
+using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
@@ -202,13 +202,13 @@ public class CreateProductEntryCommandHandler(
                 BundleItemCount = item.BundleItemCount,
                 ProductId = product.Id,
                 Product = product,
-                ProductTypeItems = new List<ProductTypeItem>()
+                ProductTypeItems = [],
+                UnitPrice = item.UnitPrice
             };
 
             context.ProductTypes.Add(productType);
 
-            if (product.ProductTypes is null)
-                product.ProductTypes = new List<ProductType>();
+            product.ProductTypes ??= [];
 
             product.ProductTypes.Add(productType);
         }
