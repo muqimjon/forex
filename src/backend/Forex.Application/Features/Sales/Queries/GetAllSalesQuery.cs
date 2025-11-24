@@ -13,8 +13,7 @@ public class GetAllSalesQueryHandler(
     IMapper mapper) : IRequestHandler<GetAllSalesQuery, IReadOnlyCollection<SaleDto>>
 {
     public async Task<IReadOnlyCollection<SaleDto>> Handle(GetAllSalesQuery request, CancellationToken cancellationToken)
-    { 
-       var a = mapper.Map<IReadOnlyCollection<SaleDto>>(await context.Sales
+       => mapper.Map<IReadOnlyCollection<SaleDto>>(await context.Sales
         .Include(s => s.Customer)
         .Include(items => items.SaleItems)
         .ThenInclude(pt => pt.ProductType)
@@ -22,6 +21,4 @@ public class GetAllSalesQueryHandler(
         .ThenInclude(m => m.UnitMeasure)
         .AsNoTracking()
         .ToListAsync(cancellationToken));
-        return a;
-    }
 }
