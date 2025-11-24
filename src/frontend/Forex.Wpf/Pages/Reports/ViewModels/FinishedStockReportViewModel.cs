@@ -83,9 +83,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 var product = pt.Product;
                 if (product == null) continue;
 
-                decimal unitPrice = stock.ProductEntries?
-                    .OrderByDescending(e => e.Id)
-                    .FirstOrDefault()?.CostPrice ?? 0;
+                decimal unitPrice = stock.ProductType.UnitPrice;
 
                 _allItems.Add(new FinishedStockItemViewModel
                 {
