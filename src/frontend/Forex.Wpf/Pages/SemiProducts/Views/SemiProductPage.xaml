@@ -1,45 +1,47 @@
-﻿<Page x:Name="RootPage"
-      x:Class="Forex.Wpf.Pages.SemiProducts.Views.SemiProductPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-      xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
-      mc:Ignorable="d"
-      Title="Kirim qilish"
-      d:DesignHeight="580"
-      d:DesignWidth="810">
+﻿<Page
+    x:Class="Forex.Wpf.Pages.SemiProducts.Views.SemiProductPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    x:Name="RootPage"
+    Title="Kirim qilish"
+    d:DesignHeight="580"
+    d:DesignWidth="810"
+    mc:Ignorable="d">
 
     <Page.Resources>
-        <!-- Input TextBox Style -->
+        <!--  Input TextBox Style  -->
         <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#CCCCCC"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#CCCCCC" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
 
-        <!-- Delete Button Style -->
+        <!--  Delete Button Style  -->
         <Style x:Key="DeleteButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FF5252"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Width" Value="30"/>
-            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="#FF5252" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="15"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="15">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -51,30 +53,31 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Add Button Style -->
+        <!--  Add Button Style  -->
         <Style x:Key="AddButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#4CAF50"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="#4CAF50" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="5" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="4"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#45a049"/>
+                    <Setter Property="Background" Value="#45a049" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -89,16 +92,17 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Back Button -->
-            <Button HorizontalAlignment="Right"
-                    md:ButtonAssist.CornerRadius="5"
-                    Background="{DynamicResource OtherBackground}"
-                    BorderThickness="0"
-                    Click="BtnBack_Click"
-                    Content="🔙 Orqaga"
-                    ToolTip="Orqaga" />
+            <!--  Back Button  -->
+            <Button
+                HorizontalAlignment="Right"
+                md:ButtonAssist.CornerRadius="5"
+                Background="{DynamicResource OtherBackground}"
+                BorderThickness="0"
+                Click="BtnBack_Click"
+                Content="🔙 Orqaga"
+                ToolTip="Orqaga" />
 
-            <!-- Invoice Header -->
+            <!--  Invoice Header  -->
             <Grid Grid.Row="1" Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -118,239 +122,431 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Sana -->
-                <TextBlock Text="Sana:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <controls:UserCalendar Grid.Column="1" Width="120" Height="28" Margin="5"
-                                       FontSize="14" SelectedDate="{Binding Invoice.Date, Mode=TwoWay}" />
+                <!--  Sana  -->
+                <TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Sana:" />
+                <controls:UserCalendar
+                    Grid.Column="1"
+                    Width="120"
+                    Height="28"
+                    Margin="5"
+                    FontSize="14"
+                    SelectedDate="{Binding Invoice.Date, Mode=TwoWay}" />
 
-                <!-- Invoys raqami -->
-                <TextBlock Grid.Row="1" Text="Invoice raqami:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <TextBox Grid.Column="1" Grid.Row="1" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
-                         Text="{Binding Invoice.Number, UpdateSourceTrigger=PropertyChanged}" />
+                <!--  Invoys raqami  -->
+                <TextBlock
+                    Grid.Row="1"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Invoice raqami:" />
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Width="120"
+                    Margin="5"
+                    Style="{StaticResource InputTextBoxStyle}"
+                    Text="{Binding Invoice.Number, UpdateSourceTrigger=PropertyChanged}" />
 
-                <!-- Tan narxi -->
-                <TextBlock Grid.Column="2" Text="Tan narxi:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <Border Grid.Column="3" CornerRadius="4" BorderBrush="Black" BorderThickness="1" Margin="5" Width="120"  Padding="8,4">
-                <TextBlock TextAlignment="Right" VerticalAlignment="Center" 
-                           Text="{Binding Invoice.CostPrice, StringFormat={}{0:N0}}" />
+                <!--  Tan narxi  -->
+                <TextBlock
+                    Grid.Column="2"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Tan narxi:" />
+                <Border
+                    Grid.Column="3"
+                    Width="120"
+                    Margin="5"
+                    Padding="8,4"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding Invoice.CostPrice, StringFormat={}{0:N0}}"
+                        TextAlignment="Right" />
                 </Border>
 
-                <!-- Yo'l xarajati -->
-                <TextBlock Grid.Row="1" Grid.Column="2" Text="*Yo'l xarajati:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <TextBox Grid.Column="3" Grid.Row="1" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
-                         PreviewTextInput="NumericTextBox_PreviewTextInput"
-                         Text="{Binding Invoice.CostDelivery, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" />
+                <!--  Yo'l xarajati  -->
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="*Yo'l xarajati:" />
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    Width="120"
+                    Margin="5"
+                    PreviewTextInput="NumericTextBox_PreviewTextInput"
+                    Style="{StaticResource InputTextBoxStyle}"
+                    Text="{Binding Invoice.CostDelivery, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" />
 
-                <!-- Ta'minotchi -->
-                <TextBlock Grid.Column="4" Text="Ta'minotchi:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <Border Grid.Column="5" Width="150" Margin="5" Height="28" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="8 0">
-                <ComboBox  FontSize="14" BorderThickness="0"
-                          DisplayMemberPath="Name" ItemsSource="{Binding AvailableSuppliers}"
-                          SelectedItem="{Binding Invoice.PaymentToSupplier.User}" />
+                <!--  Ta'minotchi  -->
+                <TextBlock
+                    Grid.Column="4"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Ta'minotchi:" />
+                <Border
+                    Grid.Column="5"
+                    Width="150"
+                    Height="28"
+                    Margin="5"
+                    Padding="8,0"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <ComboBox
+                        BorderThickness="0"
+                        DisplayMemberPath="Name"
+                        FontSize="14"
+                        ItemsSource="{Binding AvailableSuppliers}"
+                        SelectedItem="{Binding Invoice.PaymentToSupplier.User}" />
                 </Border>
 
-                <!-- Vositachi orqali ekanligini aniqlash -->
-                <TextBlock Grid.Row="1" Grid.Column="4" Text="Vositachi orqali:" FontSize="14" VerticalAlignment="Center" Margin="5"/>
-                <ToggleButton Grid.Row="1" Grid.Column="5" Margin="5" VerticalAlignment="Center"
-                              IsChecked="{Binding Invoice.ViaConsolidator, Mode=TwoWay}" />
+                <!--  Vositachi orqali ekanligini aniqlash  -->
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="4"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Vositachi orqali:" />
+                <ToggleButton
+                    Grid.Row="1"
+                    Grid.Column="5"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding Invoice.ViaConsolidator, Mode=TwoWay}" />
 
-                <!-- Vositachi -->
-                <TextBlock Grid.Column="6" Text="Vositachi:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <Border Grid.Column="7" Width="150" Margin="5" Height="28" BorderBrush="Black" BorderThickness="1" CornerRadius="4" Padding="8 0"
-                        Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ComboBox FontSize="14" BorderThickness="0" DisplayMemberPath="Name" 
-                              ItemsSource="{Binding AvailableConsolidators}" SelectedItem="{Binding Invoice.PaymentToConsolidator.User}"/>
+                <!--  Vositachi  -->
+                <TextBlock
+                    Grid.Column="6"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Vositachi:"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Border
+                    Grid.Column="7"
+                    Width="150"
+                    Height="28"
+                    Margin="5"
+                    Padding="8,0"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ComboBox
+                        BorderThickness="0"
+                        DisplayMemberPath="Name"
+                        FontSize="14"
+                        ItemsSource="{Binding AvailableConsolidators}"
+                        SelectedItem="{Binding Invoice.PaymentToConsolidator.User}" />
                 </Border>
 
-                <!-- Kontiner soni -->
-                <TextBlock Grid.Row="1" Grid.Column="6" Text="*Kontiner soni:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <TextBox Grid.Row="1" Grid.Column="7" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
-                         PreviewTextInput="NumericTextBox_PreviewTextInput"
-                         Text="{Binding Invoice.ContainerCount, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                         Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <!--  Kontiner soni  -->
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="6"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="*Kontiner soni:"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="7"
+                    Width="120"
+                    Margin="5"
+                    PreviewTextInput="NumericTextBox_PreviewTextInput"
+                    Style="{StaticResource InputTextBoxStyle}"
+                    Text="{Binding Invoice.ContainerCount, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <!-- Dona kontiner uchun to'lov -->
-                <TextBlock Grid.Column="8" Text="*Dona kon. u-n to'lov:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <TextBox Grid.Column="9" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
-                         PreviewTextInput="NumericTextBox_PreviewTextInput"
-                         Text="{Binding Invoice.PricePerUnitContainer, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                         Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <!--  Dona kontiner uchun to'lov  -->
+                <TextBlock
+                    Grid.Column="8"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="*Dona kon. u-n to'lov:"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <TextBox
+                    Grid.Column="9"
+                    Width="120"
+                    Margin="5"
+                    PreviewTextInput="NumericTextBox_PreviewTextInput"
+                    Style="{StaticResource InputTextBoxStyle}"
+                    Text="{Binding Invoice.PricePerUnitContainer, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <!-- Tanlangan valyuta ayirboshlash qiymati (so'mga nisbatan) -->
-                <TextBlock Grid.Row="1" Grid.Column="8" Text="*Kursi:" FontSize="14" VerticalAlignment="Center" Margin="5"
-                           Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <TextBox Grid.Row="1" Grid.Column="9" Width="120" Margin="5" Style="{StaticResource InputTextBoxStyle}"
-                         PreviewTextInput="NumericTextBox_PreviewTextInput"
-                         Text="{Binding Invoice.PaymentToConsolidator.ExchangeRate, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                         Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <!--  Tanlangan valyuta ayirboshlash qiymati (so'mga nisbatan)  -->
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="8"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="*Kursi:"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="9"
+                    Width="120"
+                    Margin="5"
+                    PreviewTextInput="NumericTextBox_PreviewTextInput"
+                    Style="{StaticResource InputTextBoxStyle}"
+                    Text="{Binding Invoice.PaymentToConsolidator.ExchangeRate, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                    Visibility="{Binding Invoice.ViaConsolidator, Converter={StaticResource BoolToVisibilityConverter}}" />
             </Grid>
 
-            <!-- Products List -->
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl ItemsSource="{Binding Products}" Margin="5">
+            <!--  Products List  -->
+            <ScrollViewer
+                Grid.Row="2"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <ItemsControl Margin="5" ItemsSource="{Binding Products}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="#F5F5F5" BorderBrush="#CCCCCC" BorderThickness="1" 
-                                    CornerRadius="4" Margin="0,0,0,10" Padding="10">
+                            <Border
+                                Margin="0,0,0,10"
+                                Padding="10"
+                                Background="#F5F5F5"
+                                BorderBrush="#CCCCCC"
+                                BorderThickness="1"
+                                CornerRadius="4">
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
 
-                                    <!-- Product Header -->
+                                    <!--  Product Header  -->
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="150"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="120"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="120"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Image -->
-                                        <Button Height="100" Width="100" Margin="5"
-                                                Command="{Binding SelectImageCommand}">
+                                        <!--  Image  -->
+                                        <Button
+                                            Width="100"
+                                            Height="100"
+                                            Margin="5"
+                                            Command="{Binding SelectImageCommand}">
                                             <Button.Background>
-                                                <ImageBrush ImageSource="{Binding Image, Converter={StaticResource ImageFallbackConverter}}"
-                                                           Stretch="UniformToFill" />
+                                                <ImageBrush ImageSource="{Binding Image, Converter={StaticResource ImageFallbackConverter}}" Stretch="UniformToFill" />
                                             </Button.Background>
                                         </Button>
 
-                                        <!-- Code -->
-                                        <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center">
-                                            <TextBlock Text="Kodi:" FontSize="12" Foreground="#666"/>
-                                            <TextBox Style="{StaticResource InputTextBoxStyle}"
-                                                     Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
+                                        <!--  Code  -->
+                                        <StackPanel
+                                            Grid.Column="1"
+                                            Margin="5"
+                                            VerticalAlignment="Center">
+                                            <TextBlock
+                                                FontSize="12"
+                                                Foreground="#666"
+                                                Text="Kodi:" />
+                                            <TextBox Style="{StaticResource InputTextBoxStyle}" Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
 
-                                        <!-- Name -->
-                                        <StackPanel Grid.Column="3" Margin="5" VerticalAlignment="Center">
-                                            <TextBlock Text="Nomi:" FontSize="12" Foreground="#666"/>
-                                            <TextBox Style="{StaticResource InputTextBoxStyle}"
-                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                        <!--  Name  -->
+                                        <StackPanel
+                                            Grid.Column="3"
+                                            Margin="5"
+                                            VerticalAlignment="Center">
+                                            <TextBlock
+                                                FontSize="12"
+                                                Foreground="#666"
+                                                Text="Nomi:" />
+                                            <TextBox Style="{StaticResource InputTextBoxStyle}" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
 
-                                        <!-- Delete Product Button -->
-                                        <Button Grid.Column="7" Style="{StaticResource DeleteButtonStyle}"
-                                                Content="×" ToolTip="Mahsulotni o'chirish"
-                                                VerticalAlignment="Top"
-                                                Command="{Binding DataContext.RemoveProductCommand, ElementName=RootPage}"
-                                                CommandParameter="{Binding}"/>
+                                        <!--  Delete Product Button  -->
+                                        <Button
+                                            Grid.Column="7"
+                                            VerticalAlignment="Top"
+                                            Command="{Binding DataContext.RemoveProductCommand, ElementName=RootPage}"
+                                            CommandParameter="{Binding}"
+                                            Content="×"
+                                            Style="{StaticResource DeleteButtonStyle}"
+                                            ToolTip="Mahsulotni o'chirish" />
                                     </Grid>
 
-                                    <!-- Product Types -->
-                                    <ItemsControl Grid.Row="1" ItemsSource="{Binding ProductTypes}" Margin="10,10,0,10">
+                                    <!--  Product Types  -->
+                                    <ItemsControl
+                                        Grid.Row="1"
+                                        Margin="10,10,0,10"
+                                        ItemsSource="{Binding ProductTypes}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Background="White" BorderBrush="#DDDDDD" BorderThickness="1" 
-                                                        CornerRadius="3" Margin="0,0,0,8" Padding="8">
+                                                <Border
+                                                    Margin="0,0,0,8"
+                                                    Padding="8"
+                                                    Background="White"
+                                                    BorderBrush="#DDDDDD"
+                                                    BorderThickness="1"
+                                                    CornerRadius="3">
                                                     <Grid>
                                                         <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto"/>
-                                                            <RowDefinition Height="Auto"/>
-                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
                                                         </Grid.RowDefinitions>
 
-                                                        <!-- Type Header -->
+                                                        <!--  Type Header  -->
                                                         <Grid>
                                                             <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto"/>
-                                                                <ColumnDefinition Width="150"/>
-                                                                <ColumnDefinition Width="*"/>
-                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="150" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
                                                             </Grid.ColumnDefinitions>
 
-                                                            <TextBlock Text="O'lchami:" FontSize="12" Foreground="#666" 
-                                                                      VerticalAlignment="Center" Margin="5"/>
-                                                            <TextBox Grid.Column="1" Style="{StaticResource InputTextBoxStyle}" Margin="5"
-                                                                     Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
-                                                                     ToolTip="Misol: 24-29, 30-35" />
+                                                            <TextBlock
+                                                                Margin="5"
+                                                                VerticalAlignment="Center"
+                                                                FontSize="12"
+                                                                Foreground="#666"
+                                                                Text="O'lchami:" />
+                                                            <TextBox
+                                                                Grid.Column="1"
+                                                                Margin="5"
+                                                                Style="{StaticResource InputTextBoxStyle}"
+                                                                Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
+                                                                ToolTip="Misol: 24-29, 30-35" />
 
-                                                            <!-- Delete Type Button -->
-                                                            <Button Grid.Column="3" Style="{StaticResource DeleteButtonStyle}"
-                                                                    Content="×" ToolTip="O'lchamni o'chirish" Margin="5"
-                                                                    Command="{Binding DataContext.RemoveProductTypeCommand, ElementName=RootPage}">
+                                                            <!--  Delete Type Button  -->
+                                                            <Button
+                                                                Grid.Column="3"
+                                                                Margin="5"
+                                                                Command="{Binding DataContext.RemoveProductTypeCommand, ElementName=RootPage}"
+                                                                Content="×"
+                                                                Style="{StaticResource DeleteButtonStyle}"
+                                                                ToolTip="O'lchamni o'chirish">
                                                                 <Button.CommandParameter>
                                                                     <MultiBinding Converter="{StaticResource ArrayMultiValueConverter}">
-                                                                        <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=Border, AncestorLevel=2}"/>
-                                                                        <Binding/>
+                                                                        <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=Border, AncestorLevel=2}" />
+                                                                        <Binding />
                                                                     </MultiBinding>
                                                                 </Button.CommandParameter>
                                                             </Button>
                                                         </Grid>
 
-                                                        <!-- Type Items -->
-                                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,5,0,0">
-                                                            <TextBlock Text="Nomi" Width="152"/>
-                                                            <TextBlock Text="Soni" Width="102"/>
-                                                            <TextBlock Text="O'lchov birligi" Width="152"/>
-                                                            <TextBlock Text="Tan narxi" Width="122"/>
-                                                            <TextBlock Text="Jami narxi" Width="122"/>
+                                                        <!--  Type Items  -->
+                                                        <StackPanel
+                                                            Grid.Row="1"
+                                                            Margin="10,5,0,0"
+                                                            Orientation="Horizontal">
+                                                            <TextBlock Width="152" Text="Nomi" />
+                                                            <TextBlock Width="102" Text="Soni" />
+                                                            <TextBlock Width="152" Text="O'lchov birligi" />
+                                                            <TextBlock Width="122" Text="Tan narxi" />
+                                                            <TextBlock Width="122" Text="Jami narxi" />
                                                         </StackPanel>
 
-                                                        <ItemsControl  Grid.Row="2" ItemsSource="{Binding ProductTypeItems}" Margin="10,5,0,0">
+                                                        <ItemsControl
+                                                            Grid.Row="2"
+                                                            Margin="10,5,0,0"
+                                                            ItemsSource="{Binding ProductTypeItems}">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate>
                                                                     <Grid Margin="0,0,0,5">
                                                                         <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="150"/>
-                                                                            <ColumnDefinition Width="100"/>
-                                                                            <ColumnDefinition Width="150"/>
-                                                                            <ColumnDefinition Width="120"/>
-                                                                            <ColumnDefinition Width="120"/>
-                                                                            <ColumnDefinition Width="*"/>
-                                                                            <ColumnDefinition Width="Auto"/>
+                                                                            <ColumnDefinition Width="150" />
+                                                                            <ColumnDefinition Width="100" />
+                                                                            <ColumnDefinition Width="150" />
+                                                                            <ColumnDefinition Width="120" />
+                                                                            <ColumnDefinition Width="120" />
+                                                                            <ColumnDefinition Width="*" />
+                                                                            <ColumnDefinition Width="Auto" />
                                                                         </Grid.ColumnDefinitions>
 
-                                                                        <!-- Nome -->
-                                                                        <TextBox Style="{StaticResource InputTextBoxStyle}" Margin="2"
-                                                                                 Text="{Binding SemiProduct.Name, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                                                                                 ToolTip="Nomi" />
-                                                                        
-                                                                        <!-- Quantity -->
-                                                                        <TextBox Grid.Column="1" Style="{StaticResource InputTextBoxStyle}" Margin="2"
-                                                                                 PreviewTextInput="NumericTextBox_PreviewTextInput"
-                                                                                 Text="{Binding SemiProduct.Quantity, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                                                                                 ToolTip="Soni" />
+                                                                        <!--  Nome  -->
+                                                                        <TextBox
+                                                                            Margin="2"
+                                                                            Style="{StaticResource InputTextBoxStyle}"
+                                                                            Text="{Binding SemiProduct.Name, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                                                            ToolTip="Nomi" />
 
-                                                                        <!-- Unit Measure -->
-                                                                        <Border Grid.Column="2" Margin="2" Height="31" BorderBrush="LightGray" BorderThickness="1" Padding="10 0">
-                                                                            <ComboBox FontSize="14" BorderThickness="0"
-                                                                                  DisplayMemberPath="Name"
-                                                                                  ItemsSource="{Binding DataContext.AvailableUnitMeasures, ElementName=RootPage}"
-                                                                                  SelectedItem="{Binding SemiProduct.UnitMeasure}"
-                                                                                  ToolTip="O'lchov birligi" />
+                                                                        <!--  Quantity  -->
+                                                                        <TextBox
+                                                                            Grid.Column="1"
+                                                                            Margin="2"
+                                                                            PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                                                            Style="{StaticResource InputTextBoxStyle}"
+                                                                            Text="{Binding SemiProduct.Quantity, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                                                            ToolTip="Soni" />
+
+                                                                        <!--  Unit Measure  -->
+                                                                        <Border
+                                                                            Grid.Column="2"
+                                                                            Height="31"
+                                                                            Margin="2"
+                                                                            Padding="10,0"
+                                                                            BorderBrush="LightGray"
+                                                                            BorderThickness="1">
+                                                                            <ComboBox
+                                                                                BorderThickness="0"
+                                                                                DisplayMemberPath="Name"
+                                                                                FontSize="14"
+                                                                                ItemsSource="{Binding DataContext.AvailableUnitMeasures, ElementName=RootPage}"
+                                                                                SelectedItem="{Binding SemiProduct.UnitMeasure}"
+                                                                                ToolTip="O'lchov birligi" />
                                                                         </Border>
 
-                                                                        <!-- Cost Price -->
-                                                                        <TextBox Grid.Column="3" Margin="2" Padding="8,4" Style="{StaticResource InputTextBoxStyle}"
-                                                                                 PreviewTextInput="NumericTextBox_PreviewTextInput"
-                                                                                 Text="{Binding SemiProduct.CostPrice, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
-                                                                                 ToolTip="Bir maxsulot narxi" />
+                                                                        <!--  Cost Price  -->
+                                                                        <TextBox
+                                                                            Grid.Column="3"
+                                                                            Margin="2"
+                                                                            Padding="8,4"
+                                                                            PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                                                            Style="{StaticResource InputTextBoxStyle}"
+                                                                            Text="{Binding SemiProduct.CostPrice, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                                                                            ToolTip="Bir maxsulot narxi" />
 
-                                                                        <!-- Total Amount -->
-                                                                        <TextBlock Grid.Column="4" Margin="2" Padding="8,4"
-                                                                                  Background="#E8F5E9" TextAlignment="Right"
-                                                                                  VerticalAlignment="Center" FontWeight="Bold"
-                                                                                  Text="{Binding SemiProduct.TotalAmount, StringFormat={}{0:N2}}"
-                                                                                  ToolTip="Jami summa" />
+                                                                        <!--  Total Amount  -->
+                                                                        <TextBlock
+                                                                            Grid.Column="4"
+                                                                            Margin="2"
+                                                                            Padding="8,4"
+                                                                            VerticalAlignment="Center"
+                                                                            Background="#E8F5E9"
+                                                                            FontWeight="Bold"
+                                                                            Text="{Binding SemiProduct.TotalAmount, StringFormat={}{0:N2}}"
+                                                                            TextAlignment="Right"
+                                                                            ToolTip="Jami summa" />
 
-                                                                        <!-- Delete Item Button -->
-                                                                        <Button Grid.Column="6" Style="{StaticResource DeleteButtonStyle}"
-                                                                                Content="×" ToolTip="Elementni o'chirish" Margin="2"
-                                                                                Command="{Binding DataContext.RemoveProductTypeItemCommand, ElementName=RootPage}">
+                                                                        <!--  Delete Item Button  -->
+                                                                        <Button
+                                                                            Grid.Column="6"
+                                                                            Margin="2"
+                                                                            Command="{Binding DataContext.RemoveProductTypeItemCommand, ElementName=RootPage}"
+                                                                            Content="×"
+                                                                            Style="{StaticResource DeleteButtonStyle}"
+                                                                            ToolTip="Elementni o'chirish">
                                                                             <Button.CommandParameter>
                                                                                 <MultiBinding Converter="{StaticResource ArrayMultiValueConverter}">
-                                                                                    <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=Border, AncestorLevel=2}"/>
-                                                                                    <Binding/>
+                                                                                    <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=Border, AncestorLevel=2}" />
+                                                                                    <Binding />
                                                                                 </MultiBinding>
                                                                             </Button.CommandParameter>
                                                                         </Button>
@@ -370,29 +566,48 @@
                 </ItemsControl>
             </ScrollViewer>
 
-            <!-- Footer -->
+            <!--  Footer  -->
             <Grid Grid.Row="3" Margin="5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Total -->
-                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="10,5">
-                    <TextBlock FontWeight="Bold" FontSize="18" Text="Jami: " VerticalAlignment="Center"/>
-                    <TextBlock FontWeight="Bold" FontSize="18" VerticalAlignment="Center"
-                               Text="{Binding Invoice.TotalAmount, StringFormat={}{0:N0}}" />
-                    <TextBlock Margin="10,0" FontSize="18" FontWeight="Bold" Text="UZS" VerticalAlignment="Center"/>
+                <!--  Total  -->
+                <StackPanel
+                    Margin="10,5"
+                    HorizontalAlignment="Left"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Text="Jami: " />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Text="{Binding Invoice.TotalAmount, StringFormat={}{0:N0}}" />
+                    <TextBlock
+                        Margin="10,0"
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Text="UZS" />
                 </StackPanel>
 
-                <!-- Submit Button -->
-                <Button Grid.Column="1" md:ElevationAssist.Elevation="Dp24"
-                        Background="{StaticResource SuccessButtonBackground}"
-                        BorderBrush="{StaticResource SuccessButtonBorder}"
-                        Foreground="{StaticResource SuccessButtonForeground}"
-                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}"
-                        Command="{Binding SubmitCommand}"
-                        Content="Yuborish" Padding="20,8" FontSize="14" />
+                <!--  Submit Button  -->
+                <Button
+                    Grid.Column="1"
+                    Padding="20,8"
+                    md:ElevationAssist.Elevation="Dp24"
+                    Background="{StaticResource SuccessButtonBackground}"
+                    BorderBrush="{StaticResource SuccessButtonBorder}"
+                    Command="{Binding SubmitCommand}"
+                    Content="Yuborish"
+                    FontSize="14"
+                    Foreground="{StaticResource SuccessButtonForeground}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}" />
             </Grid>
         </Grid>
     </Border>

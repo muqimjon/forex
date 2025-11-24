@@ -18,6 +18,10 @@ public class SaleFilterQueryHandler(
     : IRequestHandler<SaleFilterQuery, IReadOnlyCollection<SaleDto>>
 {
     public async Task<IReadOnlyCollection<SaleDto>> Handle(SaleFilterQuery request, CancellationToken cancellationToken)
-        => mapper.Map<IReadOnlyCollection<SaleDto>>(await context.Sales
+
+    {
+        var a = mapper.Map<IReadOnlyCollection<SaleDto>>(await context.Sales
             .ToPagedListAsync(request, writer, cancellationToken));
+        return a;
+    }
 }
