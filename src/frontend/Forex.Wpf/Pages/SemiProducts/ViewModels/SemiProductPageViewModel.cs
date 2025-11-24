@@ -49,11 +49,9 @@ public partial class SemiProductPageViewModel : ViewModelBase
 
     private async Task LoadDataAsync()
     {
-        await Task.WhenAll(
-            LoadCurrenciesAsync(),
-            LoadUnitMeasures(),
-            LoadUsersAsync()
-        );
+        await LoadCurrenciesAsync();
+        await LoadUnitMeasures();
+        await LoadUsersAsync();
     }
 
     private async Task LoadCurrenciesAsync()
@@ -436,7 +434,7 @@ public partial class SemiProductPageViewModel : ViewModelBase
                                 Id = t.Id,
                                 Type = t.Type,
                                 BundleItemCount = t.BundleItemCount,
-                                Cost = t.Cost,
+                                UnitPrice = t.UnitPrice,
                                 ProductTypeItems = new ObservableCollection<ProductTypeItemViewModel>(validItems)
                             };
                         })

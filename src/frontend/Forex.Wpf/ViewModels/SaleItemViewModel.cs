@@ -6,8 +6,8 @@ using Forex.Wpf.ViewModels;
 
 public partial class SaleItemViewModel : ViewModelBase
 {
-    [ObservableProperty] private int? bundleCount;
-    [ObservableProperty] private int? totalCount;
+    [ObservableProperty] private uint? bundleCount;
+    [ObservableProperty] private uint? totalCount;
     [ObservableProperty] private decimal? unitPrice;
     [ObservableProperty] private decimal? amount;
 
@@ -18,9 +18,9 @@ public partial class SaleItemViewModel : ViewModelBase
     #region Property Changes
 
     partial void OnUnitPriceChanged(decimal? value) => RecalculateTotalAmount();
-    partial void OnBundleCountChanged(int? value) => ReCalculateTotalCount();
+    partial void OnBundleCountChanged(uint? value) => ReCalculateTotalCount();
     partial void OnProductTypeChanged(ProductTypeViewModel value) => ReCalculateTotalCount();
-    partial void OnTotalCountChanged(int? value) => RecalculateTotalAmount();
+    partial void OnTotalCountChanged(uint? value) => RecalculateTotalAmount();
 
     #endregion Property Changes
 

@@ -62,7 +62,7 @@ public partial class ProcessPageViewModel : ViewModelBase
 
     public async Task LoadProductsAsync()
     {
-        var response = await Client.Products.GetAll()
+        var response = await Client.Products.GetAllAsync()
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)

@@ -149,6 +149,7 @@
 
             <Button
                 x:Name="btnProcess"
+                Visibility="Collapsed"
                 Height="120"
                 MinWidth="220"
                 Margin="10"
@@ -170,6 +171,7 @@
 
             <Button
                 x:Name="btnSemiProductEntry"
+                Visibility="Collapsed"
                 Height="120"
                 MinWidth="220"
                 Margin="10"

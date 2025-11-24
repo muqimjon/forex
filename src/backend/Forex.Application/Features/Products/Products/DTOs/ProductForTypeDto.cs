@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application.Features.Products.Products.DTOs;
 
 using Forex.Application.Features.UnitMeasures.DTOs;
+using Forex.Domain.Enums;
 
 public sealed record ProductForProductTypeDto
 {
@@ -8,6 +9,7 @@ public sealed record ProductForProductTypeDto
     public string Name { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
     public string? ImagePath { get; set; } = string.Empty;
+    public ProductionOrigin ProductionOrigin { get; set; }
 
     public long UnitMeasureId { get; set; }
     public UnitMeasureDto UnitMeasure { get; set; } = default!;

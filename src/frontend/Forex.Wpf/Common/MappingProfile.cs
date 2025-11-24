@@ -26,6 +26,8 @@ public static class MappingProfile
         // 🔹 ProductTypeItem
         config.NewConfig<ProductTypeItemViewModel, ProductTypeItemRequest>();
 
+        config.NewConfig<ProductEntryViewModel, ProductEntryViewModel>();
+
         // 🔹 SemiProduct
         config.NewConfig<SemiProductResponse, SemiProductViewModel>();
         config.NewConfig<SemiProductViewModel, SemiProductRequest>()

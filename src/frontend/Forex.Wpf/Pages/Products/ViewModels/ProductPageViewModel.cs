@@ -42,9 +42,8 @@ public partial class ProductPageViewModel(ForexClient Client, IMapper Mapper) : 
             .Where(p => p.Product is not null && p.ProductType is not null && p.Count > 0)
             .Select(p => new ProductEntryRequest
             {
-                ProductTypeId = p.ProductType!.Id,
                 Count = p.Count,
-                BundleItemCount = p.BundleItemCount
+                BundleItemCount = (uint)p.ProductType!.BundleItemCount!
             })
             .ToList();
 
