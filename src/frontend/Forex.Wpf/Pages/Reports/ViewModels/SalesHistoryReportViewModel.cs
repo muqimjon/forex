@@ -269,7 +269,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             row += 2;
 
             // Header
-            string[] headers = { "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Qopdagi soni", "Jami", "O‘lchov", "Narxi", "Umumiy summa" };
+            string[] headers = { "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa" };
             for (int i = 0; i < headers.Length; i++)
                 ws.Cell(row, i + 1).Value = headers[i];
             ws.Range(row, 1, row, 10).Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.LightGray);
@@ -377,7 +377,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         // Header
         AddRow(table, true,
             "Sana", "Mijoz", "Kodi", "Nomi", "Razmer",
-            "Qopdagi", "Jami", "O‘lchov", "Narxi", "Umumiy summa");
+            "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa");
 
         // Ma'lumotlar
         foreach (var item in FilteredItems)

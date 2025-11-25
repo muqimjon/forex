@@ -43,10 +43,10 @@
                     CornerRadius="4">
                     <ComboBox
                         Width="275"
-                        DisplayMemberPath="Code"
-                        FontSize="14"
                         Padding="3"
                         BorderThickness="0"
+                        DisplayMemberPath="Code"
+                        FontSize="14"
                         IsEditable="True"
                         ItemsSource="{Binding AvailableProducts}"
                         SelectedItem="{Binding SelectedCode, Mode=TwoWay}" />
@@ -68,9 +68,9 @@
                     CornerRadius="4">
                     <ComboBox
                         Width="275"
-                        DisplayMemberPath="Name"
                         Padding="3"
                         BorderThickness="0"
+                        DisplayMemberPath="Name"
                         FontSize="14"
                         IsEditable="True"
                         ItemsSource="{Binding AvailableProducts}"
@@ -170,7 +170,7 @@
                 <DataGridTextColumn
                     Width="0.7*"
                     Binding="{Binding BundleItemCount, StringFormat=N0}"
-                    Header="Qopdagi mahsulot soni">
+                    Header="Donasi">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Center" />

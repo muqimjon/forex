@@ -119,7 +119,11 @@
                 </Grid.RowDefinitions>
 
                 <!--  Row 0: Date and User  -->
-                <Label Content="Sana:" FontSize="14" VerticalAlignment="Center" Margin="5,0,0,0" />
+                <Label
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Sana:"
+                    FontSize="14" />
                 <controls:UserCalendar
                     Grid.Column="1"
                     Height="26"
@@ -127,8 +131,19 @@
                     FontSize="14"
                     SelectedDate="{Binding Transaction.Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <Label Grid.Column="2" Content="User:" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,0,0,0" />
-                <Border Grid.Column="3" Margin="0,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4">
+                <Label
+                    Grid.Column="2"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="User:"
+                    FontSize="14" />
+                <Border
+                    Grid.Column="3"
+                    Margin="0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
                     <ComboBox
                         Padding="5,1"
                         BorderThickness="0"
@@ -140,8 +155,19 @@
                 </Border>
 
                 <!--  Row 1: Currency and Income  -->
-                <Label Grid.Row="1" Content="Val. turi:" FontSize="14" VerticalAlignment="Center" Margin="5,0,0,0" />
-                <Border Grid.Row="1" Grid.Column="1" Margin="0,2,10,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4">
+                <Label
+                    Grid.Row="1"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Val. turi:"
+                    FontSize="14" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="0,2,10,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
                     <ComboBox
                         Padding="5,1"
                         BorderThickness="0"
@@ -151,9 +177,21 @@
                         SelectedItem="{Binding Transaction.Currency}" />
                 </Border>
 
-                <Label Grid.Row="1" Grid.Column="2" Content="Kirim:" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <Border Grid.Row="1" Grid.Column="3" Margin="0,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4"
-                        IsEnabled="{Binding Transaction.IsExpense, Converter={StaticResource InverseBoolToBoolConverter}}">
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="Kirim:"
+                    FontSize="14" />
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    Margin="0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    IsEnabled="{Binding Transaction.IsExpense, Converter={StaticResource InverseBoolToBoolConverter}}">
                     <TextBox
                         x:Name="tbKirim"
                         Padding="3,0"
@@ -165,8 +203,19 @@
                 </Border>
 
                 <!--  Row 2: Payment Method and Expense  -->
-                <Label Grid.Row="2" Content="To'lov turi:" FontSize="14" VerticalAlignment="Center" Margin="5,0,0,0" />
-                <Border Grid.Row="2" Grid.Column="1" Margin="0,2,10,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4">
+                <Label
+                    Grid.Row="2"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="To'lov turi:"
+                    FontSize="14" />
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="0,2,10,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
                     <ComboBox
                         Padding="5,1"
                         BorderThickness="0"
@@ -181,9 +230,21 @@
                     </ComboBox>
                 </Border>
 
-                <Label Grid.Row="2" Grid.Column="2" Content="Chiqim:" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <Border Grid.Row="2" Grid.Column="3" Margin="0,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4"
-                        IsEnabled="{Binding Transaction.IsIncome, Converter={StaticResource InverseBoolToBoolConverter}}">
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="Chiqim:"
+                    FontSize="14" />
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="3"
+                    Margin="0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    IsEnabled="{Binding Transaction.IsIncome, Converter={StaticResource InverseBoolToBoolConverter}}">
                     <TextBox
                         x:Name="tbChiqim"
                         Padding="3,0"
@@ -195,8 +256,19 @@
                 </Border>
 
                 <!--  Row 3: Exchange Rate and Discount  -->
-                <Label Grid.Row="3" Content="Kurs:" FontSize="14" VerticalAlignment="Center" Margin="5,0,0,0" />
-                <Border Grid.Row="3" Grid.Column="1" Margin="0,2,10,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4">
+                <Label
+                    Grid.Row="3"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Kurs:"
+                    FontSize="14" />
+                <Border
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Margin="0,2,10,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
                     <TextBox
                         Padding="3,0"
                         BorderThickness="0"
@@ -207,8 +279,20 @@
                         TextAlignment="Right" />
                 </Border>
 
-                <Label Grid.Row="3" Grid.Column="2" Content="Chegirma:" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <Border Grid.Row="3" Grid.Column="3" Margin="0,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4">
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="Chegirma:"
+                    FontSize="14" />
+                <Border
+                    Grid.Row="3"
+                    Grid.Column="3"
+                    Margin="0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
                     <TextBox
                         Padding="3,0"
                         BorderThickness="0"
@@ -220,8 +304,20 @@
                 </Border>
 
                 <!--  Row 4: Description  -->
-                <Label Grid.Row="4" Content="Izoh:" FontSize="14" VerticalAlignment="Center" Margin="5,0,0,0" />
-                <Border Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,2" BorderBrush="{DynamicResource PrimaryTextColor}" BorderThickness="1" CornerRadius="4">
+                <Label
+                    Grid.Row="4"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Center"
+                    Content="Izoh:"
+                    FontSize="14" />
+                <Border
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="3"
+                    Margin="0,2"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
                     <TextBox
                         Padding="3,0"
                         BorderThickness="0"
@@ -247,32 +343,87 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.ColumnSpan="2" Text="Hisob:" FontSize="14" FontWeight="Bold" FontStyle="Italic" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    FontStyle="Italic"
+                    FontWeight="Bold"
+                    Text="Hisob:" />
 
-                <TextBlock Grid.Row="1" Text="Joriy:" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <TextBox Grid.Row="1" Grid.Column="1" Background="Transparent" BorderThickness="0" FontSize="14" IsReadOnly="True" IsTabStop="False"
-                         Text="{Binding Transaction.TotalAmountWithUserBalance, StringFormat={}{0:N2}, TargetNullValue=''}" HorizontalAlignment="Right" />
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Joriy:" />
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="14"
+                    IsReadOnly="True"
+                    IsTabStop="False"
+                    Text="{Binding Transaction.TotalAmountWithUserBalance, StringFormat={}{0:N2}, TargetNullValue=''}" />
 
-                <TextBlock Grid.Row="2" Text="Qoldiq:" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <TextBox Grid.Row="2" Grid.Column="1" Background="Transparent" BorderThickness="0" FontSize="14" IsReadOnly="True"
-                         Text="{Binding Transaction.User.Balance, StringFormat={}{0:N2}, TargetNullValue=''}" HorizontalAlignment="Right" />
+                <TextBlock
+                    Grid.Row="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Qoldiq:" />
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="14"
+                    IsReadOnly="True"
+                    Text="{Binding Transaction.User.Balance, StringFormat={}{0:N2}, TargetNullValue=''}" />
 
-                <TextBlock Grid.Row="3" Text="Telefon:" FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <TextBox Grid.Row="3" Grid.Column="1" Background="Transparent" BorderThickness="0" FontSize="14" IsReadOnly="True" IsTabStop="False"
-                         Text="{Binding Transaction.User.Phone}" HorizontalAlignment="Right" />
+                <TextBlock
+                    Grid.Row="3"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="Telefon:" />
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="14"
+                    IsReadOnly="True"
+                    IsTabStop="False"
+                    Text="{Binding Transaction.User.Phone}" />
 
-                <TextBlock Grid.Row="4" Grid.RowSpan="2" Text="To'lash sana:" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center"
-                           Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.RowSpan="2"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    FontSize="14"
+                    Text="To'lash sana:"
+                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
                 <controls:UserCalendar
-                    Grid.Row="4" Grid.RowSpan="2" Grid.Column="1"
+                    Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
                     Height="25"
                     Margin="10,0"
                     FontSize="14"
-                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}"
-                    SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay}" />
+                    SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay}"
+                    Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <Button
-                    Grid.Row="4" Grid.RowSpan="2" Grid.Column="2"
+                    Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Grid.Column="2"
                     Height="28"
                     Margin="10,0"
                     md:ElevationAssist.Elevation="Dp8"
@@ -285,37 +436,39 @@
         </Grid>
 
         <!--  History Filter  -->
-        <md:Card Grid.Row="3" Margin="5,1,5,10" Background="#F1F1F1" UniformCornerRadius="4">
-            <StackPanel Margin="5" Orientation="Horizontal">
-                <TextBlock Text="Kassa amaliyotlar tarixi" FontSize="20" FontWeight="Medium" VerticalAlignment="Center" Margin="5,0,20,0" />
+        <md:Card
+            Grid.Row="3"
+            Margin="5,1,5,10"
+            Background="#F1F1F1"
+            UniformCornerRadius="4">
+            <StackPanel
+                Grid.Row="0"
+                Margin="0,10"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Center"
+                    Text="Boshlanish:" />
+                <controls:UserCalendar
+                    Width="150"
+                    Height="30"
+                    SelectedDate="{Binding BeginDate, Mode=TwoWay}" />
 
-                <TextBlock Text="Boshlanish sana:" FontSize="14" VerticalAlignment="Center" />
-                <Border Margin="2,5" Background="{DynamicResource SecondaryBackground}" CornerRadius="4">
-                    <controls:UserCalendar
-                        Height="28"
-                        MinWidth="100"
-                        Margin="5,0"
-                        FontSize="14"
-                        SelectedDate="{Binding BeginDate}" />
-                </Border>
-
-                <TextBlock Text="Tugash sana:" FontSize="14" VerticalAlignment="Center" />
-                <Border Margin="2,5" Background="{DynamicResource SecondaryBackground}" CornerRadius="4">
-                    <controls:UserCalendar
-                        Width="100"
-                        Height="28"
-                        Margin="5,0"
-                        FontSize="14"
-                        SelectedDate="{Binding EndDate}" />
-                </Border>
+                <TextBlock
+                    Margin="20,0,10,0"
+                    VerticalAlignment="Center"
+                    Text="Tugash:" />
+                <controls:UserCalendar
+                    Width="150"
+                    Height="30"
+                    SelectedDate="{Binding EndDate, Mode=TwoWay}" />
 
                 <Button
-                    Height="28"
-                    Margin="3"
-                    md:ElevationAssist.Elevation="Dp8"
-                    Background="{DynamicResource OtherBackground}"
-                    Command="{Binding FilterHistoryCommand}"
-                    Content="Ko'rsatish" />
+                    Height="30"
+                    Margin="20,0,0,0"
+                    Padding="10,5"
+                    Command="{Binding LoadTransactionsAsyncCommand}"
+                    Content="🔍 Qidirish" />
             </StackPanel>
         </md:Card>
 
@@ -347,14 +500,44 @@
             </DataGrid.Resources>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Width="120" Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" ElementStyle="{StaticResource CenterAlignedCellStyle}" Header="Sana" />
-                <DataGridTextColumn Width="2*" Binding="{Binding User.Name}" Header="User" />
-                <DataGridTextColumn Width="*" Binding="{Binding PaymentMethod}" ElementStyle="{StaticResource CenterAlignedCellStyle}" Header="To'lov turi" />
-                <DataGridTextColumn Width="0.5*" Binding="{Binding Currency.Name}" ElementStyle="{StaticResource CenterAlignedCellStyle}" Header="Valyuta turi" />
-                <DataGridTextColumn Width="0.5*" Binding="{Binding ExchangeRate, StringFormat={}{0:N2}}" ElementStyle="{StaticResource RightAlignedCellStyle}" Header="Kurs" />
-                <DataGridTextColumn Width="*" Binding="{Binding Income, StringFormat={}{0:N2}}" ElementStyle="{StaticResource RightAlignedCellStyle}" Header="Kirim" />
-                <DataGridTextColumn Width="*" Binding="{Binding Expense, StringFormat={}{0:N2}}" ElementStyle="{StaticResource RightAlignedCellStyle}" Header="Chiqim" />
-                <DataGridTextColumn Width="2*" Binding="{Binding Description}" Header="Izoh" />
+                <DataGridTextColumn
+                    Width="120"
+                    Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
+                    ElementStyle="{StaticResource CenterAlignedCellStyle}"
+                    Header="Sana" />
+                <DataGridTextColumn
+                    Width="2*"
+                    Binding="{Binding User.Name}"
+                    Header="User" />
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding PaymentMethod}"
+                    ElementStyle="{StaticResource CenterAlignedCellStyle}"
+                    Header="To'lov turi" />
+                <DataGridTextColumn
+                    Width="0.5*"
+                    Binding="{Binding Currency.Name}"
+                    ElementStyle="{StaticResource CenterAlignedCellStyle}"
+                    Header="Valyuta turi" />
+                <DataGridTextColumn
+                    Width="0.5*"
+                    Binding="{Binding ExchangeRate, StringFormat={}{0:N2}}"
+                    ElementStyle="{StaticResource RightAlignedCellStyle}"
+                    Header="Kurs" />
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Income, StringFormat={}{0:N2}}"
+                    ElementStyle="{StaticResource RightAlignedCellStyle}"
+                    Header="Kirim" />
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Expense, StringFormat={}{0:N2}}"
+                    ElementStyle="{StaticResource RightAlignedCellStyle}"
+                    Header="Chiqim" />
+                <DataGridTextColumn
+                    Width="2*"
+                    Binding="{Binding Description}"
+                    Header="Izoh" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

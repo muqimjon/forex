@@ -280,7 +280,7 @@ public partial class SalePageViewModel : ViewModelBase
             page.Children.Add(info);
 
             // Headerlar — sizniki
-            string[] headers = { "Kod", "Nomi", "Razmer", "Razmer soni", "Jami soni", "Narxi", "Jami summa" };
+            string[] headers = { "Kod", "Nomi", "Razmer", "Qop soni", "Jami soni", "Narxi", "Jami summa" };
             double[] ratios = { 1.0, 2.8, 1.2, 1.3, 1.3, 1.4, 2.0 }; // A4 eniga 100% to'ldiradi!
 
             for (int i = 0; i < headers.Length; i++)

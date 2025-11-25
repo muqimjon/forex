@@ -13,15 +13,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Controls;
 
 /// <summary>
-/// Interaction logic for TurnoverViewModel.xaml
+/// Interaction logic for CustomerTurnoverReportView.xaml
 /// </summary>
 public partial class CustomerTurnoverReportView : UserControl
 {
-    //public CustomerTurnoverReportView()
-    //{
-    //    InitializeComponent();
-    //}
+    public CustomerTurnoverReportView()
+    {
+        InitializeComponent();
+    }
 }
