@@ -83,9 +83,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 var product = pt.Product;
                 if (product == null) continue;
 
-                decimal unitPrice = stock.ProductEntries?
-                    .OrderByDescending(e => e.Id)
-                    .FirstOrDefault()?.CostPrice ?? 0;
+                decimal unitPrice = stock.ProductType.UnitPrice;
 
                 _allItems.Add(new FinishedStockItemViewModel
                 {
@@ -205,7 +203,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
             row += 2;
 
             // Header
-            string[] headers = { "Kodi", "Nomi", "Razmer", "Qopdagi", "Qop soni", "Jami", "Narxi", "Umumiy" };
+            string[] headers = { "Kodi", "Nomi", "Razmer", "Donasi", "Qop soni", "Jami", "Narxi", "Umumiy" };
             for (int i = 0; i < headers.Length; i++)
                 ws.Cell(row, i + 1).Value = headers[i];
 
@@ -284,7 +282,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
             table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
         // Header (Qopdagi soni va Qop soni almashtirildi)
-        AddRow(table, true, "Kodi", "Nomi", "Razmer", "Qopdagi", "Qop soni", "Jami", "Narxi", "Umumiy");
+        AddRow(table, true, "Kodi", "Nomi", "Razmer", "Donasi", "Qop soni", "Jami", "Narxi", "Umumiy");
 
         foreach (var x in Items)
         {

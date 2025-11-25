@@ -2,9 +2,11 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
+using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
@@ -21,6 +23,12 @@ public partial class PaymentPageViewModel : ViewModelBase
         this.client = client;
         this.mapper = mapper;
 
+        this.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(BeginDate) or nameof(EndDate))
+                _ = LoadTransactionsAsync();
+        };
+
         _ = LoadDataAsync();
     }
 
@@ -31,6 +39,9 @@ public partial class PaymentPageViewModel : ViewModelBase
     [ObservableProperty] private TransactionViewModel transaction = new();
 
     public static IEnumerable<PaymentMethod> AvailablePaymentMethods => Enum.GetValues<PaymentMethod>();
+    [ObservableProperty] private DateTime? beginDate = DateTime.Today;
+    [ObservableProperty] private DateTime? endDate = DateTime.Today;
+
 
     #region Load Data
 
@@ -46,7 +57,26 @@ public partial class PaymentPageViewModel : ViewModelBase
 
     private async Task LoadTransactionsAsync()
     {
-        var response = await client.Transactions.GetAll().Handle(isLoading => IsLoading = isLoading);
+        var request = new FilteringRequest();
+
+        // Sana bo‘yicha filter
+        var begin = BeginDate?.Date ?? DateTime.Today;
+        var end = (EndDate?.Date ?? DateTime.Today).AddDays(1);
+
+        request.Filters = new()
+        {
+            ["date"] = new()
+        {
+            $">={begin:yyyy-MM-dd}",
+            $"<{end:yyyy-MM-dd}"
+        },
+            ["user"] = ["include"],
+            ["currency"] = ["include"],
+            ["shopAccount"] = ["include"]
+        };
+
+        var response = await client.Transactions.Filter(request)
+            .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {

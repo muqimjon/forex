@@ -49,10 +49,10 @@
                     BorderThickness="2"
                     CornerRadius="4">
                     <ComboBox
-                        DisplayMemberPath="Name"
                         Padding="3"
-                        FontSize="14"
                         BorderThickness="0"
+                        DisplayMemberPath="Name"
+                        FontSize="14"
                         IsEditable="True"
                         ItemsSource="{Binding AvailableCustomers}"
                         SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}" />
@@ -93,21 +93,23 @@
                         Margin="2,0,0,0"
                         VerticalAlignment="Center"
                         Text="gacha" />
-                    <Button Grid.Column="4"
-                            Margin="3 0 0 0"
-                            Width="36"
-                            Height="30"
-                            ToolTip="Filtr"
-                            Command="{Binding FilterCommand}"
-                            Padding="0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center">
+                    <Button
+                        Grid.Column="4"
+                        Width="36"
+                        Height="30"
+                        Margin="3,0,0,0"
+                        Padding="0"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding FilterCommand}"
+                        ToolTip="Filtr">
 
                         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Viewbox Width="18" Height="18">
-                                <Path Data="M3,5h18v2H3V5z M6,11h12v2H6v-2z M10,17h4v2h-4v-2z"
-                                      Fill="Black"
-                                      Stretch="Uniform"/>
+                                <Path
+                                    Data="M3,5h18v2H3V5z M6,11h12v2H6v-2z M10,17h4v2h-4v-2z"
+                                    Fill="Black"
+                                    Stretch="Uniform" />
                             </Viewbox>
                         </Grid>
 
@@ -210,176 +212,208 @@
         </Grid>
 
         <!--  DataGrid — SEN HOZIRGI USTUNLARING TO‘LIQ!  -->
-        <DataGrid Grid.Row="1" Margin="10,5"
-                  ItemsSource="{Binding FilteredItems}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  AlternatingRowBackground="#F8F9FA"
-                  RowBackground="White"
-                  FontSize="14"
-                  HeadersVisibility="Column"
-                  RowHeaderWidth="0"
-                  GridLinesVisibility="All"
-                  BorderThickness="1"
-                  BorderBrush="#DDDDDD">
+        <DataGrid
+            Grid.Row="1"
+            Margin="10,5"
+            AlternatingRowBackground="#F8F9FA"
+            AutoGenerateColumns="False"
+            BorderBrush="#DDDDDD"
+            BorderThickness="1"
+            FontSize="14"
+            GridLinesVisibility="All"
+            HeadersVisibility="Column"
+            IsReadOnly="True"
+            ItemsSource="{Binding FilteredItems}"
+            RowBackground="White"
+            RowHeaderWidth="0">
 
             <DataGrid.Columns>
 
-                <!-- 1. Sana — O‘rtada (header + qiymat) -->
-                <DataGridTextColumn Header="Sana" Binding="{Binding Date, StringFormat=dd.MM.yyyy}" Width="0.8*">
+                <!--  1. Sana — O‘rtada (header + qiymat)  -->
+                <DataGridTextColumn
+                    Width="0.8*"
+                    Binding="{Binding Date, StringFormat=dd.MM.yyyy}"
+                    Header="Sana">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 2. Mijoz — Chapda -->
-                <DataGridTextColumn Header="Mijoz" Binding="{Binding Customer}" Width="1.5*">
+                <!--  2. Mijoz — Chapda  -->
+                <DataGridTextColumn
+                    Width="1.5*"
+                    Binding="{Binding Customer}"
+                    Header="Mijoz">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Left"/>
-                            <Setter Property="Margin" Value="8,0,0,0"/>
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="Margin" Value="8,0,0,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 3. Kodi — O‘rtada -->
-                <DataGridTextColumn Header="Kodi" Binding="{Binding Code}" Width="0.6*">
+                <!--  3. Kodi — O‘rtada  -->
+                <DataGridTextColumn
+                    Width="0.6*"
+                    Binding="{Binding Code}"
+                    Header="Kodi">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 4. Nomi — Chapda -->
-                <DataGridTextColumn Header="Nomi" Binding="{Binding ProductName}" Width="*">
+                <!--  4. Nomi — Chapda  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding ProductName}"
+                    Header="Nomi">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Left"/>
-                            <Setter Property="Margin" Value="8,0,0,0"/>
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="Margin" Value="8,0,0,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 5. Razmer — O‘rtada -->
-                <DataGridTextColumn Header="Razmer" Binding="{Binding Type}" Width="100">
+                <!--  5. Razmer — O‘rtada  -->
+                <DataGridTextColumn
+                    Width="100"
+                    Binding="{Binding Type}"
+                    Header="Razmer">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 6. Qopdagi soni — O‘rtada -->
-                <DataGridTextColumn Header="Qopdagi soni" Binding="{Binding BundleItemCount, StringFormat=N0}" Width="0.8*">
+                <!--  6. Qopdagi soni — O‘rtada  -->
+                <DataGridTextColumn
+                    Width="0.8*"
+                    Binding="{Binding BundleItemCount, StringFormat=N0}"
+                    Header="Donasi">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 7. Jami — O‘ngda -->
-                <DataGridTextColumn Header="Jami" Binding="{Binding TotalCount, StringFormat=N0}" Width="*">
+                <!--  7. Jami — O‘ngda  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding TotalCount, StringFormat=N0}"
+                    Header="Jami">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Margin" Value="0,0,8,0"/>
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Margin" Value="0,0,8,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 8. O‘lchov — O‘rtada -->
-                <DataGridTextColumn Header="O‘lchov" Binding="{Binding UnitMeasure}" Width="0.7*">
+                <!--  8. O‘lchov — O‘rtada  -->
+                <DataGridTextColumn
+                    Width="0.7*"
+                    Binding="{Binding UnitMeasure}"
+                    Header="O‘lchov">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 9. Narxi — O‘ngda -->
-                <DataGridTextColumn Header="Narxi" Binding="{Binding UnitPrice, StringFormat=N2}" Width="*">
+                <!--  9. Narxi — O‘ngda  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding UnitPrice, StringFormat=N2}"
+                    Header="Narxi">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Margin" Value="0,0,8,0"/>
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Margin" Value="0,0,8,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- 10. Umumiy summa — O‘ngda -->
-                <DataGridTextColumn Header="Umumiy summa" Binding="{Binding Amount, StringFormat=N2}" Width="*">
+                <!--  10. Umumiy summa — O‘ngda  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Amount, StringFormat=N2}"
+                    Header="Umumiy summa">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="Background" Value="#FFE6F0FF"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="Background" Value="#FFE6F0FF" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                            <Setter Property="Margin" Value="0,0,10,0"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="Foreground" Value="#FF1976D2"/>
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Margin" Value="0,0,10,0" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="Foreground" Value="#FF1976D2" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>

@@ -7,6 +7,7 @@ using Forex.Application.Features.Sales.SaleItems.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
 using Forex.Domain.Entities.Sales;
+using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +45,29 @@ public class CreateSaleCommandHandler(IAppDbContext context, IMapper mapper)
 
             context.Sales.Add(sale);
             context.SaleItems.AddRange(saleItems);
+
+            // -------------------------------------------------------
+            // 🔥  YANGI: Transaction yaratish
+            // -------------------------------------------------------
+            //var uzs = await context.Currencies
+            //    .FirstOrDefaultAsync(c => c.Code == "UZS", ct)
+            //    ?? throw new NotFoundException(nameof(Currencies.DTOs), nameof(UInt128), "UZS");
+
+            //var transaction = new Transaction
+            //{
+            //    Amount = -request.TotalAmount,
+            //    ExchangeRate = 1,
+            //    Discount = 0,
+            //    PaymentMethod = PaymentMethod.Plastik,
+            //    IsIncome = false,
+            //    Description = $"BundleCount: {request.SaleItems.Sum(i => i.BundleCount)}",
+            //    Date = request.Date,
+            //    UserId = request.CustomerId,
+            //    CurrencyId = uzs.Id
+            //};
+
+            //context.Transactions.Add(transaction);
+            // -------------------------------------------------------
 
             await context.CommitTransactionAsync(ct);
             return sale.Id;
