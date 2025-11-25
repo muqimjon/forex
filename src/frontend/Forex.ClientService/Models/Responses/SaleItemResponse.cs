@@ -7,6 +7,7 @@ public sealed record SaleItemResponse
     public decimal CostPrice { get; set; }      // 1 ta savdoda umumiy tannarxi
     public decimal BenifitPrice { get; set; }    // 1 ta savdoda umumiy foydasi
     public decimal UnitPrice { get; set; }
+    public int BundleCount { get; set; }   // 1 ta razmer (6 ta ayoq kiyim) razmerlar soni
     public int TotalCount { get; set; }       // 1 ta savdoda jami necha dona sotildi
     public decimal Amount { get; set; }   // 1 ta savdoda jami summa
     public string? Note { get; set; }

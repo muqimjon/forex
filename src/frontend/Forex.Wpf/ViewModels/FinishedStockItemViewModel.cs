@@ -20,12 +20,7 @@ public partial class FinishedStockItemViewModel : ObservableObject
         if (BundleItemCount > 0)
         {
             int fullBags = TotalCount / BundleItemCount;
-            int remainder = TotalCount % BundleItemCount;
-
-            if (remainder == 0)
-                BundleCount = $"{fullBags} ta qop";
-            else
-                BundleCount = $"{fullBags} ta qop {remainder} dona";
+            BundleCount = fullBags.ToString("N0");
         }
         else
         {
