@@ -21,4 +21,7 @@ public class Transaction : Auditable
 
     public long CurrencyId { get; set; }
     public Currency Currency { get; set; } = default!;
+
+    public long OperationRecordId { get; set; }
+    public OperationRecord OperationRecord { get; set; } = default!;
 }

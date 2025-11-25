@@ -15,5 +15,8 @@ public class Sale : Auditable
     public long CustomerId { get; set; }
     public User Customer { get; set; } = default!;
 
+    public long OperationRecordId { get; set; }
+    public OperationRecord OperationRecord { get; set; } = default!;
+
     public ICollection<SaleItem> SaleItems { get; set; } = default!;
 }

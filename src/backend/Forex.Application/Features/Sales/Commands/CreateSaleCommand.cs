@@ -10,6 +10,8 @@ using Forex.Domain.Entities.Sales;
 using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Threading.Tasks;
 
 public record CreateSaleCommand(
     DateTime Date,
@@ -19,7 +21,9 @@ public record CreateSaleCommand(
     List<SaleItemCommand> SaleItems)
     : IRequest<long>;
 
-public class CreateSaleCommandHandler(IAppDbContext context, IMapper mapper)
+public class CreateSaleCommandHandler(
+    IAppDbContext context, 
+    IMapper mapper)
     : IRequestHandler<CreateSaleCommand, long>
 {
     public async Task<long> Handle(CreateSaleCommand request, CancellationToken ct)
@@ -46,28 +50,15 @@ public class CreateSaleCommandHandler(IAppDbContext context, IMapper mapper)
             context.Sales.Add(sale);
             context.SaleItems.AddRange(saleItems);
 
-            // -------------------------------------------------------
-            // 🔥  YANGI: Transaction yaratish
-            // -------------------------------------------------------
-            //var uzs = await context.Currencies
-            //    .FirstOrDefaultAsync(c => c.Code == "UZS", ct)
-            //    ?? throw new NotFoundException(nameof(Currencies.DTOs), nameof(UInt128), "UZS");
+            var description = await GenerateDescription(sale);
 
-            //var transaction = new Transaction
-            //{
-            //    Amount = -request.TotalAmount,
-            //    ExchangeRate = 1,
-            //    Discount = 0,
-            //    PaymentMethod = PaymentMethod.Plastik,
-            //    IsIncome = false,
-            //    Description = $"BundleCount: {request.SaleItems.Sum(i => i.BundleCount)}",
-            //    Date = request.Date,
-            //    UserId = request.CustomerId,
-            //    CurrencyId = uzs.Id
-            //};
-
-            //context.Transactions.Add(transaction);
-            // -------------------------------------------------------
+            sale.OperationRecord = new()
+            {
+                Amount = -sale.TotalAmount,
+                Date = sale.Date,
+                Description = description,
+                Type = OperationType.Sale
+            };
 
             await context.CommitTransactionAsync(ct);
             return sale.Id;
@@ -77,6 +68,23 @@ public class CreateSaleCommandHandler(IAppDbContext context, IMapper mapper)
             await context.RollbackTransactionAsync(ct);
             throw;
         }
+    }
+
+    private async Task<string> GenerateDescription(Sale sale)
+    {
+        StringBuilder text = new();
+
+        foreach (var item in sale.SaleItems)
+        { 
+            var productType = await context.ProductTypes
+                .Include(pt => pt.Product)
+                .FirstOrDefaultAsync(pt => pt.Id == item.ProductTypeId)
+                ?? throw new NotFoundException(nameof(ProductType), nameof(item.ProductTypeId), item.ProductTypeId);
+
+            text.AppendLine($"Kodi: {productType.Product.Code} ({productType.Type}), Soni: {item.TotalCount}, Narxi: {item.UnitPrice}, Jami: {item.Amount} UZS");
+        }
+
+        return text.ToString();
     }
 
     private async Task<UserAccount> GetOrCreateUserAccountAsync(long customerId, decimal initialBalance, CancellationToken ct)

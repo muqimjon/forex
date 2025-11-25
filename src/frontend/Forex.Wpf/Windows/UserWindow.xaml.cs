@@ -5,6 +5,8 @@ using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Services;
+using Forex.Wpf.ViewModels;
+using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,13 +17,17 @@ public partial class UserWindow : Window
 {
     private long somId;
     private readonly ForexClient client;
+    private readonly IMapper mapper;
+
+    public UserViewModel? user;
     public UserWindow()
     {
         InitializeComponent();
 
         client = App.AppHost!.Services.GetRequiredService<ForexClient>();
+        mapper = App.AppHost!.Services.GetRequiredService<IMapper>();
 
-        txtName.Focus();
+        txtPhone.Focus();
 
         // Enter bosilganda navbatdagi elementga o'tish
         FocusNavigator.AttachEnterNavigation([
@@ -61,19 +67,14 @@ public partial class UserWindow : Window
             if (somId == 0)
                 await LoadValyutaTypeAsync();
 
-            // 💰 Qarzdorlik yoki haqdorlikni aniqlaymiz
             decimal balance = 0;
 
             if (!string.IsNullOrWhiteSpace(txtBeginningSum.Text) &&
                 decimal.TryParse(txtBeginningSum.Text, out var qarz))
-            {
-                balance = -qarz; // Qarzdorlik — manfiy
-            }
+                balance = -qarz;
             else if (!string.IsNullOrWhiteSpace(txtBeginningSum2.Text) &&
                      decimal.TryParse(txtBeginningSum2.Text, out var haq))
-            {
-                balance = haq; // Haqdorlik — musbat
-            }
+                balance = haq;
 
             var userRequest = new UserRequest
             {
@@ -97,6 +98,8 @@ public partial class UserWindow : Window
 
             if (response.IsSuccess)
             {
+                userRequest.Id = response.Data ?? 0;
+                user = mapper.Map<UserViewModel>(userRequest);
                 DialogResult = true;
                 Close();
             }
@@ -150,11 +153,11 @@ public partial class UserWindow : Window
             if (digits.Length > 3)
                 formatted += digits.Substring(3, Math.Min(2, digits.Length - 3));
             if (digits.Length > 5)
-                formatted += " " + digits.Substring(5, Math.Min(3, digits.Length - 5));
+                formatted += string.Concat(" ", digits.AsSpan(5, Math.Min(3, digits.Length - 5)));
             if (digits.Length > 8)
-                formatted += " " + digits.Substring(8, Math.Min(2, digits.Length - 8));
+                formatted += string.Concat(" ", digits.AsSpan(8, Math.Min(2, digits.Length - 8)));
             if (digits.Length > 10)
-                formatted += " " + digits.Substring(10, Math.Min(2, digits.Length - 10));
+                formatted += string.Concat(" ", digits.AsSpan(10, Math.Min(2, digits.Length - 10)));
 
             textBox.Text = formatted.TrimEnd();
             textBox.SelectionStart = textBox.Text.Length;

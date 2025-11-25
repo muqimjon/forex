@@ -5,6 +5,7 @@ using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Sales.ViewModels;
+using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
@@ -57,17 +58,10 @@ public partial class SalePage : Page
 
         if (confirm == MessageBoxResult.Yes)
         {
-            var newCustomer = await CreateCustomerAsync(input);
+            var newCustomer = CreateCustomerAsync(input);
             if (newCustomer is not null)
             {
-                vm.Customer = new()
-                {
-                    Id = newCustomer.Id,
-                    Name = newCustomer.Name,
-                    Phone = newCustomer.Phone,
-                    Address = newCustomer.Address,
-                    Description = newCustomer.Description
-                };
+                vm.Customer = newCustomer;
 
                 vm.AvailableCustomers.Add(vm.Customer);
 
@@ -83,22 +77,17 @@ public partial class SalePage : Page
         }
     }
 
-    private async Task<UserResponse?> CreateCustomerAsync(string name)
+    private UserViewModel CreateCustomerAsync(string name)
     {
         var dialog = new UserWindow();
         dialog.txtName.Text = name;
 
         var result = dialog.ShowDialog();
         if (result != true)
-            return null;
+            return null!;
 
-        var client = App.AppHost!.Services.GetRequiredService<ForexClient>();
-        var all = await client.Users.GetAllAsync().Handle();
 
-        if (!all.IsSuccess || all.Data is null)
-            return null;
-
-        return all.Data.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        return dialog.user!;
     }
 
 

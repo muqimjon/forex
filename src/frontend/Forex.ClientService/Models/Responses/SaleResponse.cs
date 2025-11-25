@@ -10,6 +10,9 @@ public sealed record SaleResponse
     public decimal TotalAmount { get; set; }
     public string? Note { get; set; }
 
+    public long OperationRecordId { get; set; }
+    public OperationRecordResponse OperationRecord { get; set; } = default!;
+
     public long CustomerId { get; set; }
     public UserResponse Customer { get; set; } = default!;
 

@@ -7,6 +7,7 @@ using Forex.Domain.Entities;
 using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 public sealed record CreateTransactionCommand(
     decimal Amount,
@@ -65,7 +66,7 @@ public class CreateTransactionCommandHandler(
                 OpeningBalance = 0,
                 Balance = 0,
                 Discount = 0,
-                Shop = shop
+                Shop = shop,
             };
 
             context.ShopCashAccounts.Add(shopAccount);
@@ -75,8 +76,39 @@ public class CreateTransactionCommandHandler(
         var transaction = mapper.Map<Transaction>(request);
         transaction.Shop = shop;
 
+        var description = await GenerateDescription(transaction);
+        var amount = transaction.Amount * transaction.ExchangeRate + (transaction.IsIncome ? transaction.Discount: 0);
+
+        transaction.OperationRecord = new()
+        {
+            Amount = amount,
+            Date = transaction.Date,
+            Description = description,
+            Type = OperationType.Transaction
+        };
+
         context.Transactions.Add(transaction);
         return transaction;
+    }
+
+    private async Task<string> GenerateDescription(Transaction transaction)
+    {
+        var currency = await context.Currencies.FirstOrDefaultAsync(c => c.Id == transaction.CurrencyId)
+            ?? throw new NotFoundException(nameof(Currency), nameof(transaction.CurrencyId), transaction.CurrencyId);
+
+        if (transaction.Discount < 0)
+            throw new ForbiddenException("Chegirma 0 dan kichik bo'lishi mumkin emas!");
+
+        var isWithDiscount = transaction.Discount > 0;
+
+        return transaction.PaymentMethod switch
+        {
+            PaymentMethod.Naqd => $"Naqd to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
+            PaymentMethod.Plastik => $"Karta to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
+            PaymentMethod.HisobRaqam => $"Hisob raqam orqali to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
+            PaymentMethod.MobilIlova => $"Online to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
+            _ => "Noma'lum to'lov usuli",
+        };
     }
 
     private async Task UpdateUserAccountAsync(CreateTransactionCommand request, Transaction transaction, CancellationToken cancellationToken)

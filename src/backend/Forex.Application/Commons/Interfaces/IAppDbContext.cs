@@ -40,6 +40,7 @@ public interface IAppDbContext
     DbSet<ProductionStage> ProductionStages { get; set; }
     DbSet<CompanyInfo> CompanyInfo { get; set; }
     DbSet<SocialLink> SocialLinks { get; set; }
+    DbSet<OperationRecord> OperationRecords { get; set; }
 
     Task<bool> SaveAsync(CancellationToken cancellation);
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);

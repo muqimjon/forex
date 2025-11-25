@@ -13,6 +13,9 @@ public sealed record TransactionResponse
     public string? Description { get; set; }
     public DateTime Date { get; set; }
 
+    public long OperationRecordId { get; set; }
+    public OperationRecordResponse OperationRecord { get; set; } = default!;
+
     public long? ShopId { get; set; }
     public ShopResponse Shop { get; set; } = default!;
 

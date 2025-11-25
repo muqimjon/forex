@@ -53,6 +53,26 @@ public class CreateUserCommandHandler(
                 user.Accounts.First().Currency = currency;
             else user.Accounts.Add(new() { Currency = currency });
         }
+        else if (request.Role == UserRole.Mijoz)
+        {
+            var currency = await context.Currencies.FirstOrDefaultAsync(c => c.NormalizedName == "So'm".ToNormalized(), cancellationToken);
+
+            currency ??= new()
+            {
+                Name = "So'm",
+                NormalizedName = "So'm".ToNormalized(),
+                Code = "UZS",
+                Symbol = "so'm",
+                IsEditable = false,
+                IsActive = true,
+                IsDefault = true,
+                ExchangeRate = 1
+            };
+
+            if (user.Accounts.Count != 0)
+                user.Accounts.First().Currency = currency;
+            else user.Accounts.Add(new() { Currency = currency });
+        }
         else
         {
             var currency = await context.Currencies.FirstOrDefaultAsync(c => c.IsDefault, cancellationToken)

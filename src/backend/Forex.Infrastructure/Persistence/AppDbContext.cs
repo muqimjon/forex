@@ -42,6 +42,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<EntryToProcess> EntryToProcesses { get; set; }
     public DbSet<CompanyInfo> CompanyInfo { get; set; }
     public DbSet<SocialLink> SocialLinks { get; set; }
+    public DbSet<OperationRecord> OperationRecords { get; set; }
 
     private IDbContextTransaction? currentTransaction;
 

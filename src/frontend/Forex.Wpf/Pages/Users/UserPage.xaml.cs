@@ -270,12 +270,12 @@ public partial class UserPage : Page
             return;
         }
 
-        bool isUser = role.Equals("Customer", StringComparison.OrdinalIgnoreCase);
+        bool isUser = role.Equals("User", StringComparison.OrdinalIgnoreCase);
 
-        // Qarzdorlik: faqat "Customer" bo'lmaganda ko'rinsin
+        // Qarzdorlik: faqat "User" bo'lmaganda ko'rinsin
         brDebt.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
 
-        // Qolgan elementlar ham "Customer" bo'lmaganda ko'rinsin
+        // Qolgan elementlar ham "User" bo'lmaganda ko'rinsin
         brValutaType.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         brAccount.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         btnSave.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
@@ -287,48 +287,79 @@ public partial class UserPage : Page
 
     private async void BtnSave_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            var roleText = cbRole.SelectedItem?.ToString();
-            if (string.IsNullOrWhiteSpace(roleText) || !Enum.TryParse<UserRole>(roleText, out var role))
-            {
-                MessageBox.Show("Rol tanlanmagan yoki noto‘g‘ri.");
-                return;
-            }
+        if (!ValidateUserFields())
+            return;
 
-            var request = new UserRequest
-            {
-                Name = txtName.Text.Trim(),
-                Phone = txtPhone.Text.Trim(),
-                Address = txtAddress.Text.Trim(),
-                Description = txtDescription.Text.Trim(),
-                Role = role,
-                Accounts =
-                [
-                   new UserAccount
-                   {
-                        CurrencyId = (long)(cbxValutaType.SelectedValue ?? 0),
-                        OpeningBalance = GetOpeningBalance(),
-                        Discount = 0
-                   }
-                ]
-            };
+        var roleText = cbRole.SelectedItem?.ToString();
 
-            var response = await client.Users.Create(request).Handle();
-            if (response.Data > 0)
-            {
-                ClearForm();
-                LoadUsers();
-            }
-            else
-            {
-                MessageBox.Show("Foydalanuvchini qo‘shishda xatolik.");
-            }
-        }
-        catch (Exception ex)
+        if (string.IsNullOrWhiteSpace(roleText) || !Enum.TryParse<UserRole>(roleText, out var role))
         {
-            MessageBox.Show("Xatolik: " + ex.Message);
+            MessageBox.Show("Rol tanlanmagan yoki noto‘g‘ri formatda.", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
         }
+
+        var request = new UserRequest
+        {
+            Name = txtName.Text.Trim(),
+            Phone = txtPhone.Text.Trim(),
+            Address = txtAddress.Text.Trim(),
+            Description = txtDescription.Text.Trim(),
+            Role = role,
+            Accounts =
+            [
+                new ()
+                {
+                    CurrencyId = (long)cbxValutaType.SelectedValue,
+                    OpeningBalance = GetOpeningBalance(),
+                    Discount = 0
+                }
+            ]
+        };
+
+        var response = await client.Users.Create(request).Handle();
+        if (response.Data > 0)
+        {
+            MessageBox.Show("Foydalanuvchi muvaffaqiyatli qo'shildi.", "Muvaffaqiyat", MessageBoxButton.OK, MessageBoxImage.Information);
+            ClearForm();
+            LoadUsers();
+        }
+        else
+        {
+            MessageBox.Show("Foydalanuvchini qo‘shishda xatolik. Server javobida xato.", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private bool ValidateUserFields()
+    {
+        if (string.IsNullOrWhiteSpace(txtName.Text))
+        {
+            MessageBox.Show("Foydalanuvchining Ismi majburiy maydon. Iltimos, to'ldiring.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtName.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtPhone.Text))
+        {
+            MessageBox.Show("Foydalanuvchining Telefon raqami majburiy maydon. Iltimos, to'ldiring.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtPhone.Focus();
+            return false;
+        }
+
+        if (cbRole.SelectedItem == null || string.IsNullOrWhiteSpace(cbRole.SelectedItem.ToString()))
+        {
+            MessageBox.Show("Rol tanlanmagan. Iltimos, foydalanuvchi rolini tanlang.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            cbRole.Focus();
+            return false;
+        }
+
+        if (cbxValutaType.SelectedValue == null || (long)cbxValutaType.SelectedValue == 0)
+        {
+            MessageBox.Show("Hisob (Account) uchun Valyuta turi majburiy maydon. Iltimos, tanlang.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            cbxValutaType.Focus();
+            return false;
+        }
+
+        return true;
     }
 
     private void ClearForm()

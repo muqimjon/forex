@@ -1,6 +1,9 @@
 ﻿namespace Forex.Application.Features.Sales.DTOs;
 
+using Forex.Application.Features.OperationRecords.DTOs;
+using Forex.Application.Features.Sales.SaleItems.DTOs;
 using Forex.Application.Features.Users.DTOs;
+using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
 
 public sealed record SaleForSaleItemDto
@@ -13,9 +16,9 @@ public sealed record SaleForSaleItemDto
     public decimal TotalAmount { get; set; }   // 1 ta savdoda jami summa
     public string? Note { get; set; }
 
+    public long OperationRecordId { get; set; }
+    public OperationRecordForSaleDto OperationRecord { get; set; } = default!;
+
     public long CustomerId { get; set; }
     public UserForSaleDto Customer { get; set; } = default!;
-
-    public long ProductTypeId { get; set; }   // 24-29, 30-35, 36-41 razmeri idsi
-    public ProductType ProductType { get; set; } = default!;
 }

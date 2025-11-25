@@ -285,15 +285,6 @@ public partial class ProductEntryPageViewModel : ViewModelBase
             return;
         }
 
-        var result = MessageBox.Show(
-            $"{ProductEntries.Count} ta mahsulotni saqlashni tasdiqlaysizmi?",
-            "Tasdiqlash",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-
-        if (result == MessageBoxResult.No)
-            return;
-
         // Product Code bo'yicha guruhlash
         var groupedByProduct = ProductEntries
             .Where(p => p.Product is not null &&
