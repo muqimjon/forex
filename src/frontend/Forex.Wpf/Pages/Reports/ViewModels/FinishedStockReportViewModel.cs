@@ -282,7 +282,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
             table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
         // Header (Qopdagi soni va Qop soni almashtirildi)
-        AddRow(table, true, "Kodi", "Nomi", "Razmer", "Donasi", "Qop soni", "Jami", "Narxi", "Umumiy");
+        AddRow(table, true, "Kodi", "Nomi", "Razmer",  "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
 
         foreach (var x in Items)
         {
@@ -290,8 +290,8 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 x.Code,
                 x.Name,
                 x.Type,
+                x.BundleCount!.ToString(),            // Qop soni
                 x.BundleItemCount.ToString(),        // Qopdagi soni
-                x.BundleCount.ToString(),            // Qop soni
                 x.TotalCount.ToString("N0"),         // Jami
                 x.UnitPrice.ToString("N2"),          // Narxi
                 x.TotalAmount.ToString("N2")         // Umumiy
@@ -329,7 +329,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 TextAlignment = !isHeader
                     ? i switch
                     {
-                        1 or 4 => TextAlignment.Left,             // Nomi chapda
+                        1 => TextAlignment.Left,             // Nomi chapda
                         5 or 6 or 7 => TextAlignment.Right, // Jami, Narxi, Umumiy o‘ngda
                         _ => TextAlignment.Center           // Qolgan ustunlar o‘rtada
                     }

@@ -112,6 +112,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                         Code = product.Code ?? "-",
                         ProductName = product.Name ?? "-",
                         Type = item.ProductType?.Type ?? "-",
+                        BundleCount = item.BundleCount,
                         BundleItemCount = item.ProductType?.BundleItemCount ?? 0,
                         TotalCount = item.TotalCount,
                         UnitMeasure = product.UnitMeasure?.Name ?? "dona",
@@ -258,21 +259,21 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
             // Sarlavha
             ws.Cell(row, 1).Value = "SAVDO TARIXI HISOBOTI";
-            ws.Range(row, 1, row, 10).Merge().Style
+            ws.Range(row, 1, row, 11).Merge().Style
                 .Font.SetBold().Font.SetFontSize(18)
                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
             row += 2;
 
             // Davr
             ws.Cell(row, 1).Value = $"Davr: {BeginDate:dd.MM.yyyy} — {EndDate:dd.MM.yyyy}";
-            ws.Range(row, 1, row, 10).Merge().Style.Font.SetBold().Font.SetFontSize(14);
+            ws.Range(row, 1, row, 11).Merge().Style.Font.SetBold().Font.SetFontSize(14);
             row += 2;
 
             // Header
-            string[] headers = { "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa" };
+            string[] headers = { "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa" };
             for (int i = 0; i < headers.Length; i++)
                 ws.Cell(row, i + 1).Value = headers[i];
-            ws.Range(row, 1, row, 10).Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.LightGray);
+            ws.Range(row, 1, row, 11).Style.Font.SetBold().Fill.SetBackgroundColor(XLColor.LightGray);
             row++;
 
             // Ma'lumotlar
@@ -283,20 +284,21 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                 ws.Cell(row, 3).Value = item.Code;
                 ws.Cell(row, 4).Value = item.ProductName;
                 ws.Cell(row, 5).Value = item.Type;
-                ws.Cell(row, 6).Value = item.BundleItemCount;
-                ws.Cell(row, 7).Value = item.TotalCount;
-                ws.Cell(row, 8).Value = item.UnitMeasure;
-                ws.Cell(row, 9).Value = item.UnitPrice;
-                ws.Cell(row, 10).Value = item.Amount;
+                ws.Cell(row, 6).Value = item.BundleCount;
+                ws.Cell(row, 7).Value = item.BundleItemCount;
+                ws.Cell(row, 8).Value = item.TotalCount;
+                ws.Cell(row, 9).Value = item.UnitMeasure;
+                ws.Cell(row, 10).Value = item.UnitPrice;
+                ws.Cell(row, 11).Value = item.Amount;
                 row++;
             }
 
             // Jami summa
             var totalAmount = FilteredItems.Sum(x => x.Amount);
-            ws.Cell(row, 9).Value = "JAMI:";
-            ws.Cell(row, 9).Style.Font.SetBold();
-            ws.Cell(row, 10).Value = totalAmount;
-            ws.Cell(row, 10).Style.Font.SetBold().NumberFormat.Format = "#,##0.00";
+            ws.Cell(row, 1).Value = "JAMI:";
+            ws.Cell(row, 1).Style.Font.SetBold();
+            ws.Cell(row, 11).Value = totalAmount;
+            ws.Cell(row, 11).Style.Font.SetBold().NumberFormat.Format = "#,##0.00";
 
             ws.Columns().AdjustToContents();
             workbook.SaveAs(dialog.FileName);
@@ -358,16 +360,17 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
         // ENG MUHIM: Ustun enlarini oxirgi millimetrgacha hisobladim
         double[] widths = {
-        62,   // Sana
-        90,  // Mijoz
+        56,   // Sana
+        80,  // Mijoz
         52,   // Kodi
-        70,  // Nomi
+        60,  // Nomi
         58,   // Razmer
+        60,   // Donasi
         60,   // Qopdagi
         52,   // Jami
-        60,   // O‘lchov
-        80,   // Narxi
-        110   // Umumiy summa — ENDI TO‘LIQ SIG‘ADI!
+        50,   // O‘lchov
+        70,   // Narxi
+        100   // Umumiy summa — ENDI TO‘LIQ SIG‘ADI!
     };
 
         // Jami en: 62+105+52+115+58+60+52+60+80+110 = 704px → to‘g‘ri keladi!
@@ -376,7 +379,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
         // Header
         AddRow(table, true,
-            "Sana", "Mijoz", "Kodi", "Nomi", "Razmer",
+            "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Qop soni",
             "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa");
 
         // Ma'lumotlar
@@ -388,6 +391,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                 item.Code,
                 item.ProductName,
                 item.Type,
+                item.BundleCount.ToString("N0"),
                 item.BundleItemCount.ToString("N0"),
                 item.TotalCount.ToString("N0"),
                 item.UnitMeasure,
@@ -399,7 +403,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         // JAMI QATOR — eng keng joyda
         var totalAmount = FilteredItems.Sum(x => x.Amount);
         AddRow(table, true,
-            "JAMI:", "", "", "", "", "", "", "", "", $"{totalAmount:N2}"
+            "JAMI:", "", "", "", "", "", "", "", "", "", $"{totalAmount:N2}"
         );
 
         stack.Children.Add(table);

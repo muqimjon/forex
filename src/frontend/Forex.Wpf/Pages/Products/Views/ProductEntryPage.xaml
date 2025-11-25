@@ -11,7 +11,8 @@
     Title="ProductEntryPage"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    mc:Ignorable="d" Background="Azure">
+    Background="Azure"
+    mc:Ignorable="d">
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -199,14 +200,14 @@
 
                     <DataGridTextColumn
                         Width="*"
-                        Binding="{Binding Product.SelectedType.BundleItemCount, StringFormat={}{0:N0}}"
-                        Header="Qopdagi soni"
+                        Binding="{Binding BundleCount, StringFormat={}{0:N0}}"
+                        Header="Qop soni"
                         IsReadOnly="True" />
 
                     <DataGridTextColumn
                         Width="*"
-                        Binding="{Binding BundleCount, StringFormat={}{0:N0}}"
-                        Header="Qop soni"
+                        Binding="{Binding Product.SelectedType.BundleItemCount, StringFormat={}{0:N0}}"
+                        Header="Donasi"
                         IsReadOnly="True" />
 
                     <DataGridTextColumn

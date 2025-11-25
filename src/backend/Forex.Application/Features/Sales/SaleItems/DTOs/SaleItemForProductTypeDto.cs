@@ -5,7 +5,7 @@ using Forex.Application.Features.Sales.DTOs;
 public sealed record SaleItemForProductTypeDto
 {
     public long Id { get; set; }
-    public int PerTypeCount { get; set; }   // 1 ta razmer (6 ta ayoq kiyim) razmerlar soni
+    public int BundleCount { get; set; }   // 1 ta razmer (6 ta ayoq kiyim) razmerlar soni
     public int Count { get; set; }    // (1 ta oyoq kiyim) 1 qatorda jami 50 ta ayoq kiyim sotildi
     public decimal CostPrice { get; set; }    // 1 ta savdoning bir qatorining tannarxi
     public decimal Benifit { get; set; } // 1 ta savdoning bir qatorining foydasi
