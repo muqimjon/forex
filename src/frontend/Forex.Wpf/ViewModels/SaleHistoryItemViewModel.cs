@@ -9,6 +9,7 @@ public class SaleHistoryItemViewModel
     public string Code { get; set; } = default!;
     public string ProductName { get; set; } = default!;
     public string Type { get; set; } = default!;     // Razmer
+    public int BundleCount { get; set; }
     public int BundleItemCount { get; set; }
 
     // SaleItem

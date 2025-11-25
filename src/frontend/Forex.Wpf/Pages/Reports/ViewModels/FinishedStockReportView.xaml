@@ -166,6 +166,18 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
+                <!--  Qop soni — chapda  -->
+                <DataGridTextColumn
+                    Width="0.7*"
+                    Binding="{Binding BundleCount}"
+                    Header="Qop soni">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
                 <!--  Qopdagi soni — o‘rtada  -->
                 <DataGridTextColumn
                     Width="0.7*"
@@ -178,17 +190,6 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Qop soni — chapda  -->
-                <DataGridTextColumn
-                    Width="0.7*"
-                    Binding="{Binding BundleCount}"
-                    Header="Qop soni">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
 
                 <!--  Jami — o‘ngda  -->
                 <DataGridTextColumn

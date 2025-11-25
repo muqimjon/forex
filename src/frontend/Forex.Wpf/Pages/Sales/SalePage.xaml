@@ -419,7 +419,7 @@
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding BundleCount, StringFormat={}{0:N0}}"
-                        Header="Razmer soni" />
+                        Header="Qop soni" />
 
                     <DataGridTextColumn
                         Width="*"

@@ -322,6 +322,24 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
+                <!--  6. Qop soni — O‘rtada  -->
+                <DataGridTextColumn
+                    Width="0.8*"
+                    Binding="{Binding BundleCount, StringFormat=N0}"
+                    Header="Qop soni">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
                 <!--  6. Qopdagi soni — O‘rtada  -->
                 <DataGridTextColumn
                     Width="0.8*"
