@@ -210,6 +210,26 @@
                 <DataGridTextColumn
                     Width="150"
                     Binding="{Binding Debit, StringFormat=N0}"
+                    Header="Chiqim">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="Foreground" Value="#C62828" />
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="Margin" Value="0,0,12,0" />
+                            <Setter Property="Foreground" Value="#C62828" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn
+                    Width="150"
+                    Binding="{Binding Credit, StringFormat=N0}"
                     Header="Kirim">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
@@ -221,27 +241,7 @@
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
                             <Setter Property="Margin" Value="0,0,12,0" />
-                            <Setter Property="Foreground" Value="#2E7D32" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <DataGridTextColumn
-                    Width="150"
-                    Binding="{Binding Credit, StringFormat=N0}"
-                    Header="Chiqim">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="Foreground" Value="#B71C1C" />
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Margin" Value="0,0,12,0" />
-                            <Setter Property="Foreground" Value="#C62828" />
+                            <Setter Property="Foreground" Value="#1B5E20" />
                             <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>

@@ -17,12 +17,14 @@ public class ForexClient(
     IApiProductEntries productEntries,
     IApiSales sales,
     IApiTransactions transactions,
+    IApiOperationRecord operationRecord,
     IApiShops shops,
     IApiProcesses processes,
     IApiProductResidues productResidues)
 {
     public IApiAuth Auth { get; } = auth;
     public IApiUser Users { get; } = users;
+    public IApiOperationRecord OperationRecords { get; } = operationRecord;
     public IApiUserAccount UserAccounts { get; } = userAccounts;
     public IApiSemiProducts SemiProduct { get; } = semiProduct;
     public IApiManufactory Manufactories { get; } = manufactory;
