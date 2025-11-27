@@ -1,15 +1,15 @@
 ﻿namespace Forex.Wpf.Pages.Home;
+
 using Forex.ClientService.Services;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Processes;
 using Forex.Wpf.Pages.Products;
-using Forex.Wpf.Pages.Products.Views;
 using Forex.Wpf.Pages.Reports;
 using Forex.Wpf.Pages.Sales;
 using Forex.Wpf.Pages.SemiProducts.Views;
 using Forex.Wpf.Pages.Settings;
-using Forex.Wpf.Pages.ShopCashes;
+using Forex.Wpf.Pages.Transactions.Views;
 using Forex.Wpf.Pages.Users;
 using Forex.Wpf.Windows;
 using Forex.Wpf.Windows.OverdueAccountsWindow;
@@ -65,7 +65,7 @@ public partial class HomePage : Page
         => Main.NavigateTo(new ProductPage());
 
     private void BtnCash_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new ShopCashPage());
+        => Main.NavigateTo(new TransactionPage());
 
     private void BtnSale_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new SalePage());

@@ -1,4 +1,5 @@
 ﻿namespace Forex.Application.Features.Transactions.Queries;
+
 using AutoMapper;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;

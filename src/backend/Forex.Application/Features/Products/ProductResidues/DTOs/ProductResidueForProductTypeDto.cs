@@ -1,4 +1,5 @@
 ﻿namespace Forex.Application.Features.Products.ProductResidues.DTOs;
+
 using Forex.Application.Features.Shops.DTOs;
 
 public sealed record ProductResidueForProductTypeDto

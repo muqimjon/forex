@@ -3,7 +3,6 @@
 using Forex.Wpf.Resources.UserControls;
 using System;
 using System.Windows;
-using System.Windows.Navigation;
 
 public static class SpinnerService
 {

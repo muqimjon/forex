@@ -1,5 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
-using CommunityToolkit.Mvvm.ComponentModel;
+
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;

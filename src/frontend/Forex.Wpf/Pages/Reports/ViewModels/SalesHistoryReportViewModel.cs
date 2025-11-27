@@ -11,15 +11,14 @@ using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Media;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 public partial class SalesHistoryReportViewModel : ViewModelBase
 {
@@ -65,7 +64,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
     public async Task LoadAsync()
     {
         IsLoading = true;
-        _allItems.Clear();     
+        _allItems.Clear();
         FilteredItems.Clear();
 
         try

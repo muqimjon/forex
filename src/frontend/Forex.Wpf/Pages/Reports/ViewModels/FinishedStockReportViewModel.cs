@@ -282,7 +282,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
             table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
         // Header (Qopdagi soni va Qop soni almashtirildi)
-        AddRow(table, true, "Kodi", "Nomi", "Razmer",  "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
+        AddRow(table, true, "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
 
         foreach (var x in Items)
         {

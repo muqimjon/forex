@@ -1,4 +1,5 @@
 ﻿namespace Forex.ClientService.Models.Responses;
+
 public sealed record ManufactoryResponse
 {
     public long Id { get; set; }

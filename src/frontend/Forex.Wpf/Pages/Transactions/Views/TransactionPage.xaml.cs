@@ -1,8 +1,8 @@
-﻿namespace Forex.Wpf.Pages.ShopCashes;
+﻿namespace Forex.Wpf.Pages.Transactions.Views;
 
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
-using Forex.Wpf.Pages.ShopCashes.ViewModels;
+using Forex.Wpf.Pages.Transactions.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
@@ -10,15 +10,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-public partial class ShopCashPage : Page
+public partial class TransactionPage : Page
 {
     private static readonly Regex NumericRegex = new(@"^[0-9]+$", RegexOptions.Compiled);
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
 
-    public ShopCashPage()
+    public TransactionPage()
     {
         InitializeComponent();
-        DataContext = App.AppHost!.Services.GetRequiredService<PaymentPageViewModel>();
+        DataContext = App.AppHost!.Services.GetRequiredService<TransactionPageViewModel>();
         SetupFocusNavigation();
     }
 

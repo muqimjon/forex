@@ -1,4 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
@@ -52,7 +53,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         {
             Filters = new()
             {
-                ["date"] = [ $">={begin:yyyy-MM-dd}", $"<{end.AddDays(1):yyyy-MM-dd}" ]
+                ["date"] = [$">={begin:yyyy-MM-dd}", $"<{end.AddDays(1):yyyy-MM-dd}"]
             }
         };
 

@@ -40,15 +40,15 @@ public partial class ProductPageViewModel : ViewModelBase
     {
         FilteringRequest request = new()
         {
-             Filters = new()
-             {
-                 ["producttype"] = ["include:product"],
-                 ["date"] = [$"{BeginDate:yyyy-MM-dd}"]
-             }
+            Filters = new()
+            {
+                ["producttype"] = ["include:product"],
+                ["date"] = [$"{BeginDate:yyyy-MM-dd}"]
+            }
         };
 
         var response = await Client.ProductEntries.Filter(request).Handle();
-        if(response.IsSuccess)
+        if (response.IsSuccess)
             ProductEntries = Mapper.Map<ObservableCollection<ProductEntryViewModel>>(response.Data);
         else ErrorMessage = response.Message ?? "Product kirimi ma'lumotlarini yuklashda xatolik!";
     }

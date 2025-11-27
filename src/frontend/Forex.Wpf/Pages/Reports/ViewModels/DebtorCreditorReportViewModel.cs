@@ -1,7 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using global::Forex.ClientService;
 using global::Forex.Wpf.Pages.Common;
 using global::Forex.Wpf.Pages.Reports.ViewModels;

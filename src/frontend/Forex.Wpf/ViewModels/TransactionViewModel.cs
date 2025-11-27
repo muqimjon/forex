@@ -42,7 +42,7 @@ public partial class TransactionViewModel : ViewModelBase
     partial void OnExchangeRateChanged(decimal? value) => ReCalculateNetAmount();
     partial void OnExpenseChanged(decimal? value) => ChangeTansactionType(-Expense);
     partial void OnIncomeChanged(decimal? value) => ChangeTansactionType(Income);
-    
+
     partial void OnCurrencyChanged(CurrencyViewModel value)
     {
         if (value is not null)

@@ -86,7 +86,7 @@ public class CreateTransactionCommandHandler(
         transaction.Shop = shop;
 
         var description = await GenerateDescription(transaction);
-        var amount = transaction.Amount * transaction.ExchangeRate + (transaction.IsIncome ? transaction.Discount: 0);
+        var amount = transaction.Amount * transaction.ExchangeRate + (transaction.IsIncome ? transaction.Discount : 0);
 
         transaction.OperationRecord = new()
         {
