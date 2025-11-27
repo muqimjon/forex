@@ -65,11 +65,11 @@ public partial class PaymentPageViewModel : ViewModelBase
 
         request.Filters = new()
         {
-            ["date"] = new()
-        {
-            $">={begin:yyyy-MM-dd}",
-            $"<{end:yyyy-MM-dd}"
-        },
+            ["date"] =
+            [
+                $">={begin:yyyy-MM-dd}",
+                $"<{end:yyyy-MM-dd}"
+            ],
             ["user"] = ["include"],
             ["currency"] = ["include"],
             ["shopAccount"] = ["include"]

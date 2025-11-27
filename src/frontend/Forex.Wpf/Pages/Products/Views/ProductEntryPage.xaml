@@ -25,7 +25,7 @@
 
         <DockPanel LastChildFill="False">
             <Label
-                Content="Mahsulotlar kirim oynasi"
+                Content="Mahsulot kirim qilish"
                 FontSize="18"
                 FontWeight="Bold"
                 Foreground="{StaticResource SecondaryTextColor}" />
@@ -179,7 +179,7 @@
                         IsReadOnly="True" />
 
                     <DataGridTextColumn
-                        Width="1.5*"
+                        Width="1.3*"
                         MinWidth="100"
                         Binding="{Binding Product.Name}"
                         Header="Nomi"

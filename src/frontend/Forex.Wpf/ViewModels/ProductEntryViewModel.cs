@@ -7,6 +7,7 @@ using System.ComponentModel;
 
 public partial class ProductEntryViewModel : ViewModelBase
 {
+    public long Id { get; set; }
     [ObservableProperty] private ProductViewModel? product;
     [ObservableProperty] private uint? count;
     [ObservableProperty] private uint availableCount;
@@ -15,8 +16,16 @@ public partial class ProductEntryViewModel : ViewModelBase
     [ObservableProperty] private uint? bundleCount;
     [ObservableProperty] private decimal? unitPrice;
     [ObservableProperty] private ProductTypeViewModel? productType;
+    [ObservableProperty] private DateTime date = DateTime.Now;
+    [ObservableProperty] private uint? bundleItemCount;
+    [ObservableProperty] private decimal? costPrice;
+    [ObservableProperty] private decimal? preparationCostPerUnit;
+    [ObservableProperty] private decimal? totalAmount;
 
     #region Property Changes
+
+    partial void OnCountChanged(uint? value) => RecalculateBundleCount();
+    partial void OnBundleItemCountChanged(uint? value) => RecalculateBundleCount();
 
     partial void OnProductChanged(ProductViewModel? value)
     {
@@ -57,6 +66,11 @@ public partial class ProductEntryViewModel : ViewModelBase
         ProductionOrigin = Enum.TryParse<ProductionOrigin>(ProductionOriginName, out var productionOrigin) ? productionOrigin : ProductionOrigin.Eva;
         if (Product is not null)
             Product!.ProductionOrigin = ProductionOrigin;
+    }
+
+    private void RecalculateBundleCount()
+    {
+        BundleCount = Count / BundleItemCount;
     }
 
     #endregion

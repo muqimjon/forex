@@ -19,4 +19,7 @@ public class ProductEntryResponse
 
     public long ShopId { get; set; }
     public ShopResponse Shop { get; set; } = default!;
+
+    public long ProductResidueId { get; set; }
+    public ProductResidueResponse ProductResidue { get; set; } = default!;
 }
