@@ -13,4 +13,8 @@ public class OperationRecordsController
     [HttpPost("filter")]
     public async Task<IActionResult> GetFiltered(OperationRecordFilterQuery query)
         => Ok(new Response { Data = await Mediator.Send(query) });
+
+    [HttpPost]
+    public async Task<IActionResult> GetTurnover([FromBody] GetOperationRecordByUserIdQuery query)
+       => Ok(new Response { Data = await Mediator.Send(query) });
 }
