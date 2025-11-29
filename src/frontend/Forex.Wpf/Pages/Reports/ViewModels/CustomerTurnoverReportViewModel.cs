@@ -4,13 +4,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
 using global::Forex.Wpf.Pages.Common;
 using global::Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,6 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Diagnostics;     
 using System.Windows.Input;
 using PdfSharp.Drawing;
+using Forex.ClientService.Models.Responses;
 
 public partial class CustomerTurnoverReportViewModel : ViewModelBase
 {
@@ -32,11 +31,14 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     [ObservableProperty] private DateTime? _endDate = DateTime.Today.AddDays(1).AddMinutes(-1);
 
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
+
+
     public ObservableCollection<TurnoversViewModel> Operations { get; } = new();
+    [ObservableProperty] private TurnoversViewModel? selectedItem;
 
     [ObservableProperty] private decimal _beginBalance;
     [ObservableProperty] private decimal _lastBalance;
-
+    private List<OperationRecordDto> _originalRecords = new();
     public CustomerTurnoverReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
         _client = client;
@@ -51,7 +53,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         _ = LoadDataAsync();
     }
 
-    [RelayCommand]
     private async Task LoadDataAsync()
     {
         if (SelectedCustomer == null)
@@ -81,7 +82,10 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         if (!response.IsSuccess)
             return;
 
+
         var data = response.Data;
+
+        _originalRecords = data.OperationRecords.ToList();
 
         BeginBalance = data.BeginBalance;
         LastBalance = data.EndBalance;
@@ -123,6 +127,72 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task Delete()
+    {
+        var selected = SelectedItem;
+
+        if (selected == null)
+        {
+            MessageBox.Show("O‘chirish uchun qatorni tanlang.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var result = MessageBox.Show(
+            $"Tanlangan operatsiyani o‘chirishni xohlaysizmi?\n\n" +
+            $"{selected.Date:dd.MM.yyyy} — {selected.Description}",
+            "O‘chirishni tasdiqlang",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result != MessageBoxResult.Yes) return;
+
+        try
+        {
+            var originalRecord = _originalRecords.FirstOrDefault(x => x.Id == selected.Id);
+            if (originalRecord == null)
+            {
+                MessageBox.Show("Operatsiya topilmadi.", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            bool success = false;
+
+            if (originalRecord.Type == ClientService.Enums.OperationType.Sale && originalRecord.Sale != null)
+            {
+                var resp = await _client.Sales.Delete(originalRecord.Sale.Id).Handle(l => IsLoading = l);
+                success = resp.IsSuccess;
+            }
+            else if (originalRecord.Type == ClientService.Enums.OperationType.Transaction && originalRecord.Transaction != null)
+            {
+                var resp = await _client.Transactions.Delete(originalRecord.Transaction.Id).Handle(l => IsLoading = l);
+                success = resp.IsSuccess;
+            }
+            else
+            {
+                MessageBox.Show("Operatsiya turi aniqlanmadi.", "Xato");
+                return;
+            }
+
+            if (success)
+            {
+                Operations.Remove(selected);
+                _originalRecords.Remove(originalRecord);
+                await LoadDataAsync(); // qoldiqlar yangilanadi
+
+                MessageBox.Show("Operatsiya muvaffaqiyatli o‘chirildi!", "Bajarildi", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Serverda o‘chirishda xatolik.", "Xato");
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Xatolik: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
     private void Preview()
     {
         if (Operations.Count == 0)
@@ -153,7 +223,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task ExportToExcel()
+    private void ExportToExcel()
     {
         if (Operations.Count == 0)
         {
@@ -275,7 +345,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         LastBalance = 0;
     }
 
-    // Preview oynasini alohida funksiya qilib chiqardim (ikkalasida ishlatish uchun)
     private void ShowPreviewWindow(FixedDocument doc)
     {
         var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(15) };
