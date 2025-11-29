@@ -1,29 +1,29 @@
-﻿namespace Forex.Wpf.Pages.ShopCashes.ViewModels;
+﻿namespace Forex.Wpf.Pages.Transactions.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Forex.ClientService;
 using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
 
-public partial class PaymentPageViewModel : ViewModelBase
+public partial class TransactionPageViewModel : ViewModelBase
 {
     private readonly ForexClient client;
     private readonly IMapper mapper;
 
-    public PaymentPageViewModel(ForexClient client, IMapper mapper)
+    public TransactionPageViewModel(ForexClient client, IMapper mapper)
     {
         this.client = client;
         this.mapper = mapper;
 
-        this.PropertyChanged += (_, e) =>
+        PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(BeginDate) or nameof(EndDate))
                 _ = LoadTransactionsAsync();
@@ -57,30 +57,30 @@ public partial class PaymentPageViewModel : ViewModelBase
 
     private async Task LoadTransactionsAsync()
     {
-        var request = new FilteringRequest();
+        FilteringRequest request = new FilteringRequest();
 
         // Sana bo‘yicha filter
-        var begin = BeginDate?.Date ?? DateTime.Today;
-        var end = (EndDate?.Date ?? DateTime.Today).AddDays(1);
+        DateTime begin = BeginDate?.Date ?? DateTime.Today;
+        DateTime end = (EndDate?.Date ?? DateTime.Today).AddDays(1);
 
         request.Filters = new()
         {
-            ["date"] = new()
-        {
-            $">={begin:yyyy-MM-dd}",
-            $"<{end:yyyy-MM-dd}"
-        },
+            ["date"] =
+            [
+                $">={begin:yyyy-MM-dd}",
+                $"<{end:yyyy-MM-dd}"
+            ],
             ["user"] = ["include"],
             ["currency"] = ["include"],
             ["shopAccount"] = ["include"]
         };
 
-        var response = await client.Transactions.Filter(request)
+        Response<List<TransactionResponse>> response = await client.Transactions.Filter(request)
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {
-            var ordered = response.Data.OrderByDescending(t => t.Date).ToList();
+            List<TransactionResponse> ordered = response.Data.OrderByDescending(t => t.Date).ToList();
             Transactions = mapper.Map<ObservableCollection<TransactionViewModel>>(ordered);
         }
         else
@@ -91,11 +91,11 @@ public partial class PaymentPageViewModel : ViewModelBase
 
     private async Task LoadShopCashes()
     {
-        var response = await client.Shops.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
+        Response<List<ShopResponse>> response = await client.Shops.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {
-            var accounts = response.Data.SelectMany(sh => sh.ShopAccounts);
+            IEnumerable<ShopAccountResponse> accounts = response.Data.SelectMany(sh => sh.ShopAccounts);
             AvailableShopAccounts = mapper.Map<ObservableCollection<ShopAccountViewModel>>(accounts);
         }
         else
@@ -106,7 +106,7 @@ public partial class PaymentPageViewModel : ViewModelBase
 
     private async Task LoadCurrenciesAsync()
     {
-        var response = await client.Currencies.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
+        Response<List<CurrencyResponse>> response = await client.Currencies.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {
@@ -121,7 +121,7 @@ public partial class PaymentPageViewModel : ViewModelBase
 
     private async Task LoadUsersAsync()
     {
-        var response = await client.Users.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
+        Response<List<UserResponse>> response = await client.Users.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {
@@ -146,8 +146,8 @@ public partial class PaymentPageViewModel : ViewModelBase
         if (Transaction.Date.Date == DateTime.Today)
             Transaction.Date = DateTime.Now;
 
-        var request = mapper.Map<TransactionRequest>(Transaction);
-        var response = await client.Transactions.CreateAsync(request).Handle(isLoading => IsLoading = isLoading);
+        TransactionRequest request = mapper.Map<TransactionRequest>(Transaction);
+        Response<long?> response = await client.Transactions.CreateAsync(request).Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {

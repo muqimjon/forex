@@ -3,6 +3,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.ClientService.Enums;
 using Forex.Wpf.Pages.Common;
+using System.ComponentModel;
 
 public partial class TransactionViewModel : ViewModelBase
 {
@@ -36,14 +37,21 @@ public partial class TransactionViewModel : ViewModelBase
 
     partial void OnNetAmountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
     partial void OnDiscountChanged(decimal? value) => RecalculateTotalAmountWithUserBalance();
-    partial void OnCurrencyChanged(CurrencyViewModel value) => RefreshExchangeRate();
     partial void OnUserChanged(UserViewModel value) => RecalculateTotalAmountWithUserBalance();
     partial void OnAmountChanged(decimal? value) => ReCalculateNetAmount();
     partial void OnExchangeRateChanged(decimal? value) => ReCalculateNetAmount();
     partial void OnExpenseChanged(decimal? value) => ChangeTansactionType(-Expense);
     partial void OnIncomeChanged(decimal? value) => ChangeTansactionType(Income);
 
-    #endregion
+    partial void OnCurrencyChanged(CurrencyViewModel value)
+    {
+        if (value is not null)
+            value.PropertyChanged += OnCurrencyPropertyChanged;
+    }
+
+    private void OnCurrencyPropertyChanged(object? sender, PropertyChangedEventArgs e) => ReCalculateNetAmount();
+
+    #endregion Property Changes
 
     #region Private Helpers
 
@@ -71,9 +79,7 @@ public partial class TransactionViewModel : ViewModelBase
         IsDebtor = total < 0;
     }
 
-    private void ReCalculateNetAmount() => NetAmount = Amount * ExchangeRate;
-
-    private void RefreshExchangeRate() => ExchangeRate = Currency?.ExchangeRate;
+    private void ReCalculateNetAmount() => NetAmount = Amount * Currency?.ExchangeRate;
 
     #endregion
 }

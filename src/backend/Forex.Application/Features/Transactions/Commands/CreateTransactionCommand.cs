@@ -34,7 +34,8 @@ public class CreateTransactionCommandHandler(
         {
             var transaction = await CreateTransactionAsync(request, cancellationToken);
             await UpdateUserAccountAsync(request, transaction, cancellationToken);
-            UpdateShopAccountAsync(transaction);
+            UpdateShopAccount(transaction);
+            await UpdateCurrencyExchangeRate(transaction.CurrencyId, transaction.ExchangeRate);
 
             await context.CommitTransactionAsync(cancellationToken);
             return transaction.Id;
@@ -44,6 +45,14 @@ public class CreateTransactionCommandHandler(
             await context.RollbackTransactionAsync(cancellationToken);
             throw;
         }
+    }
+
+    private async Task UpdateCurrencyExchangeRate(long currencyId, decimal exchangeRate)
+    {
+        var currency = await context.Currencies.FirstOrDefaultAsync(c => c.Id == currencyId)
+            ?? throw new NotFoundException(nameof(Currency), nameof(currencyId), currencyId);
+
+        currency.ExchangeRate = exchangeRate;
     }
 
     private async Task<Transaction> CreateTransactionAsync(CreateTransactionCommand request, CancellationToken cancellationToken)
@@ -77,7 +86,7 @@ public class CreateTransactionCommandHandler(
         transaction.Shop = shop;
 
         var description = await GenerateDescription(transaction);
-        var amount = transaction.Amount * transaction.ExchangeRate + (transaction.IsIncome ? transaction.Discount: 0);
+        var amount = transaction.Amount * transaction.ExchangeRate + (transaction.IsIncome ? transaction.Discount : 0);
 
         transaction.OperationRecord = new()
         {
@@ -115,7 +124,7 @@ public class CreateTransactionCommandHandler(
     {
         var uzsCurrency = await context.Currencies
             .FirstOrDefaultAsync(c => c.Code == "UZS", cancellationToken)
-            ?? throw new InvalidOperationException("UZS currency not found");
+            ?? throw new NotFoundException(nameof(Currency), nameof(Currency.Code), "UZS");
 
         var userAccount = await context.UserAccounts
             .FirstOrDefaultAsync(a => a.UserId == request.UserId && a.CurrencyId == uzsCurrency.Id, cancellationToken);
@@ -140,7 +149,7 @@ public class CreateTransactionCommandHandler(
         userAccount.Balance += delta;
     }
 
-    private static void UpdateShopAccountAsync(Transaction transaction)
+    private static void UpdateShopAccount(Transaction transaction)
     {
         var shopAccount = transaction.Shop.ShopAccounts.FirstOrDefault(sh => sh.CurrencyId == transaction.CurrencyId);
 

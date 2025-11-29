@@ -1,11 +1,9 @@
 ﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
-using CommunityToolkit.Mvvm.ComponentModel;
+
 using CommunityToolkit.Mvvm.Input;
 using Forex.Wpf.Common.Interfaces;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.Pages.Sales.ViewModels;
-using System.Windows;
-using System.Windows.Controls;
 
 
 public partial class ReportsPageViewModel : ViewModelBase

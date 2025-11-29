@@ -1,4 +1,5 @@
 ﻿namespace Forex.Wpf.Common.Extensions;
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 

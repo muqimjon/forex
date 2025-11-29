@@ -3,7 +3,6 @@
 using Forex.Application.Features.OperationRecords.DTOs;
 using Forex.Application.Features.Sales.SaleItems.DTOs;
 using Forex.Application.Features.Users.DTOs;
-using Forex.Domain.Entities;
 
 public sealed record SaleDto
 {

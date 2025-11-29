@@ -31,7 +31,7 @@ public partial class ProductEntryPageViewModel : ViewModelBase
     public string[] ProductionOrigins { get; set; } = Enum.GetNames<ProductionOrigin>();
     [ObservableProperty] private ObservableCollection<ProductEntryViewModel> productEntries = [];
     [ObservableProperty] private ProductEntryViewModel currentProductEntry = new();
-    [ObservableProperty] private ProductEntryViewModel? selectedProductEntry = new();
+    [ObservableProperty] private ProductEntryViewModel? selectedProductEntry = default;
 
     #region Load Data
 

@@ -90,6 +90,7 @@ public static class MappingProfile
           }
       });
         config.NewConfig<TransactionViewModel, TransactionRequest>()
+            .Map(dest => dest.ExchangeRate, src => src.Currency.ExchangeRate)
             .Map(dest => dest.CurrencyId, src => src.Currency.Id)
             .Map(dest => dest.UserId, src => src.User.Id);
     }

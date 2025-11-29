@@ -22,7 +22,7 @@ public record CreateSaleCommand(
     : IRequest<long>;
 
 public class CreateSaleCommandHandler(
-    IAppDbContext context, 
+    IAppDbContext context,
     IMapper mapper)
     : IRequestHandler<CreateSaleCommand, long>
 {
@@ -72,14 +72,14 @@ public class CreateSaleCommandHandler(
 
     private async Task<string> GenerateDescription(Sale sale)
     {
-        StringBuilder text = new();
+        StringBuilder text = new();
 
         foreach (var item in sale.SaleItems)
-        { 
-            var productType = await context.ProductTypes
-                .Include(pt => pt.Product)
-                .FirstOrDefaultAsync(pt => pt.Id == item.ProductTypeId)
-                ?? throw new NotFoundException(nameof(ProductType), nameof(item.ProductTypeId), item.ProductTypeId);
+        {
+            var productType = await context.ProductTypes
+                      .Include(pt => pt.Product)
+                      .FirstOrDefaultAsync(pt => pt.Id == item.ProductTypeId)
+                      ?? throw new NotFoundException(nameof(ProductType), nameof(item.ProductTypeId), item.ProductTypeId);
 
             text.AppendLine($"Kodi: {productType.Product.Code} ({productType.Type}), Soni: {item.TotalCount}, Narxi: {item.UnitPrice}, Jami: {item.Amount} UZS");
         }

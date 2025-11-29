@@ -13,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using NavigationService = Forex.Wpf.Common.Services.NavigationService;
 
 namespace Forex.Wpf;
