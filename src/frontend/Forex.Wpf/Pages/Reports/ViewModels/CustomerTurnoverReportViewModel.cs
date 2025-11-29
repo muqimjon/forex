@@ -4,23 +4,21 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
 using global::Forex.Wpf.Pages.Common;
 using global::Forex.Wpf.ViewModels;
+using PdfSharp.Drawing;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
-using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Diagnostics;     
-using System.Windows.Input;
-using PdfSharp.Drawing;
 
 public partial class CustomerTurnoverReportViewModel : ViewModelBase
 {
@@ -68,9 +66,9 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         Operations.Clear();
 
         var requset = new TurnoverRequest
-        ( 
+        (
             UserId: SelectedCustomer.Id,
-            Begin : begin,
+            Begin: begin,
             End: end
         );
 
@@ -383,7 +381,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         double[] colWidths = { 90, 120, 120, 370 };
 
         // Header
-        stack.Children.Add(CreateRow(colWidths, true, "Sana",  "Chiqim", "Kirim", "Izoh"));
+        stack.Children.Add(CreateRow(colWidths, true, "Sana", "Chiqim", "Kirim", "Izoh"));
 
         // Boshlang‘ich qoldiq
         stack.Children.Add(CreateBalanceRow(colWidths, "Boshlang‘ich qoldiq", BeginBalance.ToString("N2")));

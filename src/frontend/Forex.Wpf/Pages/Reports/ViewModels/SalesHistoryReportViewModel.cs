@@ -81,11 +81,11 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             var begin = BeginDate?.Date ?? DateTime.Today;
             var end = (EndDate?.Date ?? DateTime.Today).AddDays(1);
 
-            request.Filters["date"] = new List<string>
-            {
+            request.Filters["date"] =
+            [
                 $">={begin:yyyy-MM-dd}",
                 $"<{end:yyyy-MM-dd}"
-            };
+            ];
 
             var response = await _client.Sales.Filter(request).Handle(l => IsLoading = l);
 

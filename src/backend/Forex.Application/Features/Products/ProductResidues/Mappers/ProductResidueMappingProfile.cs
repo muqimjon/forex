@@ -11,5 +11,6 @@ public class ProductResidueMappingProfile : Profile
         CreateMap<ProductResidue, ProductResidueDto>();
         CreateMap<ProductResidue, ProductResidueForProductTypeDto>();
         CreateMap<ProductResidue, ProductResidueForShopDto>();
+        CreateMap<ProductResidue, ProductResidueForProductEntryDto>();
     }
 }
