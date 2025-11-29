@@ -69,7 +69,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
             var response = await _client.ProductResidues.Filter(request)
                 .Handle(l => IsLoading = l);
 
-            if (!response.IsSuccess || response.Data == null)
+            if (!response.IsSuccess)
             {
                 ErrorMessage = "Tayyor mahsulot qoldiqlari yuklanmadi";
                 return;

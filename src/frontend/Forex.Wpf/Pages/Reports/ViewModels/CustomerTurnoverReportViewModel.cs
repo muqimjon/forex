@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Requests;
+using Forex.ClientService.Models.Responses;
 using global::Forex.Wpf.Pages.Common;
 using global::Forex.Wpf.ViewModels;
 using PdfSharp.Drawing;
@@ -19,10 +20,6 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Diagnostics;     
-using System.Windows.Input;
-using PdfSharp.Drawing;
-using Forex.ClientService.Models.Responses;
 
 public partial class CustomerTurnoverReportViewModel : ViewModelBase
 {

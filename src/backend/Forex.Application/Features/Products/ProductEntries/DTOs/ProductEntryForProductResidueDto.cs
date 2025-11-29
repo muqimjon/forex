@@ -17,10 +17,10 @@ public sealed record ProductEntryForProductResidueDto
     public ProductionOrigin ProductionOrigin { get; set; }
 
     public long ProductTypeId { get; set; }
-    public ProductTypeForProductEntryDto ProductType { get; set; } = default!;
+    public ProductTypeForProductResidueDto ProductType { get; set; } = default!;
 
     public long ShopId { get; set; }
-    public ShopForProductEntryDto Shop { get; set; } = default!;
+    public ShopForProductResidueDto Shop { get; set; } = default!;
 
     public long ProductResidueId { get; set; }
 }

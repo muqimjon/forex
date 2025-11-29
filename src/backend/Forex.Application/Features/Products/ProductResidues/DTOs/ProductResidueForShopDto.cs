@@ -13,5 +13,5 @@ public sealed record ProductResidueForShopDto
 
     public long ShopId { get; set; }
 
-    public ICollection<ProductEntryDto> ProductEntries { get; set; } = default!;
+    public ICollection<ProductEntryForProductResidueDto> ProductEntries { get; set; } = default!;
 }
