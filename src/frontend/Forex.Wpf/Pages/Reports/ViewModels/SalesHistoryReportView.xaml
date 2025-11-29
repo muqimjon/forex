@@ -185,11 +185,13 @@
                 Orientation="Vertical">
                 <Button
                     Height="29"
+                    md:ButtonAssist.CornerRadius="4"
                     Margin="0,3"
                     Command="{Binding PreviewCommand}"
                     Content="Ko‘rish" />
                 <Button
                     Height="29"
+                    md:ButtonAssist.CornerRadius="4"
                     Margin="0,3"
                     Command="{Binding ClearFilterCommand}"
                     Content="Tozalash" />
@@ -200,11 +202,13 @@
                 Orientation="Vertical">
                 <Button
                     Height="29"
+                    md:ButtonAssist.CornerRadius="4"
                     Margin="0,3"
                     Command="{Binding PrintCommand}"
                     Content="Pechat" />
                 <Button
                     Height="29"
+                    md:ButtonAssist.CornerRadius="4"
                     Margin="0,3"
                     Command="{Binding ExportToExcelCommand}"
                     Content="Excel" />
