@@ -2,6 +2,7 @@
 
 public sealed record SaleRequest
 {
+    public long Id { get; set; }
     public DateTime Date { get; set; }
     public long CustomerId { get; set; }
     public decimal TotalAmount { get; set; }

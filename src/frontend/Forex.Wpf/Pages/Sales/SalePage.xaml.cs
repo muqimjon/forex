@@ -1,8 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Sales;
 
-using Forex.ClientService;
-using Forex.ClientService.Extensions;
-using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.ViewModels;
