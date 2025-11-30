@@ -66,7 +66,7 @@ public class DeleteSaleCommandHandler(
             var residue = residues.FirstOrDefault(r => r.ProductTypeId == item.ProductTypeId)
                 ?? throw new NotFoundException(nameof(ProductResidue), nameof(item.ProductTypeId), item.ProductTypeId);
 
-            residue.Count += item.BundleCount;
+            residue.Count += item.BundleCount * item.BundleItemCount;
         }
     }
 }
