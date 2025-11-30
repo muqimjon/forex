@@ -23,7 +23,8 @@ public static class ConversionHelper
         "yyyy-MM-ddTHH:mm:sszzz",
         "MMM d, yyyy",
         "MMMM d yyyy",
-        "d MMM yyyy"
+        "d MMM yyyy",
+        "dd.MM.yyyy.HH:mm:ss"
     };
 
     public static object? TryConvert(object value, Type targetType)

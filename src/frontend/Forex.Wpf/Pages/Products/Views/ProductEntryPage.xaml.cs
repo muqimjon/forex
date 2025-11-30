@@ -22,7 +22,7 @@ public partial class ProductEntryPage : Page
         vm = App.AppHost!.Services.GetRequiredService<ProductEntryPageViewModel>();
         DataContext = vm;
 
-        // LostFocus event'larini ulash - FloatingComboBox darajasida
+        // LostFocus event'larini ulash
         cbxProductCode.LostFocus += CbxProductCode_LostFocus;
         cbxProductName.LostFocus += CbxProductName_LostFocus;
         cbxRazmerType.LostFocus += CbxRazmerType_LostFocus;
@@ -44,11 +44,10 @@ public partial class ProductEntryPage : Page
     {
         if (sender is FloatingComboBox comboBox)
         {
-
             string enteredText = comboBox.Text?.Trim() ?? string.Empty;
-            if (!string.IsNullOrWhiteSpace(enteredText))
+            if (!string.IsNullOrWhiteSpace(enteredText) && vm.CurrentProductEntry.Product is not null)
             {
-                vm.CurrentProductEntry.Product!.Name = enteredText;
+                vm.CurrentProductEntry.Product.Name = enteredText;
             }
         }
     }
@@ -73,8 +72,8 @@ public partial class ProductEntryPage : Page
             Main.NavigateTo(new HomePage());
     }
 
-    private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private async void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        vm.Edit();
+        await vm.Edit();
     }
 }

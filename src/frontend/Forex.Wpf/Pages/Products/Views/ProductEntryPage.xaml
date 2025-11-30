@@ -76,7 +76,7 @@
                 IsTextSearchEnabled="True"
                 ItemsSource="{Binding DataContext.AvailableProducts, ElementName=RootPage}"
                 Label="Kodi"
-                SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged}" />
+                SelectedItem="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Mahsulot nomi  -->
             <controls:FloatingComboBox
@@ -88,7 +88,7 @@
                 IsTextSearchEnabled="False"
                 ItemsSource="{Binding DataContext.AvailableProducts, ElementName=RootPage}"
                 Label="Nomi"
-                SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged}" />
+                SelectedItem="{Binding Product, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  tayyorlanish usuli  -->
             <controls:FloatingComboBox
@@ -98,7 +98,7 @@
                 IsTextSearchEnabled="True"
                 ItemsSource="{Binding DataContext.ProductionOrigins, ElementName=RootPage}"
                 Label="Tayyorlanish usuli"
-                SelectedItem="{Binding ProductionOriginName, UpdateSourceTrigger=PropertyChanged}" />
+                SelectedItem="{Binding ProductionOriginName}" />
 
             <!--  Razmer  -->
             <controls:FloatingComboBox
@@ -111,8 +111,7 @@
                 ItemsSource="{Binding Product.ProductTypes}"
                 Label="Razmer"
                 SelectedItem="{Binding Product.SelectedType, UpdateSourceTrigger=PropertyChanged}" />
-
-
+            
             <!--  Qoplar soni  -->
             <controls:FloatingInput
                 x:Name="tbxBundle"
@@ -194,7 +193,7 @@
 
                     <DataGridTextColumn
                         Width="*"
-                        Binding="{Binding Product.SelectedType.Type}"
+                        Binding="{Binding Product.SelectedType.Type, UpdateSourceTrigger=PropertyChanged}"
                         Header="Razmer"
                         IsReadOnly="True" />
 

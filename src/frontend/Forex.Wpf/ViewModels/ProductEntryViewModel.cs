@@ -24,7 +24,6 @@ public partial class ProductEntryViewModel : ViewModelBase
 
     #region Property Changes
 
-    partial void OnCountChanged(uint? value) => RecalculateBundleCount();
     partial void OnBundleItemCountChanged(uint? value) => RecalculateBundleCount();
 
     partial void OnProductChanged(ProductViewModel? value)
