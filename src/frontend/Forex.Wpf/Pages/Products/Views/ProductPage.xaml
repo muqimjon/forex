@@ -41,15 +41,55 @@
         </DockPanel>
 
         <Grid Grid.Row="1" Margin="0 10 0 0">
-            <controls:UserCalendar
-                Width="110"
-                Height="28"
-                HorizontalAlignment="Left"
-                FontSize="14"
-                SelectedDate="{Binding Date}" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Davr oralig'i:" FontSize="16" VerticalAlignment="Center"/>
+
+            <controls:UserCalendar Grid.Column="2"
+                            Width="110"
+                            Height="28"
+                            HorizontalAlignment="Left"
+                            FontSize="14"
+                            SelectedDate="{Binding BeginDate, Mode=TwoWay}" />
+
+            <TextBlock Text="dan" Grid.Column="4" FontSize="16" VerticalAlignment="Center"/>
+
+            <controls:UserCalendar Grid.Column="6"
+                                Width="110"
+                                Height="28"
+                                HorizontalAlignment="Left"
+                                FontSize="14"
+                                SelectedDate="{Binding EndDate, Mode=TwoWay}" />
+            <TextBlock Text="gacha" Grid.Column="8" FontSize="16" VerticalAlignment="Center"/>
+
+            <Button Grid.Column="10"
+            x:Name="btnRefreshPage"
+            Padding="8,0"
+            md:ButtonAssist.CornerRadius="4"
+            md:ElevationAssist.Elevation="Dp2"
+            Background="{DynamicResource BackButtonBackground}"
+            BorderBrush="{StaticResource BackButtonBorder}"
+                Command="{Binding FilterProductEntriesCommand}"
+            Content="Yangilash"
+                HorizontalAlignment="Right"
+            DockPanel.Dock="Right"
+            Foreground="{StaticResource BackButtonForeground}" />
 
 
-            <Button
+            <Button Grid.Column="12"
             x:Name="btnRedirectToAddPage"
             Padding="8,0"
             md:ButtonAssist.CornerRadius="4"
@@ -63,13 +103,12 @@
             Foreground="{StaticResource BackButtonForeground}" />
 
         </Grid>
-        
-        
+
+
 
         <Grid
         Grid.Row="2"
-        Margin="0,17,0,0"
-        DataContext="{Binding CurrentProductEntry}">
+        Margin="0,17,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MaxWidth="120" />
                 <ColumnDefinition Width="1.3*" MinWidth="100" />
@@ -84,48 +123,48 @@
 
             <!--  Mahsulot kodi  -->
             <controls:FloatingComboBox
-            x:Name="cbxProductCode"
-            Margin="0,0,2,0"
-            DisplayMemberPath="Code"
-            IsEditable="True"
-            IsTextSearchEnabled="True"
-            ItemsSource="{Binding DataContext.AvailableProducts, ElementName=RootPage}"
-            Label="Kodi"
-            SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged}" />
+                x:Name="cbxProductCode"
+                Margin="0,0,2,0"
+                DisplayMemberPath="Code"
+                IsEditable="False"
+                IsTextSearchEnabled="True"
+                ItemsSource="{Binding DataContext.AvailableProducts, ElementName=RootPage}"
+                Label="Kodi"
+                SelectedItem="{Binding DataContext.CurrentProductEntry.Product, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Mahsulot nomi  -->
             <controls:FloatingComboBox
-            x:Name="cbxProductName"
-            Grid.Column="1"
-            Margin="2,0"
-            DisplayMemberPath="Name"
-            IsEditable="{Binding IsEditing}"
-            IsTextSearchEnabled="False"
-            ItemsSource="{Binding DataContext.AvailableProducts, ElementName=RootPage}"
-            Label="Nomi"
-            SelectedItem="{Binding Product, UpdateSourceTrigger=PropertyChanged}" />
+                x:Name="cbxProductName"
+                Grid.Column="1"
+                Margin="2,0"
+                DisplayMemberPath="Name"
+                IsEditable="False"
+                IsTextSearchEnabled="True"
+                ItemsSource="{Binding DataContext.AvailableProducts, ElementName=RootPage}"
+                Label="Nomi"
+                SelectedItem="{Binding DataContext.CurrentProductEntry.Product, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  tayyorlanish usuli  -->
             <controls:FloatingComboBox
-            x:Name="cbxProductionOrigin"
-            Grid.Column="2"
-            Margin="2,0"
-            IsTextSearchEnabled="True"
-            ItemsSource="{Binding DataContext.ProductionOrigins, ElementName=RootPage}"
-            Label="Tayyorlanish usuli"
-            SelectedItem="{Binding ProductionOriginName, UpdateSourceTrigger=PropertyChanged}" />
+                x:Name="cbxProductionOrigin"
+                Grid.Column="2"
+                Margin="2,0"
+                IsTextSearchEnabled="True"
+                ItemsSource="{Binding DataContext.ProductionOrigins, ElementName=RootPage}"
+                Label="Tayyorlanish usuli"
+                SelectedItem="{Binding DataContext.CurrentProductEntry.ProductionOriginName, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Razmer  -->
             <controls:FloatingComboBox
-            x:Name="cbxRazmerType"
-            Grid.Column="3"
-            Margin="2,0"
-            DisplayMemberPath="Type"
-            IsEditable="True"
-            IsTextSearchEnabled="True"
-            ItemsSource="{Binding Product.ProductTypes}"
-            Label="Razmer"
-            SelectedItem="{Binding Product.SelectedType, UpdateSourceTrigger=PropertyChanged}" />
+                x:Name="cbxRazmerType"
+                Grid.Column="3"
+                Margin="2,0"
+                DisplayMemberPath="Type"
+                IsEditable="False"
+                IsTextSearchEnabled="True"
+                ItemsSource="{Binding DataContext.CurrentProductEntry.Product.ProductTypes, ElementName=RootPage}"
+                Label="Razmer"
+                SelectedItem="{Binding DataContext.CurrentProductEntry.Product.SelectedType, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Qoplar soni  -->
             <controls:FloatingInput
@@ -133,7 +172,7 @@
             Grid.Column="4"
             Margin="2,0"
             Label="Qop soni"
-            Text="{Binding BundleCount, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding DataContext.CurrentProductEntry.BundleCount, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Qopda nechta borligi  -->
             <controls:FloatingInput
@@ -141,7 +180,7 @@
             Grid.Column="5"
             Margin="2,0"
             Label="Donasi"
-            Text="{Binding Product.SelectedType.BundleItemCount, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding DataContext.CurrentProductEntry.Product.SelectedType.BundleItemCount, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <!--  Jami soni  -->
             <controls:FloatingInput
             x:Name="tbxQuantity"
@@ -149,7 +188,7 @@
             Margin="2,0"
             IsEnabled="False"
             Label="Jami soni"
-            Text="{Binding Count, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding DataContext.CurrentProductEntry.Count, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Tannarxi  -->
             <controls:FloatingInput
@@ -157,7 +196,7 @@
             Grid.Column="7"
             Margin="2,0"
             Label="Tan narxi"
-            Text="{Binding Product.SelectedType.UnitPrice, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}" />
+            Text="{Binding DataContext.CurrentProductEntry.Product.SelectedType.UnitPrice, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}" />
 
             <Button
             x:Name="addButton"
@@ -166,11 +205,12 @@
             Margin="2,0,0,0"
             md:ButtonAssist.CornerRadius="4"
             Background="{DynamicResource OtherBackground}"
-            Command="{Binding DataContext.AddCommand, ElementName=RootPage}"
-            Content="Qo'shish"
+            Command="{Binding DataContext.UpdateCommand, ElementName=RootPage}"
+            Content="Saqlash"
             FontSize="14" />
         </Grid>
 
+        <!-- Data grid Ma'lumotlarni ko'rastib turadi -->
         <Grid Grid.Row="3" Margin="0,5,0,5">
             <DataGrid
             x:Name="dataGrid"
@@ -185,6 +225,14 @@
             SelectionMode="Single"
             SelectionUnit="FullRow">
                 <DataGrid.Columns>
+
+                    <DataGridTextColumn
+                    Width="*"
+                    MinWidth="80"
+                    Binding="{Binding Date, Mode=TwoWay, StringFormat={}{0:dd.MM.yyyy}}"
+                    Header="Sana"
+                    IsReadOnly="True" />
+
                     <DataGridTextColumn
                     Width="*"
                     MinWidth="80"
@@ -235,21 +283,60 @@
                     Binding="{Binding ProductType.UnitPrice, StringFormat={}{0:N0}}"
                     Header="Tannarxi"
                     IsReadOnly="True" />
+
+
+                    <DataGridTemplateColumn Width="90" Header="Amallar">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <!-- EDIT BUTTON -->
+                                                <Button
+                                                Width="30"
+                                                Height="26"
+                                                Margin="2,0"
+                                                Padding="0"
+                                                Background="#FFB300"
+                                                Foreground="White"
+                                                FontWeight="Bold"
+                                                FontSize="12"
+                                                ToolTip="Tahrirlash"
+                                                Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                                                    <md:PackIcon Kind="Pencil" Width="16" Height="16"/>
+                                                </Button>
+                                                <!-- DELETE BUTTON -->
+                                                <Button
+                                                Width="30"
+                                                Height="26"
+                                                Margin="2,0"
+                                                Padding="0"
+                                                Background="#D32F2F"
+                                                Foreground="White"
+                                                FontWeight="Bold"
+                                                FontSize="12"
+                                                ToolTip="O'chirish"
+                                                Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                CommandParameter="{Binding}">
+                                                    <md:PackIcon Kind="Delete" Width="16" Height="16"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
-
-        <!--  Submit Button  -->
-        <Button
-        Grid.Row="4"
-        Margin="0,5,0,0"
-        HorizontalAlignment="Right"
-        md:ButtonAssist.CornerRadius="4"
-        md:ElevationAssist.Elevation="Dp24"
-        Background="{StaticResource SuccessButtonBackground}"
-        BorderBrush="{StaticResource SuccessButtonBorder}"
-        Command="{Binding SubmitCommand}"
-        Content="Yuborish"
-        Foreground="{StaticResource SuccessButtonForeground}" />
     </Grid>
 </Page>

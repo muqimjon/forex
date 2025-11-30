@@ -10,6 +10,9 @@ public interface IApiProductEntries
     [Post("/product-entries")]
     Task<Response<long?>> Create(CreateProductEntryCommandRequest request);
 
+    [Post("/product-entries")]
+    Task<Response<bool>> Update(ProductEntryRequest request);
+
     [Delete("/product-entries/{id}")]
     Task<Response<bool>> Delete(long id);
 
