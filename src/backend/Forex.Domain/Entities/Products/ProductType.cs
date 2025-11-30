@@ -12,6 +12,9 @@ public class ProductType : Auditable
     public long ProductId { get; set; }
     public Product Product { get; set; } = default!;
 
+    public long CurrencyId { get; set; }
+    public Currency Currency { get; set; } = default!;
+
     public ProductResidue? ProductResidue { get; set; } = default!;
     public InProcess? InProcess { get; set; } = default!;
 

@@ -15,6 +15,9 @@ public class ProductEntry : Auditable
     public decimal TotalAmount { get; set; }
     public ProductionOrigin ProductionOrigin { get; set; }
 
+    public long CurrencyId { get; set; }
+    public Currency Currency { get; set; } = default!;
+
     public long ProductTypeId { get; set; }
     public ProductType ProductType { get; set; } = default!;  // razmeri 24-29, 30-35, 36-41
 

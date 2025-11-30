@@ -6,8 +6,8 @@ using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
-using global::Forex.Wpf.Pages.Common;
-using global::Forex.Wpf.ViewModels;
+using Forex.Wpf.Pages.Common;
+using Forex.Wpf.ViewModels;
 using PdfSharp.Drawing;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -33,12 +33,12 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
 
 
-    public ObservableCollection<TurnoversViewModel> Operations { get; } = new();
+    public ObservableCollection<TurnoversViewModel> Operations { get; } = [];
     [ObservableProperty] private TurnoversViewModel? selectedItem;
 
     [ObservableProperty] private decimal _beginBalance;
     [ObservableProperty] private decimal _lastBalance;
-    private List<OperationRecordDto> _originalRecords = new();
+    private List<OperationRecordDto> _originalRecords = [];
     public CustomerTurnoverReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
         _client = client;
@@ -55,7 +55,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
     private async Task LoadDataAsync()
     {
-        if (SelectedCustomer == null)
+        if (SelectedCustomer is null)
         {
             Operations.Clear();
             BeginBalance = 0;
@@ -85,7 +85,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         var data = response.Data;
 
-        _originalRecords = data.OperationRecords.ToList();
+        _originalRecords = [.. data.OperationRecords];
 
         BeginBalance = data.BeginBalance;
         LastBalance = data.EndBalance;

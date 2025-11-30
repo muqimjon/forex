@@ -1,5 +1,6 @@
 ﻿namespace Forex.Application.Features.Products.ProductEntries.DTOs;
 
+using Forex.Application.Features.Currencies.DTOs;
 using Forex.Application.Features.Shops.DTOs;
 using Forex.Domain.Enums;
 
@@ -14,6 +15,9 @@ public sealed record ProductEntryForProductTypeDto
     public decimal UnitPrice { get; set; }
     public decimal TotalAmount { get; set; }
     public ProductionOrigin ProductionOrigin { get; set; }
+
+    public long CurrencyId { get; set; }
+    public CurrencyDto Currency { get; set; } = default!;
 
     public long ProductTypeId { get; set; }
 
