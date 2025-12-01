@@ -1,25 +1,27 @@
-﻿namespace Forex.Wpf.Pages.Sales;
+﻿namespace Forex.Wpf.Pages.Sales.Views;
 
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 /// <summary>
-/// Interaction logic for SalePage.xaml
+/// Interaction logic for AddSalePage.xaml
 /// </summary>
-public partial class SalePage : Page
+public partial class AddSalePage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-    private readonly SalePageViewModel vm;
+    private readonly AddSalePageViewModel vm;
 
-    public SalePage()
+    public AddSalePage()
     {
         InitializeComponent();
-        vm = App.AppHost!.Services.GetRequiredService<SalePageViewModel>();
+        vm = App.AppHost!.Services.GetRequiredService<AddSalePageViewModel>();
         DataContext = vm;
     }
 
@@ -37,7 +39,6 @@ public partial class SalePage : Page
             return;
 
         var input = comboBox.Text.Trim();
-
         var existing = vm.AvailableCustomers.FirstOrDefault(c =>
             c.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
 
@@ -59,9 +60,7 @@ public partial class SalePage : Page
             if (newCustomer is not null)
             {
                 vm.Customer = newCustomer;
-
                 vm.AvailableCustomers.Add(vm.Customer);
-
             }
         }
     }
@@ -78,14 +77,11 @@ public partial class SalePage : Page
     {
         var dialog = new UserWindow();
         dialog.txtName.Text = name;
-
         var result = dialog.ShowDialog();
+
         if (result != true)
             return null!;
 
-
         return dialog.user!;
     }
-
-
 }

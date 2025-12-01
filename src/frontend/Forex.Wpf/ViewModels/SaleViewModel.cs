@@ -1,20 +1,21 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
+using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
+using System.Collections.ObjectModel;
 
 public partial class SaleViewModel : ViewModelBase
 {
     public long Id { get; set; }
-    public DateTime Date { get; set; }
-    public decimal CostPrice { get; set; }
-    public decimal BenifitPrice { get; set; }
-    public int TotalCount { get; set; }
-    public decimal TotalAmount { get; set; }
-    public string? Note { get; set; }
-
     public long CustomerId { get; set; }
-    public UserResponse Customer { get; set; } = default!;
+    [ObservableProperty] private DateTime date;
+    [ObservableProperty] private decimal costPrice;
+    [ObservableProperty] private decimal benifitPrice;
+    [ObservableProperty] private int totalCount;
+    [ObservableProperty] private decimal totalAmount;
+    [ObservableProperty] private string? note;
 
-    public ICollection<SaleItemResponse> SaleItems { get; set; } = default!;
+    [ObservableProperty] private UserResponse customer = new();
+    [ObservableProperty] private ObservableCollection<SaleItemResponse> saleItems = [];
 }

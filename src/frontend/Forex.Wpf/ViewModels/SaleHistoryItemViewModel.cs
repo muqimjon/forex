@@ -9,11 +9,11 @@ public class SaleHistoryItemViewModel
     public string Code { get; set; } = default!;
     public string ProductName { get; set; } = default!;
     public string Type { get; set; } = default!;     // Razmer
-    public int BundleCount { get; set; }
+    public uint BundleCount { get; set; }
     public int BundleItemCount { get; set; }
 
     // SaleItem
-    public int TotalCount { get; set; }
+    public uint TotalCount { get; set; }
     public string UnitMeasure { get; set; } = default!;
     public decimal UnitPrice { get; set; }
     public decimal Amount { get; set; }
