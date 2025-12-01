@@ -95,36 +95,54 @@
                   GridLinesVisibility="Horizontal"
                   BorderBrush="#DDDDDD">
 
+            <!-- ⭐ HEADERlarni o‘rtaga, fon rang, semi-bold -->
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="Background" Value="#E3F2FD" />
+                    <Setter Property="Padding" Value="8" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
             <DataGrid.Columns>
 
                 <!-- Mijoz -->
-                <DataGridTextColumn Header="Mijoz" Binding="{Binding Name}" Width="200" />
+                <DataGridTextColumn Header="Mijoz"
+                                    Binding="{Binding Name}"
+                                    Width="200" />
 
                 <!-- Telefon -->
-                <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" Width="140" />
+                <DataGridTextColumn Header="Telefon"
+                                    Binding="{Binding Phone}"
+                                    Width="140" />
 
                 <!-- Address -->
-                <DataGridTextColumn Header="Manzil" Binding="{Binding Address}" Width="250" />
+                <DataGridTextColumn Header="Manzil"
+                                    Binding="{Binding Address}"
+                                    Width="250" />
 
                 <!-- Bizga qarz (Debtor) -->
-                <DataGridTextColumn Header="Bizga qarzi"
-                                    Binding="{Binding DebtorAmount, StringFormat=N0}" Width="150">
+                <DataGridTextColumn Header="Debit(Bizga qarzi)"
+                                    Binding="{Binding DebtorAmount, StringFormat=N2}"
+                                    Width="150">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Foreground" Value="#D32F2F" />
+                            <Setter Property="Foreground" Value="#88E3C3" />
                             <Setter Property="FontWeight" Value="Bold" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Bizning qarzimiz (Creditor) -->
-                <DataGridTextColumn Header="Bizning qarzimiz"
-                                    Binding="{Binding CreditorAmount, StringFormat=N0}" Width="150">
+                <DataGridTextColumn Header="Kredit(Bizning qarzimiz)"
+                                    Binding="{Binding CreditorAmount, StringFormat=N2}"
+                                    Width="150">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Foreground" Value="#388E3C" />
+                            <Setter Property="Foreground" Value="#D32F2F" />
                             <Setter Property="FontWeight" Value="Bold" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
