@@ -7,20 +7,24 @@ using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
+using Forex.Wpf.Common.Interfaces;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Windows;
 
 public partial class ProductEntryPageViewModel : ViewModelBase
 {
-    private readonly ForexClient Client = App.AppHost!.Services.GetRequiredService<ForexClient>();
-    private readonly IMapper Mapper = App.AppHost!.Services.GetRequiredService<IMapper>();
+    private readonly ForexClient Client;
+    private readonly IMapper Mapper;
+    private readonly INavigationService Navigation;
 
-    public ProductEntryPageViewModel()
+    public ProductEntryPageViewModel(IMapper mapper, ForexClient client, INavigationService navigation)
     {
+        Mapper = mapper;
+        Client = client;
+        Navigation = navigation;
         CurrentProductEntry = new ProductEntryViewModel();
         CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
         _ = LoadDataAsync();
@@ -337,9 +341,9 @@ public partial class ProductEntryPageViewModel : ViewModelBase
         if (response.IsSuccess)
         {
             SuccessMessage = "Mahsulotlar muvaffaqiyatli saqlandi.";
-            ProductEntries.Clear();
-            ClearCurrentEntry();
-            await LoadProductsAsync();
+
+            if (Navigation.CanGoBack) Navigation.GoBack();
+            else Navigation.NavigateTo(new ProductPage());
         }
         else
         {

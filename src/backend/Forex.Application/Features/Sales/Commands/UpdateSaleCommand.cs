@@ -124,7 +124,7 @@ public class UpdateSaleCommandHandler(
         sale.OperationRecord = new OperationRecord
         {
             Amount = -sale.TotalAmount,
-            Date = sale.Date, // already set to UTC
+            Date = sale.Date.ToUtcSafe(), // already set to UTC
             Description = await GenerateDescriptionAsync(saleItems, ct),
             Type = OperationType.Sale
         };

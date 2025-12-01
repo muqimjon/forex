@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
+using Forex.Wpf.Common.Interfaces;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
@@ -12,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Windows;
 
-public partial class SalePageViewModel : ViewModelBase
+public partial class SalePageViewModel : ViewModelBase, INavigationAware
 {
     private readonly ForexClient client = App.AppHost!.Services.GetRequiredService<ForexClient>();
     private readonly IMapper mapper = App.AppHost!.Services.GetRequiredService<IMapper>();
@@ -157,4 +158,17 @@ public partial class SalePageViewModel : ViewModelBase
     }
 
     #endregion
+
+    #region Private Helpers
+
+    public void OnNavigatedTo()
+    {
+        _ = LoadDataAsync();
+    }
+
+    public void OnNavigatedFrom()
+    {
+    }
+
+    #endregion Private Helpers
 }

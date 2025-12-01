@@ -102,11 +102,12 @@
                         Width="120"
                         Margin="0,0,5,0"
                         Padding="0"
+                        IsEnabled="{Binding IsEditing, Converter={StaticResource InverseBoolToBoolConverter}}"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Background="{DynamicResource PrimaryBackground}"
                         FontSize="14"
-                        SelectedDate="{Binding OperationDate}" />
+                        SelectedDate="{Binding Date, Mode=TwoWay}" />
                 </Grid>
 
                 <!--  Mijoz  -->

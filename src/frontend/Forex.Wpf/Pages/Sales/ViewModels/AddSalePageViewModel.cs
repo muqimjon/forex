@@ -6,6 +6,7 @@ using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
+using Forex.Wpf.Common.Interfaces;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
@@ -21,18 +22,19 @@ public partial class AddSalePageViewModel : ViewModelBase
 {
     private readonly ForexClient client;
     private readonly IMapper mapper;
+    private readonly INavigationService navigation;
 
-    public AddSalePageViewModel(ForexClient client, IMapper mapper)
+    public AddSalePageViewModel(ForexClient client, IMapper mapper, INavigationService navigation)
     {
         this.client = client;
         this.mapper = mapper;
-
+        this.navigation = navigation;
         CurrentSaleItem.PropertyChanged += SaleItemPropertyChanged;
         _ = LoadDataAsync();
     }
 
     // 🗓 Sana
-    [ObservableProperty] private DateTime operationDate = DateTime.Now;
+    [ObservableProperty] private DateTime date = DateTime.Now;
     [ObservableProperty] private decimal? totalAmount;
     [ObservableProperty] private decimal? finalAmount;
     [ObservableProperty] private decimal? totalAmountWithUserBalance;
@@ -229,7 +231,7 @@ public partial class AddSalePageViewModel : ViewModelBase
 
         SaleRequest request = new()
         {
-            Date = OperationDate,
+            Date = Date,
             CustomerId = Customer?.Id ?? 0,
             TotalAmount = FinalAmount ?? 0,
             Note = Note,
@@ -242,23 +244,22 @@ public partial class AddSalePageViewModel : ViewModelBase
             })]
         };
 
+        bool isSuccess;
+
         if (EditingSaleId > 0)
         {
             request.Id = EditingSaleId;
             var response = await client.Sales.Update(request).Handle(isLoading => IsLoading = isLoading);
 
-            if (response.IsSuccess)
-            {
+            if (isSuccess = response.IsSuccess)
                 SuccessMessage = "Savdo muvaffaqiyatli yangilandi!";
-                Clear();
-            }
             else ErrorMessage = response.Message ?? "Savdoni yangilashda xatolik!";
         }
         else
         {
             var response = await client.Sales.Create(request).Handle(isLoading => IsLoading = isLoading);
 
-            if (response.IsSuccess)
+            if (isSuccess = response.IsSuccess)
             {
                 SuccessMessage = $"Savdo muvaffaqiyatli yuborildi. Mahsulotlar soni: {SaleItems.Count}";
 
@@ -270,13 +271,15 @@ public partial class AddSalePageViewModel : ViewModelBase
 
                 if (result == MessageBoxResult.Yes)
                     ShowPrintPreview();
-
-                Clear();
             }
             else ErrorMessage = response.Message ?? "Savdoni ro'yxatga olishda xatolik!";
         }
 
-        await LoadDataAsync();
+        if (isSuccess)
+        {
+            Clear();
+            navigation.GoBack();
+        }
     }
 
     private void ShowPrintPreview()
@@ -353,7 +356,7 @@ public partial class AddSalePageViewModel : ViewModelBase
 
             var info = new TextBlock
             {
-                Text = $"Mijoz: {Customer?.Name.ToUpper() ?? "Naqd"} \t\t\t\t Sana: {OperationDate:dd.MM.yyyy}",
+                Text = $"Mijoz: {Customer?.Name.ToUpper() ?? "Naqd"} \t\t\t\t Sana: {Date:dd.MM.yyyy}",
                 FontSize = 15,
                 Margin = new Thickness(45, 0, 45, 20)
             };
@@ -526,6 +529,11 @@ public partial class AddSalePageViewModel : ViewModelBase
             TotalAmountWithUserBalance = Customer.Balance - FinalAmount;
     }
 
+    partial void OnEditingSaleIdChanged(long value)
+    {
+        IsEditing = value > 0;
+    }
+
     #endregion Property Changes
 
     #region Private Helpers
@@ -574,7 +582,7 @@ public partial class AddSalePageViewModel : ViewModelBase
 
         // Formani to'ldirish
         EditingSaleId = sale.Id;
-        OperationDate = sale.Date;
+        Date = sale.Date;
         Note = sale.Note ?? string.Empty;
 
         // Mijozni topish va tanlash

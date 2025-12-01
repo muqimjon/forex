@@ -26,13 +26,20 @@ public static class MappingProfile
         // 🔹 ProductTypeItem
         config.NewConfig<ProductTypeItemViewModel, ProductTypeItemRequest>();
 
-        config.NewConfig<ProductEntryViewModel, ProductEntryViewModel>();
+        config.NewConfig<ProductEntryViewModel, ProductEntryRequest>();
+        config.NewConfig<ProductEntryResponse, ProductEntryViewModel>()
+            .Map(dest => dest.Date, src => src.Date.ToLocalTime());
 
         // 🔹 SemiProduct
         config.NewConfig<SemiProductResponse, SemiProductViewModel>();
         config.NewConfig<SemiProductViewModel, SemiProductRequest>()
             .Map(dest => dest.UnitMeasureId, src => src.UnitMeasure.Id)
             .Map(dest => dest.ImageBytes, src => ImageToBytes(src.Image));
+
+        // Sale
+        config.NewConfig<SaleViewModel, SaleRequest>();
+        config.NewConfig<SaleResponse, SaleViewModel>()
+            .Map(dest => dest.Date, src => src.Date.ToLocalTime());
 
         // 🔹 Processes
         config.NewConfig<InProcessResponse, InProcessViewModel>();
@@ -70,6 +77,7 @@ public static class MappingProfile
             .Map(dest => dest.UserId, src => src.User.Id)
             .Map(dest => dest.CurrencyId, src => src.Currency.Id);
 
+        // Currency
         config.NewConfig<CurrencyResponse, CurrencyViewModel>();
         config.NewConfig<UserAccountResponse, UserAccountViewModel>();
 
