@@ -12,6 +12,10 @@ public class SalesController : BaseController
     public async Task<IActionResult> Entry(CreateSaleCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 
+    [HttpPut]
+    public async Task<IActionResult> Update(UpdateSaleCommand command)
+        => Ok(new Response { Data = await Mediator.Send(command) });
+
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
         => Ok(new Response { Data = await Mediator.Send(new DeleteSaleCommand(id)) });

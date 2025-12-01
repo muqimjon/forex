@@ -22,6 +22,7 @@ public partial class TransactionPageViewModel : ViewModelBase
 
     // Edit qilinayotgan tranzaksiyaning original qiymati
     private decimal _originalTransactionNetAmount = 0;
+    private TransactionViewModel? _originalTransaction = null;
 
     public TransactionPageViewModel(ForexClient client, IMapper mapper)
     {
@@ -30,7 +31,7 @@ public partial class TransactionPageViewModel : ViewModelBase
 
         PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(BeginDate) or nameof(EndDate))
+            if (e.PropertyName is nameof(BeginDate) or nameof(EndDate) or nameof(SelectedFilterUser))
                 _ = LoadTransactionsAsync();
         };
 
@@ -44,15 +45,19 @@ public partial class TransactionPageViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<CurrencyViewModel> availableCurrencies = [];
     [ObservableProperty] private ObservableCollection<ShopAccountViewModel> availableShopAccounts = [];
     [ObservableProperty] private TransactionViewModel transaction = new();
+    [ObservableProperty] private UserViewModel? selectedFilterUser;
 
     public static IEnumerable<PaymentMethod> AvailablePaymentMethods => Enum.GetValues<PaymentMethod>();
     [ObservableProperty] private DateTime? beginDate = DateTime.Today;
     [ObservableProperty] private DateTime? endDate = DateTime.Today;
 
     // UI-specific computed properties
-    [ObservableProperty] private bool isExpense;
+    [ObservableProperty] private bool isIncomeEnabled = true;
+    [ObservableProperty] private bool isExpenseEnabled = true;
+    [ObservableProperty] private bool isDiscountEnabled = false;
     [ObservableProperty] private decimal? totalAmountWithUserBalance;
     [ObservableProperty] private bool isDebtor;
+    [ObservableProperty] private string submitButtonText = "To'lash";
 
     #region Load Data
 
@@ -84,6 +89,12 @@ public partial class TransactionPageViewModel : ViewModelBase
             ["currency"] = ["include"],
             ["shopAccount"] = ["include"]
         };
+
+        // User filter qo'shish
+        if (SelectedFilterUser != null)
+        {
+            request.Filters["userId"] = [$"={SelectedFilterUser.Id}"];
+        }
 
         Response<List<TransactionResponse>> response = await client.Transactions.Filter(request)
             .Handle(isLoading => IsLoading = isLoading);
@@ -209,6 +220,18 @@ public partial class TransactionPageViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void Cancel()
+    {
+        if (_originalTransaction != null)
+        {
+            // Original tranzaksiyani qaytarish
+            Transactions.Insert(0, _originalTransaction);
+        }
+
+        ResetTransaction();
+    }
+
+    [RelayCommand]
     private async Task Edit(TransactionViewModel selectedTransaction)
     {
         if (selectedTransaction is null)
@@ -237,6 +260,7 @@ public partial class TransactionPageViewModel : ViewModelBase
         {
             // Original transaction qiymatini saqlash
             _originalTransactionNetAmount = (decimal)(selectedTransaction.Amount * selectedTransaction.ExchangeRate)!;
+            _originalTransaction = selectedTransaction;
 
             // Ma'lumotlarni ko'chirish
             Transaction.Id = selectedTransaction.Id;
@@ -271,6 +295,7 @@ public partial class TransactionPageViewModel : ViewModelBase
 
             // Edit rejimini yoqish
             IsEditing = true;
+            SubmitButtonText = "Yangilash";
 
             // DataGrid'dan olib tashlash
             Transactions.Remove(selectedTransaction);
@@ -316,6 +341,12 @@ public partial class TransactionPageViewModel : ViewModelBase
         }
     }
 
+    [RelayCommand]
+    private void ClearUserFilter()
+    {
+        SelectedFilterUser = null;
+    }
+
     private void OnTransactionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -352,7 +383,15 @@ public partial class TransactionPageViewModel : ViewModelBase
             Transaction.ExchangeRate = Transaction.Currency.ExchangeRate;
         Transaction.PropertyChanged += OnTransactionPropertyChanged;
         IsEditing = false;
+        SubmitButtonText = "To'lash";
         _originalTransactionNetAmount = 0;
+        _originalTransaction = null;
+
+        // Input field'larni qayta yoqish
+        IsIncomeEnabled = true;
+        IsExpenseEnabled = true;
+        IsDiscountEnabled = false;
+
         RecalculateAll();
     }
 
@@ -375,11 +414,15 @@ public partial class TransactionPageViewModel : ViewModelBase
     {
         if (Transaction.Income is null || Transaction.Income == 0)
         {
-            IsExpense = false;
+            // Kirim bo'sh bo'lsa, ikkala field ham ochiq
+            IsExpenseEnabled = true;
+            IsDiscountEnabled = false;
         }
         else
         {
-            IsExpense = false;
+            // Kirim kiritilgan bo'lsa, chiqim yopiladi
+            IsExpenseEnabled = false;
+            IsDiscountEnabled = true;
             Transaction.Expense = null;
         }
 
@@ -390,11 +433,15 @@ public partial class TransactionPageViewModel : ViewModelBase
     {
         if (Transaction.Expense is null || Transaction.Expense == 0)
         {
-            IsExpense = false;
+            // Chiqim bo'sh bo'lsa, ikkala field ham ochiq
+            IsIncomeEnabled = true;
+            IsDiscountEnabled = false;
         }
         else
         {
-            IsExpense = true;
+            // Chiqim kiritilgan bo'lsa, kirim va chegirma yopiladi
+            IsIncomeEnabled = false;
+            IsDiscountEnabled = false;
             Transaction.Income = null;
             Transaction.Discount = null;
         }
@@ -450,7 +497,7 @@ public partial class TransactionPageViewModel : ViewModelBase
         else
         {
             // Add rejimida: oddiy qo'shamiz
-            total = (decimal)Transaction.User.Balance! + currentNetAmount + discount;
+            total = (decimal)Transaction!.User.Balance! + currentNetAmount + discount;
         }
 
         TotalAmountWithUserBalance = total;
@@ -468,7 +515,7 @@ public partial class TransactionPageViewModel : ViewModelBase
         if (TotalAmountWithUserBalance < 0 &&
             (!Transaction.DueDate.HasValue || Transaction.DueDate < DateTime.Now))
         {
-            WarningMessage = "To'lov muddati kiritilmagan yoki noto'g'ri formatda!";
+            WarningMessage = "Kamomat uchun to'lov muddati kiritilmagan yoki noto'g'ri formatda!";
             return false;
         }
 

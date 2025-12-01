@@ -244,7 +244,6 @@ public partial class AddSalePageViewModel : ViewModelBase
 
         if (EditingSaleId > 0)
         {
-            // Update qilish
             request.Id = EditingSaleId;
             var response = await client.Sales.Update(request).Handle(isLoading => IsLoading = isLoading);
 
@@ -257,7 +256,6 @@ public partial class AddSalePageViewModel : ViewModelBase
         }
         else
         {
-            // Yangi qo'shish
             var response = await client.Sales.Create(request).Handle(isLoading => IsLoading = isLoading);
 
             if (response.IsSuccess)
@@ -313,7 +311,6 @@ public partial class AddSalePageViewModel : ViewModelBase
 
     private FixedDocument CreateFixedDocumentForPrint()
     {
-        double dpiScale = 96.0 / 72.0;
         double pageWidth = 8.27 * 72;
         double pageHeight = 11.69 * 72;
         double margin = 35;
@@ -442,7 +439,7 @@ public partial class AddSalePageViewModel : ViewModelBase
                 {
                     tbvalue.FontSize = 16;
                     tbvalue.FontWeight = FontWeights.ExtraBold;
-                    tbvalue.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 80, 180));
+                    tbvalue.Foreground = new SolidColorBrush(Color.FromRgb(0, 80, 180));
                 }
                 grid.Children.Add(totalValue);
             }
@@ -467,13 +464,13 @@ public partial class AddSalePageViewModel : ViewModelBase
         return fixedDoc;
     }
 
-    private System.Windows.Controls.Border CreateCell(string text, bool isHeader, TextAlignment alignment = TextAlignment.Left)
+    private Border CreateCell(string text, bool isHeader, TextAlignment alignment = TextAlignment.Left)
     {
-        var border = new System.Windows.Controls.Border
+        var border = new Border
         {
             BorderBrush = Brushes.Gray,
             BorderThickness = new Thickness(0.5),
-            Background = isHeader ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(235, 235, 235)) : Brushes.White,
+            Background = isHeader ? new SolidColorBrush(Color.FromRgb(235, 235, 235)) : Brushes.White,
             Padding = new Thickness(6, 5, 6, 5)
         };
 

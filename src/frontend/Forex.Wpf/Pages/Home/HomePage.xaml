@@ -107,7 +107,7 @@
                 FontWeight="Medium"
                 Foreground="{DynamicResource MainMenuTextColor}"
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                🛒 Sotuv
+                🛒 Savdo
             </Button>
 
             <Button
@@ -123,7 +123,7 @@
                 FontWeight="Medium"
                 Foreground="{DynamicResource MainMenuTextColor}"
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                💵 Kassa
+                💵 To'lov
             </Button>
 
             <Button
@@ -139,12 +139,7 @@
                 FontWeight="Medium"
                 Foreground="{DynamicResource MainMenuTextColor}"
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center">👟</TextBlock>
-                    <TextBlock TextAlignment="Center" TextWrapping="Wrap">
-                        Tayyor<LineBreak />
-                        mahsulot</TextBlock>
-                </StackPanel>
+                👟 Mahsulot
             </Button>
 
             <Button
@@ -236,7 +231,7 @@
                 FontWeight="Medium"
                 Foreground="{DynamicResource MainMenuTextColor}"
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
-                ⚙️ Sozlash
+                ⚙️ Sozlama
             </Button>
 
 
