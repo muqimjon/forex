@@ -6,13 +6,20 @@ using Forex.Wpf.ViewModels;
 
 public partial class SaleItemViewModel : ViewModelBase
 {
+    public long Id { get; set; }
+    public long SaleId { get; set; }
+    public long ProductTypeId { get; set; }   // 24-29, 30-35, 36-41 razmeri idsi
     [ObservableProperty] private uint? bundleCount;
+    [ObservableProperty] private uint? bundleItemCount;
     [ObservableProperty] private uint? totalCount;
     [ObservableProperty] private decimal? unitPrice;
+    [ObservableProperty] private decimal? costtPrice;
+    [ObservableProperty] private decimal? benifit;
     [ObservableProperty] private decimal? amount;
 
     [ObservableProperty] private ProductViewModel product = default!;
     [ObservableProperty] private ProductTypeViewModel productType = default!;
+    [ObservableProperty] private SaleViewModel sale = default!;
 
 
     #region Property Changes

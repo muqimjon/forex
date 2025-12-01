@@ -7,23 +7,25 @@ using Forex.ClientService.Enums;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
+using Forex.Wpf.Common.Interfaces;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.Pages.Products.Views;
 using Forex.Wpf.ViewModels;
-using Forex.Wpf.Windows;
 using MapsterMapper;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Windows;
 
-public partial class ProductPageViewModel : ViewModelBase
+public partial class ProductPageViewModel : ViewModelBase, INavigationAware
 {
-    private readonly ForexClient Client = App.AppHost!.Services.GetRequiredService<ForexClient>();
-    private readonly IMapper Mapper = App.AppHost!.Services.GetRequiredService<IMapper>();
-    private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
+    private readonly ForexClient client;
+    private readonly IMapper mapper;
+    private readonly INavigationService navigation;
 
-    public ProductPageViewModel()
+    public ProductPageViewModel(IMapper mapper, ForexClient client, INavigationService navigation)
     {
+        this.mapper = mapper;
+        this.client = client;
+        this.navigation = navigation;
         CurrentProductEntry = new ProductEntryViewModel();
         CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
         _ = LoadDataAsync();
@@ -47,11 +49,11 @@ public partial class ProductPageViewModel : ViewModelBase
 
     private async Task LoadProductsAsync()
     {
-        var response = await Client.Products.GetAllAsync()
+        var response = await client.Products.GetAllAsync()
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
-            AvailableProducts = Mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
+            AvailableProducts = mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
         else
             ErrorMessage = response.Message ?? "Mahsulotlarni yuklashda xatolik!";
     }
@@ -67,12 +69,12 @@ public partial class ProductPageViewModel : ViewModelBase
             }
         };
 
-        var response = await Client.ProductEntries.Filter(request)
+        var response = await client.ProductEntries.Filter(request)
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {
-            ProductEntries = Mapper.Map<ObservableCollection<ProductEntryViewModel>>(response.Data);
+            ProductEntries = mapper.Map<ObservableCollection<ProductEntryViewModel>>(response.Data);
         }
         else
             ErrorMessage = response.Message ?? "Product kirimi ma'lumotlarini yuklashda xatolik!";
@@ -91,12 +93,12 @@ public partial class ProductPageViewModel : ViewModelBase
             }
         };
 
-        var response = await Client.ProductTypes.Filter(request)
+        var response = await client.ProductTypes.Filter(request)
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {
-            product.ProductTypes = Mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
+            product.ProductTypes = mapper.Map<ObservableCollection<ProductTypeViewModel>>(response.Data);
         }
         else
             ErrorMessage = response.Message ?? "Maxsulot turlarini yuklashda xatolik";
@@ -124,7 +126,7 @@ public partial class ProductPageViewModel : ViewModelBase
     [RelayCommand]
     private void RedirectToAddPage()
     {
-        Main.NavigateTo(new ProductEntryPage());
+        navigation.NavigateTo(new ProductEntryPage());
     }
 
     [RelayCommand]
@@ -148,7 +150,7 @@ public partial class ProductPageViewModel : ViewModelBase
         if (result == MessageBoxResult.No)
             return;
 
-        var response = await Client.ProductEntries.Delete(value.Id)
+        var response = await client.ProductEntries.Delete(value.Id)
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
@@ -229,7 +231,7 @@ public partial class ProductPageViewModel : ViewModelBase
             }
         };
 
-        var response = await Client.ProductEntries.Update(request)
+        var response = await client.ProductEntries.Update(request)
             .Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
@@ -425,6 +427,15 @@ public partial class ProductPageViewModel : ViewModelBase
         CurrentProductEntry.ProductionOriginName = null!;
 
         CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
+    }
+
+    public void OnNavigatedTo()
+    {
+        _ = LoadDataAsync();
+    }
+
+    public void OnNavigatedFrom()
+    {
     }
 
     #endregion

@@ -83,7 +83,6 @@
                     FontSize="16"
                     IsEditable="False"
                     IsTextSearchEnabled="False"
-                    Loaded="CbRole_Loaded"
                     StaysOpenOnEdit="True" />
             </Border>
 
@@ -290,7 +289,7 @@
                     Header="Valyuta turi" />
 
 
-                <!--  Actions  -->
+                <!--  Actions  --><!-- // TODO User ma'lumotlarini tahrirlash imkonini qo'shish kerak
                 <DataGridTemplateColumn Width="Auto">
                     <DataGridTemplateColumn.CellStyle>
                         <StaticResource ResourceKey="TransparentCellStyle" />
@@ -304,7 +303,7 @@
                                 SaveCommand="{Binding SaveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn>-->
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

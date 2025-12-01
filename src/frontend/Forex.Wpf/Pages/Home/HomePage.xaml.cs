@@ -75,6 +75,7 @@ public partial class HomePage : Page
 
     private void BtnSemiProduct_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new SemiProductPage());
+
     private void btnReports_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new ReportsPage());
 

@@ -59,7 +59,7 @@ public static class DependencyInjection
         }
 
         // MUHIM: ReportsPageViewModel uchun maxsus factory (constructor injection)
-        services.AddTransient<ReportsPageViewModel>(provider => new ReportsPageViewModel(
+        services.AddTransient(provider => new ReportsPageViewModel(
             provider.GetRequiredService<INavigationService>(),
             provider.GetRequiredService<SalesHistoryReportViewModel>(),
             provider.GetRequiredService<FinishedStockReportViewModel>(),
@@ -82,7 +82,7 @@ public static class DependencyInjection
         services.AddSingleton<INavigationService>(sp =>
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow!;
-            return new NavigationService(mainWindow);
+            return new NavigationService(mainWindow.MainFrame);
         });
     }
 }
