@@ -190,7 +190,7 @@
                     BorderBrush="{DynamicResource PrimaryTextColor}"
                     BorderThickness="1"
                     CornerRadius="4"
-                    IsEnabled="{Binding Transaction.IsExpense, Converter={StaticResource InverseBoolToBoolConverter}}">
+                    IsEnabled="{Binding IsIncomeEnabled}">
                     <TextBox
                         x:Name="tbKirim"
                         Padding="3,0"
@@ -243,7 +243,7 @@
                     BorderBrush="{DynamicResource PrimaryTextColor}"
                     BorderThickness="1"
                     CornerRadius="4"
-                    IsEnabled="{Binding Transaction.IsIncome, Converter={StaticResource InverseBoolToBoolConverter}}">
+                    IsEnabled="{Binding IsExpenseEnabled}">
                     <TextBox
                         x:Name="tbChiqim"
                         Padding="3,0"
@@ -296,7 +296,7 @@
                         Padding="3,0"
                         BorderThickness="0"
                         FontSize="14"
-                        IsEnabled="{Binding Transaction.IsIncome}"
+                        IsEnabled="{Binding IsDiscountEnabled}"
                         PreviewTextInput="NumericTextBox_PreviewTextInput"
                         Text="{Binding Transaction.Discount, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
                         TextAlignment="Right" />
@@ -330,6 +330,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80" />
                     <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -419,18 +420,36 @@
                     SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
 
+                <!-- To'lash/Yangilash tugmasi -->
                 <Button
                     Grid.Row="4"
                     Grid.RowSpan="2"
                     Grid.Column="2"
                     Height="28"
-                    Margin="10,0"
+                    Padding="0"
+                    Margin="10,0,0,0"
                     md:ElevationAssist.Elevation="Dp8"
                     Background="{StaticResource SuccessButtonBackground}"
                     BorderBrush="{StaticResource SuccessButtonBorder}"
                     Command="{Binding SubmitCommand}"
-                    Content="To'lash"
+                    Content="{Binding SubmitButtonText}"
                     Foreground="{StaticResource SuccessButtonForeground}" />
+
+                <!-- Bekor qilish tugmasi (faqat edit rejimida) -->
+                <Button
+                    Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Grid.Column="3"
+                    Height="28"
+                    Margin="10,0,0,0"
+                    Padding="0"
+                    md:ElevationAssist.Elevation="Dp8"
+                    Background="#FF6B6B"
+                    BorderBrush="#D32F2F"
+                    Command="{Binding CancelCommand}"
+                    Content="Bekor qilish"
+                    Foreground="White"
+                    Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}" />
             </Grid>
         </Grid>
 
@@ -445,7 +464,7 @@
                 Margin="0,10"
                 Orientation="Horizontal">
                 <TextBlock
-                    Margin="0,0,10,0"
+                    Margin="10,0,10,0"
                     VerticalAlignment="Center"
                     Text="Boshlanish:" />
                 <controls:UserCalendar
@@ -462,12 +481,27 @@
                     Height="30"
                     SelectedDate="{Binding EndDate, Mode=TwoWay}" />
 
-                <Button
+                <TextBlock
+                    Margin="20,0,10,0"
+                    VerticalAlignment="Center"
+                    Text="Foydalanuvchi:" />
+                <!--<Border // TODO user bo'yicha filterlash
+                    Width="150"
                     Height="30"
-                    Margin="20,0,0,0"
-                    Padding="10,5"
-                    Command="{Binding LoadTransactionsAsyncCommand}"
-                    Content="🔍 Qidirish" />
+                    Margin="0,0,10,0"
+                    BorderBrush="{DynamicResource PrimaryTextColor}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <ComboBox
+                        Padding="5,1"
+                        BorderThickness="0"
+                        DisplayMemberPath="Name"
+                        FontSize="14"
+                        IsTextSearchEnabled="True"
+                        IsEditable="True"
+                        ItemsSource="{Binding AvailableUsers}"
+                        SelectedItem="{Binding SelectedFilterUser}" />
+                </Border>-->
             </StackPanel>
         </md:Card>
 

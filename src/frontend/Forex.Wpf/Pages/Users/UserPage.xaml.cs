@@ -12,7 +12,6 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -24,16 +23,16 @@ using System.Windows.Input;
 public partial class UserPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-
     private readonly ForexClient client = App.AppHost!.Services.GetRequiredService<ForexClient>();
+
     private List<UserResponse> rawUsers = [];
     private ObservableCollection<UserResponse> filteredUsers = [];
+    private bool isCreatingNewUser = false; // 🔴 Yangi user qo'shish jarayonini kuzatish
 
     public UserPage()
     {
         InitializeComponent();
 
-        cbRole.GotFocus += CbRole_GotFocus;
         cbRole.SelectionChanged += CbRole_SelectionChanged;
         txtSearch.TextChanged += TxtSearch_TextChanged;
         btnSave.Click += BtnSave_Click;
@@ -44,63 +43,56 @@ public partial class UserPage : Page
         tbDebt.LostFocus += TbNumeric_LostFocus;
         tbAccount.GotFocus += TextBox_GotFocus_SelectAll;
         tbDebt.GotFocus += TextBox_GotFocus_SelectAll;
-        dgUsers.SelectionChanged += DgUsers_SelectionChanged;
+
+        // 🔴 Input maydonlariga focus berilganda yangi yaratish rejimiga o'tish
+        txtName.GotFocus += InputField_GotFocus;
+        txtPhone.GotFocus += InputField_GotFocus;
+        txtAddress.GotFocus += InputField_GotFocus;
+        txtDescription.GotFocus += InputField_GotFocus;
+        tbDebt.GotFocus += InputField_GotFocus;
+        tbAccount.GotFocus += InputField_GotFocus;
+
         LoadValyutaType();
         LoadUsers();
         UpdateRoleList();
 
-        FocusNavigator.AttachEnterNavigation(
-        [
-            txtSearch,
-            cbRole,
-            txtName,
-            txtPhone,
-            txtAddress,
-            txtDescription,
-            cbxValutaType,
-            tbDebt,
-            tbAccount,
-            btnSave
+        FocusNavigator.AttachEnterNavigation([
+            txtSearch, cbRole, txtName, txtPhone, txtAddress,
+            txtDescription, cbxValutaType, tbDebt, tbAccount, btnSave
         ]);
     }
 
-    private void DgUsers_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    // 🔴 Input maydonlariga focus berilganda
+    private void InputField_GotFocus(object sender, RoutedEventArgs e)
     {
-        if (dgUsers.SelectedItem is UserResponse)
+        if (!isCreatingNewUser)
         {
-            // Row tanlangan → Update rejimi
-            btnSave.Visibility = Visibility.Collapsed;
-        }
-        else
-        {
-            // Row tanlanmagan → Save rejimi
-            btnSave.Visibility = Visibility.Visible;
+            isCreatingNewUser = true;
+            dgUsers.SelectedItem = null; // Selection ni tozalash
+            btnSave.Visibility = GetSaveButtonVisibility();
             btnUpdate.Visibility = Visibility.Collapsed;
-
-            txtName.Text = "";
-            txtPhone.Text = null;
-            txtAddress.Text = "";
-            txtDescription.Text = "";
-            tbDebt.Text = "";
-            tbAccount.Text = "";
         }
     }
 
+
+    // 🔴 Save tugmasi ko'rinishini aniqlash
+    private Visibility GetSaveButtonVisibility()
+    {
+        string role = cbRole.SelectedItem?.ToString() ?? "";
+        bool isUser = role.Equals("User", StringComparison.OrdinalIgnoreCase);
+        return isUser ? Visibility.Collapsed : Visibility.Visible;
+    }
 
     private void TextBox_GotFocus_SelectAll(object sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb)
-        {
             tb.Dispatcher.BeginInvoke(new Action(() => tb.SelectAll()));
-        }
     }
 
     private void TbNumeric_LostFocus(object sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb && decimal.TryParse(tb.Text, out var value))
-        {
-            tb.Text = value.ToString("N2"); // formatlash
-        }
+            tb.Text = value.ToString("N2");
     }
 
     private async void BtnUpdate_Click(object sender, RoutedEventArgs e)
@@ -111,7 +103,6 @@ public partial class UserPage : Page
             if (dgUsers.SelectedItem is not UserResponse user)
                 return;
 
-            // Foydalanuvchi yangilash uchun request tuzamiz
             var updateUser = new UserRequest
             {
                 Id = user.Id,
@@ -123,48 +114,57 @@ public partial class UserPage : Page
                 Accounts = []
             };
 
-            // Agar account fieldlari mavjud bo‘lsa
-            if (decimal.TryParse(tbAccount.Text, out decimal accountBalance) &&
-                decimal.TryParse(tbDebt.Text, out decimal discount))
+            // Accountlarni to'g'ri yangilash
+            if (user.Accounts != null && user.Accounts.Count > 0)
+            {
+                var existingAccount = user.Accounts[0];
+
+                updateUser.Accounts.Add(new UserAccount
+                {
+                    CurrencyId = (long)cbxValutaType.SelectedValue,
+                    OpeningBalance = GetOpeningBalance(),
+                    Discount = 0
+                });
+            }
+            else if (cbxValutaType.SelectedValue != null)
             {
                 updateUser.Accounts.Add(new UserAccount
                 {
                     CurrencyId = (long)cbxValutaType.SelectedValue,
-                    OpeningBalance = GetOpeningBalance(),  // Yangi metod
+                    OpeningBalance = GetOpeningBalance(),
                     Discount = 0
                 });
             }
 
-
-            // Update chaqirish
             var response = await client.Users.Update(updateUser);
 
             if (response.IsSuccess)
             {
-                LoadUsers(); // qaytadan listni yangilash
+                MessageBox.Show("Foydalanuvchi muvaffaqiyatli yangilandi.", "Muvaffaqiyat",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                LoadUsers();
             }
             else
             {
-                var vm = new SemiProductViewModel
-                {
-                    ErrorMessage = string.Empty
-                };
-                vm.ErrorMessage = $"Foydalanuvchining ma'lumotlarini o'zgartirmoqchimisiz?";
+                MessageBox.Show("Yangilashda xatolik yuz berdi.", "Xato",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Yangilashda xatolik:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Yangilashda xatolik:\n" + ex.Message, "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally
         {
             btnUpdate.IsEnabled = true;
-            btnSave.Visibility = Visibility.Visible;
+            isCreatingNewUser = false;
+            btnSave.Visibility = GetSaveButtonVisibility();
             btnUpdate.Visibility = Visibility.Collapsed;
+            dgUsers.SelectedItem = null;
             ClearForm();
         }
     }
-
 
     private async void LoadValyutaType()
     {
@@ -178,13 +178,8 @@ public partial class UserPage : Page
             }
 
             cbxValutaType.ItemsSource = response.Data?.ToList();
-
-            // Faqat symbol ko‘rinsin
             cbxValutaType.DisplayMemberPath = "Code";
-
-            // SelectedValue sifatida Id ishlatiladi
             cbxValutaType.SelectedValuePath = "Id";
-
             cbxValutaType.SelectedItem = response.Data!.FirstOrDefault(v => v.IsDefault);
         }
         catch (Exception ex)
@@ -192,6 +187,7 @@ public partial class UserPage : Page
             MessageBox.Show("Valyuta turlarini yuklashda xatolik:\n" + ex.Message);
         }
     }
+
     private async void LoadUsers()
     {
         try
@@ -220,9 +216,10 @@ public partial class UserPage : Page
     {
         var roles = Enum.GetNames<UserRole>().ToList();
         cbRole.ItemsSource = roles;
-        cbRole.SelectedItem = roles[0];
-    }
 
+        // 🔴 Default qiymat sifatida "User" ni o'rnatish
+        cbRole.SelectedItem = "User";
+    }
 
     private void ApplyFilters()
     {
@@ -231,14 +228,15 @@ public partial class UserPage : Page
 
         var filtered = rawUsers.AsEnumerable();
 
-        // 🔹 UserRole bo‘yicha filter
-        if (!string.IsNullOrWhiteSpace(selectedRole) && selectedRole != "Customer")
+        // 🔴 Filter logikasi: "User" tanlanganida HAMMA ko'rinadi
+        if (!string.IsNullOrWhiteSpace(selectedRole) && selectedRole != "User")
         {
+            // Boshqa rol tanlanganida faqat o'sha rolni ko'rsatish
             filtered = filtered.Where(u => u.Role.ToString() == selectedRole);
         }
-        // Agar Customer bo‘lsa → hech qanday filter ishlamaydi (hammasi chiqadi)
+        // "User" tanlanganida yoki bo'sh bo'lganida hamma ko'rinadi
 
-        // 🔹 Search bo‘yicha filter
+        // Search bo'yicha filter
         if (!string.IsNullOrWhiteSpace(query))
         {
             filtered = filtered.Where(u =>
@@ -251,6 +249,7 @@ public partial class UserPage : Page
         filteredUsers = new ObservableCollection<UserResponse>(filtered);
         dgUsers.ItemsSource = filteredUsers;
     }
+
     private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
     {
         ApplyFilters();
@@ -260,7 +259,6 @@ public partial class UserPage : Page
     {
         ApplyFilters();
 
-        // Rol tanlanmagan bo'lsa — hammasi yashirilsin
         if (cbRole.SelectedItem is not string role || string.IsNullOrWhiteSpace(role))
         {
             brValutaType.Visibility = Visibility.Collapsed;
@@ -270,19 +268,19 @@ public partial class UserPage : Page
             return;
         }
 
+        // 🔴 "User" rollida hech narsa ko'rinmaydi
         bool isUser = role.Equals("User", StringComparison.OrdinalIgnoreCase);
 
-        // Qarzdorlik: faqat "User" bo'lmaganda ko'rinsin
         brDebt.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
-
-        // Qolgan elementlar ham "User" bo'lmaganda ko'rinsin
         brValutaType.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         brAccount.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         btnSave.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
-    }
-    private void CbRole_GotFocus(object sender, RoutedEventArgs e)
-    {
-        LoadUsers();
+
+        // 🔴 Rol o'zgarganda yangi yaratish rejimini tozalash
+        if (!isCreatingNewUser && !isUser)
+        {
+            dgUsers.SelectedItem = null;
+        }
     }
 
     private async void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -294,7 +292,8 @@ public partial class UserPage : Page
 
         if (string.IsNullOrWhiteSpace(roleText) || !Enum.TryParse<UserRole>(roleText, out var role))
         {
-            MessageBox.Show("Rol tanlanmagan yoki noto‘g‘ri formatda.", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Rol tanlanmagan yoki noto'g'ri formatda.", "Xato",
+                MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
@@ -305,9 +304,8 @@ public partial class UserPage : Page
             Address = txtAddress.Text.Trim(),
             Description = txtDescription.Text.Trim(),
             Role = role,
-            Accounts =
-            [
-                new ()
+            Accounts = [
+                new()
                 {
                     CurrencyId = (long)cbxValutaType.SelectedValue,
                     OpeningBalance = GetOpeningBalance(),
@@ -319,13 +317,16 @@ public partial class UserPage : Page
         var response = await client.Users.Create(request).Handle();
         if (response.Data > 0)
         {
-            MessageBox.Show("Foydalanuvchi muvaffaqiyatli qo'shildi.", "Muvaffaqiyat", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Foydalanuvchi muvaffaqiyatli qo'shildi.", "Muvaffaqiyat",
+                MessageBoxButton.OK, MessageBoxImage.Information);
             ClearForm();
             LoadUsers();
+            isCreatingNewUser = false; // 🔴 Yaratish rejimidan chiqish
         }
         else
         {
-            MessageBox.Show("Foydalanuvchini qo‘shishda xatolik. Server javobida xato.", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Foydalanuvchini qo'shishda xatolik.", "Xato",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -333,28 +334,32 @@ public partial class UserPage : Page
     {
         if (string.IsNullOrWhiteSpace(txtName.Text))
         {
-            MessageBox.Show("Foydalanuvchining Ismi majburiy maydon. Iltimos, to'ldiring.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Foydalanuvchining Ismi majburiy maydon.", "Diqqat",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             txtName.Focus();
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(txtPhone.Text))
         {
-            MessageBox.Show("Foydalanuvchining Telefon raqami majburiy maydon. Iltimos, to'ldiring.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Foydalanuvchining Telefon raqami majburiy maydon.", "Diqqat",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             txtPhone.Focus();
             return false;
         }
 
         if (cbRole.SelectedItem == null || string.IsNullOrWhiteSpace(cbRole.SelectedItem.ToString()))
         {
-            MessageBox.Show("Rol tanlanmagan. Iltimos, foydalanuvchi rolini tanlang.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Rol tanlanmagan.", "Diqqat",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             cbRole.Focus();
             return false;
         }
 
         if (cbxValutaType.SelectedValue == null || (long)cbxValutaType.SelectedValue == 0)
         {
-            MessageBox.Show("Hisob (Account) uchun Valyuta turi majburiy maydon. Iltimos, tanlang.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Valyuta turi majburiy maydon.", "Diqqat",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             cbxValutaType.Focus();
             return false;
         }
@@ -364,13 +369,16 @@ public partial class UserPage : Page
 
     private void ClearForm()
     {
-        cbRole.SelectedIndex = 0;
         txtName.Text = "";
         txtPhone.Text = "";
         txtAddress.Text = "";
         txtDescription.Text = "";
         tbDebt.Text = "";
         tbAccount.Text = "";
+
+        // 🔴 User default qiymat
+        cbRole.SelectedItem = "User";
+        isCreatingNewUser = false; // 🔴 Reset
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -381,47 +389,22 @@ public partial class UserPage : Page
             Main.NavigateTo(new HomePage());
     }
 
-    private void CbRole_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (cbRole.Template.FindName("PART_EditableTextBox", cbRole) is TextBox tb)
-            tb.TextChanged += CbRole_EditableTextBox_TextChanged;
-    }
-
-    private void CbRole_EditableTextBox_TextChanged(object? sender, TextChangedEventArgs e)
-    {
-        if (sender is not TextBox tb) return;
-
-        string text = tb.Text ?? string.Empty;
-        cbRole.IsDropDownOpen = true;
-
-        var roles = Enum.GetNames<UserRole>().ToList();
-        roles.Insert(0, "");
-
-        cbRole.ItemsSource = string.IsNullOrWhiteSpace(text)
-            ? roles
-            : [.. roles.Where(r => r.Contains(text, StringComparison.InvariantCultureIgnoreCase))];
-
-        tb.SelectionStart = tb.Text!.Length;
-    }
-
     private void TxtPhone_TextChanged(object sender, TextChangedEventArgs e)
     {
         FormatPhoneNumber((sender as TextBox)!);
     }
+
     private void TxtPhone_GotFocus(object sender, RoutedEventArgs e)
     {
         if (sender is TextBox tb)
         {
             if (string.IsNullOrWhiteSpace(tb.Text) || !tb.Text.Replace("+", "").StartsWith("998"))
-            {
                 tb.Text = "+998 ";
-            }
 
-            // Fokus paytida matn tanlanib qolmasligi uchun:
             tb.Dispatcher.BeginInvoke(new Action(() =>
             {
-                tb.SelectionStart = tb.Text.Length;   // kursorni oxiriga qo‘yish
-                tb.SelectionLength = 0;               // tanlovni olib tashlash
+                tb.SelectionStart = tb.Text.Length;
+                tb.SelectionLength = 0;
             }), System.Windows.Threading.DispatcherPriority.Input);
         }
     }
@@ -431,27 +414,20 @@ public partial class UserPage : Page
         if (textBox == null) return;
         string text = textBox.Text?.Trim() ?? string.Empty;
         string digits = Digits().Replace(text, "");
+
         textBox.TextChanged -= TxtPhone_TextChanged;
         try
         {
-
             string formatted = "+998 ";
             if (digits.Length > 3)
-            {
                 formatted += digits.Substring(3, Math.Min(2, digits.Length - 3));
-            }
             if (digits.Length > 5)
-            {
                 formatted += string.Concat(" ", digits.AsSpan(5, Math.Min(3, digits.Length - 5)));
-            }
             if (digits.Length > 8)
-            {
                 formatted += string.Concat(" ", digits.AsSpan(8, Math.Min(2, digits.Length - 8)));
-            }
             if (digits.Length > 10)
-            {
                 formatted += string.Concat(" ", digits.AsSpan(10, Math.Min(2, digits.Length - 10)));
-            }
+
             textBox.Text = formatted.TrimEnd();
             textBox.SelectionStart = textBox.Text.Length;
         }
@@ -461,19 +437,13 @@ public partial class UserPage : Page
         }
     }
 
-    private void BtnEdit_Click(object sender, RoutedEventArgs e)
-    {
-        long userId;
-        if (dgUsers.SelectedItem is not UserResponse user) return;
-        userId = user.Id;
-        LoadingUser(userId);
-
-    }
-
     private async void LoadingUser(long userId)
     {
+        isCreatingNewUser = false; // 🔴 Edit rejimiga o'tish
+
         var exitUser = await client.Users.GetById(userId);
         var user = exitUser.Data;
+
         cbRole.SelectedItem = user!.Role.ToString();
         txtName.Text = user.Name;
         txtPhone.Text = user.Phone;
@@ -517,7 +487,6 @@ public partial class UserPage : Page
     {
         var vm = new SemiProductViewModel { ErrorMessage = string.Empty };
         vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o'zgartirmoqchimisiz?";
-
         LoadingUser(response.Id);
     }
 
@@ -525,7 +494,7 @@ public partial class UserPage : Page
     private static void RemoveUser(UserResponse response)
     {
         var vm = new SemiProductViewModel { ErrorMessage = string.Empty };
-        vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o‘chirmoqchimisiz?";
+        vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o'chirmoqchimisiz?";
     }
 
     [RelayCommand]
@@ -558,7 +527,10 @@ public partial class UserPage : Page
 
     private void TbDebt_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (!string.IsNullOrWhiteSpace(tbDebt.Text) && tbDebt.Text.Trim() != "0" && tbDebt.Text.Trim() != "," && tbDebt.Text.Trim() != ".")
+        if (!string.IsNullOrWhiteSpace(tbDebt.Text) &&
+            tbDebt.Text.Trim() != "0" &&
+            tbDebt.Text.Trim() != "," &&
+            tbDebt.Text.Trim() != ".")
         {
             tbAccount.Text = "";
         }
@@ -566,36 +538,34 @@ public partial class UserPage : Page
 
     private void TbAccount_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (!string.IsNullOrWhiteSpace(tbAccount.Text) && tbAccount.Text.Trim() != "0" && tbAccount.Text.Trim() != "," && tbAccount.Text.Trim() != ".")
+        if (!string.IsNullOrWhiteSpace(tbAccount.Text) &&
+            tbAccount.Text.Trim() != "0" &&
+            tbAccount.Text.Trim() != "," &&
+            tbAccount.Text.Trim() != ".")
         {
             tbDebt.Text = "";
         }
     }
+
     private decimal GetOpeningBalance()
     {
         string debtText = tbDebt.Text?.Trim();
         string accountText = tbAccount.Text?.Trim();
 
-        // 1. Qarzdorlikni tekshirish
         if (!string.IsNullOrWhiteSpace(debtText) &&
-            decimal.TryParse(debtText,
-                out decimal debt) &&
+            decimal.TryParse(debtText, out decimal debt) &&
             debt > 0)
         {
-            return -debt; // Qarzdorlik → minus
+            return -debt;
         }
 
-        // 2. Haqdorlikni tekshirish
         if (!string.IsNullOrWhiteSpace(accountText) &&
-            decimal.TryParse(accountText,
-                out decimal balance) &&
+            decimal.TryParse(accountText, out decimal balance) &&
             balance > 0)
         {
-            return balance; // Haqdorlik → plus
+            return balance;
         }
 
-        // 3. Hech narsa kiritilmagan yoki 0
         return 0;
     }
 }
-

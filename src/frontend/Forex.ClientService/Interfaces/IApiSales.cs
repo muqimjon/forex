@@ -10,6 +10,9 @@ public interface IApiSales
     [Post("/sales")]
     Task<Response<long?>> Create(SaleRequest request);
 
+    [Put("/sales")]
+    Task<Response<bool>> Update(SaleRequest request);
+
     [Delete("/sales/{id}")]
     Task<Response<bool>> Delete(long id);
 

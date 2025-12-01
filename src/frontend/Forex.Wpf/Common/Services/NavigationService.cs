@@ -1,27 +1,37 @@
 ﻿namespace Forex.Wpf.Common.Services;
 
 using Forex.Wpf.Common.Interfaces;
-using Forex.Wpf.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 public class NavigationService : INavigationService
 {
-    private readonly MainWindow _mainWindow;
+    private readonly Frame frame;
 
-    public NavigationService(MainWindow mainWindow)
+    public NavigationService(Frame frame)
     {
-        _mainWindow = mainWindow;
+        this.frame = frame;
+        this.frame.Navigated += Frame_Navigated;
     }
 
     public void NavigateTo(Page page)
     {
-        _mainWindow.NavigateTo(page);
+        frame.Navigate(page);
     }
 
     public void GoBack()
     {
-        _mainWindow.GoBack();
+        if (frame.CanGoBack)
+            frame.GoBack();
     }
 
-    public bool CanGoBack => _mainWindow.MainFrame.CanGoBack;
+    public bool CanGoBack => frame.CanGoBack;
+
+    private void Frame_Navigated(object? sender, NavigationEventArgs e)
+    {
+        if (e.Content is Page page && page.DataContext is INavigationAware aware)
+        {
+            aware.OnNavigatedTo();
+        }
+    }
 }
