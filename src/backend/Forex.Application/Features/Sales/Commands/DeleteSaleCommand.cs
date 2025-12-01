@@ -31,9 +31,15 @@ public class DeleteSaleCommandHandler(
             RevertProductResidueCounts(sale.SaleItems, productResidues);
 
             context.SaleItems.RemoveRange(sale.SaleItems);
+
+            if (sale.OperationRecord is not null)
+            {
+                context.OperationRecords.Remove(sale.OperationRecord);
+                sale.OperationRecord = null!;
+            }
+
             context.Sales.Remove(sale);
 
-            await context.SaveAsync(ct);
             return await context.CommitTransactionAsync(ct);
         }
         catch
@@ -49,6 +55,7 @@ public class DeleteSaleCommandHandler(
             .Include(s => s.SaleItems)
             .Include(s => s.Customer)
                 .ThenInclude(u => u.Accounts)
+            .Include(s => s.OperationRecord)
             .FirstOrDefaultAsync(s => s.Id == saleId, ct);
 
         return sale ?? throw new NotFoundException(nameof(Sale), nameof(saleId), saleId);
