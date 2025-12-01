@@ -134,71 +134,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
     #region Commands
 
-    [RelayCommand]
-    private async Task Delete()
-    {
-        var selected = SelectedItem;
-
-        if (selected == null)
-        {
-            MessageBox.Show("O‘chirish uchun qatorni tanlang.", "Diqqat", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        var result = MessageBox.Show(
-            $"Tanlangan operatsiyani o‘chirishni xohlaysizmi?\n\n" +
-            $"{selected.Date:dd.MM.yyyy} — {selected.Description}",
-            "O‘chirishni tasdiqlang",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-
-        if (result != MessageBoxResult.Yes) return;
-
-        try
-        {
-            var originalRecord = _originalRecords.FirstOrDefault(x => x.Id == selected.Id);
-            if (originalRecord == null)
-            {
-                MessageBox.Show("Operatsiya topilmadi.", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            bool success = false;
-
-            if (originalRecord.Type == ClientService.Enums.OperationType.Sale && originalRecord.Sale != null)
-            {
-                var resp = await _client.Sales.Delete(originalRecord.Sale.Id).Handle(l => IsLoading = l);
-                success = resp.IsSuccess;
-            }
-            else if (originalRecord.Type == ClientService.Enums.OperationType.Transaction && originalRecord.Transaction != null)
-            {
-                var resp = await _client.Transactions.Delete(originalRecord.Transaction.Id).Handle(l => IsLoading = l);
-                success = resp.IsSuccess;
-            }
-            else
-            {
-                MessageBox.Show("Operatsiya turi aniqlanmadi.", "Xato");
-                return;
-            }
-
-            if (success)
-            {
-                Operations.Remove(selected);
-                _originalRecords.Remove(originalRecord);
-                await LoadDataAsync(); // qoldiqlar yangilanadi
-
-                MessageBox.Show("Operatsiya muvaffaqiyatli o‘chirildi!", "Bajarildi", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                MessageBox.Show("Serverda o‘chirishda xatolik.", "Xato");
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Xatolik: {ex.Message}");
-        }
-    }
 
     [RelayCommand]
     private void Preview()
@@ -371,7 +306,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         var shareButton = new Button
         {
             Content = "Telegram’da ulashish",
-            Padding = new Thickness(15, 8, 15, 8),
+            Padding = new Thickness(15, 2, 15, 2),
             Background = new SolidColorBrush(Color.FromRgb(0, 136, 204)),
             Foreground = Brushes.White,
             FontSize = 14,
@@ -461,13 +396,13 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             Margin = new Thickness(0, 0, 0, 30)
         });
 
+
         double[] colWidths = { 90, 120, 120, 370 };
+        // Boshlang‘ich qoldiq
+        stack.Children.Add(CreateBalanceRow(colWidths, "Boshlang‘ich qoldiq", BeginBalance.ToString("N2")));
 
         // Header
         stack.Children.Add(CreateRow(colWidths, true, "Sana", "Chiqim", "Kirim", "Izoh"));
-
-        // Boshlang‘ich qoldiq
-        stack.Children.Add(CreateBalanceRow(colWidths, "Boshlang‘ich qoldiq", BeginBalance.ToString("N2")));
 
         // Operatsiyalar
         foreach (var op in Operations)

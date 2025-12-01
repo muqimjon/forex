@@ -99,6 +99,10 @@
                         Height="30"
                         Margin="3,0,0,0"
                         Padding="0"
+                        BorderThickness="0"
+                        Background="CadetBlue"
+                        Foreground="White"
+
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
                         Command="{Binding FilterCommand}"
@@ -108,7 +112,7 @@
                             <Viewbox Width="18" Height="18">
                                 <Path
                                     Data="M3,5h18v2H3V5z M6,11h12v2H6v-2z M10,17h4v2h-4v-2z"
-                                    Fill="Black"
+                                    Fill="White"
                                     Stretch="Uniform" />
                             </Viewbox>
                         </Grid>
@@ -186,12 +190,18 @@
                 <Button
                     Height="29"
                     md:ButtonAssist.CornerRadius="4"
+                    Background="#1976D2"
+                    Foreground="White"
+                    BorderThickness="0"
                     Margin="0,3"
                     Command="{Binding PreviewCommand}"
                     Content="Ko‘rish" />
                 <Button
                     Height="29"
                     md:ButtonAssist.CornerRadius="4"
+                    Background="#3949AB"
+                    Foreground="White"
+                    BorderThickness="0"
                     Margin="0,3"
                     Command="{Binding ClearFilterCommand}"
                     Content="Tozalash" />
@@ -203,12 +213,18 @@
                 <Button
                     Height="29"
                     md:ButtonAssist.CornerRadius="4"
+                    BorderThickness="0"
+                    Background="#00897B"
+                    Foreground="White"
                     Margin="0,3"
                     Command="{Binding PrintCommand}"
                     Content="Pechat" />
                 <Button
                     Height="29"
                     md:ButtonAssist.CornerRadius="4"
+                    BorderThickness="0"
+                    Background="#2E7D32"
+                    Foreground="White"
                     Margin="0,3"
                     Command="{Binding ExportToExcelCommand}"
                     Content="Excel" />
