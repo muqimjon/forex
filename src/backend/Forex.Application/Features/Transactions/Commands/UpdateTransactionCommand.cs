@@ -33,23 +33,25 @@ public class UpdateTransactionCommandHandler(
 
         try
         {
-            // Mavjud tranzaksiyani olish
+            // 1) Mavjud tranzaksiyani olish
             var existingTransaction = await context.Transactions
                 .Include(t => t.Shop)
                     .ThenInclude(s => s.ShopAccounts)
+                .Include(t => t.OperationRecord) // OperationRecord ham yuklanadi
                 .FirstOrDefaultAsync(t => t.Id == request.Id, cancellationToken)
                 ?? throw new NotFoundException(nameof(Transaction), nameof(request.Id), request.Id);
 
-            // Eski ma'lumotlarni revert qilish
+            // 2) Eski ma'lumotlarni revert qilish
             await RevertUserAccountAsync(existingTransaction, cancellationToken);
             RevertShopAccount(existingTransaction);
 
-            // Yangi ma'lumotlarni qo'llash
+            // 3) Yangi ma'lumotlarni qo'llash
             await UpdateTransactionAsync(existingTransaction, request, cancellationToken);
             await UpdateUserAccountAsync(request, existingTransaction, cancellationToken);
             UpdateShopAccount(existingTransaction, request);
             await UpdateCurrencyExchangeRate(request.CurrencyId, request.ExchangeRate);
 
+            // 4) Commit
             await context.CommitTransactionAsync(cancellationToken);
             return true;
         }
@@ -83,13 +85,16 @@ public class UpdateTransactionCommandHandler(
 
         if (existingTransaction.OperationRecord is not null)
         {
+            // mavjudini yangilash
             existingTransaction.OperationRecord.Amount = amount;
             existingTransaction.OperationRecord.Date = existingTransaction.Date.ToUtcSafe();
             existingTransaction.OperationRecord.Description = description;
+            existingTransaction.OperationRecord.Type = OperationType.Transaction;
         }
         else
         {
-            existingTransaction.OperationRecord = new()
+            // yangisini yaratish
+            existingTransaction.OperationRecord = new OperationRecord
             {
                 Amount = amount,
                 Date = existingTransaction.Date.ToUtcSafe(),

@@ -1,6 +1,5 @@
 ﻿namespace Forex.Application.Features.Sales.Commands;
 
-using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
@@ -23,8 +22,7 @@ public record UpdateSaleCommand(
     : IRequest<bool>;
 
 public class UpdateSaleCommandHandler(
-    IAppDbContext context,
-    IMapper mapper)
+    IAppDbContext context)
     : IRequestHandler<UpdateSaleCommand, bool>
 {
     public async Task<bool> Handle(UpdateSaleCommand request, CancellationToken ct)
@@ -35,8 +33,8 @@ public class UpdateSaleCommandHandler(
         {
             var sale = await LoadSaleWithRelationsAsync(request.Id, ct);
 
-            // 1) Revert previous changes tied to this sale
-            await RevertSaleChangesAsync(sale, ct);
+            // 1) Revert previous effects (balance, stock, items)
+            await RevertSaleEffectsAsync(sale, ct);
 
             // 2) Apply new data deterministically
             await ApplyNewSaleDataAsync(sale, request, ct);
@@ -51,7 +49,7 @@ public class UpdateSaleCommandHandler(
         }
     }
 
-    // --- 1. Load and revert ---
+    // --- Load ---
 
     private async Task<Sale> LoadSaleWithRelationsAsync(long id, CancellationToken ct)
     {
@@ -64,37 +62,30 @@ public class UpdateSaleCommandHandler(
             ?? throw new NotFoundException(nameof(Sale), nameof(id), id);
     }
 
-    private async Task RevertSaleChangesAsync(Sale sale, CancellationToken ct)
+    private async Task RevertSaleEffectsAsync(Sale sale, CancellationToken ct)
     {
         // 1) Return account balance
         var userAccount = sale.Customer.Accounts.FirstOrDefault()
             ?? throw new NotFoundException(nameof(UserAccount), nameof(sale.CustomerId), sale.CustomerId);
-
         userAccount.Balance += sale.TotalAmount;
 
-        // 2) Return product residues for every existing item
+        // 2) Return product residues
         var productTypeIds = sale.SaleItems.Select(si => si.ProductTypeId).Distinct().ToList();
         var productResidues = await LoadProductResiduesAsync(productTypeIds, ct);
-
         RestoreProductResidues(sale.SaleItems, productResidues);
 
-        // 3) Remove old SaleItems from context and from navigation
+        // 3) Remove old items (navigation and DbSet)
         context.SaleItems.RemoveRange(sale.SaleItems);
         sale.SaleItems.Clear();
 
-        // 4) Remove old OperationRecord
-        if (sale.OperationRecord is not null)
-        {
-            context.OperationRecords.Remove(sale.OperationRecord);
-            sale.OperationRecord = null!;
-        }
+        // Note: keep existing OperationRecord to update; do not remove it here.
     }
 
-    // --- 2. Apply new ---
+    // --- Apply ---
 
     private async Task ApplyNewSaleDataAsync(Sale sale, UpdateSaleCommand request, CancellationToken ct)
     {
-        // 1) Load user account and apply balance change
+        // 1) Account balance apply
         var userAccount = await GetOrCreateUserAccountAsync(request.CustomerId, request.TotalAmount, ct);
         userAccount.Balance -= request.TotalAmount;
 
@@ -102,38 +93,51 @@ public class UpdateSaleCommandHandler(
         var productTypeIds = request.SaleItems.Select(i => i.ProductTypeId).Distinct().ToList();
         var productResidues = await LoadProductResiduesAsync(productTypeIds, ct);
 
-        // 3) Update only scalar fields (avoid mapping collections)
+        // 3) Update scalar fields only
         sale.Date = request.Date.ToUtcSafe();
         sale.CustomerId = request.CustomerId;
         sale.TotalAmount = request.TotalAmount;
         sale.Note = request.Note;
 
-        // 4) Build new SaleItems from commands (BundleCount > 0 only)
+        // 4) Build new items (BundleCount > 0)
         var saleItems = BuildSaleItems(request.SaleItems, productResidues, sale);
 
-        // 5) Deduct residues using the same bundle sizing logic
+        // 5) Deduct residues using consistent bundle sizing (latest entry)
         DeductProductResidues(request.SaleItems, productResidues);
 
-        // 6) Recalculate aggregate totals
+        // 6) Recalculate totals
         CalculateSaleTotals(sale, saleItems);
 
-        // 7) Attach items only via navigation (no AddRange to DbSet)
+        // 7) Attach items via navigation only
         sale.SaleItems = saleItems;
 
-        // 8) Create new OperationRecord
-        sale.OperationRecord = new OperationRecord
-        {
-            Amount = -sale.TotalAmount,
-            Date = sale.Date.ToUtcSafe(), // already set to UTC
-            Description = await GenerateDescriptionAsync(saleItems, ct),
-            Type = OperationType.Sale
-        };
+        // 8) Update or create OperationRecord (no manual Id assignment)
+        var description = await GenerateDescriptionAsync(saleItems, ct);
 
-        // Mark the root entity as updated
+        if (sale.OperationRecord is not null)
+        {
+            sale.OperationRecord.Amount = -sale.TotalAmount;
+            sale.OperationRecord.Date = sale.Date;
+            sale.OperationRecord.Description = description;
+            sale.OperationRecord.Type = OperationType.Sale;
+        }
+        else
+        {
+            sale.OperationRecord = new OperationRecord
+            {
+                Amount = -sale.TotalAmount,
+                Date = sale.Date,
+                Description = description,
+                Type = OperationType.Sale,
+                // If you have a FK like SaleId in OperationRecord, set it here:
+                // SaleId = sale.Id
+            };
+        }
+
         context.Sales.Update(sale);
     }
 
-    // --- 3. Helpers ---
+    // --- Helpers ---
 
     private async Task<string> GenerateDescriptionAsync(List<SaleItem> saleItems, CancellationToken ct)
     {
@@ -150,10 +154,7 @@ public class UpdateSaleCommandHandler(
             var productType = productTypes.FirstOrDefault(pt => pt.Id == item.ProductTypeId)
                 ?? throw new NotFoundException(nameof(ProductType), nameof(item.ProductTypeId), item.ProductTypeId);
 
-            text.AppendLine($"Kodi: {productType.Product.Code} ({productType.Type}), " +
-                            $"Soni: {item.TotalCount}, " +
-                            $"Narxi: {item.UnitPrice}, " +
-                            $"Jami: {item.Amount} UZS");
+            text.AppendLine($"Kodi: {productType.Product.Code} ({productType.Type}), Soni: {item.TotalCount}, Narxi: {item.UnitPrice}, Jami: {item.Amount} UZS");
         }
 
         return text.ToString();
@@ -188,7 +189,6 @@ public class UpdateSaleCommandHandler(
             .ToListAsync(ct);
     }
 
-    // Build new items based on the latest entry price and bundle sizing
     private List<SaleItem> BuildSaleItems(List<SaleItemCommand> commands, List<ProductResidue> residues, Sale sale)
     {
         var items = new List<SaleItem>();
@@ -198,7 +198,6 @@ public class UpdateSaleCommandHandler(
             var residue = residues.FirstOrDefault(r => r.ProductTypeId == cmd.ProductTypeId)
                 ?? throw new NotFoundException(nameof(ProductResidue), nameof(cmd.ProductTypeId), cmd.ProductTypeId);
 
-            // Use latest ProductEntry for cost and bundle sizing
             var entry = residue.ProductEntries.OrderByDescending(e => e.Date).FirstOrDefault()
                 ?? throw new NotFoundException(nameof(ProductEntry), nameof(residue.ProductTypeId), residue.ProductTypeId);
 
@@ -233,7 +232,6 @@ public class UpdateSaleCommandHandler(
         }
     }
 
-    // Deduct using the same bundle sizing taken from the latest entry
     private void DeductProductResidues(List<SaleItemCommand> commands, List<ProductResidue> residues)
     {
         foreach (var cmd in commands.Where(c => c.BundleCount > 0))

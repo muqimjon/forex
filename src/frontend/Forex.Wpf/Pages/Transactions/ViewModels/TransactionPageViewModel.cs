@@ -259,7 +259,7 @@ public partial class TransactionPageViewModel : ViewModelBase
         try
         {
             // Original transaction qiymatini saqlash
-            _originalTransactionNetAmount = (decimal)(selectedTransaction.Amount * selectedTransaction.ExchangeRate)!;
+            _originalTransactionNetAmount = (decimal)(selectedTransaction.Amount * selectedTransaction.ExchangeRate + selectedTransaction.Discount)!;
             _originalTransaction = selectedTransaction;
 
             // Ma'lumotlarni ko'chirish
