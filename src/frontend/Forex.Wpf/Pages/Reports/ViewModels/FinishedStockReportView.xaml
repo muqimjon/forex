@@ -85,12 +85,18 @@
                 Orientation="Vertical">
                 <Button
                     Height="29"
+                    Background="#1976D2"
+                    Foreground="White"
+                    BorderThickness="0"
                     md:ButtonAssist.CornerRadius="4"
                     Margin="0,2"
                     Command="{Binding PreviewCommand}"
                     Content="Ko‘rish" />
                 <Button
                     Height="29"
+                    Background="#3949AB"
+                    Foreground="White"
+                    BorderThickness="0"
                     md:ButtonAssist.CornerRadius="4"
                     Margin="0,2"
                     Command="{Binding ClearFilterCommand}"
@@ -103,12 +109,18 @@
                 Orientation="Vertical">
                 <Button
                     Height="29"
+                    BorderThickness="0"
+                    Background="#00897B"
+                    Foreground="White"
                     md:ButtonAssist.CornerRadius="4"
                     Margin="0,2"
                     Command="{Binding PrintCommand}"
                     Content="Pechat" />
                 <Button
                     Height="29"
+                    BorderThickness="0"
+                    Background="#2E7D32"
+                    Foreground="White"
                     md:ButtonAssist.CornerRadius="4"
                     Margin="0,2"
                     Command="{Binding ExportToExcelCommand}"

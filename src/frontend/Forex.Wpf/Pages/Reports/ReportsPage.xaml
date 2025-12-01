@@ -15,20 +15,23 @@
 
         <!--  Orqaga tugmasi  -->
         <Button
-            Margin="0,0,0,16"
-            Padding="8,2"
+            x:Name="btnBack"
+            Grid.Row="0"
             HorizontalAlignment="Right"
-            Command="{Binding BackCommand}"
-            Content="Orqaga"
-            FontSize="14"
-            Style="{StaticResource MaterialDesignFlatDarkBgButton}" />
+            md:ButtonAssist.CornerRadius="4"
+            Background="{DynamicResource OtherBackground}"
+            BorderThickness="0"
+            Margin="0 5"
+            Click="BtnBack_Click"
+            Content="🔙 Orqaga"
+            ToolTip="Orqaga" />
 
         <!--  TabControl – MaterialDesign chiroyli ko‘rinishi  -->
         <md:Card
             Grid.Row="1"
             Padding="0"
             md:ElevationAssist.Elevation="Dp4"
-            UniformCornerRadius="12">
+            UniformCornerRadius="4">
             <TabControl
                 x:Name="ReportsTab"
                 md:ColorZoneAssist.Mode="PrimaryLight"
