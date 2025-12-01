@@ -22,6 +22,7 @@ public class CreateProductEntryCommandHandler(
         {
             var shop = await GetOrCreateDefaultShopAsync(cancellationToken);
             var defaultUnitMeasure = await GetOrCreateDefaultUnitMeasureAsync(cancellationToken);
+            var defaultCurrency = await GetOrCreateDefaultCurrencyAsync(cancellationToken);
 
             // Product Code bo'yicha guruhlash
             var groupedByProduct = request.Command
@@ -40,7 +41,7 @@ public class CreateProductEntryCommandHandler(
                 foreach (var item in productGroup)
                 {
                     // ProductType ni olish yoki yaratish
-                    var productType = await GetOrCreateProductTypeAsync(item, product, cancellationToken);
+                    var productType = await GetOrCreateProductTypeAsync(item, product, defaultCurrency, cancellationToken);
 
                     // BundleItemCount va UnitPrice ni yangilash
                     productType.BundleItemCount = item.BundleItemCount;
@@ -59,7 +60,7 @@ public class CreateProductEntryCommandHandler(
                     var costPrice = CalculateCostPrice(productType);
 
                     // ProductEntry ni saqlash
-                    SaveProductEntry(item, productType, shop, residue, costPrice);
+                    SaveProductEntry(item, productType, shop, residue, costPrice, defaultCurrency);
                 }
             }
 
@@ -107,6 +108,29 @@ public class CreateProductEntryCommandHandler(
         }
 
         return unitMeasure;
+    }
+
+    private async Task<Currency> GetOrCreateDefaultCurrencyAsync(CancellationToken ct)
+    {
+        var currency = await context.Currencies
+            .FirstOrDefaultAsync(c => c.Code == "UZS" || c.IsDefault, ct);
+
+        if (currency is null)
+        {
+            currency = new Currency
+            {
+                Code = "UZS",
+                Name = "So'm",
+                NormalizedName = "So'm".ToNormalized(),
+                Symbol = "so'm",
+                ExchangeRate = 1,
+                IsDefault = true,
+                IsActive = true
+            };
+            context.Currencies.Add(currency);
+        }
+
+        return currency;
     }
 
     private async Task<Product> GetOrCreateProductAsync(ProductEntryCommand item, UnitMeasure defaultUnitMeasure, CancellationToken ct)
@@ -174,6 +198,7 @@ public class CreateProductEntryCommandHandler(
     private async Task<ProductType> GetOrCreateProductTypeAsync(
         ProductEntryCommand item,
         Product product,
+        Currency defaultCurrency,
         CancellationToken ct)
     {
         ProductType? productType = null;
@@ -220,7 +245,8 @@ public class CreateProductEntryCommandHandler(
                 ProductId = product.Id,
                 Product = product,
                 ProductTypeItems = [],
-                UnitPrice = item.UnitPrice
+                UnitPrice = item.UnitPrice,
+                Currency = defaultCurrency
             };
 
             context.ProductTypes.Add(productType);
@@ -270,7 +296,7 @@ public class CreateProductEntryCommandHandler(
                 ProductType = productType,
                 Shop = shop,
                 Count = count,
-                ProductEntries = new List<ProductEntry>()
+                ProductEntries = []
             };
             context.ProductResidues.Add(residue);
 
@@ -316,7 +342,8 @@ public class CreateProductEntryCommandHandler(
         ProductType productType,
         Shop shop,
         ProductResidue residue,
-        decimal costPrice)
+        decimal costPrice,
+        Currency defaultCurrency)
     {
         var totalAmount = item.Count * item.UnitPrice;
 
@@ -332,16 +359,17 @@ public class CreateProductEntryCommandHandler(
             ProductionOrigin = item.ProductionOrigin,
             ProductType = productType,
             Shop = shop,
-            ProductResidue = residue
+            ProductResidue = residue,
+            Currency = defaultCurrency
         };
 
         context.ProductEntries.Add(entry);
 
         // Ikki tomonlama bog'lanish
-        residue.ProductEntries ??= new List<ProductEntry>();
+        residue.ProductEntries ??= [];
         residue.ProductEntries.Add(entry);
 
-        productType.ProductEntries ??= new List<ProductEntry>();
+        productType.ProductEntries ??= [];
         productType.ProductEntries.Add(entry);
     }
 }

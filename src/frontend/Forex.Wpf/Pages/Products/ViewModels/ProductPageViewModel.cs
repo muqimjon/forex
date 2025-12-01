@@ -402,8 +402,6 @@ public partial class ProductPageViewModel : ViewModelBase
             // DataGrid'dan olib tashlash
             ProductEntries.Remove(SelectedProductEntry);
             SelectedProductEntry = null;
-
-            SuccessMessage = "Ma'lumotlar tahrirlash uchun yuklandi!";
         }
         finally
         {

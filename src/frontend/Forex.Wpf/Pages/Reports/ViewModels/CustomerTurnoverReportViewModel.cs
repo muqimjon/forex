@@ -6,8 +6,8 @@ using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Requests;
 using Forex.ClientService.Models.Responses;
-using global::Forex.Wpf.Pages.Common;
-using global::Forex.Wpf.ViewModels;
+using Forex.Wpf.Pages.Common;
+using Forex.Wpf.ViewModels;
 using PdfSharp.Drawing;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -33,12 +33,12 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
 
 
-    public ObservableCollection<TurnoversViewModel> Operations { get; } = new();
+    public ObservableCollection<TurnoversViewModel> Operations { get; } = [];
     [ObservableProperty] private TurnoversViewModel? selectedItem;
 
     [ObservableProperty] private decimal _beginBalance;
     [ObservableProperty] private decimal _lastBalance;
-    private List<OperationRecordDto> _originalRecords = new();
+    private List<OperationRecordDto> _originalRecords = [];
     public CustomerTurnoverReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
         _client = client;
@@ -53,9 +53,12 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         _ = LoadDataAsync();
     }
 
+
+    #region Load Data
+
     private async Task LoadDataAsync()
     {
-        if (SelectedCustomer == null)
+        if (SelectedCustomer is null)
         {
             Operations.Clear();
             BeginBalance = 0;
@@ -85,7 +88,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         var data = response.Data;
 
-        _originalRecords = data.OperationRecords.ToList();
+        _originalRecords = [.. data.OperationRecords];
 
         BeginBalance = data.BeginBalance;
         LastBalance = data.EndBalance;
@@ -125,6 +128,11 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             });
         }
     }
+
+    #endregion Load Data
+
+
+    #region Commands
 
     [RelayCommand]
     private async Task Delete()
@@ -345,6 +353,10 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         LastBalance = 0;
     }
 
+    #endregion Commands
+
+    #region Private Helpers
+
     private void ShowPreviewWindow(FixedDocument doc)
     {
         var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(15) };
@@ -489,6 +501,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         return doc;
     }
+
     private Grid CreateRow(double[] widths, bool isHeader, params string[] cells)
     {
         var grid = new Grid();
@@ -551,6 +564,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         return grid;
     }
+
     private Grid CreateBalanceRow(double[] widths, string label, string value)
     {
         var grid = new Grid { Margin = new Thickness(0, 10, 0, 10) };
@@ -609,6 +623,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         return grid;
     }
+
     private void SaveFixedDocumentToPdf(FixedDocument doc, string path, int dpi = 96)
     {
         try
@@ -664,4 +679,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             MessageBox.Show($"PDF saqlashda xatolik: {ex.Message}");
         }
     }
+
+    #endregion Private Helpers
 }

@@ -12,6 +12,10 @@ public class ProductEntriesController : BaseController
     public async Task<IActionResult> Entry(CreateProductEntryCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 
+    [HttpPut]
+    public async Task<IActionResult> Update(UpdateProductEntryCommand query)
+        => Ok(new Response { Data = await Mediator.Send(query) });
+
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
         => Ok(new Response { Data = await Mediator.Send(new DeleteProductEntryCommand(id)) });

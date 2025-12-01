@@ -10,6 +10,9 @@ public interface IApiTransactions
     [Post("/transactions")]
     Task<Response<long?>> CreateAsync(TransactionRequest request);
 
+    [Put("/transactions")]
+    Task<Response<bool>> Update(TransactionRequest request);
+
     [Delete("/transactions/{id}")]
     Task<Response<bool>> Delete(long id);
 
