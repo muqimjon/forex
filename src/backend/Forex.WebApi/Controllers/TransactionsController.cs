@@ -12,6 +12,10 @@ public class TransactionsController : BaseController
     public async Task<IActionResult> Create(CreateTransactionCommand command)
         => Ok(new Response { Data = await Mediator.Send(command) });
 
+    [HttpPut]
+    public async Task<IActionResult> Update(UpdateTransactionCommand command)
+        => Ok(new Response { Data = await Mediator.Send(command) });
+
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete(long id)
         => Ok(new Response { Data = await Mediator.Send(new DeleteTransactionCommand(id)) });

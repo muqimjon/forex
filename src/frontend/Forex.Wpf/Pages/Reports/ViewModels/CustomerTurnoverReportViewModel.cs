@@ -53,6 +53,9 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         _ = LoadDataAsync();
     }
 
+
+    #region Load Data
+
     private async Task LoadDataAsync()
     {
         if (SelectedCustomer is null)
@@ -125,6 +128,11 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             });
         }
     }
+
+    #endregion Load Data
+
+
+    #region Commands
 
     [RelayCommand]
     private async Task Delete()
@@ -345,6 +353,10 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         LastBalance = 0;
     }
 
+    #endregion Commands
+
+    #region Private Helpers
+
     private void ShowPreviewWindow(FixedDocument doc)
     {
         var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(15) };
@@ -489,6 +501,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         return doc;
     }
+
     private Grid CreateRow(double[] widths, bool isHeader, params string[] cells)
     {
         var grid = new Grid();
@@ -551,6 +564,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         return grid;
     }
+
     private Grid CreateBalanceRow(double[] widths, string label, string value)
     {
         var grid = new Grid { Margin = new Thickness(0, 10, 0, 10) };
@@ -609,6 +623,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         return grid;
     }
+
     private void SaveFixedDocumentToPdf(FixedDocument doc, string path, int dpi = 96)
     {
         try
@@ -664,4 +679,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             MessageBox.Show($"PDF saqlashda xatolik: {ex.Message}");
         }
     }
+
+    #endregion Private Helpers
 }

@@ -437,6 +437,8 @@
                         Binding="{Binding Amount, StringFormat={}{0:N2}}"
                         Header="Jami summa"
                         IsReadOnly="True" />
+                    
+                    
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

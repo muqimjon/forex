@@ -4,7 +4,6 @@ using Forex.Application.Features.Currencies.DTOs;
 using Forex.Application.Features.Products.ProductResidues.DTOs;
 using Forex.Application.Features.Products.ProductTypes.DTOs;
 using Forex.Application.Features.Shops.DTOs;
-using Forex.Domain.Entities;
 using Forex.Domain.Enums;
 
 public sealed record ProductEntryDto
