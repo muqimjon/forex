@@ -45,23 +45,23 @@
                     <views:SalesHistoryReportView DataContext="{Binding SalesHistoryVM}" />
                 </TabItem>
 
-                <!--  3. Tayyor mahsulotlar qoldig‘i  -->
+                <!--  2. Tayyor mahsulotlar qoldig‘i  -->
                 <TabItem Header="Tayyor mahsulotlar qoldig‘i">
                     <views:FinishedStockReportView DataContext="{Binding FinishedStockVM}" />
                 </TabItem>
-                <!--  2. Mijoz aylanmasi  -->
+                <!--  3. Mijoz aylanmasi  -->
                 <TabItem Header="Mijoz aylanmasi">
                     <views:CustomerTurnoverReportView DataContext="{Binding CustomerTurnoverVM}" />
+                </TabItem>
+                <!--4. Debitor va Kreditor-->
+                <TabItem Header="Debitor va Kreditor">
+                    <views:DebtorCreditorReportView DataContext="{Binding DebtorCreditorVM}"/>
                 </TabItem>
                 <!--4. Yarim tayyor mahsulotlar
                 <TabItem Header="Yarim tayyor mahsulotlar">
                 <views:SemiFinishedStockReportView DataContext="{Binding SemiFinishedStockVM}"/>
                 </TabItem>
 
-                5. Debitor va Kreditor
-                <TabItem Header="Debitor va Kreditor">
-                <views:DebtorCreditorReportView DataContext="{Binding DebtorCreditorVM}"/>
-                </TabItem>
 
                 6. Hodimlar balansi
                 <TabItem Header="Hodimlar balansi">

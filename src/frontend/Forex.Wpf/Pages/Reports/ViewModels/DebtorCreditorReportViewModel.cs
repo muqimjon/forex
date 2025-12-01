@@ -2,6 +2,7 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.ClientService;
+using Forex.ClientService.Extensions;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.Pages.Reports.ViewModels;
 using Forex.Wpf.ViewModels;
@@ -13,7 +14,7 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
     private readonly ForexClient _client;
     private readonly CommonReportDataService _commonData;
 
-    //[ObservableProperty] private ObservableCollection<DebtorCreditorItemViewModel> items = [];
+    [ObservableProperty] private ObservableCollection<DebtorCreditorItemViewModel> items = [];
 
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
     [ObservableProperty] private UserViewModel? selectedCustomer;
@@ -34,23 +35,35 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
 
     private async Task LoadAsync()
     {
-        // Items.Clear();
+        //Items.Clear();
 
-        ////var response = await _client.Reports.GetDebtorCreditor().Handle(l => IsLoading = l);
-        ////if (!response.IsSuccess || response.Data == null)
-        ////{ ErrorMessage = "Debitor/Kreditor ma'lumotlari yuklanmadi"; return; }
+        //var response = await _client.Users.GetAllAsync().Handle(l => IsLoading = l);
+        //if (!response.IsSuccess)
+        //{
+        //    ErrorMessage = "Debitor/Kreditor ma'lumotlari yuklanmadi";
+        //    return;
+        //}
 
-        ////foreach (var item in response.Data)
-        ////{
-        ////    if (SelectedCustomer != null && item.CustomerId != SelectedCustomer.Id) continue;
+        //foreach (var account in response.Data)
+        //{
+        //    var user = account.User;
 
-        ////    Items.Add(new DebtorCreditorItemViewModel
-        ////    {
-        ////        Customer = item.CustomerName,
-        ////        Debitor = item.Debitor,
-        ////        Creditor = item.Creditor,
-        ////        Balance = item.Balance
-        ////    });
+        //    if (SelectedCustomer != null && user.Id != SelectedCustomer.Id)
+        //        continue;
+
+        //    decimal balance = account.Balance;
+
+        //    Items.Add(new DebtorCreditorItemViewModel
+        //    {
+        //        Id = account.Id,
+        //        Name = user.Name,
+        //        Phone = user.Phone,
+        //        Address = user.Address,
+
+        //        DebtorAmount = balance < 0 ? Math.Abs(balance) : 0,  // qarzdorlik (bizga qarzi)
+        //        CreditorAmount = balance > 0 ? balance : 0           // bizning qarz
+        //    });
         //}
     }
+
 }

@@ -22,8 +22,8 @@
             <!-- MIJOZ COMBOBOX (Kodi o‘rniga) -->
             <Grid Grid.Column="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="250" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -34,35 +34,24 @@
                            Margin="5,0" VerticalAlignment="Center"
                            FontSize="13" Text="Mijoz" />
 
-                <Border Grid.Row="0" Grid.Column="1"
-                        Height="30" BorderBrush="#CCCCCC" BorderThickness="2" CornerRadius="4">
-                    <ComboBox Width="350" Padding="8,0"
-                           BorderThickness="0"
-                           FontSize="14"
-                           IsEditable="True"
-                           TextSearch.TextPath="Name"
-                           DisplayMemberPath="Name"
-                           ItemsSource="{Binding AvailableCustomers}"
-                           SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}"
-                           md:HintAssist.Hint="Mijoz nomi yoki telefoni bo‘yicha qidirish"
-                           Style="{StaticResource MaterialDesignOutlinedComboBox}" />
+                <Border
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Height="30"
+                    BorderBrush="#CCCCCC"
+                    BorderThickness="2"
+                    CornerRadius="4">
+                    <ComboBox
+                        Padding="3"
+                        BorderThickness="0"
+                        DisplayMemberPath="Name"
+                        FontSize="14"
+                        IsEditable="True"
+                        ItemsSource="{Binding AvailableCustomers}"
+                        SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}" />
                 </Border>
 
-                <!-- Sana oralig‘i (ixtiyoriy qo‘shdim, kerak bo‘lsa qoldirasan) -->
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           Margin="5,8,5,0" VerticalAlignment="Center"
-                           FontSize="13" Text="Sana" />
 
-                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-                    <DatePicker Width="165" Margin="0,0,10,0"
-                                SelectedDate="{Binding BeginDate}"
-                                md:HintAssist.Hint="Dan"
-                                Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
-                    <DatePicker Width="165"
-                                SelectedDate="{Binding EndDate}"
-                                md:HintAssist.Hint="Gacha"
-                                Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
-                </StackPanel>
             </Grid>
 
             <!-- KO‘RISH + TOZALASH -->
@@ -96,9 +85,8 @@
             </StackPanel>
         </Grid>
 
-        <!-- JADVAL — QARZDORLAR VA KREDITORLAR BIRGA -->
         <DataGrid Grid.Row="1" Margin="10,5"
-                  ItemsSource="{Binding ReportItems}"
+                  ItemsSource="{Binding Items}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   FontSize="14"
@@ -107,79 +95,46 @@
                   GridLinesVisibility="Horizontal"
                   BorderBrush="#DDDDDD">
 
-            <!-- Headerlarni o‘rtaga -->
-            <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                    <Setter Property="Background" Value="#E3F2FD" />
-                    <Setter Property="Padding" Value="8" />
-                </Style>
-            </DataGrid.ColumnHeaderStyle>
-
             <DataGrid.Columns>
-                <!-- Mijoz nomi -->
-                <DataGridTextColumn Header="Mijoz / Yetkazib beruvchi" Binding="{Binding Name}" Width="300">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Margin" Value="12,0,0,0" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+
+                <!-- Mijoz -->
+                <DataGridTextColumn Header="Mijoz" Binding="{Binding Name}" Width="200" />
 
                 <!-- Telefon -->
-                <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" Width="140">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                <DataGridTextColumn Header="Telefon" Binding="{Binding Phone}" Width="140" />
 
-                <!-- Qarzdorlik (bizga qarzi) — qizil, o‘ngda -->
-                <DataGridTextColumn Header="Qarzdorlik (Bizga qarzi)" 
-                                    Binding="{Binding DebtorAmount, StringFormat=N0}" Width="180">
+                <!-- Address -->
+                <DataGridTextColumn Header="Manzil" Binding="{Binding Address}" Width="250" />
+
+                <!-- Bizga qarz (Debtor) -->
+                <DataGridTextColumn Header="Bizga qarzi"
+                                    Binding="{Binding DebtorAmount, StringFormat=N0}" Width="150">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
                             <Setter Property="Foreground" Value="#D32F2F" />
                             <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="Margin" Value="0,0,20,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Kreditorlik (bizning qarzimiz) — yashil, o‘ngda -->
-                <DataGridTextColumn Header="Kreditorlik (Bizning qarzimiz)" 
-                                    Binding="{Binding CreditorAmount, StringFormat=N0}" Width="180">
+                <!-- Bizning qarzimiz (Creditor) -->
+                <DataGridTextColumn Header="Bizning qarzimiz"
+                                    Binding="{Binding CreditorAmount, StringFormat=N0}" Width="150">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
                             <Setter Property="Foreground" Value="#388E3C" />
                             <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="Margin" Value="0,0,20,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Oxirgi operatsiya -->
-                <DataGridTextColumn Header="Oxirgi operatsiya" 
-                                    Binding="{Binding LastOperationDate, StringFormat=dd.MM.yyyy}" Width="140">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Center" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Izoh -->
-                <DataGridTextColumn Header="Izoh" Binding="{Binding Note}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
 
         <!-- Jami qatorlar soni -->
-        <TextBlock Grid.Row="1" 
+        <TextBlock Grid.Row="1"
                    Text="{Binding ReportItems.Count, StringFormat='Jami yozuvlar: {0} ta'}"
                    FontSize="14" FontWeight="Medium" Foreground="#555"
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
