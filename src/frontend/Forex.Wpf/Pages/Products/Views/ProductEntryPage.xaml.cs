@@ -1,5 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.Products.Views;
 
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Products.ViewModels;
 using Forex.Wpf.Resources.UserControls;
@@ -26,6 +27,18 @@ public partial class ProductEntryPage : Page
         cbxProductCode.LostFocus += CbxProductCode_LostFocus;
         cbxProductName.LostFocus += CbxProductName_LostFocus;
         cbxRazmerType.LostFocus += CbxRazmerType_LostFocus;
+
+        // Add button click'dan keyin fokusni qaytarish uchun event ulash
+        addButton.Click += AddButton_Click;
+    }
+
+    private void AddButton_Click(object sender, RoutedEventArgs e)
+    {
+        // Add komandasi bajarilgandan keyin fokusni qaytarish
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            cbxProductCode.comboBox.Focus();
+        }), System.Windows.Threading.DispatcherPriority.Input);
     }
 
     private async void CbxProductCode_LostFocus(object sender, RoutedEventArgs e)
