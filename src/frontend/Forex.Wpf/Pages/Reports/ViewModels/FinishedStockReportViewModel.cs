@@ -1,11 +1,12 @@
-﻿using ClosedXML.Excel;
+﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
+
+using ClosedXML.Excel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
-using Forex.Wpf.Pages.Reports.ViewModels;
 using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -62,12 +63,12 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 Filters = new()
                 {
                     ["productType"] = ["include:product.unitMeasure"],
-                    ["ProductEntries"] = ["include"]
+                    ["ProductEntries"] = ["include"],
+                    ["count"] = [">0"]
                 }
             };
 
-            var response = await _client.ProductResidues.Filter(request)
-                .Handle(l => IsLoading = l);
+            var response = await _client.ProductResidues.Filter(request).Handle(l => IsLoading = l);
 
             if (!response.IsSuccess)
             {
@@ -78,10 +79,10 @@ public partial class FinishedStockReportViewModel : ViewModelBase
             foreach (var stock in response.Data)
             {
                 var pt = stock.ProductType;
-                if (pt == null) continue;
+                if (pt is null) continue;
 
                 var product = pt.Product;
-                if (product == null) continue;
+                if (product is null) continue;
 
                 decimal unitPrice = stock.ProductType.UnitPrice;
 
