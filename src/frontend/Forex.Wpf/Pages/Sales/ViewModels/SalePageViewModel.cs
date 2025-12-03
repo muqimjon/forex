@@ -44,7 +44,7 @@ public partial class SalePageViewModel : ViewModelBase, INavigationAware
         await Task.WhenAll(
             LoadCustomersAsync(),
             LoadSalesAsync()
-        );
+            );
     }
 
     private async Task LoadCustomersAsync()
@@ -72,20 +72,18 @@ public partial class SalePageViewModel : ViewModelBase, INavigationAware
 
     private async Task LoadSalesAsync()
     {
-        FilteringRequest request = new();
-
-        DateTime begin = BeginDate.Date;
-        DateTime end = EndDate.Date.AddDays(1);
-
-        request.Filters = new()
+        FilteringRequest request = new()
         {
-            ["date"] =
-            [
-                $">={begin:yyyy-MM-dd}",
-                $"<{end:yyyy-MM-dd}"
-            ],
-            ["customer"] = ["include"],
-            ["saleItems"] = ["include:productType.product"]
+            Filters = new()
+            {
+                ["date"] =
+                [
+                    $">={BeginDate:dd-MM-yyyy}",
+                    $"<{EndDate.AddDays(1):dd-MM-yyyy}"
+                ],
+                ["customer"] = ["include"],
+                ["saleItems"] = ["include:productType.product"]
+            }
         };
 
         // Agar mijoz tanlangan bo'lsa, filter qo'shamiz

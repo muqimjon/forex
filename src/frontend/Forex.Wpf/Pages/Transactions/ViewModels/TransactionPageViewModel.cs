@@ -48,8 +48,8 @@ public partial class TransactionPageViewModel : ViewModelBase
     [ObservableProperty] private UserViewModel? selectedFilterUser;
 
     public static IEnumerable<PaymentMethod> AvailablePaymentMethods => Enum.GetValues<PaymentMethod>();
-    [ObservableProperty] private DateTime? beginDate = DateTime.Today;
-    [ObservableProperty] private DateTime? endDate = DateTime.Today;
+    [ObservableProperty] private DateTime beginDate = DateTime.Today;
+    [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     // UI-specific computed properties
     [ObservableProperty] private bool isIncomeEnabled = true;
@@ -73,21 +73,19 @@ public partial class TransactionPageViewModel : ViewModelBase
 
     private async Task LoadTransactionsAsync()
     {
-        FilteringRequest request = new();
-
-        DateTime begin = BeginDate?.Date ?? DateTime.Today;
-        DateTime end = (EndDate?.Date ?? DateTime.Today).AddDays(1);
-
-        request.Filters = new()
+        FilteringRequest request = new()
         {
-            ["date"] =
-            [
-                $">={begin:yyyy-MM-dd}",
-                $"<{end:yyyy-MM-dd}"
-            ],
-            ["user"] = ["include"],
-            ["currency"] = ["include"],
-            ["shopAccount"] = ["include"]
+            Filters = new()
+            {
+                ["date"] =
+                [
+                    $">={BeginDate:dd-MM-yyyy}",
+                    $"<{EndDate.AddDays(1):dd-MM-yyyy}"
+                ],
+                ["user"] = ["include"],
+                ["currency"] = ["include"],
+                ["shopAccount"] = ["include"]
+            }
         };
 
         // User filter qo'shish
