@@ -110,26 +110,26 @@
                 <!-- Mijoz -->
                 <DataGridTextColumn Header="Mijoz"
                                     Binding="{Binding Name}"
-                                    Width="200" />
+                                    Width="*" />
 
                 <!-- Telefon -->
                 <DataGridTextColumn Header="Telefon"
                                     Binding="{Binding Phone}"
-                                    Width="140" />
+                                    Width="*" />
 
                 <!-- Address -->
                 <DataGridTextColumn Header="Manzil"
                                     Binding="{Binding Address}"
-                                    Width="250" />
+                                    Width="*" />
 
                 <!-- Bizga qarz (Debtor) -->
                 <DataGridTextColumn Header="Debit(Bizga qarzi)"
                                     Binding="{Binding DebtorAmount, StringFormat=N2}"
-                                    Width="150">
+                                    Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Foreground" Value="#88E3C3" />
+                            <Setter Property="Foreground" Value="#2E7D32" />
                             <Setter Property="FontWeight" Value="Bold" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
@@ -138,7 +138,7 @@
                 <!-- Bizning qarzimiz (Creditor) -->
                 <DataGridTextColumn Header="Kredit(Bizning qarzimiz)"
                                     Binding="{Binding CreditorAmount, StringFormat=N2}"
-                                    Width="150">
+                                    Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right" />
