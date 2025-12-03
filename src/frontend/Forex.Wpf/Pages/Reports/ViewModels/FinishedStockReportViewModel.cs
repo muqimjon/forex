@@ -146,31 +146,6 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         }
     }
 
-    // 🔵 PREVIEW
-    [RelayCommand]
-    private void Preview()
-    {
-        if (!Items.Any())
-        {
-            MessageBox.Show("Ko‘rsatish uchun ma’lumot yo‘q!", "Xabar", MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-
-        var doc = CreateFixedDocument();
-        var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(20) };
-
-        var window = new Window
-        {
-            Title = "Tayyor mahsulot qoldig‘i",
-            Width = 1000,
-            Height = 800,
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            Content = viewer
-        };
-
-        window.ShowDialog();
-    }
-
     // 🔵 EXCEL EXPORT
     [RelayCommand]
     private async Task ExportToExcel()
@@ -246,77 +221,120 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         }
     }
 
-    // 🔵 PDF/Print uchun document yaratish
+    // 🔵 PREVIEW
+    [RelayCommand]
+    private void Preview()
+    {
+        if (!Items.Any())
+        {
+            MessageBox.Show("Ko‘rsatish uchun ma’lumot yo‘q!", "Xabar", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var doc = CreateFixedDocument();
+        var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(20) };
+
+        var window = new Window
+        {
+            Title = "Tayyor mahsulot qoldig‘i",
+            Width = 1000,
+            Height = 800,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Content = viewer
+        };
+
+        window.ShowDialog();
+    }
+
+    // PDF/Print uchun document yaratish (PASTDAN 25mm BO‘SH JOY!)
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
         const double pageWidth = 794;
         const double pageHeight = 1123;
+        const double sideMargin = 40;        // chap-o‘ng
+        const double topMargin = 40;         // tepa
+        const double bottomMargin = 40 + 94; // 40 (odatiy) + 94px ≈ 25mm (96 dpi da 1mm ≈ 3.78px → 25×3.78 ≈ 94.5)
 
-        var page = new FixedPage
+        var items = Items.ToList();
+        var totalSum = items.Sum(i => i.TotalAmount);
+        int rowsPerPage = 38;
+        int totalPages = (int)Math.Ceiling(items.Count / (double)rowsPerPage);
+
+        for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
-            Width = pageWidth,
-            Height = pageHeight,
-            Background = Brushes.White
-        };
+            var page = new FixedPage
+            {
+                Width = pageWidth,
+                Height = pageHeight,
+                Background = Brushes.White
+            };
 
-        var container = new StackPanel { Margin = new Thickness(40) };
+            // StackPanel margin — pastdan 25mm qo‘shib qo‘ydim!
+            var container = new StackPanel
+            {
+                Margin = new Thickness(sideMargin, topMargin, sideMargin, bottomMargin)
+            };
 
-        container.Children.Add(new TextBlock
-        {
-            Text = "TAYYOR MAHSULOT QOLDIG‘I",
-            FontSize = 22,
-            FontWeight = FontWeights.Bold,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 0, 0, 10)
-        });
+            // Sarlavha
+            container.Children.Add(new TextBlock
+            {
+                Text = "TAYYOR MAHSULOT QOLDIG‘I",
+                FontSize = 22,
+                FontWeight = FontWeights.Bold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 10)
+            });
 
-        container.Children.Add(new TextBlock
-        {
-            Text = $"Sana: {DateTime.Today:dd.MM.yyyy}",
-            FontSize = 14,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Margin = new Thickness(0, 0, 0, 20)
-        });
+            container.Children.Add(new TextBlock
+            {
+                Text = $"Sana: {DateTime.Today:dd.MM.yyyy}   |   Sahifa {pageIndex + 1} / {totalPages}",
+                FontSize = 14,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(0, 0, 0, 20),
+                Foreground = Brushes.Gray
+            });
 
-        // Table
-        var table = new Grid();
-        double[] widths = { 70, 130, 80, 80, 120, 60, 80, 100 };
-        foreach (var w in widths)
-            table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
+            var table = new Grid();
+            double[] widths = { 70, 130, 80, 80, 120, 60, 80, 100 };
+            foreach (var w in widths)
+                table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-        // Header (Qopdagi soni va Qop soni almashtirildi)
-        AddRow(table, true, "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
+            AddRow(table, true, "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
 
-        foreach (var x in Items)
-        {
-            AddRow(table, false,
-                x.Code,
-                x.Name,
-                x.Type,
-                x.BundleCount!.ToString(),            // Qop soni
-                x.BundleItemCount.ToString(),        // Qopdagi soni
-                x.TotalCount.ToString("N0"),         // Jami
-                x.UnitPrice.ToString("N2"),          // Narxi
-                x.TotalAmount.ToString("N2")         // Umumiy
-            );
+            int start = pageIndex * rowsPerPage;
+            int count = Math.Min(rowsPerPage, items.Count - start);
+
+            for (int i = 0; i < count; i++)
+            {
+                var x = items[start + i];
+                AddRow(table, false,
+                    x.Code,
+                    x.Name,
+                    x.Type,
+                    x.BundleCount?.ToString() ?? "0",
+                    x.BundleItemCount.ToString(),
+                    x.TotalCount.ToString("N0"),
+                    x.UnitPrice.ToString("N2"),
+                    x.TotalAmount.ToString("N2")
+                );
+            }
+
+            if (pageIndex == totalPages - 1)
+            {
+                AddRow(table, true, "JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
+            }
+
+            container.Children.Add(table);
+            page.Children.Add(container);
+
+            var pc = new PageContent();
+            ((IAddChild)pc).AddChild(page);
+            doc.Pages.Add(pc);
         }
-
-        // Total summa (Umumiy)
-        var totalSum = Items.Sum(i => i.TotalAmount);
-        AddRow(table, true, "JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
-
-        container.Children.Add(table);
-        page.Children.Add(container);
-
-        var pc = new PageContent();
-        ((IAddChild)pc).AddChild(page);
-        doc.Pages.Add(pc);
 
         return doc;
     }
-
-    // ===== Helper =====
     private void AddRow(Grid grid, bool isHeader, params string[] values)
     {
         int row = grid.RowDefinitions.Count;

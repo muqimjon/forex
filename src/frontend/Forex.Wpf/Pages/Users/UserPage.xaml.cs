@@ -317,8 +317,6 @@ public partial class UserPage : Page
         var response = await client.Users.Create(request).Handle();
         if (response.Data > 0)
         {
-            MessageBox.Show("Foydalanuvchi muvaffaqiyatli qo'shildi.", "Muvaffaqiyat",
-                MessageBoxButton.OK, MessageBoxImage.Information);
             ClearForm();
             LoadUsers();
             isCreatingNewUser = false; // 🔴 Yaratish rejimidan chiqish
