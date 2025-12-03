@@ -48,7 +48,9 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         _ = LoadAsync();
     }
 
-    // 🔵 Serverdan ma’lumot yuklash
+
+    #region Commands
+
     [RelayCommand]
     public async Task LoadAsync()
     {
@@ -103,7 +105,8 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         finally { IsLoading = false; }
     }
 
-    // 🔵 Filtrlash funksiyasi
+    #endregion Commands
+
     private void ApplyFilters()
     {
         var result = _allItems.AsEnumerable();

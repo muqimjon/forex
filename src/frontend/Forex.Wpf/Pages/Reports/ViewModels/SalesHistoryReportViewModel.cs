@@ -12,8 +12,6 @@ using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -38,8 +36,8 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
     [ObservableProperty] private UserViewModel? selectedCustomer;
     [ObservableProperty] private ProductViewModel? selectedProduct;
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime? beginDate;
-    [ObservableProperty] private DateTime? endDate;
+    [ObservableProperty] private DateTime beginDate = DateTime.Today;
+    [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public SalesHistoryReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
@@ -47,18 +45,16 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         _commonData = commonData;
 
         // Har qanday filtr o‘zgarsa → darrov filtrla
-        this.PropertyChanged += (_, e) =>
+        PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(SelectedCustomer) or nameof(SelectedProduct) or nameof(SelectedCode) or nameof(BeginDate) or nameof(EndDate))
                 ApplyFilters();
         };
 
-        // Boshlang‘ich sana
-        BeginDate = DateTime.Today;
-        EndDate = DateTime.Today;
-
         _ = LoadAsync();
     }
+
+    #region Commands
 
     [RelayCommand]
     public async Task LoadAsync()
@@ -73,19 +69,15 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             {
                 Filters = new()
                 {
+                    ["date"] =
+                [
+                    $">={BeginDate:dd-MM-yyyy}",
+                    $"<{EndDate.AddDays(1):dd-MM-yyyy}"
+                ],
                     ["customer"] = ["include"],
                     ["saleItems"] = ["include:productType.product.unitMeasure"]
                 }
             };
-
-            var begin = BeginDate?.Date ?? DateTime.Today;
-            var end = (EndDate?.Date ?? DateTime.Today).AddDays(1);
-
-            request.Filters["date"] =
-            [
-                $">={begin:yyyy-MM-dd}",
-                $"<{end:yyyy-MM-dd}"
-            ];
 
             var response = await _client.Sales.Filter(request).Handle(l => IsLoading = l);
 
@@ -131,35 +123,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         {
             IsLoading = false;
         }
-    }
-
-    private void ApplyFilters()
-    {
-        var result = _allItems.AsEnumerable();
-
-        if (SelectedCustomer != null)
-            result = result.Where(x => x.Customer == SelectedCustomer.Name);
-
-        if (SelectedProduct != null)
-            result = result.Where(x => x.ProductName == SelectedProduct.Name);
-
-        if (SelectedCode != null)
-            result = result.Where(x => x.Code == SelectedCode.Code);
-
-        if (BeginDate != null && EndDate != null && BeginDate == EndDate)
-        {
-            var begin = BeginDate.Value.Date;
-            var end = EndDate.Value.Date.AddDays(1);
-            result = result.Where(x => x.Date >= begin && x.Date < end);
-        }
-        else if (BeginDate != null && EndDate != null && BeginDate != EndDate)
-        {
-            var begin = BeginDate.Value.Date;
-            var end = EndDate.Value.Date;
-            result = result.Where(x => x.Date >= begin && x.Date <= end);
-        }
-
-        FilteredItems = new ObservableCollection<SaleHistoryItemViewModel>(result);
     }
 
     [RelayCommand]
@@ -310,6 +273,41 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         }
     }
 
+    #endregion Commands
+
+    #region Private Methods
+
+    private void ApplyFilters()
+    {
+        var result = _allItems.AsEnumerable();
+
+        if (SelectedCustomer != null)
+            result = result.Where(x => x.Customer == SelectedCustomer.Name);
+
+        if (SelectedProduct != null)
+            result = result.Where(x => x.ProductName == SelectedProduct.Name);
+
+        if (SelectedCode != null)
+            result = result.Where(x => x.Code == SelectedCode.Code);
+
+        if (BeginDate == EndDate)
+        {
+            var begin = BeginDate.Date;
+            var end = EndDate.Date.AddDays(1);
+            result = result.Where(x => x.Date >= begin && x.Date < end);
+        }
+        else if (BeginDate != EndDate)
+        {
+            var begin = BeginDate.Date;
+            var end = EndDate.Date;
+            result = result.Where(x => x.Date >= begin && x.Date <= end);
+        }
+
+        FilteredItems = new ObservableCollection<SaleHistoryItemViewModel>(result);
+    }
+
+
+
     // PDF yaratish
     private FixedDocument CreateFixedDocument()
     {
@@ -348,7 +346,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
         stack.Children.Add(new TextBlock
         {
-            Text = $"Davr: {(BeginDate?.ToString("dd.MM.yyyy") ?? "-")} — {(EndDate?.ToString("dd.MM.yyyy") ?? "-")}",
+            Text = $"Davr: {BeginDate.ToString("dd.MM.yyyy") ?? "-"} — {(EndDate.ToString("dd.MM.yyyy") ?? "-")}",
             FontSize = 15,
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(0, 0, 0, 25)
@@ -414,7 +412,8 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         doc.Pages.Add(pageContent);
 
         return doc;
-    }    // Yordamchi metod — toza kod uchun
+    }
+
     private void AddRow(Grid grid, bool isHeader, params string[] cells)
     {
         int row = grid.RowDefinitions.Count;
@@ -446,34 +445,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             grid.Children.Add(border);
         }
     }
-    private Grid CreateRow(bool isHeader, params string[] cells)
-    {
-        var grid = new Grid();
-        double[] widths = { 80, 140, 70, 160, 80, 80, 70, 80, 90, 100 };
-        for (int i = 0; i < widths.Length; i++)
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(widths[i]) });
-
-        for (int i = 0; i < cells.Length; i++)
-        {
-            var tb = new TextBlock
-            {
-                Text = cells[i],
-                Padding = new Thickness(4),
-                FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
-                Background = isHeader ? Brushes.LightGray : Brushes.Transparent,
-                TextAlignment = i >= 8 ? TextAlignment.Right : TextAlignment.Left
-            };
-            var border = new Border
-            {
-                BorderBrush = Brushes.Black,
-                BorderThickness = new Thickness(0.5),
-                Child = tb
-            };
-            Grid.SetColumn(border, i);
-            grid.Children.Add(border);
-        }
-        return grid;
-    }
 
     private async Task ShareAsPdfAsync(FixedDocument doc)
     {
@@ -495,4 +466,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             MessageBox.Show($"Ulashishda xato: {ex.Message}");
         }
     }
+
+    #endregion Private Methods
 }

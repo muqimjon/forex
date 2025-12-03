@@ -34,6 +34,8 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
         _ = LoadAsync();
     }
 
+    #region Load Data
+
     private async Task LoadAsync()
     {
         Items.Clear();
@@ -58,10 +60,14 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
         }
 
         if (SelectedCustomer != null)
-            return response.Data.Where(u => u.Id == SelectedCustomer.Id).ToList();
+            return [.. response.Data.Where(u => u.Id == SelectedCustomer.Id)];
 
-        return response.Data.ToList();
+        return [.. response.Data];
     }
+
+    #endregion Load Data
+
+    #region Private Helpers
 
     private List<DebtorCreditorItemViewModel> MapUsersToDebtorCreditor(
     List<UserResponse> users)
@@ -87,4 +93,5 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
         return list;
     }
 
+    #endregion Private Helpers
 }
