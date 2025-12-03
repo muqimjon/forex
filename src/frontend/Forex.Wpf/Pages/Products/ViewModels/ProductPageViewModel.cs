@@ -35,7 +35,7 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
     public string[] ProductionOrigins { get; set; } = Enum.GetNames<ProductionOrigin>();
     [ObservableProperty] private DateTime beginDate = DateTime.Today;
-    [ObservableProperty] private DateTime endDate = DateTime.Now;
+    [ObservableProperty] private DateTime endDate = DateTime.Today;
     [ObservableProperty] private ProductEntryViewModel currentProductEntry = new();
     [ObservableProperty] private ProductEntryViewModel? selectedProductEntry = default;
 
@@ -65,7 +65,7 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             Filters = new()
             {
                 ["producttype"] = ["include:product"],
-                ["date"] = [$">={BeginDate:yyyy-MM-dd}", $"<={EndDate.AddDays(1).AddSeconds(-1):yyyy-MM-dd HH:mm:ss}"]
+                ["date"] = [$">={BeginDate:yyyy-MM-dd}", $"<{EndDate.AddDays(1):yyyy-MM-dd}"]
             }
         };
 
