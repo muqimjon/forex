@@ -6,8 +6,8 @@ using System.Text.Json;
 
 public static class ConversionHelper
 {
-    private static readonly string[] DateFormats = new[]
-    {
+    private static readonly string[] DateFormats =
+    [
         "yyyy-MM-dd HH:mm:ss",
         "yyyy-MM-dd",
         "yyyy/M/d HH:mm",
@@ -24,8 +24,9 @@ public static class ConversionHelper
         "MMM d, yyyy",
         "MMMM d yyyy",
         "d MMM yyyy",
-        "dd.MM.yyyy.HH:mm:ss"
-    };
+        "dd.MM.yyyy.HH:mm:ss",
+        "dd-MM-yyyy",
+    ];
 
     public static object? TryConvert(object value, Type targetType)
     {

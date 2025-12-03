@@ -65,7 +65,7 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             Filters = new()
             {
                 ["producttype"] = ["include:product"],
-                ["date"] = [$">={BeginDate:yyyy-MM-dd}", $"<{EndDate.AddDays(1):yyyy-MM-dd}"]
+                ["date"] = [$">={BeginDate:dd-MM-yyyy}", $"<{EndDate.AddDays(1):dd-MM-yyyy}"]
             }
         };
 
