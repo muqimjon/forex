@@ -189,7 +189,7 @@
                 </DataGridTextColumn>
 
                 <!-- DueDate (tahrirlanadigan, o'rtada) -->
-                <DataGridTemplateColumn Header="DueDate" Width="0.8*">
+                <DataGridTemplateColumn Header="To'lash muddati" Width="0.8*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding DueDate, StringFormat=dd.MM.yyyy}"

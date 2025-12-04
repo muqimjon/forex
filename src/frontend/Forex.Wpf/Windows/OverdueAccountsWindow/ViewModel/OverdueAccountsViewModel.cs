@@ -118,7 +118,7 @@ public partial class OverdueAccountsViewModel : ViewModelBase
         var saveDialog = new SaveFileDialog
         {
             Filter = "Excel fayllari (*.xlsx)|*.xlsx",
-            FileName = $"Qarzdor_mijozlar_{DateTime.Now:yyyy-MM-dd}.xlsx"
+            FileName = $"Qarzdor_mijozlar_{DateTime.Now:dd.MM.yyyy}.xlsx"
         };
 
         if (saveDialog.ShowDialog() != true) return;

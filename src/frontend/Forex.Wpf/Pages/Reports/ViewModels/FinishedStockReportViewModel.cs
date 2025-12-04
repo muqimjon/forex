@@ -148,7 +148,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
 
     // 🔵 EXCEL EXPORT
     [RelayCommand]
-    private async Task ExportToExcel()
+    private void ExportToExcel()
     {
         if (!Items.Any())
         {
@@ -250,16 +250,37 @@ public partial class FinishedStockReportViewModel : ViewModelBase
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
-        const double pageWidth = 794;
-        const double pageHeight = 1123;
-        const double sideMargin = 40;        // chap-o‘ng
-        const double topMargin = 40;         // tepa
-        const double bottomMargin = 40 + 94; // 40 (odatiy) + 94px ≈ 25mm (96 dpi da 1mm ≈ 3.78px → 25×3.78 ≈ 94.5)
+
+        // A4 format (96 DPI)
+        double pageWidth = 793.7;
+        double pageHeight = 1122.5;
+
+        // Margins (mm → px)
+        double marginTop = 38;      // 10 mm
+        double marginBottom = 38;   // 10 mm
+        double marginLeft = 30;     // 8 mm
+        double marginRight = 30;    // 8 mm
+
+        // Title + Date qatorlari balandligi
+        double titleHeight = 40;
+        double dateHeight = 30;
+
+        // Jadvalning bitta qatorining balandligi
+        double rowHeight = 25;
 
         var items = Items.ToList();
         var totalSum = items.Sum(i => i.TotalAmount);
-        int rowsPerPage = 38;
-        int totalPages = (int)Math.Ceiling(items.Count / (double)rowsPerPage);
+
+        // Jadval uchun mavjud bo'sh balandlik
+        double tableAvailableHeight =
+            pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
+
+        // Nechta qator sig'adi?
+        int rowsPerPage = (int)(tableAvailableHeight / rowHeight);
+        if (rowsPerPage < 1) rowsPerPage = 1;
+
+        // 2 ta qatorni keyingi sahifaga o‘tkazish uchun +2 qo‘shamiz
+        int totalPages = (int)Math.Ceiling((items.Count + 2) / (double)rowsPerPage);
 
         for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
@@ -270,45 +291,74 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 Background = Brushes.White
             };
 
-            // StackPanel margin — pastdan 25mm qo‘shib qo‘ydim!
             var container = new StackPanel
             {
-                Margin = new Thickness(sideMargin, topMargin, sideMargin, bottomMargin)
+                Margin = new Thickness(marginLeft, marginTop, marginRight, marginBottom)
             };
 
-            // Sarlavha
+            // 🟦 1-qator: Sarlavha
             container.Children.Add(new TextBlock
             {
-                Text = "TAYYOR MAHSULOT QOLDIG‘I",
+                Text = "Mavjud mahsulotlar qoldig‘i",
                 FontSize = 22,
                 FontWeight = FontWeights.Bold,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 10)
+                Margin = new Thickness(0, 0, 0, 5)
             });
 
+            // 🟦 2-qator: Sana
             container.Children.Add(new TextBlock
             {
                 Text = $"Sana: {DateTime.Today:dd.MM.yyyy}   |   Sahifa {pageIndex + 1} / {totalPages}",
                 FontSize = 14,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(0, 0, 0, 20),
-                Foreground = Brushes.Gray
+                Foreground = Brushes.Gray,
+                Margin = new Thickness(0, 0, 0, 10)
             });
 
+            // 🟦 3-qator: JADVAL
             var table = new Grid();
-            double[] widths = { 70, 130, 80, 80, 120, 60, 80, 100 };
+
+            // ⭐ yangi T/r ustuni qo‘shildi
+            double[] widths = { 30, 70, 130, 70, 70, 70, 70, 80, 140 };
             foreach (var w in widths)
                 table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-            AddRow(table, true, "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
+            // Header qatori — T/r bilan birga
+            AddRow(table, true,
+                "T/r", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
 
-            int start = pageIndex * rowsPerPage;
-            int count = Math.Min(rowsPerPage, items.Count - start);
+            // ——————————————————————————————————————
+            // ⭐ 1-sahifadagi oxirgi 2 qatorni keyingi sahifaga o‘tkazish
+            // ——————————————————————————————————————
+            int effectiveRows = rowsPerPage;
 
+            if (pageIndex == 0 && totalPages > 1)
+                effectiveRows -= 2;   // Birinchi sahifa 2 qator kam oladi
+
+            // Qaysi itemdan boshlash?
+            int start;
+
+            if (pageIndex == 0)
+            {
+                start = 0;
+            }
+            else
+            {
+                // Birinchi sahifadagi -2 qator kompensatsiya qilingan
+                start = (rowsPerPage - 2) + (pageIndex - 1) * rowsPerPage;
+            }
+
+            int count = Math.Min(effectiveRows, items.Count - start);
+
+            // ⭐ Qatorlarni qo‘shish (T/r bilan)
             for (int i = 0; i < count; i++)
             {
                 var x = items[start + i];
+
+                int number = start + i + 1; // RAQAM
+
                 AddRow(table, false,
+                    number.ToString(),   // ⭐ T/r
                     x.Code,
                     x.Name,
                     x.Type,
@@ -316,18 +366,18 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                     x.BundleItemCount.ToString(),
                     x.TotalCount.ToString("N0"),
                     x.UnitPrice.ToString("N2"),
-                    x.TotalAmount.ToString("N2")
-                );
+                    x.TotalAmount.ToString("N2"));
             }
 
+            // ⭐ Oxirgi sahifaga JAMI qo‘shish
             if (pageIndex == totalPages - 1)
             {
-                AddRow(table, true, "JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
+                AddRow(table, true, "","JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
             }
 
             container.Children.Add(table);
-            page.Children.Add(container);
 
+            page.Children.Add(container);
             var pc = new PageContent();
             ((IAddChild)pc).AddChild(page);
             doc.Pages.Add(pc);
@@ -342,24 +392,31 @@ public partial class FinishedStockReportViewModel : ViewModelBase
 
         for (int i = 0; i < values.Length; i++)
         {
+            // ⭐ Almashtirilgan TextAlignment
+            TextAlignment align =
+                isHeader ? TextAlignment.Center : i switch
+                {
+                    0 => TextAlignment.Right,   // T/r – O‘NG
+                    1 => TextAlignment.Center,  // Kodi – O‘RTA
+                    2 => TextAlignment.Left,   // Nomi – O‘NG
+                    5 => TextAlignment.Center,  // Donasi – O‘RTA
+                    6 => TextAlignment.Right,   // Jami – O‘NG
+                    7 => TextAlignment.Right,   // Narxi – O‘NG
+                    8 => TextAlignment.Right,   // Umumiy – O‘NG
+                    _ => TextAlignment.Center   // Boshqa ustunlar – O‘RTA
+                };
+
             var tb = new TextBlock
             {
                 Text = values[i],
                 Padding = new Thickness(4, 5, 4, 5),
                 FontSize = isHeader ? 12 : 11,
                 FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
-                TextAlignment = !isHeader
-                    ? i switch
-                    {
-                        1 => TextAlignment.Left,             // Nomi chapda
-                        5 or 6 or 7 => TextAlignment.Right, // Jami, Narxi, Umumiy o‘ngda
-                        _ => TextAlignment.Center           // Qolgan ustunlar o‘rtada
-                    }
-                    : TextAlignment.Center,                  // Headerlar doimo o‘rtada
+                TextAlignment = align,
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var border = new System.Windows.Controls.Border
+            var border = new Border
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(0.5),
