@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Title="UserPage"
+    Title="User oynasi"
     d:DesignHeight="580"
     d:DesignWidth="810"
     mc:Ignorable="d">
@@ -257,53 +257,198 @@
             HeadersVisibility="Column"
             IsReadOnly="True"
             ItemsSource="{Binding filteredUsers}">
+
+            <!--  Barcha headerlar uchun umumiy style  -->
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="Height" Value="35" />
+                    <Setter Property="Background" Value="{DynamicResource SecondaryBackground}" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                    <Setter Property="Padding" Value="8,5" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <!--  Cell style  -->
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Padding" Value="8" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="BorderThickness" Value="0,0,1,0" />
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                </Style>
+            </DataGrid.CellStyle>
+
             <DataGrid.Columns>
+                <!--  Nomi - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Name}"
-                    Header="Nomi" />
+                    Header="Nomi">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="5,0" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Telefon - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Phone}"
-                    Header="Telefon" />
+                    Header="Telefon">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="5,0" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Manzil - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Address}"
-                    Header="Manzil" />
+                    Header="Manzil">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="5,0" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Izoh - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Description}"
-                    Header="Izoh" />
+                    Header="Izoh">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="Padding" Value="5,0" />
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Rol - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Role}"
-                    Header="Rol" />
+                    Header="Rol">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Hisob qoldiq - O'ng tomonda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding FirstBalance, StringFormat={}{0:N2}}"
-                    Header="Hisob qoldiq" />
+                    Header="Hisob qoldiq">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                            <Setter Property="Padding" Value="0,0,15,0" />
+                            <!--  O'ng tomondan padding  -->
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
+                <!--  Valyuta turi - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding FirstCurrencyName}"
-                    Header="Valyuta turi" />
+                    Header="Valyuta turi">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-
-                <!--  Actions  --><!-- // TODO User ma'lumotlarini tahrirlash imkonini qo'shish kerak
-                <DataGridTemplateColumn Width="Auto">
+                <!--  Amallar - Markazda  -->
+                <DataGridTemplateColumn Width="90" Header="Amallar">
                     <DataGridTemplateColumn.CellStyle>
-                        <StaticResource ResourceKey="TransparentCellStyle" />
+                        <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="DataGridCell">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="Padding" Value="4" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <StackPanel
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                            <!--  EDIT BUTTON  -->
+                                            <Button
+                                                x:Name="btnEdit"
+                                                Width="30"
+                                                Height="26"
+                                                Margin="2,0"
+                                                Padding="0"
+                                                Background="#FFB300"
+                                                Click="btnEdit_Click"
+                                                FontSize="12"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                Tag="{Binding}"
+                                                ToolTip="Tahrirlash">
+                                                <md:PackIcon
+                                                    Width="16"
+                                                    Height="16"
+                                                    Kind="Pencil" />
+                                            </Button>
+                                            <!--  DELETE BUTTON  -->
+                                            <Button
+                                                x:Name="btnDelete"
+                                                Width="30"
+                                                Height="26"
+                                                Margin="2,0"
+                                                Padding="0"
+                                                Background="#D32F2F"
+                                                Click="btnDelete_Click"
+                                                Cursor="Hand"
+                                                FontSize="12"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                Tag="{Binding}"
+                                                ToolTip="O'chirish">
+                                                <md:PackIcon
+                                                    Width="16"
+                                                    Height="16"
+                                                    Kind="Delete" />
+                                            </Button>
+                                        </StackPanel>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
                     </DataGridTemplateColumn.CellStyle>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <controls:ActionButton
-                                CommandParameter="{Binding}"
-                                DeleteCommand="{Binding RemoveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                EditCommand="{Binding EditUserCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                SaveCommand="{Binding SaveUserCommand, RelativeSource={RelativeSource AncestorType=Page}}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>-->
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

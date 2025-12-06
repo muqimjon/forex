@@ -30,31 +30,5 @@
                 Main.NavigateTo(new HomePage());
         }
 
-        private bool _finishedStockLoaded = false;
-
-
-
-        //private async void ReportsTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (e.AddedItems.Count == 0 || !_isInitialized) return;
-
-        //    if (DataContext is not ReportsPageViewModel vm) return;
-
-        //    var selectedIndex = ReportsTab.SelectedIndex;
-
-        //    // Faqat bir marta yuklash!
-        //    switch (selectedIndex)
-        //    {
-        //        case 0 when !vm.SalesHistoryVM.IsDataLoaded:
-        //            await vm.SalesHistoryVM.LoadAsync();
-        //            vm.SalesHistoryVM.IsDataLoaded = true;
-        //            break;
-        //        case 1 when !vm.FinishedStockVM.IsDataLoaded:
-        //            await vm.FinishedStockVM.LoadAsync();
-        //            vm.FinishedStockVM.IsDataLoaded = true;
-        //            break;
-        //            // qolganlari ham shunday
-        //    }
-        //}
     }
 }

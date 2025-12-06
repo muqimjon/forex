@@ -57,6 +57,12 @@
                 <TabItem Header="Debitor va Kreditor">
                     <views:DebtorCreditorReportView DataContext="{Binding DebtorCreditorVM}"/>
                 </TabItem>
+
+                <!--7. Mijozlar sotgan mahsulotlar soni-->
+                <TabItem Header="Mijozlar savdo reytingi">
+                    <views:CustomerSalesRatingView DataContext="{Binding CustomerSalesRatingVM}"/>
+                </TabItem>
+
                 <!--4. Yarim tayyor mahsulotlar
                 <TabItem Header="Yarim tayyor mahsulotlar">
                 <views:SemiFinishedStockReportView DataContext="{Binding SemiFinishedStockVM}"/>

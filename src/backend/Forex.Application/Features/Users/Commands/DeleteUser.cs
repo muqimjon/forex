@@ -32,9 +32,10 @@ public class DeleteUserCommandHandler(IAppDbContext context)
             throw new ForbiddenException($"Foydalanuvchi hisobida mablag' mavjud:\n{string.Join("\n", details)}");
         }
 
-        user.IsDeleted = true;
         foreach (var account in user.Accounts)
-            account.IsDeleted = true;
+            context.Accounts.Remove(account);
+
+        context.Users.Remove(user);
 
         return await context.SaveAsync(cancellationToken);
     }
