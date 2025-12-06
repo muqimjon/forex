@@ -420,14 +420,14 @@
                     SelectedDate="{Binding Transaction.DueDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <!-- To'lash/Yangilash tugmasi -->
+                <!--  To'lash/Yangilash tugmasi  -->
                 <Button
                     Grid.Row="4"
                     Grid.RowSpan="2"
                     Grid.Column="2"
                     Height="28"
-                    Padding="0"
                     Margin="10,0,0,0"
+                    Padding="0"
                     md:ElevationAssist.Elevation="Dp8"
                     Background="{StaticResource SuccessButtonBackground}"
                     BorderBrush="{StaticResource SuccessButtonBorder}"
@@ -435,7 +435,7 @@
                     Content="{Binding SubmitButtonText}"
                     Foreground="{StaticResource SuccessButtonForeground}" />
 
-                <!-- Bekor qilish tugmasi (faqat edit rejimida) -->
+                <!--  Bekor qilish tugmasi (faqat edit rejimida)  -->
                 <Button
                     Grid.Row="4"
                     Grid.RowSpan="2"
@@ -470,6 +470,7 @@
                 <controls:UserCalendar
                     Width="150"
                     Height="30"
+                    FontSize="14"
                     SelectedDate="{Binding BeginDate, Mode=TwoWay}" />
 
                 <TextBlock
@@ -479,6 +480,7 @@
                 <controls:UserCalendar
                     Width="150"
                     Height="30"
+                    FontSize="14"
                     SelectedDate="{Binding EndDate, Mode=TwoWay}" />
 
                 <TextBlock
@@ -486,21 +488,21 @@
                     VerticalAlignment="Center"
                     Text="Foydalanuvchi:" />
                 <!--<Border // TODO user bo'yicha filterlash
-                    Width="150"
-                    Height="30"
-                    Margin="0,0,10,0"
-                    BorderBrush="{DynamicResource PrimaryTextColor}"
-                    BorderThickness="1"
-                    CornerRadius="4">
-                    <ComboBox
-                        Padding="5,1"
-                        BorderThickness="0"
-                        DisplayMemberPath="Name"
-                        FontSize="14"
-                        IsTextSearchEnabled="True"
-                        IsEditable="True"
-                        ItemsSource="{Binding AvailableUsers}"
-                        SelectedItem="{Binding SelectedFilterUser}" />
+                Width="150"
+                Height="30"
+                Margin="0,0,10,0"
+                BorderBrush="{DynamicResource PrimaryTextColor}"
+                BorderThickness="1"
+                CornerRadius="4">
+                <ComboBox
+                Padding="5,1"
+                BorderThickness="0"
+                DisplayMemberPath="Name"
+                FontSize="14"
+                IsTextSearchEnabled="True"
+                IsEditable="True"
+                ItemsSource="{Binding AvailableUsers}"
+                SelectedItem="{Binding SelectedFilterUser}" />
                 </Border>-->
             </StackPanel>
         </md:Card>
@@ -581,40 +583,49 @@
                     </DataGridTemplateColumn.HeaderStyle>
                     <DataGridTemplateColumn.CellStyle>
                         <Style TargetType="DataGridCell">
-                            <Setter Property="Padding" Value="4"/>
+                            <Setter Property="Padding" Value="4" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="DataGridCell">
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <!-- EDIT BUTTON -->
+                                        <StackPanel
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                            <!--  EDIT BUTTON  -->
                                             <Button
                                                 Width="30"
                                                 Height="26"
                                                 Margin="2,0"
                                                 Padding="0"
                                                 Background="#FFB300"
-                                                Foreground="White"
-                                                FontWeight="Bold"
-                                                FontSize="12"
-                                                ToolTip="Tahrirlash"
                                                 Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                CommandParameter="{Binding}">
-                                                <md:PackIcon Kind="Pencil" Width="16" Height="16"/>
+                                                CommandParameter="{Binding}"
+                                                FontSize="12"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                ToolTip="Tahrirlash">
+                                                <md:PackIcon
+                                                    Width="16"
+                                                    Height="16"
+                                                    Kind="Pencil" />
                                             </Button>
-                                            <!-- DELETE BUTTON -->
+                                            <!--  DELETE BUTTON  -->
                                             <Button
                                                 Width="30"
                                                 Height="26"
                                                 Margin="2,0"
                                                 Padding="0"
                                                 Background="#D32F2F"
-                                                Foreground="White"
-                                                FontWeight="Bold"
-                                                FontSize="12"
-                                                ToolTip="O'chirish"
                                                 Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                CommandParameter="{Binding}">
-                                                <md:PackIcon Kind="Delete" Width="16" Height="16"/>
+                                                CommandParameter="{Binding}"
+                                                FontSize="12"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                ToolTip="O'chirish">
+                                                <md:PackIcon
+                                                    Width="16"
+                                                    Height="16"
+                                                    Kind="Delete" />
                                             </Button>
                                         </StackPanel>
                                     </ControlTemplate>

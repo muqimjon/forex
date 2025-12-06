@@ -239,11 +239,9 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
     {
         var doc = new FixedDocument();
 
-        // A4 o‘lchami (96 DPI)
         double pageWidth = 793.7;
         double pageHeight = 1122.5;
 
-        // Marginlar
         double marginTop = 60;
         double marginBottom = 80;
         double marginLeft = 40;
@@ -251,20 +249,23 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
 
         double titleHeight = 50;
         double dateHeight = 35;
-        double rowHeight = 28; // Har bir qator balandligi
+        double rowHeight = 28;
 
         var items = FilteredItems.ToList();
+        if (!items.Any()) return doc;
+
         var totalDebtor = items.Sum(x => x.DebtorAmount);
         var totalCreditor = items.Sum(x => x.CreditorAmount);
         var totalBalance = totalDebtor - totalCreditor;
 
-        // Jadval uchun mavjud balandlik
         double availableHeight = pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
         int rowsPerPage = (int)(availableHeight / rowHeight);
         if (rowsPerPage < 10) rowsPerPage = 10;
 
-        // Oxirgi sahifada JAMI + Balans uchun 3 ta qator qoldiramiz
         int totalPages = (int)Math.Ceiling((items.Count + 3.0) / rowsPerPage);
+
+        // 2-sahifadan 1-sahifaga qo‘shiladigan qatorlar soni — ENDI 11 TA!
+        const int extraRowsFromSecondPage = 11;
 
         for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
@@ -280,44 +281,45 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
                 Margin = new Thickness(marginLeft, marginTop, marginRight, marginBottom)
             };
 
-            // Sarlavha
             container.Children.Add(new TextBlock
             {
                 Text = "DEBITOR VA KREDITORLAR HISOBOTI",
                 FontSize = 22,
                 FontWeight = FontWeights.Bold,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 10)
+                Margin = new Thickness(0, 0, 0, 8)
             });
 
-            // Sana + sahifa raqami
             container.Children.Add(new TextBlock
             {
-                Text = $"Sana: {DateTime.Today:dd.MM.yyyy}  |  Sahifa {pageIndex + 1} / {totalPages}",
+                Text = $"Sana: {DateTime.Today:dd.MM.yyyy} | Sahifa {pageIndex + 1} / {totalPages}",
                 FontSize = 14,
                 Foreground = Brushes.Gray,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(0, 0, 0, 15)
             });
 
-            // Jadval
             var table = new Grid();
-
-            // Ustunlar: T/r, Mijoz, Telefon, Manzil, Debitor, Kreditor
-            double[] widths = { 40, 180, 130, 130, 130, 130 };
+            double[] widths = { 40, 170, 130, 120, 120, 120 };
             foreach (var w in widths)
                 table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-            // Header
             AddRow(table, true, "T/r", "Mijoz nomi", "Telefon", "Manzil", "Debitor", "Kreditor");
 
-            // Qatorlar sonini hisoblash
             int effectiveRows = rowsPerPage;
-            if (pageIndex == 0 && totalPages > 1)
-                effectiveRows -= 3; // Birinchi sahifada 3 ta qator kamaytirish (JAMI uchun joy)
+            int extraRowsThisPage = 0;
 
-            int startIndex = pageIndex == 0 ? 0 : (rowsPerPage - 3) + (pageIndex - 1) * rowsPerPage;
-            int count = Math.Min(effectiveRows, items.Count - startIndex);
+            if (pageIndex == 0 && totalPages > 1)
+            {
+                effectiveRows -= 3;
+                extraRowsThisPage = extraRowsFromSecondPage; // 11 ta qator qo‘shiladi
+            }
+
+            int startIndex = pageIndex == 0
+                ? 0
+                : (rowsPerPage - 3 + extraRowsFromSecondPage) + (pageIndex - 1) * rowsPerPage;
+
+            int count = Math.Min(effectiveRows + extraRowsThisPage, items.Count - startIndex);
 
             for (int i = 0; i < count; i++)
             {
@@ -336,17 +338,12 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
                     kred);
             }
 
-            // Oxirgi sahifada JAMI va UMUMIY BALANS
             if (pageIndex == totalPages - 1 && items.Any())
             {
-                // Bo‘sh qator
                 AddRow(table, false, "", "", "", "", "", "");
-
-                // JAMI
                 AddRow(table, true, "", "JAMI:", "", "", totalDebtor.ToString("N0"), totalCreditor.ToString("N0"));
 
-                // UMUMIY BALANS
-                string balanceText = totalBalance >= 0 ? $"{totalBalance:N0}" : totalBalance.ToString("N0");
+                string balanceText = totalBalance >= 0 ? $"+{totalBalance:N0}" : totalBalance.ToString("N0");
                 Brush balanceColor = totalBalance >= 0 ? Brushes.Green : Brushes.Red;
 
                 var balanceBorder = new Border
@@ -383,8 +380,6 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
 
         return doc;
     }
-
-    // Yordamchi metod — qator qo‘shish
     private void AddRow(Grid grid, bool isHeader, params string[] values)
     {
         int row = grid.RowDefinitions.Count;
@@ -418,6 +413,6 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
             Grid.SetColumn(border, i);
             grid.Children.Add(border);
         }
-    }
+    }    
     #endregion
 }

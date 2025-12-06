@@ -17,6 +17,7 @@ public partial class ReportsPageViewModel : ViewModelBase
     public EmployeeBalanceReportViewModel EmployeeBalanceVM { get; }
     public CustomerSalesReportViewModel CustomerSalesVM { get; }
     public CustomerTurnoverReportViewModel CustomerTurnoverVM { get; }
+    public CustomerSalesRatingViewModel CustomerSalesRatingVM { get; }
 
     public IRelayCommand BackCommand { get; }
 
@@ -28,7 +29,8 @@ public partial class ReportsPageViewModel : ViewModelBase
         DebtorCreditorReportViewModel debtorCreditorVM,
         EmployeeBalanceReportViewModel employeeBalanceVM,
         CustomerSalesReportViewModel customerSalesVM,
-        CustomerTurnoverReportViewModel customerTurnoverVM)
+        CustomerTurnoverReportViewModel customerTurnoverVM,
+        CustomerSalesRatingViewModel customerSalesRatingVM)
     {
         _navigation = navigation;
         SalesHistoryVM = salesHistoryVM;
@@ -38,6 +40,7 @@ public partial class ReportsPageViewModel : ViewModelBase
         EmployeeBalanceVM = employeeBalanceVM;
         CustomerSalesVM = customerSalesVM;
         CustomerTurnoverVM = customerTurnoverVM;
+        CustomerSalesRatingVM = customerSalesRatingVM;
 
         // Orqaga tugmasi — Frame orqali yoki NavigationService orqali
         BackCommand = new RelayCommand(() =>

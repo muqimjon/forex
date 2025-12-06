@@ -258,7 +258,7 @@
             IsReadOnly="True"
             ItemsSource="{Binding filteredUsers}">
 
-            <!-- Barcha headerlar uchun umumiy style -->
+            <!--  Barcha headerlar uchun umumiy style  -->
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -274,7 +274,7 @@
                 </Style>
             </DataGrid.ColumnHeaderStyle>
 
-            <!-- Cell style -->
+            <!--  Cell style  -->
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="Padding" Value="8" />
@@ -285,14 +285,14 @@
             </DataGrid.CellStyle>
 
             <DataGrid.Columns>
-                <!-- Nomi - Markazda -->
+                <!--  Nomi - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Name}"
                     Header="Nomi">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="5 0" />
+                            <Setter Property="Padding" Value="5,0" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -300,14 +300,14 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Telefon - Markazda -->
+                <!--  Telefon - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Phone}"
                     Header="Telefon">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="5 0" />
+                            <Setter Property="Padding" Value="5,0" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -315,14 +315,14 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Manzil - Markazda -->
+                <!--  Manzil - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Address}"
                     Header="Manzil">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="5 0" />
+                            <Setter Property="Padding" Value="5,0" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -330,7 +330,7 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Izoh - Markazda -->
+                <!--  Izoh - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Description}"
@@ -339,13 +339,13 @@
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Left" />
                             <Setter Property="VerticalAlignment" Value="Center" />
-                            <Setter Property="Padding" Value="5 0" />
+                            <Setter Property="Padding" Value="5,0" />
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Rol - Markazda -->
+                <!--  Rol - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Role}"
@@ -359,7 +359,7 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Hisob qoldiq - O'ng tomonda -->
+                <!--  Hisob qoldiq - O'ng tomonda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding FirstBalance, StringFormat={}{0:N2}}"
@@ -370,12 +370,12 @@
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                             <Setter Property="Padding" Value="0,0,15,0" />
-                            <!-- O'ng tomondan padding -->
+                            <!--  O'ng tomondan padding  -->
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Valyuta turi - Markazda -->
+                <!--  Valyuta turi - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding FirstCurrencyName}"
@@ -389,10 +389,10 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!-- Amallar - Markazda -->
+                <!--  Amallar - Markazda  -->
                 <DataGridTemplateColumn Width="90" Header="Amallar">
                     <DataGridTemplateColumn.CellStyle>
-                        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                        <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="DataGridCell">
                             <Setter Property="HorizontalAlignment" Value="Center" />
                             <Setter Property="VerticalContentAlignment" Value="Center" />
                             <Setter Property="Padding" Value="4" />
@@ -400,10 +400,10 @@
                                 <Setter.Value>
                                     <ControlTemplate TargetType="DataGridCell">
                                         <StackPanel
-                                            Orientation="Horizontal"
                                             HorizontalAlignment="Center"
-                                            VerticalAlignment="Center">
-                                            <!-- EDIT BUTTON -->
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                            <!--  EDIT BUTTON  -->
                                             <Button
                                                 x:Name="btnEdit"
                                                 Width="30"
@@ -411,15 +411,18 @@
                                                 Margin="2,0"
                                                 Padding="0"
                                                 Background="#FFB300"
-                                                Foreground="White"
-                                                FontWeight="Bold"
-                                                FontSize="12"
-                                                ToolTip="Tahrirlash"
                                                 Click="btnEdit_Click"
-                                                Tag="{Binding}">
-                                                <md:PackIcon Kind="Pencil" Width="16" Height="16"/>
+                                                FontSize="12"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                Tag="{Binding}"
+                                                ToolTip="Tahrirlash">
+                                                <md:PackIcon
+                                                    Width="16"
+                                                    Height="16"
+                                                    Kind="Pencil" />
                                             </Button>
-                                            <!-- DELETE BUTTON -->
+                                            <!--  DELETE BUTTON  -->
                                             <Button
                                                 x:Name="btnDelete"
                                                 Width="30"
@@ -427,14 +430,17 @@
                                                 Margin="2,0"
                                                 Padding="0"
                                                 Background="#D32F2F"
-                                                Foreground="White"
-                                                FontWeight="Bold"
-                                                FontSize="12"
-                                                ToolTip="O'chirish"
-                                                Cursor="Hand"
                                                 Click="btnDelete_Click"
-                                                Tag="{Binding}">
-                                                <md:PackIcon Kind="Delete" Width="16" Height="16"/>
+                                                Cursor="Hand"
+                                                FontSize="12"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                Tag="{Binding}"
+                                                ToolTip="O'chirish">
+                                                <md:PackIcon
+                                                    Width="16"
+                                                    Height="16"
+                                                    Kind="Delete" />
                                             </Button>
                                         </StackPanel>
                                     </ControlTemplate>
