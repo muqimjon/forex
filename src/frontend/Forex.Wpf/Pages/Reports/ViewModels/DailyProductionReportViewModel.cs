@@ -309,7 +309,9 @@ public partial class DailyProductionReportViewModel : ViewModelBase
         {
             MessageBox.Show($"Xatolik: {ex.Message}", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-    }    // PREVIEW
+    }   
+    
+    // PREVIEW
     [RelayCommand]
     private void Preview()
     {
@@ -343,8 +345,14 @@ public partial class DailyProductionReportViewModel : ViewModelBase
         double margin = 40;
 
         var itemsList = Items.ToList();
-        int rowsPerPage = 43;
-        int totalPages = (int)Math.Ceiling((itemsList.Count + 6.0) / rowsPerPage);
+        if (!itemsList.Any()) return doc;
+
+        // 1-sahifada faqat 33 ta qator chiqadi
+        const int firstPageRows = 33;
+        const int otherPagesRows = 50; // 2 va undan keyingi sahifalar — 50 ta qator
+
+        int totalPages = 1 + (int)Math.Ceiling((itemsList.Count - firstPageRows) / (double)otherPagesRows);
+        if (itemsList.Count <= firstPageRows) totalPages = 1;
 
         for (int p = 0; p < totalPages; p++)
         {
@@ -355,12 +363,12 @@ public partial class DailyProductionReportViewModel : ViewModelBase
                 Background = System.Windows.Media.Brushes.White
             };
 
-            // =================== SARLAVHA + DAVR (YANGI VERSIYA) ===================
+            // =================== SARLAVHA + DAVR ===================
             var headerPanel = new StackPanel
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(margin, 25, margin, 10) // jadval bilan orasi 10 px
+                Margin = new Thickness(margin, 25, margin, 10)
             };
 
             var title = new TextBlock
@@ -375,40 +383,42 @@ public partial class DailyProductionReportViewModel : ViewModelBase
 
             var period = new TextBlock
             {
-                Text = $"Davri: {BeginDate:dd.MM.yyyy} — {EndDate:dd.MM.yyyy}",
+                Text = $"Davri: {BeginDate:dd.MM.yyyy} — {EndDate:dd.MM.yyyy} | Sahifa {p + 1} / {totalPages}",
                 FontSize = 16,
                 FontWeight = FontWeights.SemiBold,
                 Foreground = new SolidColorBrush(Color.FromRgb(40, 40, 40)),
-                HorizontalAlignment = HorizontalAlignment.Left,     // chapdan boshlanadi
-                Margin = new Thickness(0, 0, 0, 0)
+                HorizontalAlignment = HorizontalAlignment.Left
             };
 
             headerPanel.Children.Add(title);
             headerPanel.Children.Add(period);
             page.Children.Add(headerPanel);
 
-            // Jadvalni biroz pastga tushirdim (davrdan keyin 10 px bo‘sh joy)
+            // =================== JADVAL ===================
             var grid = new Grid
             {
-                Margin = new Thickness(margin, 100, margin, 10) // 140 → 150 qilib, orasida 10 px qoldirdim
+                Margin = new Thickness(margin, 100, margin, 10)
             };
-            // SIZ AYTGAN KENGILIKLAR
+
             double[] widths = { 40, 80, 60, 115, 70, 70, 70, 90, 120 };
             foreach (var w in widths)
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-            // Header — hammasi o‘rtada
             AddRow(grid, true,
                 "T/r", "Sana", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Tayyorlanish usuli");
 
-            int start = p * rowsPerPage;
-            int count = Math.Min(rowsPerPage, itemsList.Count - start);
+            // Qaysi sahifadagi qatorlar sonini hisoblaymiz
+            int rowsThisPage = p == 0 ? firstPageRows : otherPagesRows;
+            int startIndex = p == 0 ? 0 : firstPageRows + (p - 1) * otherPagesRows;
+            int count = Math.Min(rowsThisPage, itemsList.Count - startIndex);
+
+            count = Math.Min(rowsThisPage, itemsList.Count - startIndex);
 
             for (int i = 0; i < count; i++)
             {
-                var x = itemsList[start + i];
+                var x = itemsList[startIndex + i];
                 AddRow(grid, false,
-                    x.RowNumber.ToString(),
+                    (startIndex + i + 1).ToString(),
                     x.Date.ToString("dd.MM.yyyy"),
                     x.Code,
                     x.Name,
@@ -422,7 +432,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
             // =================== OXIRGI SAHIFADA JAMI ===================
             if (p == totalPages - 1)
             {
-                AddRow(grid, false, "", "", "", "", "", "", "", "", ""); // bo‘sh qator
+                AddRow(grid, false, "", "", "", "", "", "", "", "", "");
 
                 var totalBorder = new Border
                 {
@@ -436,7 +446,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
 
                 var totalText = new TextBlock
                 {
-                    Text = $"JAMI:     Tayyor: {TayyorAmount:N0}     |     Aralash: {AralashAmount:N0}     |     Eva: {EvaAmount:N0}",
+                    Text = $"JAMI: Tayyor: {TayyorAmount:N0} | Aralash: {AralashAmount:N0} | Eva: {EvaAmount:N0}",
                     FontSize = 18,
                     FontWeight = FontWeights.ExtraBold,
                     Foreground = new SolidColorBrush(Color.FromRgb(0, 110, 0)),
@@ -454,19 +464,6 @@ public partial class DailyProductionReportViewModel : ViewModelBase
 
             page.Children.Add(grid);
 
-            // =================== FOOTER — chop etilgan sana + sahifa ===================
-            var footer = new TextBlock
-            {
-                Text = $"Chop etilgan sana: {DateTime.Now:dd.MM.yyyy HH:mm}     |     Sahifa {p + 1} / {totalPages}",
-                FontSize = 11,
-                Foreground = System.Windows.Media.Brushes.Gray,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(0, 0, margin + 20, 20)
-            };
-            FixedPage.SetBottom(footer, 30);
-            page.Children.Add(footer);
-
-            // Sahifani qo‘shish
             var pageContent = new PageContent();
             ((IAddChild)pageContent).AddChild(page);
             doc.Pages.Add(pageContent);
