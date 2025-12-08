@@ -146,34 +146,9 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         }
     }
 
-    // 🔵 PREVIEW
-    [RelayCommand]
-    private void Preview()
-    {
-        if (!Items.Any())
-        {
-            MessageBox.Show("Ko‘rsatish uchun ma’lumot yo‘q!", "Xabar", MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-
-        var doc = CreateFixedDocument();
-        var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(20) };
-
-        var window = new Window
-        {
-            Title = "Tayyor mahsulot qoldig‘i",
-            Width = 1000,
-            Height = 800,
-            WindowStartupLocation = WindowStartupLocation.CenterScreen,
-            Content = viewer
-        };
-
-        window.ShowDialog();
-    }
-
     // 🔵 EXCEL EXPORT
     [RelayCommand]
-    private async Task ExportToExcel()
+    private void ExportToExcel()
     {
         if (!Items.Any())
         {
@@ -246,77 +221,170 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         }
     }
 
-    // 🔵 PDF/Print uchun document yaratish
+    // 🔵 PREVIEW
+    [RelayCommand]
+    private void Preview()
+    {
+        if (!Items.Any())
+        {
+            MessageBox.Show("Ko‘rsatish uchun ma’lumot yo‘q!", "Xabar", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var doc = CreateFixedDocument();
+        var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(20) };
+
+        var window = new Window
+        {
+            Title = "Tayyor mahsulot qoldig‘i",
+            Width = 1000,
+            Height = 800,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Content = viewer
+        };
+
+        window.ShowDialog();
+    }
+
+    // PDF/Print uchun document yaratish (PASTDAN 25mm BO‘SH JOY!)
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
-        const double pageWidth = 794;
-        const double pageHeight = 1123;
 
-        var page = new FixedPage
+        // A4 format (96 DPI)
+        double pageWidth = 793.7;
+        double pageHeight = 1122.5;
+
+        // Margins (mm → px)
+        double marginTop = 38;      // 10 mm
+        double marginBottom = 38;   // 10 mm
+        double marginLeft = 30;     // 8 mm
+        double marginRight = 30;    // 8 mm
+
+        // Title + Date qatorlari balandligi
+        double titleHeight = 40;
+        double dateHeight = 30;
+
+        // Jadvalning bitta qatorining balandligi
+        double rowHeight = 25;
+
+        var items = Items.ToList();
+        var totalSum = items.Sum(i => i.TotalAmount);
+
+        // Jadval uchun mavjud bo'sh balandlik
+        double tableAvailableHeight =
+            pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
+
+        // Nechta qator sig'adi?
+        int rowsPerPage = (int)(tableAvailableHeight / rowHeight);
+        if (rowsPerPage < 1) rowsPerPage = 1;
+
+        // 2 ta qatorni keyingi sahifaga o‘tkazish uchun +2 qo‘shamiz
+        int totalPages = (int)Math.Ceiling((items.Count + 2) / (double)rowsPerPage);
+
+        for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
-            Width = pageWidth,
-            Height = pageHeight,
-            Background = Brushes.White
-        };
+            var page = new FixedPage
+            {
+                Width = pageWidth,
+                Height = pageHeight,
+                Background = Brushes.White
+            };
 
-        var container = new StackPanel { Margin = new Thickness(40) };
+            var container = new StackPanel
+            {
+                Margin = new Thickness(marginLeft, marginTop, marginRight, marginBottom)
+            };
 
-        container.Children.Add(new TextBlock
-        {
-            Text = "TAYYOR MAHSULOT QOLDIG‘I",
-            FontSize = 22,
-            FontWeight = FontWeights.Bold,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 0, 0, 10)
-        });
+            // 🟦 1-qator: Sarlavha
+            container.Children.Add(new TextBlock
+            {
+                Text = "Mavjud mahsulotlar qoldig‘i",
+                FontSize = 22,
+                FontWeight = FontWeights.Bold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 5)
+            });
 
-        container.Children.Add(new TextBlock
-        {
-            Text = $"Sana: {DateTime.Today:dd.MM.yyyy}",
-            FontSize = 14,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Margin = new Thickness(0, 0, 0, 20)
-        });
+            // 🟦 2-qator: Sana
+            container.Children.Add(new TextBlock
+            {
+                Text = $"Sana: {DateTime.Today:dd.MM.yyyy}   |   Sahifa {pageIndex + 1} / {totalPages}",
+                FontSize = 14,
+                Foreground = Brushes.Gray,
+                Margin = new Thickness(0, 0, 0, 10)
+            });
 
-        // Table
-        var table = new Grid();
-        double[] widths = { 70, 130, 80, 80, 120, 60, 80, 100 };
-        foreach (var w in widths)
-            table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
+            // 🟦 3-qator: JADVAL
+            var table = new Grid();
 
-        // Header (Qopdagi soni va Qop soni almashtirildi)
-        AddRow(table, true, "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
+            // ⭐ yangi T/r ustuni qo‘shildi
+            double[] widths = { 30, 70, 130, 70, 70, 70, 70, 80, 140 };
+            foreach (var w in widths)
+                table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-        foreach (var x in Items)
-        {
-            AddRow(table, false,
-                x.Code,
-                x.Name,
-                x.Type,
-                x.BundleCount!.ToString(),            // Qop soni
-                x.BundleItemCount.ToString(),        // Qopdagi soni
-                x.TotalCount.ToString("N0"),         // Jami
-                x.UnitPrice.ToString("N2"),          // Narxi
-                x.TotalAmount.ToString("N2")         // Umumiy
-            );
+            // Header qatori — T/r bilan birga
+            AddRow(table, true,
+                "T/r", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
+
+            // ——————————————————————————————————————
+            // ⭐ 1-sahifadagi oxirgi 2 qatorni keyingi sahifaga o‘tkazish
+            // ——————————————————————————————————————
+            int effectiveRows = rowsPerPage;
+
+            if (pageIndex == 0 && totalPages > 1)
+                effectiveRows -= 2;   // Birinchi sahifa 2 qator kam oladi
+
+            // Qaysi itemdan boshlash?
+            int start;
+
+            if (pageIndex == 0)
+            {
+                start = 0;
+            }
+            else
+            {
+                // Birinchi sahifadagi -2 qator kompensatsiya qilingan
+                start = (rowsPerPage - 2) + (pageIndex - 1) * rowsPerPage;
+            }
+
+            int count = Math.Min(effectiveRows, items.Count - start);
+
+            // ⭐ Qatorlarni qo‘shish (T/r bilan)
+            for (int i = 0; i < count; i++)
+            {
+                var x = items[start + i];
+
+                int number = start + i + 1; // RAQAM
+
+                AddRow(table, false,
+                    number.ToString(),   // ⭐ T/r
+                    x.Code,
+                    x.Name,
+                    x.Type,
+                    x.BundleCount?.ToString() ?? "0",
+                    x.BundleItemCount.ToString(),
+                    x.TotalCount.ToString("N0"),
+                    x.UnitPrice.ToString("N2"),
+                    x.TotalAmount.ToString("N2"));
+            }
+
+            // ⭐ Oxirgi sahifaga JAMI qo‘shish
+            if (pageIndex == totalPages - 1)
+            {
+                AddRow(table, true, "","JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
+            }
+
+            container.Children.Add(table);
+
+            page.Children.Add(container);
+            var pc = new PageContent();
+            ((IAddChild)pc).AddChild(page);
+            doc.Pages.Add(pc);
         }
-
-        // Total summa (Umumiy)
-        var totalSum = Items.Sum(i => i.TotalAmount);
-        AddRow(table, true, "JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
-
-        container.Children.Add(table);
-        page.Children.Add(container);
-
-        var pc = new PageContent();
-        ((IAddChild)pc).AddChild(page);
-        doc.Pages.Add(pc);
 
         return doc;
     }
-
-    // ===== Helper =====
     private void AddRow(Grid grid, bool isHeader, params string[] values)
     {
         int row = grid.RowDefinitions.Count;
@@ -324,24 +392,31 @@ public partial class FinishedStockReportViewModel : ViewModelBase
 
         for (int i = 0; i < values.Length; i++)
         {
+            // ⭐ Almashtirilgan TextAlignment
+            TextAlignment align =
+                isHeader ? TextAlignment.Center : i switch
+                {
+                    0 => TextAlignment.Right,   // T/r – O‘NG
+                    1 => TextAlignment.Center,  // Kodi – O‘RTA
+                    2 => TextAlignment.Left,   // Nomi – O‘NG
+                    5 => TextAlignment.Center,  // Donasi – O‘RTA
+                    6 => TextAlignment.Right,   // Jami – O‘NG
+                    7 => TextAlignment.Right,   // Narxi – O‘NG
+                    8 => TextAlignment.Right,   // Umumiy – O‘NG
+                    _ => TextAlignment.Center   // Boshqa ustunlar – O‘RTA
+                };
+
             var tb = new TextBlock
             {
                 Text = values[i],
                 Padding = new Thickness(4, 5, 4, 5),
                 FontSize = isHeader ? 12 : 11,
                 FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
-                TextAlignment = !isHeader
-                    ? i switch
-                    {
-                        1 => TextAlignment.Left,             // Nomi chapda
-                        5 or 6 or 7 => TextAlignment.Right, // Jami, Narxi, Umumiy o‘ngda
-                        _ => TextAlignment.Center           // Qolgan ustunlar o‘rtada
-                    }
-                    : TextAlignment.Center,                  // Headerlar doimo o‘rtada
+                TextAlignment = align,
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var border = new System.Windows.Controls.Border
+            var border = new Border
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(0.5),
