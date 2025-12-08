@@ -290,7 +290,7 @@ public partial class UserPage : Page
     {
         if (!ValidateUserFields())
             return;
-        
+
         var roleText = cbRole.SelectedItem?.ToString();
 
         if (string.IsNullOrWhiteSpace(roleText) || !Enum.TryParse<UserRole>(roleText, out var role))

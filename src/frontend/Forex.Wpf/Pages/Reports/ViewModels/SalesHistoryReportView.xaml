@@ -99,13 +99,12 @@
                         Height="30"
                         Margin="3,0,0,0"
                         Padding="0"
-                        BorderThickness="0"
-                        Background="CadetBlue"
-                        Foreground="White"
-
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
+                        Background="CadetBlue"
+                        BorderThickness="0"
                         Command="{Binding FilterCommand}"
+                        Foreground="White"
                         ToolTip="Filtr">
 
                         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -189,22 +188,22 @@
                 Orientation="Vertical">
                 <Button
                     Height="29"
+                    Margin="0,3"
                     md:ButtonAssist.CornerRadius="4"
                     Background="#1976D2"
-                    Foreground="White"
                     BorderThickness="0"
-                    Margin="0,3"
                     Command="{Binding PreviewCommand}"
-                    Content="Ko‘rish" />
+                    Content="Ko‘rish"
+                    Foreground="White" />
                 <Button
                     Height="29"
+                    Margin="0,3"
                     md:ButtonAssist.CornerRadius="4"
                     Background="#3949AB"
-                    Foreground="White"
                     BorderThickness="0"
-                    Margin="0,3"
                     Command="{Binding ClearFilterCommand}"
-                    Content="Tozalash" />
+                    Content="Tozalash"
+                    Foreground="White" />
             </StackPanel>
             <StackPanel
                 Grid.Column="3"
@@ -212,22 +211,22 @@
                 Orientation="Vertical">
                 <Button
                     Height="29"
-                    md:ButtonAssist.CornerRadius="4"
-                    BorderThickness="0"
-                    Background="#00897B"
-                    Foreground="White"
                     Margin="0,3"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="#00897B"
+                    BorderThickness="0"
                     Command="{Binding PrintCommand}"
-                    Content="Pechat" />
+                    Content="Pechat"
+                    Foreground="White" />
                 <Button
                     Height="29"
-                    md:ButtonAssist.CornerRadius="4"
-                    BorderThickness="0"
-                    Background="#2E7D32"
-                    Foreground="White"
                     Margin="0,3"
+                    md:ButtonAssist.CornerRadius="4"
+                    Background="#2E7D32"
+                    BorderThickness="0"
                     Command="{Binding ExportToExcelCommand}"
-                    Content="Excel" />
+                    Content="Excel"
+                    Foreground="White" />
             </StackPanel>
         </Grid>
 

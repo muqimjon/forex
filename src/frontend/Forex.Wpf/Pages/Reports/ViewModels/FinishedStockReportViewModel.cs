@@ -372,7 +372,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
             // ⭐ Oxirgi sahifaga JAMI qo‘shish
             if (pageIndex == totalPages - 1)
             {
-                AddRow(table, true, "","JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
+                AddRow(table, true, "", "JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
             }
 
             container.Children.Add(table);

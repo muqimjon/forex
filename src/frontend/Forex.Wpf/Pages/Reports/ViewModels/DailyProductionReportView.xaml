@@ -1,12 +1,15 @@
-﻿<UserControl
-    x:Class="Forex.Wpf.Pages.Reports.ViewModels.CustomerTurnoverReportView"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
-    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-    Background="White">
+﻿<UserControl x:Class="Forex.Wpf.Pages.Reports.ViewModels.DailyProductionReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Background="White">
 
     <Grid Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200*"/>
+            <ColumnDefinition Width="259*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="90" />
             <RowDefinition Height="*" />
@@ -16,7 +19,7 @@
         <Border
             Grid.Row="0"
             Padding="1"
-            Background="Transparent">
+            Background="Transparent" Grid.ColumnSpan="2">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -72,7 +75,7 @@
                         Margin="0,0,10,0"
                         VerticalAlignment="Center"
                         FontSize="13"
-                        Text="Mijoz" />
+                        Text="Kodi" />
                     <Border
                         Grid.Row="1"
                         Grid.Column="1"
@@ -83,11 +86,11 @@
                         <ComboBox
                             Padding="3"
                             BorderThickness="0"
-                            DisplayMemberPath="Name"
+                            DisplayMemberPath="Code"
                             FontSize="14"
                             IsEditable="True"
-                            ItemsSource="{Binding AvailableCustomers}"
-                            SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}" />
+                            ItemsSource="{Binding AvailableProducts}"
+                            SelectedItem="{Binding SelectedCode, Mode=TwoWay}" />
                     </Border>
                 </Grid>
 
@@ -147,42 +150,64 @@
                     Padding="15"
                     Background="#E8F5E8"
                     CornerRadius="8">
+
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Tayyor  -->
                         <StackPanel
-                            Grid.Row="0"
-                            HorizontalAlignment="Left"
+                            Grid.Column="0"
                             Orientation="Horizontal">
                             <TextBlock
-                                Margin="0,0,15,0"
+                                Margin="0,0,10,0"
                                 FontSize="15"
                                 FontWeight="SemiBold"
-                                Text="Boshlang‘ich qoldiq:" />
+                                Text="Tayyor:" />
                             <TextBlock
                                 FontSize="16"
                                 FontWeight="Bold"
                                 Foreground="#1B5E20"
-                                Text="{Binding BeginBalance, StringFormat=N2}" />
+                                Text="{Binding TayyorAmount, StringFormat=N2}" />
                         </StackPanel>
+
+                        <!--  Aralash  -->
                         <StackPanel
-                            Grid.Row="1"
-                            Margin="0,8,0,0"
-                            HorizontalAlignment="Left"
+                            Grid.Column="1"
+                            Margin="20,0"
                             Orientation="Horizontal">
                             <TextBlock
-                                Margin="0,0,15,0"
+                                Margin="0,0,10,0"
                                 FontSize="15"
                                 FontWeight="SemiBold"
-                                Text="Oxirgi qoldiq:" />
+                                Text="Aralash:" />
                             <TextBlock
-                                FontSize="18"
+                                FontSize="16"
                                 FontWeight="Bold"
                                 Foreground="#B71C1C"
-                                Text="{Binding LastBalance, StringFormat=N2}" />
+                                Text="{Binding AralashAmount, StringFormat=N2}" />
                         </StackPanel>
+
+                        <!--  Eva  -->
+                        <StackPanel
+                            Grid.Column="2"
+                            Margin="20,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Margin="0,0,10,0"
+                                FontSize="15"
+                                FontWeight="SemiBold"
+                                Text="Eva:" />
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Foreground="#0D47A1"
+                                Text="{Binding EvaAmount, StringFormat=N2}" />
+                        </StackPanel>
+
                     </Grid>
                 </Border>
             </Grid>
@@ -191,28 +216,26 @@
         <!--  DATAGRID — MIJOZ USTUNI YO‘Q!  -->
         <DataGrid
             Grid.Row="1"
-            Margin="0,15,0,0"
-            AlternatingRowBackground="#F8F9FA"
+            Margin="10,5,10,5"
+            AlternatingRowBackground="#F5F5F5"
             AutoGenerateColumns="False"
             FontSize="14"
-            GridLinesVisibility="Horizontal"
-            HeadersVisibility="Column"
             IsReadOnly="True"
-            ItemsSource="{Binding Operations}"
-            RowHeaderWidth="0"
-            SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+            ItemsSource="{Binding Items}" Grid.ColumnSpan="2">
+
+            <!--  HEADERLARNI O‘RTAGA OLISH  -->
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
 
             <DataGrid.Columns>
+                <!--  Sana — o‘rtada  -->
                 <DataGridTextColumn
-                    Width="110"
+                    Width="120"
                     Binding="{Binding Date, StringFormat=dd.MM.yyyy}"
                     Header="Sana">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Center" />
@@ -220,59 +243,88 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
+                <!--  Kodi — qiymati o‘rtada  -->
                 <DataGridTextColumn
-                    Width="150"
-                    Binding="{Binding Debit, StringFormat=N0}"
-                    Header="Chiqim">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="Foreground" Value="#C62828" />
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
+                    Width="120"
+                    Binding="{Binding Code}"
+                    Header="Kodi">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Margin" Value="0,0,12,0" />
-                            <Setter Property="Foreground" Value="#C62828" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="HorizontalAlignment" Value="Center" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn
-                    Width="150"
-                    Binding="{Binding Credit, StringFormat=N0}"
-                    Header="Kirim">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="Foreground" Value="#1B5E20" />
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Setter Property="Margin" Value="0,0,12,0" />
-                            <Setter Property="Foreground" Value="#1B5E20" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
+                <!--  Nomi — chapda  -->
                 <DataGridTextColumn
                     Width="*"
-                    Binding="{Binding Description}"
-                    Header="Izoh">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                        </Style>
-                    </DataGridTextColumn.HeaderStyle>
+                    Binding="{Binding Name}"
+                    Header="Nomi">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="TextWrapping" Value="Wrap" />
-                            <Setter Property="Padding" Value="8,6" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Razmer — o‘rtada  -->
+                <DataGridTextColumn
+                    Width="100"
+                    Binding="{Binding Type}"
+                    Header="Razmer">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--  Qop soni — chapda  -->
+                <DataGridTextColumn
+                    Width="0.7*"
+                    Binding="{Binding BundleCount}"
+                    Header="Qop soni">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Qopdagi soni — o‘rtada  -->
+                <DataGridTextColumn
+                    Width="0.7*"
+                    Binding="{Binding BundleItemCount, StringFormat=N0}"
+                    Header="Donasi">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+
+                <!--  Jami — o‘ngda  -->
+                <DataGridTextColumn
+                    Width="0.5*"
+                    Binding="{Binding TotalCount, StringFormat=N0}"
+                    Header="Jami">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!--  Tayyorlanish usuli — o‘rtada  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding ProductionType}"
+                    Header="Tayyorlanish usuli">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="Foreground" Value="#1565C0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>

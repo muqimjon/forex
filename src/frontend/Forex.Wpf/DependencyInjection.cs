@@ -1,4 +1,5 @@
-﻿// Forex.Wpf/DependencyInjection.cs
+﻿namespace Forex.Wpf;
+
 using Forex.ClientService;
 using Forex.Wpf.Common;
 using Forex.Wpf.Common.Interfaces;
@@ -13,9 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using NavigationService = Forex.Wpf.Common.Services.NavigationService;
+using NavigationService = Common.Services.NavigationService;
 
-namespace Forex.Wpf;
 
 public static class DependencyInjection
 {
@@ -66,9 +66,10 @@ public static class DependencyInjection
             provider.GetRequiredService<SemiFinishedStockReportViewModel>(),
             provider.GetRequiredService<DebtorCreditorReportViewModel>(),
             provider.GetRequiredService<EmployeeBalanceReportViewModel>(),
-            provider.GetRequiredService<CustomerSalesReportViewModel>(),
             provider.GetRequiredService<CustomerTurnoverReportViewModel>(),
-            provider.GetRequiredService<CustomerSalesRatingViewModel>()
+            provider.GetRequiredService<CustomerSalesRatingViewModel>(),
+            provider.GetRequiredService<DailyProductionReportViewModel>()
+
 
         ));
     }
