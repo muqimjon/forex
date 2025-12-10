@@ -1,9 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
 
-using System.Windows;                    // WPF uchun
-using System.Windows.Controls;           // Border (WPF) uchun
-using System.Windows.Documents;
-using System.Windows.Media;
 using ClosedXML.Excel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,7 +9,11 @@ using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
+using System.Windows;                    // WPF uchun
+using System.Windows.Controls;           // Border (WPF) uchun
+using System.Windows.Documents;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 // DebtorCreditorReportViewModel.cs
 public partial class DebtorCreditorReportViewModel : ViewModelBase
@@ -413,6 +413,6 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
             Grid.SetColumn(border, i);
             grid.Children.Add(border);
         }
-    }    
+    }
     #endregion
 }

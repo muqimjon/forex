@@ -1,6 +1,5 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
-using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.Wpf.Pages.Common;
 using System;
 

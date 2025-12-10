@@ -17,11 +17,11 @@
         <Button
             x:Name="btnBack"
             Grid.Row="0"
+            Margin="0,5"
             HorizontalAlignment="Right"
             md:ButtonAssist.CornerRadius="4"
             Background="{DynamicResource OtherBackground}"
             BorderThickness="0"
-            Margin="0 5"
             Click="BtnBack_Click"
             Content="🔙 Orqaga"
             ToolTip="Orqaga" />
@@ -53,15 +53,20 @@
                 <TabItem Header="Mijoz aylanmasi">
                     <views:CustomerTurnoverReportView DataContext="{Binding CustomerTurnoverVM}" />
                 </TabItem>
-                <!--4. Debitor va Kreditor-->
+                <!--  4. Debitor va Kreditor  -->
                 <TabItem Header="Debitor va Kreditor">
-                    <views:DebtorCreditorReportView DataContext="{Binding DebtorCreditorVM}"/>
+                    <views:DebtorCreditorReportView DataContext="{Binding DebtorCreditorVM}" />
                 </TabItem>
 
-                <!--7. Mijozlar sotgan mahsulotlar soni-->
+                <!--  7. Mijozlar sotgan mahsulotlar soni  -->
                 <TabItem Header="Mijozlar savdo reytingi">
-                    <views:CustomerSalesRatingView DataContext="{Binding CustomerSalesRatingVM}"/>
+                    <views:CustomerSalesRatingView DataContext="{Binding CustomerSalesRatingVM}" />
                 </TabItem>
+
+                <TabItem Header="Kunlik Ishlab chiqarish">
+                    <views:DailyProductionReportView DataContext="{Binding DailyProductionVM}" />
+                </TabItem>
+
 
                 <!--4. Yarim tayyor mahsulotlar
                 <TabItem Header="Yarim tayyor mahsulotlar">
