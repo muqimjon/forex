@@ -11,5 +11,6 @@ namespace Forex.Wpf.Pages.Reports.ViewModels
         {
             InitializeComponent();
         }
+
     }
 }

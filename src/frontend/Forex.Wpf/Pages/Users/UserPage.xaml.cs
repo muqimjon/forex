@@ -45,12 +45,12 @@ public partial class UserPage : Page
         tbDebt.GotFocus += TextBox_GotFocus_SelectAll;
 
         // 🔴 Input maydonlariga focus berilganda yangi yaratish rejimiga o'tish
-        txtName.GotFocus += InputField_GotFocus;
-        txtPhone.GotFocus += InputField_GotFocus;
-        txtAddress.GotFocus += InputField_GotFocus;
-        txtDescription.GotFocus += InputField_GotFocus;
-        tbDebt.GotFocus += InputField_GotFocus;
-        tbAccount.GotFocus += InputField_GotFocus;
+        //txtName.GotFocus += InputField_GotFocus;
+        //txtPhone.GotFocus += InputField_GotFocus;
+        //txtAddress.GotFocus += InputField_GotFocus;
+        //txtDescription.GotFocus += InputField_GotFocus;
+        //tbDebt.GotFocus += InputField_GotFocus;
+        //tbAccount.GotFocus += InputField_GotFocus;
 
         LoadValyutaType();
         LoadUsers();
@@ -100,25 +100,28 @@ public partial class UserPage : Page
         btnUpdate.IsEnabled = false;
         try
         {
-            if (dgUsers.SelectedItem is not UserResponse user)
+            // Faqat currentUser ni tekshirish
+            if (currentUser == null)
+            {
+                MessageBox.Show("Foydalanuvchi tanlanmagan.", "Xato",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
+            }
 
             var updateUser = new UserRequest
             {
-                Id = user.Id,
+                Id = currentUser.Id,
                 Name = txtName.Text.Trim(),
                 Phone = txtPhone.Text.Trim(),
                 Address = txtAddress.Text.Trim(),
                 Description = txtDescription.Text.Trim(),
-                Role = Enum.TryParse<UserRole>(cbRole.SelectedItem?.ToString(), out var role) ? role : user.Role,
+                Role = Enum.TryParse<UserRole>(cbRole.SelectedItem?.ToString(), out var role) ? role : currentUser.Role,
                 Accounts = []
             };
 
             // Accountlarni to'g'ri yangilash
-            if (user.Accounts != null && user.Accounts.Count > 0)
+            if (currentUser.Accounts != null && currentUser.Accounts.Count > 0)
             {
-                var existingAccount = user.Accounts[0];
-
                 updateUser.Accounts.Add(new UserAccount
                 {
                     CurrencyId = (long)cbxValutaType.SelectedValue,
@@ -162,10 +165,10 @@ public partial class UserPage : Page
             btnSave.Visibility = GetSaveButtonVisibility();
             btnUpdate.Visibility = Visibility.Collapsed;
             dgUsers.SelectedItem = null;
+            currentUser = null; // Tozalash
             ClearForm();
         }
     }
-
     private async void LoadValyutaType()
     {
         try
@@ -317,8 +320,6 @@ public partial class UserPage : Page
         var response = await client.Users.Create(request).Handle();
         if (response.Data > 0)
         {
-            MessageBox.Show("Foydalanuvchi muvaffaqiyatli qo'shildi.", "Muvaffaqiyat",
-                MessageBoxButton.OK, MessageBoxImage.Information);
             ClearForm();
             LoadUsers();
             isCreatingNewUser = false; // 🔴 Yaratish rejimidan chiqish
@@ -437,32 +438,36 @@ public partial class UserPage : Page
         }
     }
 
+    private UserResponse currentUser; // Class darajasida e'lon qiling
+
     private async void LoadingUser(long userId)
     {
         isCreatingNewUser = false; // 🔴 Edit rejimiga o'tish
 
         var exitUser = await client.Users.GetById(userId);
-        var user = exitUser.Data;
+        currentUser = exitUser.Data; // Saqlab qo'yish
+        // Foydalanuvchini DataGrid'da tanlash
+        dgUsers.SelectedItem = currentUser;
 
-        cbRole.SelectedItem = user!.Role.ToString();
-        txtName.Text = user.Name;
-        txtPhone.Text = user.Phone;
-        txtAddress.Text = user.Address;
-        txtDescription.Text = user.Description;
+        cbRole.SelectedItem = currentUser!.Role.ToString();
+        txtName.Text = currentUser.Name;
+        txtPhone.Text = currentUser.Phone;
+        txtAddress.Text = currentUser.Address;
+        txtDescription.Text = currentUser.Description;
 
-        if (user.Accounts != null && user.Accounts.Count > 0)
+        if (currentUser.Accounts != null && currentUser.Accounts.Count > 0)
         {
-            var account = user.Accounts[0];
+            var account = currentUser.Accounts[0];
             cbxValutaType.SelectedValue = account.CurrencyId;
 
-            if (account.OpeningBalance < 0)
+            if (account.Balance < 0)
             {
-                tbDebt.Text = Math.Abs(account.OpeningBalance).ToString("N2");
+                tbDebt.Text = Math.Abs(account.Balance).ToString("N2");
                 tbAccount.Text = "";
             }
             else if (account.OpeningBalance > 0)
             {
-                tbAccount.Text = account.OpeningBalance.ToString("N2");
+                tbAccount.Text = account.Balance.ToString("N2");
                 tbDebt.Text = "";
             }
             else
@@ -481,13 +486,21 @@ public partial class UserPage : Page
         btnSave.Visibility = Visibility.Collapsed;
         btnUpdate.Visibility = Visibility.Visible;
     }
-
-    [RelayCommand]
-    private void EditUser(UserResponse response)
+    private void btnEdit_Click(object sender, RoutedEventArgs e)
     {
-        var vm = new SemiProductViewModel { ErrorMessage = string.Empty };
-        vm.ErrorMessage = $"{response.Name}ni ma'lumotlarini o'zgartirmoqchimisiz?";
-        LoadingUser(response.Id);
+        if (sender is not Button btn || btn.Tag is not UserResponse user)
+            return;
+
+        var result = MessageBox.Show(
+            $"{user.Name} ma'lumotlarini tahrirlamoqchimisiz?",
+            "Tahrirlash",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            LoadingUser(user.Id);
+        }
     }
 
     [RelayCommand]
@@ -567,5 +580,79 @@ public partial class UserPage : Page
         }
 
         return 0;
+    }
+
+    private async void btnDelete_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            UserResponse user = null;
+
+            // Bir nechta usul bilan foydalanuvchini olish
+            if (sender is Button btn)
+            {
+                // Avval Tag'dan tekshirish
+                if (btn.Tag is UserResponse tagUser)
+                {
+                    user = tagUser;
+                }
+                // Keyin CommandParameter'dan tekshirish
+                else if (btn.CommandParameter is UserResponse paramUser)
+                {
+                    user = paramUser;
+                }
+            }
+
+            if (user == null)
+            {
+                MessageBox.Show("Foydalanuvchi tanlanmagan!", "Xato",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Tasdiqlash
+            if (MessageBox.Show(
+                $"{user.Name} foydalanuvchisini o'chirmoqchimisiz?",
+                "O'chirishni tasdiqlash",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            // O'chirish
+            var response = await client.Users.Delete(user.Id);
+
+            if (response.IsSuccess)
+            {
+                MessageBox.Show("Foydalanuvchi muvaffaqiyatli o'chirildi!",
+                    "Muvaffaqiyat",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                // Ro'yxatni yangilash
+                LoadUsers();
+
+                // Formani tozalash
+                ClearForm();
+                btnSave.Visibility = GetSaveButtonVisibility();
+                btnUpdate.Visibility = Visibility.Collapsed;
+                currentUser = null;
+            }
+            else
+            {
+                MessageBox.Show($"O'chirishda xatolik: {response.Message}",
+                    "Xato",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Xatolik: {ex.Message}",
+                "Xato",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
 }
