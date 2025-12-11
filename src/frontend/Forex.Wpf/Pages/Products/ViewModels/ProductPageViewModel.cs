@@ -162,6 +162,183 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             ErrorMessage = response.Message ?? "Mahsulot kirimini o'chirishda xatolik";
     }
 
+
+    private ProductEntryViewModel? _backupProductEntry = null;
+    [RelayCommand]
+    public async Task Edit()
+    {
+        if (SelectedProductEntry is null)
+            return;
+
+        bool hasCurrentData = CurrentProductEntry.Product is not null ||
+                             CurrentProductEntry.BundleCount.HasValue ||
+                             CurrentProductEntry.Count.HasValue;
+
+        if (hasCurrentData && IsEditing)
+        {
+            var result = MessageBox.Show(
+                "Hozirgi kiritilgan ma'lumotlar o'chib ketadi. Davom etmoqchimisiz?",
+                "Ogohlantirish",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.No)
+                return;
+        }
+
+        // BACKUP YARATISH - Edit boshida
+        _backupProductEntry = new ProductEntryViewModel
+        {
+            Id = SelectedProductEntry.Id,
+            Date = SelectedProductEntry.Date,
+            BundleCount = SelectedProductEntry.BundleCount,
+            Count = SelectedProductEntry.Count,
+            ProductionOrigin = SelectedProductEntry.ProductionOrigin,
+            ProductionOriginName = SelectedProductEntry.ProductionOrigin.ToString(),
+            ProductType = SelectedProductEntry.ProductType
+        };
+
+        // ... qolgan kod o'zgarishsiz davom etadi
+        if (!AvailableProducts.Any())
+        {
+            await LoadProductsAsync();
+        }
+
+        CurrentProductEntry.PropertyChanged -= OnCurrentProductEntryPropertyChanged;
+
+        try
+        {
+            var productCode = SelectedProductEntry.ProductType?.Product?.Code;
+            var productName = SelectedProductEntry.ProductType?.Product?.Name;
+            var productId = SelectedProductEntry.ProductType?.Product?.Id ?? 0;
+
+            if (string.IsNullOrEmpty(productCode))
+            {
+                WarningMessage = "Mahsulot ma'lumotlari topilmadi!";
+                return;
+            }
+
+            var matchingProduct = AvailableProducts.FirstOrDefault(p => p.Code == productCode);
+
+            if (matchingProduct is not null)
+            {
+                await LoadProductTypesForProduct(matchingProduct);
+                CurrentProductEntry.Product = matchingProduct;
+
+                var matchingType = matchingProduct.ProductTypes?.FirstOrDefault(t =>
+                    t.Type == SelectedProductEntry.ProductType?.Type);
+
+                if (matchingType is not null)
+                {
+                    matchingType.BundleItemCount = SelectedProductEntry.ProductType?.BundleItemCount ?? matchingType.BundleItemCount;
+                    matchingType.UnitPrice = SelectedProductEntry.ProductType?.UnitPrice ?? matchingType.UnitPrice;
+                    CurrentProductEntry.Product.SelectedType = matchingType;
+                }
+                else if (SelectedProductEntry.ProductType is not null)
+                {
+                    var newType = new ProductTypeViewModel
+                    {
+                        Id = SelectedProductEntry.ProductType.Id,
+                        Type = SelectedProductEntry.ProductType.Type ?? "",
+                        BundleItemCount = SelectedProductEntry.ProductType.BundleItemCount,
+                        UnitPrice = SelectedProductEntry.ProductType.UnitPrice,
+                        ProductTypeItems = []
+                    };
+
+                    matchingProduct.ProductTypes ??= new ObservableCollection<ProductTypeViewModel>();
+                    matchingProduct.ProductTypes.Add(newType);
+                    CurrentProductEntry.Product.SelectedType = newType;
+                }
+            }
+            else
+            {
+                var newProduct = new ProductViewModel
+                {
+                    Id = productId,
+                    Code = productCode,
+                    Name = productName ?? "",
+                    ProductionOrigin = SelectedProductEntry.ProductionOrigin,
+                    ProductTypes = []
+                };
+
+                if (productId > 0)
+                {
+                    await LoadProductTypesForProduct(newProduct);
+                }
+
+                if (SelectedProductEntry.ProductType is not null)
+                {
+                    var matchingType = newProduct.ProductTypes?.FirstOrDefault(t =>
+                        t.Type == SelectedProductEntry.ProductType.Type);
+
+                    if (matchingType is not null)
+                    {
+                        matchingType.BundleItemCount = SelectedProductEntry.ProductType.BundleItemCount ?? matchingType.BundleItemCount;
+                        matchingType.UnitPrice = SelectedProductEntry.ProductType.UnitPrice ?? matchingType.UnitPrice;
+                        newProduct.SelectedType = matchingType;
+                    }
+                    else
+                    {
+                        var newType = new ProductTypeViewModel
+                        {
+                            Id = SelectedProductEntry.ProductType.Id,
+                            Type = SelectedProductEntry.ProductType.Type ?? "",
+                            BundleItemCount = SelectedProductEntry.ProductType.BundleItemCount,
+                            UnitPrice = SelectedProductEntry.ProductType.UnitPrice,
+                            ProductTypeItems = []
+                        };
+
+                        newProduct.ProductTypes!.Add(newType);
+                        newProduct.SelectedType = newType;
+                    }
+                }
+
+                CurrentProductEntry.Product = newProduct;
+
+                if (!AvailableProducts.Any(p => p.Code == productCode))
+                {
+                    AvailableProducts.Add(newProduct);
+                }
+            }
+
+            CurrentProductEntry.Id = SelectedProductEntry.Id;
+            CurrentProductEntry.Date = SelectedProductEntry.Date;
+            CurrentProductEntry.BundleCount = SelectedProductEntry.BundleCount;
+            CurrentProductEntry.Count = SelectedProductEntry.Count;
+            CurrentProductEntry.ProductionOrigin = SelectedProductEntry.ProductionOrigin;
+            CurrentProductEntry.ProductionOriginName = SelectedProductEntry.ProductionOrigin.ToString();
+
+            IsEditing = true;
+
+            ProductEntries.Remove(SelectedProductEntry);
+            SelectedProductEntry = null;
+        }
+        finally
+        {
+            CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
+        }
+    }
+
+    [RelayCommand]
+    private void Cancel()
+    {
+        if (_backupProductEntry is null)
+        {
+            WarningMessage = "Bekor qilinadigan o'zgarish yo'q!";
+            return;
+        }
+
+        // Backup'dan ma'lumotlarni qaytarish
+        ProductEntries.Add(_backupProductEntry);
+
+        // Edit rejimini o'chirish va formani tozalash
+        IsEditing = false;
+        ClearCurrentEntry();
+
+        // Backup'ni tozalash
+        _backupProductEntry = null;
+    }
+
     [RelayCommand]
     private async Task Update()
     {
@@ -171,7 +348,6 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             return;
         }
 
-        // Validatsiya
         if (CurrentProductEntry.Product is null)
         {
             WarningMessage = "Mahsulot tanlanmagan!";
@@ -202,7 +378,6 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             return;
         }
 
-        // Request tayyorlash
         var request = new ProductEntryRequest
         {
             Id = CurrentProductEntry.Id,
@@ -221,12 +396,12 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
                 ProductTypes =
                 [
                     new() {
-                        Id = CurrentProductEntry.Product.SelectedType.Id,
-                        Type = CurrentProductEntry.Product.SelectedType.Type,
-                        BundleItemCount = (int)CurrentProductEntry.Product.SelectedType.BundleItemCount.Value,
-                        UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice.Value,
-                        ProductTypeItems = []
-                    }
+                    Id = CurrentProductEntry.Product.SelectedType.Id,
+                    Type = CurrentProductEntry.Product.SelectedType.Type,
+                    BundleItemCount = (int)CurrentProductEntry.Product.SelectedType.BundleItemCount.Value,
+                    UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice.Value,
+                    ProductTypeItems = []
+                }
                 ]
             }
         };
@@ -238,177 +413,17 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
         {
             SuccessMessage = "Mahsulot kirimi muvaffaqiyatli yangilandi!";
 
-            // Edit rejimini o'chirish va formani tozalash
             IsEditing = false;
             ClearCurrentEntry();
 
-            // Ma'lumotlarni qayta yuklash
+            // BACKUP'NI TOZALASH
+            _backupProductEntry = null;
+
             await LoadProductEntriesAsync();
         }
         else
         {
             ErrorMessage = response.Message ?? "Mahsulot kirimini yangilashda xatolik";
-        }
-    }
-
-    [RelayCommand]
-    public async Task Edit()
-    {
-        if (SelectedProductEntry is null)
-            return;
-
-        bool hasCurrentData = CurrentProductEntry.Product is not null ||
-                             CurrentProductEntry.BundleCount.HasValue ||
-                             CurrentProductEntry.Count.HasValue;
-
-        if (hasCurrentData && IsEditing)
-        {
-            var result = MessageBox.Show(
-                "Hozirgi kiritilgan ma'lumotlar o'chib ketadi. Davom etmoqchimisiz?",
-                "Ogohlantirish",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (result == MessageBoxResult.No)
-                return;
-        }
-
-        // Agar AvailableProducts bo'sh bo'lsa, yuklash
-        if (!AvailableProducts.Any())
-        {
-            await LoadProductsAsync();
-        }
-
-        // PropertyChanged event'ni vaqtincha o'chirish
-        CurrentProductEntry.PropertyChanged -= OnCurrentProductEntryPropertyChanged;
-
-        try
-        {
-            // ProductType dan Product ma'lumotlarini olish
-            var productCode = SelectedProductEntry.ProductType?.Product?.Code;
-            var productName = SelectedProductEntry.ProductType?.Product?.Name;
-            var productId = SelectedProductEntry.ProductType?.Product?.Id ?? 0;
-
-            if (string.IsNullOrEmpty(productCode))
-            {
-                WarningMessage = "Mahsulot ma'lumotlari topilmadi!";
-                return;
-            }
-
-            // AvailableProducts'dan to'g'ri Product'ni topish
-            var matchingProduct = AvailableProducts.FirstOrDefault(p => p.Code == productCode);
-
-            if (matchingProduct is not null)
-            {
-                // ProductTypes'ni yuklash (agar yuklanmagan bo'lsa)
-                await LoadProductTypesForProduct(matchingProduct);
-
-                // CurrentProductEntry ga to'g'ri Product obyektini o'rnatish
-                CurrentProductEntry.Product = matchingProduct;
-
-                // To'g'ri ProductType'ni topish va tanlash
-                var matchingType = matchingProduct.ProductTypes?.FirstOrDefault(t =>
-                    t.Type == SelectedProductEntry.ProductType?.Type);
-
-                if (matchingType is not null)
-                {
-                    // ProductType'ning qiymatlarini SelectedProductEntry'dan yangilash
-                    matchingType.BundleItemCount = SelectedProductEntry.ProductType?.BundleItemCount ?? matchingType.BundleItemCount;
-                    matchingType.UnitPrice = SelectedProductEntry.ProductType?.UnitPrice ?? matchingType.UnitPrice;
-
-                    CurrentProductEntry.Product.SelectedType = matchingType;
-                }
-                else if (SelectedProductEntry.ProductType is not null)
-                {
-                    // Agar ProductType topilmasa, yangi yaratish
-                    var newType = new ProductTypeViewModel
-                    {
-                        Id = SelectedProductEntry.ProductType.Id,
-                        Type = SelectedProductEntry.ProductType.Type ?? "",
-                        BundleItemCount = SelectedProductEntry.ProductType.BundleItemCount,
-                        UnitPrice = SelectedProductEntry.ProductType.UnitPrice,
-                        ProductTypeItems = []
-                    };
-
-                    matchingProduct.ProductTypes ??= new ObservableCollection<ProductTypeViewModel>();
-                    matchingProduct.ProductTypes.Add(newType);
-                    CurrentProductEntry.Product.SelectedType = newType;
-                }
-            }
-            else
-            {
-                // Agar product topilmasa, yangi Product yaratish
-                var newProduct = new ProductViewModel
-                {
-                    Id = productId,
-                    Code = productCode,
-                    Name = productName ?? "",
-                    ProductionOrigin = SelectedProductEntry.ProductionOrigin,
-                    ProductTypes = []
-                };
-
-                // ProductTypes yuklanganligini tekshirish
-                if (productId > 0)
-                {
-                    await LoadProductTypesForProduct(newProduct);
-                }
-
-                if (SelectedProductEntry.ProductType is not null)
-                {
-                    // ProductType topish yoki yaratish
-                    var matchingType = newProduct.ProductTypes?.FirstOrDefault(t =>
-                        t.Type == SelectedProductEntry.ProductType.Type);
-
-                    if (matchingType is not null)
-                    {
-                        matchingType.BundleItemCount = SelectedProductEntry.ProductType.BundleItemCount ?? matchingType.BundleItemCount;
-                        matchingType.UnitPrice = SelectedProductEntry.ProductType.UnitPrice ?? matchingType.UnitPrice;
-                        newProduct.SelectedType = matchingType;
-                    }
-                    else
-                    {
-                        var newType = new ProductTypeViewModel
-                        {
-                            Id = SelectedProductEntry.ProductType.Id,
-                            Type = SelectedProductEntry.ProductType.Type ?? "",
-                            BundleItemCount = SelectedProductEntry.ProductType.BundleItemCount,
-                            UnitPrice = SelectedProductEntry.ProductType.UnitPrice,
-                            ProductTypeItems = []
-                        };
-
-                        newProduct.ProductTypes!.Add(newType);
-                        newProduct.SelectedType = newType;
-                    }
-                }
-
-                CurrentProductEntry.Product = newProduct;
-
-                // AvailableProducts'ga qo'shish
-                if (!AvailableProducts.Any(p => p.Code == productCode))
-                {
-                    AvailableProducts.Add(newProduct);
-                }
-            }
-
-            // Qolgan ma'lumotlarni ko'chirish
-            CurrentProductEntry.Id = SelectedProductEntry.Id;
-            CurrentProductEntry.Date = SelectedProductEntry.Date;
-            CurrentProductEntry.BundleCount = SelectedProductEntry.BundleCount;
-            CurrentProductEntry.Count = SelectedProductEntry.Count;
-            CurrentProductEntry.ProductionOrigin = SelectedProductEntry.ProductionOrigin;
-            CurrentProductEntry.ProductionOriginName = SelectedProductEntry.ProductionOrigin.ToString();
-
-            // Edit rejimini yoqish
-            IsEditing = true;
-
-            // DataGrid'dan olib tashlash
-            ProductEntries.Remove(SelectedProductEntry);
-            SelectedProductEntry = null;
-        }
-        finally
-        {
-            // PropertyChanged event'ni qayta ulash
-            CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
         }
     }
 

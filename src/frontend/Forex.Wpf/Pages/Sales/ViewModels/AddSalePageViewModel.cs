@@ -652,4 +652,23 @@ public partial class AddSalePageViewModel : ViewModelBase
     }
 
     #endregion
+
+
+    [ObservableProperty]
+    private ObservableCollection<ComboItemModel> countries =
+    [
+        new ComboItemModel { Name = "Uzbekistan", PhotoPath = "https://flagsapi.com/UZ/flat/64.png" },
+        new ComboItemModel { Name = "USA", PhotoPath = "https://flagsapi.com/US/flat/64.png" },
+        new ComboItemModel { Name = "Japan", PhotoPath = "https://flagsapi.com/JP/flat/64.png" }
+    ];
+
+    [ObservableProperty] private ComboItemModel selectedCountry;
+}
+public partial class ComboItemModel : ObservableObject
+{
+    [ObservableProperty]
+    private string name;
+
+    [ObservableProperty]
+    private string photoPath;
 }
