@@ -21,7 +21,6 @@ public partial class SaleItemViewModel : ViewModelBase
     [ObservableProperty] private ProductTypeViewModel productType = default!;
     [ObservableProperty] private SaleViewModel sale = default!;
 
-
     #region Property Changes
 
     partial void OnUnitPriceChanged(decimal? value) => RecalculateTotalAmount();

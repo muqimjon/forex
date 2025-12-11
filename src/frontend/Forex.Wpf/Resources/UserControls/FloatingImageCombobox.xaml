@@ -1,0 +1,59 @@
+﻿<UserControl
+    x:Class="Forex.Wpf.Resources.UserControls.FloatingImageComboBox"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Height="30"
+    d:DesignHeight="32"
+    d:DesignWidth="150"
+    mc:Ignorable="d">
+
+	<Grid>
+
+		<!-- Floating Label -->
+		<TextBlock
+            HorizontalAlignment="Center"
+            FontSize="14"
+            Foreground="{DynamicResource PrimaryTextColor}"
+            Style="{StaticResource FloatingLabelStyle}"
+            Tag="{Binding ElementName=comboBox}"
+            Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+
+		<!-- Border -->
+		<Border
+            Height="30"
+            Padding="5,0"
+            VerticalAlignment="Bottom"
+            BorderBrush="{DynamicResource PrimaryTextColor}"
+            BorderThickness="1"
+            CornerRadius="4">
+
+			<ComboBox
+                x:Name="comboBox"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                FontSize="14"
+                ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                DisplayMemberPath=""
+                DropDownOpened="ComboBox_DropDownOpened"
+                LostFocus="ComboBox_LostFocus">
+
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+							<Image Source="{Binding PhotoPath}"
+                                   Width="20" Height="20" Stretch="Uniform"
+                                   Margin="0,0,8,0"/>
+							<TextBlock Text="{Binding Name}" FontSize="14"/>
+						</StackPanel>
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+
+			</ComboBox>
+		</Border>
+
+	</Grid>
+</UserControl>

@@ -130,6 +130,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!--  Mahsulot kodi  -->
@@ -219,6 +220,19 @@
                 Background="{DynamicResource OtherBackground}"
                 Command="{Binding DataContext.UpdateCommand, ElementName=RootPage}"
                 Content="Saqlash"
+                FontSize="14" />
+
+            <Button
+                x:Name="cancelButton"
+                Grid.Column="9"
+                Height="30"
+                Margin="2,0,0,0"
+                md:ButtonAssist.CornerRadius="4"
+                Background="#FF6B6B"
+                    BorderBrush="#D32F2F"
+                Command="{Binding DataContext.CancelCommand, ElementName=RootPage}"
+                Content="Bekor qilish"
+                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
                 FontSize="14" />
         </Grid>
 

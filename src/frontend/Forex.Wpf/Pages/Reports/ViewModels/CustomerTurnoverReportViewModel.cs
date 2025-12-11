@@ -134,7 +134,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
     #region Commands
 
-
     [RelayCommand]
     private void Preview()
     {

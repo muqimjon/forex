@@ -1,4 +1,5 @@
 ﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
+
 using System.Windows.Controls;
 
 /// <summary>
