@@ -24,16 +24,19 @@ public partial class AddSalePageViewModel : ViewModelBase
     private readonly IMapper mapper;
     private readonly INavigationService navigation;
 
+    // Initialization state tracking
+    private Task? _initializationTask;
+
     public AddSalePageViewModel(ForexClient client, IMapper mapper, INavigationService navigation)
     {
         this.client = client;
         this.mapper = mapper;
         this.navigation = navigation;
         CurrentSaleItem.PropertyChanged += SaleItemPropertyChanged;
-        _ = LoadDataAsync();
+
+        _initializationTask = LoadDataAsync();
     }
 
-    // 🗓 Sana
     [ObservableProperty] private DateTime date = DateTime.Now;
     [ObservableProperty] private decimal? totalAmount;
     [ObservableProperty] private decimal? finalAmount;
@@ -48,15 +51,24 @@ public partial class AddSalePageViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<UserViewModel> availableCustomers = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
 
-    // Edit rejimi uchun
     [ObservableProperty] private long editingSaleId = 0;
 
-    #region Load Data
+    #region Initialization
+
+    private async Task EnsureInitializedAsync()
+    {
+        if (_initializationTask is not null)
+        {
+            await _initializationTask;
+        }
+    }
 
     private async Task LoadDataAsync()
     {
-        await LoadUsersAsync();
-        await LoadProductsAsync();
+        await Task.WhenAll(
+            LoadUsersAsync(),
+            LoadProductsAsync()
+        );
     }
 
     public async Task LoadUsersAsync()
@@ -73,7 +85,8 @@ public partial class AddSalePageViewModel : ViewModelBase
         var response = await client.Users.Filter(request).Handle(isLoading => IsLoading = isLoading);
         if (response.IsSuccess)
             AvailableCustomers = mapper.Map<ObservableCollection<UserViewModel>>(response.Data!);
-        else ErrorMessage = response.Message ?? "Mahsulot turlarini yuklashda xatolik.";
+        else
+            ErrorMessage = response.Message ?? "Mahsulot turlarini yuklashda xatolik.";
     }
 
     public async Task LoadProductsAsync()
@@ -101,8 +114,7 @@ public partial class AddSalePageViewModel : ViewModelBase
             .Where(pt => pt is not null && pt.Product is not null)
             .ToList();
 
-        var grouped = allTypes
-            .GroupBy(pt => pt.Product.Id);
+        var grouped = allTypes.GroupBy(pt => pt.Product.Id);
 
         var products = new ObservableCollection<ProductViewModel>();
 
@@ -112,14 +124,13 @@ public partial class AddSalePageViewModel : ViewModelBase
             var product = sampleType.Product;
 
             product.ProductTypes = new ObservableCollection<ProductTypeViewModel>(group);
-
             products.Add(product);
         }
 
         AvailableProducts = products;
     }
 
-    #endregion Load Data
+    #endregion
 
     #region Commands
 
@@ -173,12 +184,10 @@ public partial class AddSalePageViewModel : ViewModelBase
                 return;
         }
 
-        // PropertyChanged event'ni vaqtincha o'chirish
         CurrentSaleItem.PropertyChanged -= SaleItemPropertyChanged;
 
         try
         {
-            // Ma'lumotlarni ko'chirish
             CurrentSaleItem.Product = SelectedSaleItem.Product;
             CurrentSaleItem.ProductType = SelectedSaleItem.ProductType;
             CurrentSaleItem.BundleCount = SelectedSaleItem.BundleCount;
@@ -186,16 +195,13 @@ public partial class AddSalePageViewModel : ViewModelBase
             CurrentSaleItem.Amount = SelectedSaleItem.Amount;
             CurrentSaleItem.TotalCount = SelectedSaleItem.TotalCount;
 
-            // DataGrid'dan olib tashlash
             SaleItems.Remove(SelectedSaleItem);
             SelectedSaleItem = null;
 
-            // Totalni qayta hisoblash
             RecalculateTotals();
         }
         finally
         {
-            // PropertyChanged event'ni qayta ulash
             CurrentSaleItem.PropertyChanged += SaleItemPropertyChanged;
         }
     }
@@ -509,7 +515,7 @@ public partial class AddSalePageViewModel : ViewModelBase
         CurrentSaleItem.PropertyChanged += SaleItemPropertyChanged;
     }
 
-    #endregion Commands
+    #endregion
 
     #region Property Changes
 
@@ -534,7 +540,7 @@ public partial class AddSalePageViewModel : ViewModelBase
         IsEditing = value > 0;
     }
 
-    #endregion Property Changes
+    #endregion
 
     #region Private Helpers
 
@@ -550,29 +556,30 @@ public partial class AddSalePageViewModel : ViewModelBase
             TotalAmountWithUserBalance = Customer.Balance - TotalAmount;
     }
 
-    #endregion Private Helpers
+    #endregion
 
     #region Public Methods for External Use
 
     /// <summary>
-    /// Backend'dan Sale ma'lumotlarini yuklash va Edit rejimiga o'tkazish
+    /// Loads sale data for editing. Ensures initialization is complete first.
     /// </summary>
-    public async Task LoadSaleForEdit(long saleId)
+    public async Task LoadSaleForEditAsync(long saleId)
     {
-        // Backend'dan to'liq ma'lumotlarni olish
+        // Ma'lumotlar yuklanishini kutamiz
+        await EnsureInitializedAsync();
+
         FilteringRequest request = new()
         {
             Filters = new()
             {
                 ["id"] = [saleId.ToString()],
-                ["customer"] = ["include:accounts.currency"],
                 ["saleItems"] = ["include:productType.product"]
             }
         };
 
         var response = await client.Sales.Filter(request).Handle(isLoading => IsLoading = isLoading);
 
-        if (!response.IsSuccess || response.Data == null || !response.Data.Any())
+        if (!response.IsSuccess || !response.Data.Any())
         {
             ErrorMessage = response.Message ?? "Savdoni yuklashda xatolik!";
             return;
@@ -580,54 +587,42 @@ public partial class AddSalePageViewModel : ViewModelBase
 
         var sale = mapper.Map<SaleViewModel>(response.Data.First());
 
-        // Formani to'ldirish
         EditingSaleId = sale.Id;
         Date = sale.Date;
         Note = sale.Note ?? string.Empty;
 
-        // Mijozni topish va tanlash
-        var customer = AvailableCustomers.FirstOrDefault(c => c.Id == sale.Customer?.Id);
-        if (customer != null)
+        // Endi AvailableCustomers to'liq yuklangan
+        var customer = AvailableCustomers.FirstOrDefault(c => c.Id == sale.CustomerId);
+        if (customer is not null)
         {
             Customer = customer;
         }
-        else if (sale.Customer != null)
-        {
-            // Agar mijoz listda bo'lmasa, qo'shish
-            var newCustomer = mapper.Map<UserViewModel>(sale.Customer);
-            AvailableCustomers.Add(newCustomer);
-            Customer = newCustomer;
-        }
 
-        // SaleItems'ni to'ldirish
         SaleItems.Clear();
-        if (sale.SaleItems != null)
+        if (sale.SaleItems is not null)
         {
             foreach (var saleItem in sale.SaleItems)
             {
-                // Product va ProductType'ni topish yoki yaratish
                 var product = AvailableProducts.FirstOrDefault(p =>
                     p.Id == saleItem.ProductType?.Product?.Id);
 
-                if (product == null && saleItem.ProductType?.Product != null)
+                if (product == null && saleItem.ProductType?.Product is not null)
                 {
-                    // Yangi product yaratish
                     product = mapper.Map<ProductViewModel>(saleItem.ProductType.Product);
                     product.ProductTypes = new ObservableCollection<ProductTypeViewModel>();
                     AvailableProducts.Add(product);
                 }
 
                 ProductTypeViewModel? productType = null;
-                if (product != null && saleItem.ProductType != null)
+                if (product is not null && saleItem.ProductType is not null)
                 {
                     productType = product.ProductTypes?.FirstOrDefault(pt =>
                         pt.Id == saleItem.ProductType.Id);
 
                     if (productType == null)
                     {
-                        // Yangi ProductType yaratish
                         productType = mapper.Map<ProductTypeViewModel>(saleItem.ProductType);
-                        product.ProductTypes ??= new ObservableCollection<ProductTypeViewModel>();
+                        product.ProductTypes ??= [];
                         product.ProductTypes.Add(productType);
                     }
                 }
@@ -653,7 +648,6 @@ public partial class AddSalePageViewModel : ViewModelBase
 
     #endregion
 
-
     [ObservableProperty]
     private ObservableCollection<ComboItemModel> countries =
     [
@@ -664,11 +658,9 @@ public partial class AddSalePageViewModel : ViewModelBase
 
     [ObservableProperty] private ComboItemModel selectedCountry;
 }
+
 public partial class ComboItemModel : ObservableObject
 {
-    [ObservableProperty]
-    private string name;
-
-    [ObservableProperty]
-    private string photoPath;
+    [ObservableProperty] private string name;
+    [ObservableProperty] private string photoPath;
 }
