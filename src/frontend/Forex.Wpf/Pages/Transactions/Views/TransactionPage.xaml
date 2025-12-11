@@ -423,7 +423,6 @@
                 <!-- To'lash/Yangilash tugmasi -->
                 <Button
                     Grid.Row="4"
-                    Grid.RowSpan="2"
                     Grid.Column="2"
                     Height="28"
                     Padding="0"
@@ -433,12 +432,12 @@
                     BorderBrush="{StaticResource SuccessButtonBorder}"
                     Command="{Binding SubmitCommand}"
                     Content="{Binding SubmitButtonText}"
+                    Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"
                     Foreground="{StaticResource SuccessButtonForeground}" />
 
                 <!-- Bekor qilish tugmasi (faqat edit rejimida) -->
                 <Button
                     Grid.Row="4"
-                    Grid.RowSpan="2"
                     Grid.Column="3"
                     Height="28"
                     Margin="10,0,0,0"
@@ -448,7 +447,7 @@
                     BorderBrush="#D32F2F"
                     Command="{Binding CancelCommand}"
                     Content="Bekor qilish"
-                    Foreground="White"
+                    Foreground="{StaticResource SuccessButtonForeground}"
                     Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}" />
             </Grid>
         </Grid>

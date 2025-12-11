@@ -1,8 +1,12 @@
-﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
+﻿using Forex.Wpf.ViewModels;
+
+namespace Forex.Wpf.Pages.Sales.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
+using System.Collections.ObjectModel;
 
 public partial class SaleItemViewModel : ViewModelBase
 {
@@ -20,7 +24,6 @@ public partial class SaleItemViewModel : ViewModelBase
     [ObservableProperty] private ProductViewModel product = default!;
     [ObservableProperty] private ProductTypeViewModel productType = default!;
     [ObservableProperty] private SaleViewModel sale = default!;
-
 
     #region Property Changes
 
