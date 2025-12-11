@@ -309,8 +309,8 @@ public partial class DailyProductionReportViewModel : ViewModelBase
         {
             MessageBox.Show($"Xatolik: {ex.Message}", "Xato", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-    }   
-    
+    }
+
     // PREVIEW
     [RelayCommand]
     private void Preview()

@@ -1,12 +1,8 @@
-﻿using Forex.Wpf.ViewModels;
-
-namespace Forex.Wpf.Pages.Sales.ViewModels;
+﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
-using System.Collections.ObjectModel;
 
 public partial class SaleItemViewModel : ViewModelBase
 {
