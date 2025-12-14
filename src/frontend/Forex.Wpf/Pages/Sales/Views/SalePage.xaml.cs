@@ -37,21 +37,15 @@ public partial class SalePage : Page
 
     private async void BtnEditSale_Click(object sender, RoutedEventArgs e)
     {
-        // Edit tugmasi bosilganda
         if (sender is not Button button || button.Tag is not SaleViewModel sale)
             return;
 
-        // Yangi AddSalePage instance yaratish
         var addSalePage = new AddSalePage();
-
-        // ViewModel'ni olish
         var addSaleVm = App.AppHost!.Services.GetRequiredService<AddSalePageViewModel>();
         addSalePage.DataContext = addSaleVm;
 
-        // Backend'dan ma'lumotlarni yuklash
-        await addSaleVm.LoadSaleForEdit(sale.Id);
+        await addSaleVm.LoadSaleForEditAsync(sale.Id);
 
-        // Sahifaga o'tish
         Main.NavigateTo(addSalePage);
     }
 }

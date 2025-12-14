@@ -23,6 +23,16 @@ public partial class AddSalePage : Page
         InitializeComponent();
         vm = App.AppHost!.Services.GetRequiredService<AddSalePageViewModel>();
         DataContext = vm;
+
+        addButton.Click += AddButton_Click;
+    }
+
+    private void AddButton_Click(object sender, RoutedEventArgs e)
+    {
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            cbxProductCode.comboBox.Focus();
+        }), System.Windows.Threading.DispatcherPriority.Input);
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
