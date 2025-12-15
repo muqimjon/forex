@@ -320,22 +320,55 @@ public partial class AddSalePageViewModel : ViewModelBase
 
     private FixedDocument CreateFixedDocumentForPrint()
     {
-        double pageWidth = 8.27 * 72;
-        double pageHeight = 11.69 * 72;
-        double margin = 35;
-
         var fixedDoc = new FixedDocument();
-        fixedDoc.DocumentPaginator.PageSize = new Size(pageWidth, pageHeight);
 
-        int maxRowsPerPage = 44;
+        // A4 o'lchamlari va marginlar
+        double pageWidth = 793.7;
+        double pageHeight = 1122.5;
+
+        double marginTop = 40;
+        double marginBottom = 40;
+        double marginLeft = 30;
+        double marginRight = 30;
+
+        double tableWorkingWidth = pageWidth - marginLeft - marginRight;
+        double titleHeight = 40;
+        double dateHeight = 30;
+        double rowHeight = 25;
+
         var items = SaleItems.ToList();
-        int totalPages = (int)Math.Ceiling(items.Count / (double)maxRowsPerPage);
-        int pageNumber = 0;
-        int processed = 0;
 
-        while (processed < items.Count)
+        // ******************** Yig'indi qiymatlarni hisoblash ********************
+        decimal totalAmountSum = items.Sum(i => i.Amount) ?? 0;
+        double totalBundleCountSum = items.Sum(i => i.BundleCount) ?? 0;
+        double totalTotalCountSum = items.Sum(i => i.TotalCount) ?? 0;
+        // ************************************************************************
+
+        // Sahifalashni hisoblash
+        // Bu joyda Jami qatori jadvalning ichiga kirishi uchun joy ajratish kerak
+        double tableAvailableHeight =
+            pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
+
+        // Ma'lumot qatorlari soni + 1 (Sarlavha qatori) + 1 (Jami qatori)
+        int totalRowsWithHeaderAndFooter = items.Count + 2;
+
+        // Har bir sahifada nechta ma'lumot qatori sig'ishi
+        // maxDataRowsPerPage hozirgi qolgan joyni hisobga olgan holda
+        int maxDataRowsPerPage = (int)Math.Floor((tableAvailableHeight - rowHeight) / rowHeight);
+        if (maxDataRowsPerPage < 1) maxDataRowsPerPage = 1;
+
+        // Jami qator oxirgi sahifada joylashishi uchun umumiy qatorlar sonini to'g'irlash
+        int totalPages = (int)Math.Ceiling((double)(items.Count + 1) / maxDataRowsPerPage);
+
+        int processed = 0;
+        int globalRowIndex = 0;
+
+        string[] headers = { "T/r", "Kod", "Nomi", "Razmer", "Qop soni", "Jami soni", "Narxi", "Jami summa" };
+
+        double[] finalWidths = { 40, 70, 190, 70, 70, 80, 70, 133.7 };
+
+        for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
-            pageNumber++;
             var page = new FixedPage
             {
                 Width = pageWidth,
@@ -343,63 +376,63 @@ public partial class AddSalePageViewModel : ViewModelBase
                 Background = Brushes.White
             };
 
-            var grid = new Grid
+            var gridContainer = new StackPanel
             {
-                Margin = new Thickness(margin, 100, margin, 90)
+                Margin = new Thickness(marginLeft, marginTop, marginRight, 0) // Pastki marginni 0 qoldiramiz, chunki Sahifa raqami Footerda
             };
 
-            var title = new TextBlock
+            // Title va Info qismlari avvalgidek qoladi...
+            gridContainer.Children.Add(new TextBlock
             {
                 Text = "Sotilgan mahsulotlar ro'yxati",
-                FontSize = 18,
+                FontSize = 22,
                 FontWeight = FontWeights.Bold,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(10, 0, 10, 5)
-            };
-            FixedPage.SetLeft(title, margin);
-            FixedPage.SetTop(title, 25);
-            page.Children.Add(title);
+                Margin = new Thickness(0, 0, 0, 5)
+            });
 
-            var info = new TextBlock
+            gridContainer.Children.Add(new TextBlock
             {
-                Text = $"Mijoz: {Customer?.Name.ToUpper() ?? "Naqd"} \t\t\t\t Sana: {Date:dd.MM.yyyy}",
-                FontSize = 15,
-                Margin = new Thickness(45, 0, 45, 20)
+                Text = $"Mijoz: {Customer?.Name.ToUpper() ?? "Naqd"} | Sana: {Date:dd.MM.yyyy}",
+                FontSize = 14,
+                Foreground = Brushes.Gray,
+                Margin = new Thickness(0, 0, 0, 10)
+            });
+
+
+            // Asosiy ma'lumotlar Grid
+            var grid = new Grid
+            {
+                Width = tableWorkingWidth,
+                HorizontalAlignment = HorizontalAlignment.Left
             };
-            FixedPage.SetLeft(title, (pageWidth - 300) / 2);
-            FixedPage.SetTop(info, 70);
-            page.Children.Add(info);
 
-            string[] headers = { "Kod", "Nomi", "Razmer", "Qop soni", "Jami soni", "Narxi", "Jami summa" };
-            double[] ratios = { 1.0, 2.8, 1.2, 1.3, 1.3, 1.4, 2.0 };
-
+            // Ustun ta'riflari
             for (int i = 0; i < headers.Length; i++)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
-                    Width = new GridLength(ratios[i], GridUnitType.Star)
+                    Width = new GridLength(finalWidths[i], GridUnitType.Pixel)
                 });
             }
 
             int row = 0;
 
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            for (int i = 0; i < headers.Length; i++)
-            {
-                var cell = CreateCell(headers[i], true, TextAlignment.Center);
-                Grid.SetRow(cell, row);
-                Grid.SetColumn(cell, i);
-                grid.Children.Add(cell);
-            }
+            // 1. Sarlavhalarni qo'shish
+            AddRow(grid, true, row, headers);
+            row++;
 
-            var pageItems = items.Skip(processed).Take(maxRowsPerPage).ToList();
+            // 2. Ma'lumotlarni qo'shish
+            int count = Math.Min(maxDataRowsPerPage - 1, items.Count - processed); // Sarlavha allaqachon bir qatorni egallagan
+
+            var pageItems = items.Skip(processed).Take(count).ToList();
+
             foreach (var item in pageItems)
             {
-                row++;
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
+                globalRowIndex++;
                 string[] values =
                 [
+                    globalRowIndex.ToString(),
                     item.Product.Code ?? "",
                     item.Product.Name ?? "",
                     item.ProductType.Type ?? "",
@@ -409,69 +442,151 @@ public partial class AddSalePageViewModel : ViewModelBase
                     item.Amount?.ToString("N2") ?? "0.00"
                 ];
 
-                for (int i = 0; i < values.Length; i++)
-                {
-                    var cell = CreateCell(values[i], false, i >= 3 ? TextAlignment.Right : TextAlignment.Left);
-                    Grid.SetRow(cell, row);
-                    Grid.SetColumn(cell, i);
-                    grid.Children.Add(cell);
-                }
+                AddRow(grid, false, row, values);
+                row++;
             }
 
             processed += pageItems.Count;
 
-            if (processed >= items.Count)
+            // ******************** Jami qatorini qo'shish (faqat oxirgi sahifada) ********************
+            if (pageIndex == totalPages - 1)
             {
-                row += 2;
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                // Bo'sh joy
+                grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) });
+                row++;
+
+                // Jami qatori uchun yangi qator
                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-                var totalLabel = CreateCell("Jami:", true, TextAlignment.Left);
+                // 1. Jami: Labelni yaratish (T/r, Kod, Nomi, Razmer ustunlarini birlashtirish)
+                var totalLabel = CreateCell("Jami:", true, TextAlignment.Right);
                 Grid.SetRow(totalLabel, row);
                 Grid.SetColumn(totalLabel, 0);
-                Grid.SetColumnSpan(totalLabel, 6);
-                totalLabel.Padding = new Thickness(10, 0, 10, 0);
+                Grid.SetColumnSpan(totalLabel, 4); // 4 ustun birlashdi
                 totalLabel.Background = Brushes.Transparent;
+
+                // Birlashtirilgan katakning borderlari
+                totalLabel.BorderThickness = new Thickness(0.5, 0.5, 0.5, 0.5);
+
                 if (totalLabel.Child is TextBlock tblabel)
                 {
                     tblabel.FontSize = 16;
                     tblabel.FontWeight = FontWeights.SemiBold;
+                    // Paddingni o'ng tomonga siljitish
+                    tblabel.Padding = new Thickness(0, 5, 10, 5);
                 }
                 grid.Children.Add(totalLabel);
 
-                var totalValue = CreateCell((FinalAmount ?? 0).ToString("N0"), true, TextAlignment.Right);
-                Grid.SetRow(totalValue, row);
-                Grid.SetColumn(totalValue, 6);
-                totalValue.Background = Brushes.Transparent;
-                totalValue.Padding = new Thickness(15, 2, 15, 2);
-                if (totalValue.Child is TextBlock tbvalue)
+                // 2. Umumiy Qop soni (Index 4)
+                var totalBundleCountValue = CreateCell(totalBundleCountSum.ToString("N0"), true, TextAlignment.Right);
+                Grid.SetRow(totalBundleCountValue, row);
+                Grid.SetColumn(totalBundleCountValue, 4);
+                totalBundleCountValue.Background = Brushes.Transparent;
+                totalBundleCountValue.BorderThickness = new Thickness(0.5);
+                grid.Children.Add(totalBundleCountValue);
+
+                // 3. Umumiy Jami soni (Index 5)
+                var totalTotalCountValue = CreateCell(totalTotalCountSum.ToString("N0"), true, TextAlignment.Right);
+                Grid.SetRow(totalTotalCountValue, row);
+                Grid.SetColumn(totalTotalCountValue, 5);
+                totalTotalCountValue.Background = Brushes.Transparent;
+                totalTotalCountValue.BorderThickness = new Thickness(0.5);
+                grid.Children.Add(totalTotalCountValue);
+
+                // 4. Narxi ustunidagi bo'sh katak (Index 6)
+                var emptyCell = CreateCell("", true, TextAlignment.Center);
+                Grid.SetRow(emptyCell, row);
+                Grid.SetColumn(emptyCell, 6);
+                emptyCell.Background = Brushes.Transparent;
+                emptyCell.BorderThickness = new Thickness(0.5);
+                grid.Children.Add(emptyCell);
+
+                // 5. Umumiy Narxi (Jami summa) - Index 7
+                var totalAmountValue = CreateCell(totalAmountSum.ToString("N2"), true, TextAlignment.Right);
+                Grid.SetRow(totalAmountValue, row);
+                Grid.SetColumn(totalAmountValue, 7);
+                totalAmountValue.Background = Brushes.Transparent;
+                totalAmountValue.BorderThickness = new Thickness(0.5);
+                if (totalAmountValue.Child is TextBlock tbvalue)
                 {
                     tbvalue.FontSize = 16;
                     tbvalue.FontWeight = FontWeights.ExtraBold;
                     tbvalue.Foreground = new SolidColorBrush(Color.FromRgb(0, 80, 180));
                 }
-                grid.Children.Add(totalValue);
+                grid.Children.Add(totalAmountValue);
             }
+            // ****************************************************************************************
 
+            // Asosiy Gridni konteynerga qo'shish
+            gridContainer.Children.Add(grid);
+            page.Children.Add(gridContainer);
+
+
+            // ******************** FOOTER: Sahifa raqamini joylashtirish ********************
             var pageNum = new TextBlock
             {
-                Text = $"Sahifa {pageNumber} / {totalPages}",
+                Text = $"Sahifa {pageIndex + 1} / {totalPages}",
                 FontSize = 11,
-                Foreground = Brushes.Gray
+                Foreground = Brushes.Gray,
+                HorizontalAlignment = HorizontalAlignment.Right // Kerakli joyga joylashish uchun
             };
-            FixedPage.SetRight(pageNum, margin);
-            FixedPage.SetBottom(pageNum, 30);
+
+            // Sahifa raqamini FixedPage'ning pastki o'ng burchagiga joylashtirish
+            FixedPage.SetRight(pageNum, marginRight);
+            FixedPage.SetBottom(pageNum, marginBottom);
             page.Children.Add(pageNum);
+            // ******************************************************************************
 
-            page.Children.Add(grid);
-
-            var pageContent = new PageContent();
-            ((IAddChild)pageContent).AddChild(page);
-            fixedDoc.Pages.Add(pageContent);
+            var pc = new PageContent();
+            ((IAddChild)pc).AddChild(page);
+            fixedDoc.Pages.Add(pc);
         }
 
         return fixedDoc;
     }
+
+
+    private void AddRow(Grid grid, bool isHeader, int row, params string[] values)
+    {
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+        // T/r:0, Kod:1, Nomi:2, Razmer:3, Qop:4, Jami:5, Narxi:6, Summa:7
+        TextAlignment[] alignments =
+        {
+            TextAlignment.Center, // 0 T/r
+            TextAlignment.Left,   // 1 Kod
+            TextAlignment.Left,   // 2 Nomi
+            TextAlignment.Center, // 3 Razmer
+            TextAlignment.Right,  // 4 Qop soni
+            TextAlignment.Right,  // 5 Jami soni
+            TextAlignment.Right,  // 6 Narxi
+            TextAlignment.Right   // 7 Jami summa
+        };
+
+        TextAlignment finalAlignment;
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            if (isHeader)
+            {
+                finalAlignment = (i == 0 || i == 3) ? TextAlignment.Center : TextAlignment.Left;
+            }
+            else
+            {
+                finalAlignment = alignments[i];
+            }
+
+            var cell = CreateCell(values[i], isHeader, finalAlignment);
+
+            // Jami qatorini jadval ichida joylash uchun bu qism o'chirildi
+            // if (values[i] == "Jami:") { Grid.SetColumnSpan(cell, 4); }
+
+            Grid.SetRow(cell, row);
+            Grid.SetColumn(cell, i);
+            grid.Children.Add(cell);
+        }
+    }
+
 
     private Border CreateCell(string text, bool isHeader, TextAlignment alignment = TextAlignment.Left)
     {
@@ -480,7 +595,7 @@ public partial class AddSalePageViewModel : ViewModelBase
             BorderBrush = Brushes.Gray,
             BorderThickness = new Thickness(0.5),
             Background = isHeader ? new SolidColorBrush(Color.FromRgb(235, 235, 235)) : Brushes.White,
-            Padding = new Thickness(6, 5, 6, 5)
+            Padding = new Thickness(4, 5, 4, 5)
         };
 
         var tb = new TextBlock
@@ -492,10 +607,21 @@ public partial class AddSalePageViewModel : ViewModelBase
             VerticalAlignment = VerticalAlignment.Center
         };
 
+        // Jami qatoridagi 'Jami:' so'zini stilini o'rnatish
+        if (text == "Jami:")
+        {
+            tb.FontWeight = FontWeights.SemiBold;
+            tb.FontSize = 16;
+            border.Background = Brushes.Transparent;
+
+            // ❗ YANGILANISH: Chap tomonga siljitish (TextAlignment yuqorida Left ga o'rnatilgan)
+            tb.TextAlignment = TextAlignment.Left;
+            tb.Padding = new Thickness(10, 5, 4, 5); // Chapdan 10px joy qoldirish
+        }
+
         border.Child = tb;
         return border;
     }
-
     private void Clear()
     {
         SaleItems.Clear();
