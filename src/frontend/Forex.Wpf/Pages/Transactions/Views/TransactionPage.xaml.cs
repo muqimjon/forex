@@ -19,12 +19,39 @@ public partial class TransactionPage : Page
     {
         InitializeComponent();
         DataContext = App.AppHost!.Services.GetRequiredService<TransactionPageViewModel>();
-        SetupFocusNavigation();
+
+        Loaded += Page_Loaded;
     }
 
-    private void SetupFocusNavigation()
+    private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        FocusNavigator.AttachEnterNavigation(
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnSubmit,
+            key: Key.Enter,
+            modifiers: ModifierKeys.Control
+        );
+
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnBack,
+            key: Key.Escape
+        );
+
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnCancel,
+            key: Key.Delete,
+            modifiers: ModifierKeys.Control
+        );
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        FocusNavigator.RegisterElements(
         [
             tbKirim,
             tbChiqim

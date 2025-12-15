@@ -2,7 +2,6 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.Wpf.Pages.Common;
-using System;
 
 public partial class SaleItemForReportViewModel : ViewModelBase
 {

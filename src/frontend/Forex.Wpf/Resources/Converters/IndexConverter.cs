@@ -1,6 +1,5 @@
 ﻿namespace Forex.Wpf.Resources.Converters;
 
-using System;
 using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Data;

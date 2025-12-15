@@ -9,7 +9,6 @@ using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -30,7 +29,7 @@ public partial class UserWindow : Window
         txtPhone.Focus();
 
         // Enter bosilganda navbatdagi elementga o'tish
-        FocusNavigator.AttachEnterNavigation([
+        FocusNavigator.RegisterElements([
             txtName,
             txtPhone,
             txtAddress,

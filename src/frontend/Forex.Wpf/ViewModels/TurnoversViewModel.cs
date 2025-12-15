@@ -1,7 +1,6 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
 using Forex.Wpf.Pages.Common;
-using System;
 
 public class TurnoversViewModel : ViewModelBase
 {

@@ -1,13 +1,14 @@
 ﻿namespace Forex.Wpf.Pages.Sales.Views;
 
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Navigation;
 
 /// <summary>
@@ -24,15 +25,46 @@ public partial class AddSalePage : Page
         vm = App.AppHost!.Services.GetRequiredService<AddSalePageViewModel>();
         DataContext = vm;
 
-        addButton.Click += AddButton_Click;
+
+        Loaded += Page_Loaded;
     }
 
-    private void AddButton_Click(object sender, RoutedEventArgs e)
+    private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        Dispatcher.BeginInvoke(new Action(() =>
-        {
-            cbxProductCode.comboBox.Focus();
-        }), System.Windows.Threading.DispatcherPriority.Input);
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        FocusNavigator.RegisterElements(
+            [
+                btnBack,
+                date.text,
+                cbxCustomerName,
+                tbxTotalSum,
+                tbxFinalAmount,
+                tbxNote,
+                cbxProductCode.combobox,
+                cbxProductName.combobox,
+                cbxProductType.combobox,
+                tbxBundle.inputBox,
+                tbxQuantity.inputBox,
+                tbxQuantity.inputBox,
+                tbxUnitPrice.inputBox,
+                tbxTotalAmount.inputBox,
+                btnAdd,
+                btnSubmit
+            ]);
+
+        FocusNavigator.FocusElement(date.text);
+        FocusNavigator.SetFocusRedirect(btnAdd, cbxProductCode.combobox);
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        btnBack.RegisterShortcut(Key.Escape);
+        btnSubmit.RegisterShortcut(Key.Enter, ModifierKeys.Control);
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

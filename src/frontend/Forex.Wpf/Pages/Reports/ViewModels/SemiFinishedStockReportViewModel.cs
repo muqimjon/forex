@@ -1,10 +1,10 @@
 ﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using global::Forex.ClientService;
-using global::Forex.Wpf.Pages.Common;
-using global::Forex.Wpf.Pages.Reports.ViewModels;
-using global::Forex.Wpf.ViewModels;
+using Forex.ClientService;
+using Forex.Wpf.Pages.Common;
+using Forex.Wpf.Pages.Reports.ViewModels;
+using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
 
 // SemiFinishedStockReportViewModel.cs

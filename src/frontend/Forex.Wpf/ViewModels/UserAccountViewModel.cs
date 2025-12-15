@@ -1,9 +1,8 @@
 ﻿namespace Forex.Wpf.ViewModels;
 
-using CommunityToolkit.Mvvm.ComponentModel; // ObservableProperty/NotifyPropertyChanged uchun
+using CommunityToolkit.Mvvm.ComponentModel;
 using Forex.Wpf.Pages.Common;
-using System; // DateTime uchun
-using System.Globalization; // TryParseExact uchun
+using System.Globalization;
 
 public partial class UserAccountViewModel : ViewModelBase
 {

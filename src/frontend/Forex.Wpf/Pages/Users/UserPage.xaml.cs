@@ -12,9 +12,7 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -49,10 +47,39 @@ public partial class UserPage : Page
         LoadUsers();
         UpdateRoleList();
 
-        FocusNavigator.AttachEnterNavigation([
-            txtSearch, cbRole, txtName, txtPhone, txtAddress,
-            txtDescription, cbxValutaType, tbDebt, tbAccount, btnSave
+        Loaded += Page_Loaded;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnBack,
+            key: Key.Escape
+        );
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        FocusNavigator.RegisterElements([
+            txtSearch,
+            cbRole,
+            txtName,
+            txtPhone,
+            txtAddress,
+            txtDescription,
+            cbxValutaType,
+            tbDebt,
+            tbAccount,
+            btnSave
         ]);
+
+        FocusNavigator.SetFocusRedirect(btnBack, cbRole);
     }
 
     // 🔴 Input maydonlariga focus berilganda

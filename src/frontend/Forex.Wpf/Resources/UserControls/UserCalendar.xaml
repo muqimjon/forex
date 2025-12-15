@@ -20,7 +20,7 @@
             BorderThickness="1,1,0,1"
             CornerRadius="4 0 0 4">
             <TextBox
-                x:Name="dateTextBox"
+                x:Name="text"
                 Padding="0"
                 HorizontalAlignment="Stretch"
                 md:HintAssist.Hint="{Binding Hint, RelativeSource={RelativeSource AncestorType=local:UserCalendar}}"

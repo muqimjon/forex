@@ -9,7 +9,6 @@
     Title="HomePage"
     d:DesignHeight="580"
     d:DesignWidth="810"
-    Loaded="Page_Loaded"
     mc:Ignorable="d">
 
     <StackPanel Background="{DynamicResource PrimaryBackground}">
@@ -166,7 +165,6 @@
 
             <Button
                 x:Name="btnSemiProductEntry"
-                Visibility="Collapsed"
                 Height="120"
                 MinWidth="220"
                 Margin="10"
