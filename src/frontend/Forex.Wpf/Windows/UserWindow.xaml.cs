@@ -30,7 +30,7 @@ public partial class UserWindow : Window
         txtPhone.Focus();
 
         // Enter bosilganda navbatdagi elementga o'tish
-        FocusNavigator.AttachEnterNavigation([
+        FocusNavigator.RegisterElements([
             txtName,
             txtPhone,
             txtAddress,

@@ -22,7 +22,7 @@ public partial class LoginPage : Page
 
         tbLogin.Focus();
 
-        FocusNavigator.AttachEnterNavigation([
+        FocusNavigator.RegisterElements([
             tbLogin,
             pbPassword,
             btnLogin,

@@ -49,7 +49,7 @@ public partial class UserPage : Page
         LoadUsers();
         UpdateRoleList();
 
-        FocusNavigator.AttachEnterNavigation([
+        FocusNavigator.RegisterElements([
             txtSearch, cbRole, txtName, txtPhone, txtAddress,
             txtDescription, cbxValutaType, tbDebt, tbAccount, btnSave
         ]);

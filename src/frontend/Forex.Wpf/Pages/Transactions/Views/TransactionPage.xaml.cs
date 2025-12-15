@@ -24,7 +24,7 @@ public partial class TransactionPage : Page
 
     private void SetupFocusNavigation()
     {
-        FocusNavigator.AttachEnterNavigation(
+        FocusNavigator.RegisterElements(
         [
             tbKirim,
             tbChiqim

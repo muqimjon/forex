@@ -31,7 +31,7 @@ public partial class AddSalePage : Page
     {
         Dispatcher.BeginInvoke(new Action(() =>
         {
-            cbxProductCode.comboBox.Focus();
+            cbxProductCode.combobox.Focus();
         }), System.Windows.Threading.DispatcherPriority.Input);
     }
 

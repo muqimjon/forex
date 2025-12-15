@@ -3,10 +3,14 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 public static class FocusNavigator
 {
-    public static void AttachEnterNavigation(List<UIElement> focusOrder)
+    private static readonly Dictionary<UIElement, KeyEventHandler> RegisteredKeyDownHandlers = [];
+    private static readonly Dictionary<Button, RoutedEventHandler> RegisteredClickHandlers = [];
+
+    public static void RegisterElements(List<UIElement> focusOrder)
     {
         if (focusOrder is null || focusOrder.Count == 0)
             return;
@@ -15,7 +19,13 @@ public static class FocusNavigator
 
         foreach (var control in focusOrder)
         {
-            control.PreviewKeyDown += (s, e) =>
+            if (RegisteredKeyDownHandlers.ContainsKey(control))
+                UnregisterKeyDownInternal(control);
+
+            if (control is FrameworkElement fe)
+                fe.Unloaded += Element_Unloaded_Cleanup;
+
+            void handler(object s, KeyEventArgs e)
             {
                 bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
                 int currentIdx = focusOrder.IndexOf(control);
@@ -23,8 +33,6 @@ public static class FocusNavigator
 
                 if (e.Key == Key.Enter || e.Key == Key.Tab)
                 {
-                    var sd = control as Button;
-
                     if (control is Button btn && e.Key == Key.Enter && !shift)
                     {
                         btn.Command?.Execute(btn.CommandParameter);
@@ -65,7 +73,65 @@ public static class FocusNavigator
                         e.Handled = true;
                     }
                 }
-            };
+            }
+
+            control.PreviewKeyDown += handler;
+            RegisteredKeyDownHandlers[control] = handler;
+        }
+    }
+
+    public static void SetFocusRedirect(Button triggerElement, UIElement returnElement)
+    {
+        if (triggerElement is null || returnElement is null)
+            return;
+
+        if (RegisteredClickHandlers.ContainsKey(triggerElement))
+            UnregisterClickInternal(triggerElement);
+
+        if (triggerElement.Parent is FrameworkElement fe)
+            fe.Unloaded += Element_Unloaded_Cleanup;
+
+        void handler(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.CurrentDispatcher.BeginInvoke(
+                new Action(() =>
+                {
+                    FocusElement(returnElement);
+                }),
+                DispatcherPriority.Input);
+        }
+
+        triggerElement.Click += handler;
+        RegisteredClickHandlers[triggerElement] = handler;
+    }
+
+    private static void Element_Unloaded_Cleanup(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe)
+        {
+            fe.Unloaded -= Element_Unloaded_Cleanup;
+            UnregisterKeyDownInternal(fe);
+
+            if (fe is Button btn)
+                UnregisterClickInternal(btn);
+        }
+    }
+
+    private static void UnregisterKeyDownInternal(UIElement element)
+    {
+        if (RegisteredKeyDownHandlers.TryGetValue(element, out var handler))
+        {
+            element.PreviewKeyDown -= handler;
+            RegisteredKeyDownHandlers.Remove(element);
+        }
+    }
+
+    private static void UnregisterClickInternal(Button button)
+    {
+        if (RegisteredClickHandlers.TryGetValue(button, out var handler))
+        {
+            button.Click -= handler;
+            RegisteredClickHandlers.Remove(button);
         }
     }
 

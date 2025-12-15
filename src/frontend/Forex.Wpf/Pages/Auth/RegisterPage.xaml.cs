@@ -18,7 +18,7 @@ public partial class RegisterPage : Page
         this.vm = services.GetRequiredService<RegisterViewModel>();
         DataContext = vm;
 
-        FocusNavigator.AttachEnterNavigation([
+        FocusNavigator.RegisterElements([
             tbName,
             tbEmail,
             tbPhone,
