@@ -356,17 +356,183 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             Icon = Application.Current.MainWindow?.Icon
         }.ShowDialog();
     }
+
+    // ... (usinglar, konstantalar va model xususiyatlari o'zgarmadi) ...
+
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
-        var page = new FixedPage
-        {
-            Width = 793.7,  // A4 @ 96dpi
-            Height = 1122.5,
-            Background = Brushes.White
-        };
 
-        var stack = new StackPanel { Margin = new Thickness(50) };
+        // Konstanta qiymatlar
+        const double pageWidth = 793.7;
+        const double pageHeight = 1122.5;
+        const double margin = 50;
+        const double workingWidth = pageWidth - 2 * margin;
+        const double initialHeaderHeight = 120;
+        const double footerHeight = 25;
+        const double balanceRowHeight = 45;
+        const double headerHeight = 45;
+        const double totalGridHeight = 45;
+        const double lastBalanceHeight = 45;
+
+        // Ustun kengliklari
+        double[] finalColWidths = { 90, 120, 120, 363.7 }; // Jami 693.7
+
+        var allOperations = Operations.ToList();
+        int currentIndex = 0;
+        int pageNumber = 1;
+
+        // Jami debit/kreditni bir marta hisoblab olamiz
+        var totalDebit = Operations.Sum(x => x.Debit);
+        var totalCredit = Operations.Sum(x => x.Credit);
+
+        // BOSHQA ELEMENTLARNI tsikldan TASHQARIDA YARATISHNI O'CHIRAMIZ!
+        // Bu elementlar endi tsikl ichida yaratiladi.
+
+        // Har bir sahifani yaratish uchun tsikl
+        while (currentIndex < allOperations.Count || pageNumber == 1)
+        {
+            var page = new FixedPage { Width = pageWidth, Height = pageHeight, Background = Brushes.White };
+            var container = new StackPanel { Margin = new Thickness(margin) };
+            double currentY = 0;
+            bool isFirstPage = (pageNumber == 1);
+
+            // 1. HEADER (Sarlavha, Mijoz, Davr)
+            if (isFirstPage)
+            {
+                // Bu StackPanel yangi yaratilgani uchun muammo yo'q
+                container.Children.Add(CreateTitleAndInfo(SelectedCustomer?.Name, BeginDate, EndDate));
+                currentY += initialHeaderHeight;
+            }
+
+            // 2. Boshlang'ich qoldiq (Faqat 1-sahifada)
+            if (isFirstPage)
+            {
+                // 💥 YECHIM 1: Elementni har safar yangidan yaratish
+                var initialBalanceGrid = CreateBalanceRow(finalColWidths, "Boshlang‘ich qoldiq", BeginBalance.ToString("N2"));
+                container.Children.Add(initialBalanceGrid);
+                currentY += balanceRowHeight;
+            }
+
+            // 3. Header qatori (Har bir sahifada)
+            // 💥 YECHIM 2: Elementni har safar yangidan yaratish
+            var headerGrid = CreateRow(finalColWidths, true, "Sana", "Chiqim", "Kirim", "Izoh");
+            container.Children.Add(headerGrid);
+            currentY += headerHeight;
+
+            double availableHeight = pageHeight - 2 * margin - currentY - footerHeight;
+
+            int rowsAddedOnPage = 0;
+
+            while (currentIndex < allOperations.Count)
+            {
+                var op = allOperations[currentIndex];
+                double requiredHeight = CalculateRowHeight(finalColWidths[3], op.Description);
+
+                // Sig'masa yangi sahifaga o'tamiz
+                if (requiredHeight > availableHeight && rowsAddedOnPage > 0)
+                {
+                    break;
+                }
+
+                // Operatsiya qatorini yaratish
+                string debit = op.Debit > 0 ? op.Debit.ToString("N0") : "";
+                string credit = op.Credit > 0 ? op.Credit.ToString("N0") : "";
+
+                var operationRowGrid = CreateRow(finalColWidths, false,
+                    op.Date.ToString("dd.MM.yyyy"),
+                    debit,
+                    credit,
+                    op.Description
+                );
+
+                // Qatorning haqiqiy balandligini hisoblash (bu joy murakkab, shuning uchun minimal balandlikdan boshlaymiz)
+                // Agar sizning kodingizda avtomatik balandlikni hisoblash muammo bo'lsa, uni oddiy qiymatga tenglashtirish kerak.
+                // Hozirgi kodda bu hisob-kitob tashqarida bo'lgani uchun, ishonchli o'lchamni olamiz:
+
+                // Haqiqiy balandlikni topish uchun uni o'lchash (render qilmasdan)
+                operationRowGrid.Measure(new Size(workingWidth, double.MaxValue));
+                operationRowGrid.Arrange(new Rect(0, 0, workingWidth, operationRowGrid.DesiredSize.Height));
+                requiredHeight = operationRowGrid.DesiredSize.Height;
+
+                // Xatolar uchun yana bir bor tekshirish
+                if (requiredHeight > availableHeight && rowsAddedOnPage > 0)
+                {
+                    break;
+                }
+
+                container.Children.Add(operationRowGrid);
+                currentY += requiredHeight;
+                availableHeight -= requiredHeight;
+                currentIndex++;
+                rowsAddedOnPage++;
+            }
+
+            // 4. Jami va Oxirgi Qoldiq (Faqat oxirgi sahifada)
+            bool isLastPage = (currentIndex >= allOperations.Count);
+
+            if (isLastPage)
+            {
+                // JAMI
+                if (totalGridHeight < availableHeight)
+                {
+                    // 💥 YECHIM 3: Elementni har safar yangidan yaratish
+                    var totalGrid = CreateRow(finalColWidths, true, "JAMI",
+                        totalDebit > 0 ? totalDebit.ToString("N0") : "",
+                        totalCredit > 0 ? totalCredit.ToString("N0") : "",
+                        "");
+                    container.Children.Add(totalGrid);
+                    availableHeight -= totalGridHeight;
+                }
+
+                // Oxirgi Qoldiq
+                if (lastBalanceHeight < availableHeight)
+                {
+                    // 💥 YECHIM 4: Elementni har safar yangidan yaratish
+                    var lastBalanceGrid = CreateBalanceRow(finalColWidths, "Oxirgi qoldiq", LastBalance.ToString("N2"));
+                    container.Children.Add(lastBalanceGrid);
+                }
+            }
+
+            // ... (Sahifani qo'shish va Footer mantiqlari o'zgarmadi)
+            page.Children.Add(container);
+
+            // FOOTER: Sahifa raqamini joylashtirish
+            // Footer elementlari ham har safar yangidan yaratilishi kerak (UpdatePageFooter ichida shunday qilingan)
+            AddPageFooter(page, pageNumber, 0);
+
+            var pc = new PageContent();
+            ((IAddChild)pc).AddChild(page);
+            doc.Pages.Add(pc);
+
+            pageNumber++;
+
+            // Ma'lumot yo'q bo'lsa va bu birinchi sahifa bo'lsa, tsikldan chiqish
+            if (allOperations.Count == 0 && isFirstPage) break;
+            // ...
+        }
+
+        // ... (Footerlarni yakuniy to'g'rilash mantiqi o'zgarmadi)
+        int totalPages = doc.Pages.Count;
+        for (int i = 0; i < totalPages; i++)
+        {
+            var p = (FixedPage)((PageContent)doc.Pages[i]).GetPageRoot(false);
+            if (p != null)
+            {
+                UpdatePageFooter(p, i + 1, totalPages);
+            }
+        }
+
+        return doc;
+    }
+    // ************************************************************************************
+    // YORDAMCHI METODLAR (Dinamik sahifalash uchun yangi qo'shimchalar)
+    // ************************************************************************************
+
+    // Header sarlavha va mijoz ma'lumotlarini yaratish
+    private StackPanel CreateTitleAndInfo(string customerName, DateTime? beginDate, DateTime? endDate)
+    {
+        var stack = new StackPanel();
 
         // Sarlavha
         stack.Children.Add(new TextBlock
@@ -382,7 +548,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         // Mijoz va davr
         stack.Children.Add(new TextBlock
         {
-            Text = $"Mijoz: {SelectedCustomer?.Name.ToUpper() ?? "TANLANMAGAN"}",
+            Text = $"Mijoz: {customerName?.ToUpper() ?? "TANLANMAGAN"}",
             FontSize = 16,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 0, 8)
@@ -390,52 +556,91 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         stack.Children.Add(new TextBlock
         {
-            Text = $"Davr: {(BeginDate?.ToString("dd.MM.yyyy") ?? "-")} — {(EndDate?.ToString("dd.MM.yyyy") ?? "-")}",
+            Text = $"Davr: {(beginDate?.ToString("dd.MM.yyyy") ?? "-")} — {(endDate?.ToString("dd.MM.yyyy") ?? "-")}",
             FontSize = 15,
             Margin = new Thickness(0, 0, 0, 30)
         });
 
-
-        double[] colWidths = { 90, 120, 120, 370 };
-        // Boshlang‘ich qoldiq
-        stack.Children.Add(CreateBalanceRow(colWidths, "Boshlang‘ich qoldiq", BeginBalance.ToString("N2")));
-
-        // Header
-        stack.Children.Add(CreateRow(colWidths, true, "Sana", "Chiqim", "Kirim", "Izoh"));
-
-        // Operatsiyalar
-        foreach (var op in Operations)
-        {
-            string debit = op.Debit > 0 ? op.Debit.ToString("N0") : "";
-            string credit = op.Credit > 0 ? op.Credit.ToString("N0") : "";
-            stack.Children.Add(CreateRow(colWidths, false,
-                op.Date.ToString("dd.MM.yyyy"),
-                debit,
-                credit,
-                op.Description
-            ));
-        }
-
-        // Jami
-        var totalDebit = Operations.Sum(x => x.Debit);
-        var totalCredit = Operations.Sum(x => x.Credit);
-        stack.Children.Add(CreateRow(colWidths, true, "JAMI",
-            totalDebit > 0 ? totalDebit.ToString("N0") : "",
-            totalCredit > 0 ? totalCredit.ToString("N0") : "",
-            ""));
-
-        // Oxirgi qoldiq
-        stack.Children.Add(CreateBalanceRow(colWidths, "Oxirgi qoldiq", LastBalance.ToString("N2")));
-
-        page.Children.Add(stack);
-
-        var pageContent = new PageContent();
-        ((IAddChild)pageContent).AddChild(page);
-        doc.Pages.Add(pageContent);
-
-        return doc;
+        return stack;
     }
 
+    // Qator balandligini hisoblash (TextWrappingni hisobga olgan holda)
+    private double CalculateRowHeight(double commentColumnWidth, string description)
+    {
+        if (string.IsNullOrEmpty(description)) return 45; // Minimal balandlik (Padding 8 * 2 + Font 12 = ~45)
+
+        // Taxminiy o'lchash mantiqi (Sizning oldingi kodingizdan soddalashtirilgan)
+        var tempTextBlock = new TextBlock
+        {
+            Text = description,
+            Width = commentColumnWidth - 20, // Padding 8*2 = 16 (taxminan 20)
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 12,
+            Padding = new Thickness(8),
+        };
+
+        tempTextBlock.Measure(new Size(commentColumnWidth, double.MaxValue));
+
+        double actualHeight = tempTextBlock.DesiredSize.Height;
+
+        // Minimal balandlikni qaytarish (45: Padding 8,8 + Font size 12)
+        return Math.Max(45, actualHeight);
+    }
+
+    // Footer yaratish (Boshlang'ich joylashtirish)
+    private void AddPageFooter(FixedPage page, int currentPage, int totalPages)
+    {
+        // Pastki o'ng qismga sahifalash ma'lumotini qo'shamiz (Faqat o'rnatish)
+        var pageInfo = new TextBlock
+        {
+            Text = $"{currentPage}-bet / {totalPages}",
+            FontSize = 12,
+            FontWeight = FontWeights.Bold,
+        };
+
+        FixedPage.SetRight(pageInfo, 50);
+        FixedPage.SetBottom(pageInfo, 20);
+
+        page.Children.Add(pageInfo);
+    }
+
+    // Footer raqamlarini yangilash
+    private void UpdatePageFooter(FixedPage page, int currentPage, int totalPages)
+    {
+        const double margin = 50;
+
+        // Avvalgi PageInfo elementini topishga harakat qilish (agar bor bo'lsa)
+        // FixedPage.Children ni aylanib chiqish va topish.
+        TextBlock existingPageInfo = null;
+        foreach (var child in page.Children.OfType<TextBlock>())
+        {
+            // FixedPage.SetRight/SetBottom orqali joylashganligini tekshirishning ishonchli usuli yo'q,
+            // shuning uchun biz uni o'chirib, yangidan qo'shamiz.
+            if (FixedPage.GetRight(child) == margin)
+            {
+                existingPageInfo = child;
+                break;
+            }
+        }
+
+        if (existingPageInfo != null)
+        {
+            page.Children.Remove(existingPageInfo);
+        }
+
+        // Yangi Footer yaratish va joylashtirish
+        var pageInfo = new TextBlock
+        {
+            Text = $"{currentPage}-bet / {totalPages}",
+            FontSize = 12,
+            FontWeight = FontWeights.Bold,
+        };
+
+        FixedPage.SetRight(pageInfo, margin); // O'ng chetidan margin masofada
+        FixedPage.SetBottom(pageInfo, 20);    // Pastki chetidan 20 piksel yuqorida
+
+        page.Children.Add(pageInfo);
+    }
     private Grid CreateRow(double[] widths, bool isHeader, params string[] cells)
     {
         var grid = new Grid();
@@ -558,61 +763,85 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         return grid;
     }
 
-    private void SaveFixedDocumentToPdf(FixedDocument doc, string path, int dpi = 96)
+    private void SaveFixedDocumentToPdf(FixedDocument doc, string path, int dpi = 600) // ❗ DPI 300 qilib o'zgartirildi
     {
         try
         {
+            // Agar fayl mavjud bo'lsa, uni o'chirish
             if (File.Exists(path)) File.Delete(path);
 
             using var pdfDoc = new PdfSharp.Pdf.PdfDocument();
+
+            // Har bir FixedPage ni PDF sahifasiga o'tkazish
             foreach (var pageContent in doc.Pages)
             {
                 var fixedPage = pageContent.GetPageRoot(false);
                 if (fixedPage == null) continue;
 
+                // 1. FixedPage Layout-ni yangilash
+                // O'lchash (Measure) va joylashtirish (Arrange) orqali UI elementlarining haqiqiy o'lchamlarini olish
                 fixedPage.Measure(new Size(fixedPage.Width, fixedPage.Height));
                 fixedPage.Arrange(new Rect(0, 0, fixedPage.Width, fixedPage.Height));
                 fixedPage.UpdateLayout();
 
+                // 2. FixedPage-ni yuqori sifatli rasm (RenderTargetBitmap) ga render qilish
+
+                // Koeffitsient (96 DPI ga nisbatan necha marta kattaroq)
                 double scale = dpi / 96.0;
+
                 var bitmap = new RenderTargetBitmap(
+                    // Render qilinadigan rasmni piksel o'lchamlari
                     (int)(fixedPage.Width * scale),
                     (int)(fixedPage.Height * scale),
-                    dpi, dpi, PixelFormats.Pbgra32);
+                    // DPI
+                    dpi, dpi,
+                    PixelFormats.Pbgra32);
 
                 var dv = new DrawingVisual();
                 using (var dc = dv.RenderOpen())
                 {
+                    // Render qilishda scaling (masshtablash) qo'llash
                     dc.PushTransform(new ScaleTransform(scale, scale));
                     dc.DrawRectangle(new VisualBrush(fixedPage), null,
                         new Rect(0, 0, fixedPage.Width, fixedPage.Height));
                 }
                 bitmap.Render(dv);
 
+                // 3. Rasmni PNG stream orqali MemoryStream ga saqlash
                 var encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(bitmap));
                 using var ms = new MemoryStream();
                 encoder.Save(ms);
                 ms.Position = 0;
 
+                // 4. PdfSharp yordamida PDF sahifasini yaratish
                 var pdfPage = pdfDoc.AddPage();
+                // A4 o'lchamlarini mm da o'rnatish
                 pdfPage.Width = XUnit.FromMillimeter(210);
                 pdfPage.Height = XUnit.FromMillimeter(297);
 
+                // 5. Rasmni PDF sahifasiga joylashtirish
                 using var xgfx = XGraphics.FromPdfPage(pdfPage);
                 using var ximg = XImage.FromStream(ms);
+
+                // Rasm va sahifa o'lchamlari nisbatini hisoblash
                 double ratio = Math.Min(pdfPage.Width.Point / ximg.PointWidth, pdfPage.Height.Point / ximg.PointHeight);
                 double w = ximg.PointWidth * ratio;
                 double h = ximg.PointHeight * ratio;
+
+                // Rasmni PDF sahifasining markaziga joylashtirish
                 xgfx.DrawImage(ximg, (pdfPage.Width.Point - w) / 2, (pdfPage.Height.Point - h) / 2, w, h);
             }
+
+            // PDF faylni saqlash
             pdfDoc.Save(path);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"PDF saqlashda xatolik: {ex.Message}");
+            // Xatolik haqida xabar berish
+            MessageBox.Show($"PDF saqlashda xatolik: {ex.Message}", "Xatolik", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
-    #endregion Private Helpers
+        #endregion Private Helpers
 }
