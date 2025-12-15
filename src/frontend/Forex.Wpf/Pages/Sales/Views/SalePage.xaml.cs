@@ -1,5 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.Sales;
 
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.Pages.Sales.Views;
@@ -8,6 +9,7 @@ using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 public partial class SalePage : Page
 {
@@ -19,6 +21,26 @@ public partial class SalePage : Page
         InitializeComponent();
         vm = App.AppHost!.Services.GetRequiredService<SalePageViewModel>();
         DataContext = vm;
+
+        Loaded += Page_Loaded;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        // pass
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        btnBack.RegisterShortcut(Key.Escape);
+        btnAdd.RegisterShortcut(Key.Add);
+        btnFilter.RegisterShortcut(Key.F, ModifierKeys.Control);
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

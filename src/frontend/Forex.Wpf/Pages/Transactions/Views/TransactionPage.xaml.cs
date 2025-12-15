@@ -5,6 +5,7 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Transactions.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,10 +20,37 @@ public partial class TransactionPage : Page
     {
         InitializeComponent();
         DataContext = App.AppHost!.Services.GetRequiredService<TransactionPageViewModel>();
-        SetupFocusNavigation();
+
+        Loaded += Page_Loaded;
     }
 
-    private void SetupFocusNavigation()
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnSubmit,
+            key: Key.Enter,
+            modifiers: ModifierKeys.Control
+        );
+
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnBack,
+            key: Key.Escape
+        );
+
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnCancel,
+            key: Key.Delete,
+            modifiers: ModifierKeys.Control
+        );
+    }
+
+    private void RegisterFocusNavigation()
     {
         FocusNavigator.RegisterElements(
         [

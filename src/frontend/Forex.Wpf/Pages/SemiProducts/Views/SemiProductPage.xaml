@@ -93,7 +93,7 @@
             </Grid.RowDefinitions>
 
             <!--  Back Button  -->
-            <Button
+            <Button x:Name="btnBack"
                 HorizontalAlignment="Right"
                 md:ButtonAssist.CornerRadius="5"
                 Background="{DynamicResource OtherBackground}"

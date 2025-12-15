@@ -341,7 +341,7 @@ public static class FocusNavigator
         };
     }
 
-    private static void FocusElement(UIElement element)
+    public static void FocusElement(UIElement element)
     {
         element.Focus();
 

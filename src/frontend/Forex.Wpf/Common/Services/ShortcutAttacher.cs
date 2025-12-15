@@ -78,9 +78,7 @@ public static class ShortcutAttacher
             void navigationHandler(object sender, System.Windows.Navigation.NavigationEventArgs e)
             {
                 if (e.Content != page)
-                {
                     DeactivateShortcuts(page);
-                }
             }
 
             page.Loaded += (s, e) =>
@@ -95,9 +93,7 @@ public static class ShortcutAttacher
             page.Unloaded += (s, e) =>
             {
                 if (page.NavigationService is not null)
-                {
                     page.NavigationService.Navigated -= navigationHandler;
-                }
             };
         }
     }
@@ -114,9 +110,12 @@ public static class ShortcutAttacher
             void handler(object sender, KeyEventArgs e)
             {
                 var currentModifiers = Keyboard.Modifiers;
+                var nonMatchingActiveModifiers = currentModifiers & ~reg.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows);
+
                 bool modifiersMatch = reg.Modifiers == ModifierKeys.None
                     ? currentModifiers == ModifierKeys.None
-                    : (currentModifiers & reg.Modifiers) == reg.Modifiers;
+                    : (currentModifiers & reg.Modifiers) == reg.Modifiers
+                      && nonMatchingActiveModifiers == ModifierKeys.None;
 
                 if (e.Key == reg.Key && modifiersMatch)
                 {
@@ -142,14 +141,13 @@ public static class ShortcutAttacher
         if (ActiveHandlers.TryGetValue(view, out var handlers))
         {
             foreach (var handler in handlers)
-            {
                 view.PreviewKeyDown -= handler;
-            }
+
             ActiveHandlers.Remove(view);
         }
     }
 
-    public static void RegisterShortcut(FrameworkElement targetElement, Key key, Action targetAction, ModifierKeys modifiers = ModifierKeys.None)
+    public static void RegisterShortcut(this FrameworkElement targetElement, Key key, Action targetAction, ModifierKeys modifiers = ModifierKeys.None, string? tooltipText = null)
     {
         if (targetElement is null || targetAction is null)
             return;
@@ -157,16 +155,14 @@ public static class ShortcutAttacher
         FrameworkElement? view = null;
 
         if (targetElement.IsLoaded)
-        {
             view = FindRootView(targetElement);
-        }
 
         if (view is null)
         {
             void delayedRegistration(object? s, RoutedEventArgs e)
             {
                 targetElement.Loaded -= delayedRegistration;
-                RegisterShortcut(targetElement, key, targetAction, modifiers);
+                RegisterShortcut(targetElement, key, targetAction, modifiers, tooltipText);
             }
             targetElement.Loaded += delayedRegistration;
             return;
@@ -189,23 +185,22 @@ public static class ShortcutAttacher
             {
                 Key = key,
                 Modifiers = modifiers,
-                Action = targetAction
+                Action = targetAction,
+                TooltipText = tooltipText
             });
         }
 
         if (view.IsLoaded)
-        {
             ActivatePendingShortcuts(view);
-        }
     }
 
-    public static void RegisterShortcut(Button targetButton, Key key, ModifierKeys modifiers = ModifierKeys.None)
+    public static void RegisterShortcut(this Button targetButton, Key key, ModifierKeys modifiers = ModifierKeys.None, string? tooltipText = null)
     {
         if (targetButton is null)
             return;
 
         string shortcutString = KeyCombinationToString(key, modifiers);
-        UpdateTooltip(targetButton, shortcutString);
+        UpdateTooltip(targetButton, shortcutString, tooltipText);
 
         void buttonAction()
         {
@@ -254,11 +249,13 @@ public static class ShortcutAttacher
         return $"({shortcut})";
     }
 
-    private static void UpdateTooltip(Button targetButton, string shortcutString)
+    private static void UpdateTooltip(Button targetButton, string shortcutString, string? tooltipText = null)
     {
-        object currentTooltip = targetButton.ToolTip;
+        object? currentTooltip = targetButton.ToolTip;
 
-        if (currentTooltip is string currentText && !string.IsNullOrWhiteSpace(currentText))
+        if (!string.IsNullOrWhiteSpace(tooltipText))
+            targetButton.ToolTip = $"{tooltipText} {shortcutString}";
+        else if (currentTooltip is string currentText && !string.IsNullOrWhiteSpace(currentText))
         {
             if (!currentText.Contains(shortcutString))
                 targetButton.ToolTip = $"{currentText} {shortcutString}";
@@ -270,9 +267,8 @@ public static class ShortcutAttacher
     public static void ClearAll()
     {
         foreach (var view in ActiveHandlers.Keys.ToList())
-        {
             DeactivateShortcuts(view);
-        }
+
         PendingRegistrations.Clear();
         InitializedViews.Clear();
     }

@@ -31,8 +31,7 @@ public partial class LoginPage : Page
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        if (Application.Current.MainWindow is Window mainWindow)
-            WindowResizer.AnimateToSize(mainWindow, 500, 450);
+        this.ResizeWindow(500, 450);
     }
 
     private async void BtnLogin_Click(object sender, RoutedEventArgs e)

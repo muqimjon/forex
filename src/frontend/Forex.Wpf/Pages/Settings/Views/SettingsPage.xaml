@@ -114,8 +114,8 @@
                 Background="{DynamicResource OtherBackground}"
                 Click="BtnBack_Click"/>
 
-        <TabControl Margin="10" Grid.Row="1">
-            <TabItem Header="Valyutalar">
+        <TabControl Margin="10" Grid.Row="1" x:Name="tabControl">
+            <TabItem Header="Valyutalar" >
 
                 <Grid>
                     <Grid.RowDefinitions>

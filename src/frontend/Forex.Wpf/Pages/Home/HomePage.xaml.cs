@@ -15,6 +15,7 @@ using Forex.Wpf.Windows;
 using Forex.Wpf.Windows.OverdueAccountsWindow;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 /// <summary>
 /// Interaction logic for HomePage.xaml
@@ -32,7 +33,7 @@ public partial class HomePage : Page
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        ResizeWindow();
+        this.ResizeWindow(810, 580);
         RegisterFocusNavigation();
         RegisterGlobalShortcuts();
 
@@ -64,7 +65,13 @@ public partial class HomePage : Page
 
     private void RegisterGlobalShortcuts()
     {
-        //throw new NotImplementedException();
+        btnSale.RegisterShortcut(Key.F1);
+        btnCash.RegisterShortcut(Key.F2);
+        btnProduct.RegisterShortcut(Key.F3);
+        btnSemiProductEntry.RegisterShortcut(Key.F4);
+        btnUser.RegisterShortcut(Key.F5);
+        btnReports.RegisterShortcut(Key.F6);
+        btnSettings.RegisterShortcut(Key.F7);
     }
 
     private void RegisterFocusNavigation()
@@ -79,12 +86,6 @@ public partial class HomePage : Page
             btnReports,
             btnSettings,
         ]);
-    }
-
-    private static void ResizeWindow()
-    {
-        if (Application.Current.MainWindow is Window mainWindow)
-            WindowResizer.AnimateToSize(mainWindow, 810, 580);
     }
 
     private void BtnUser_Click(object sender, RoutedEventArgs e)

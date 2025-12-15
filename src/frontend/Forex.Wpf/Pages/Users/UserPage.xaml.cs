@@ -49,10 +49,39 @@ public partial class UserPage : Page
         LoadUsers();
         UpdateRoleList();
 
+        Loaded += Page_Loaded;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        ShortcutAttacher.RegisterShortcut(
+            targetButton: btnBack,
+            key: Key.Escape
+        );
+    }
+
+    private void RegisterFocusNavigation()
+    {
         FocusNavigator.RegisterElements([
-            txtSearch, cbRole, txtName, txtPhone, txtAddress,
-            txtDescription, cbxValutaType, tbDebt, tbAccount, btnSave
+            txtSearch,
+            cbRole,
+            txtName,
+            txtPhone,
+            txtAddress,
+            txtDescription,
+            cbxValutaType,
+            tbDebt,
+            tbAccount,
+            btnSave
         ]);
+
+        FocusNavigator.SetFocusRedirect(btnBack, cbRole);
     }
 
     // 🔴 Input maydonlariga focus berilganda

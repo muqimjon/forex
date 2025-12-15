@@ -30,8 +30,7 @@ public partial class RegisterPage : Page
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        if (Application.Current.MainWindow is Window mainWindow)
-            WindowResizer.AnimateToSize(mainWindow, 500, 550);
+        this.ResizeWindow(500, 550);
     }
 
     private async void BtnRegister_Click(object sender, RoutedEventArgs e)

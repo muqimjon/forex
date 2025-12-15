@@ -57,21 +57,26 @@ public partial class ProductPage : Page
         );
 
         ShortcutAttacher.RegisterShortcut(
-            targetElement: this,
-            key: Key.E,
-            modifiers: ModifierKeys.Control,
-            targetAction: () => _ = vm.Edit()
+            targetButton: btnBack,
+            key: Key.Escape
         );
 
         ShortcutAttacher.RegisterShortcut(
-            targetElement: this,
-            key: Key.Escape,
-            targetAction: () => BtnBack_Click(null!, null!)
+            targetButton: btnAdd,
+            key: Key.Enter,
+            modifiers: ModifierKeys.Control
         );
 
         ShortcutAttacher.RegisterShortcut(
             targetButton: btnRedirectToAddPage,
             key: Key.Add
+        );
+
+        ShortcutAttacher.RegisterShortcut(
+            targetElement: this,
+            key: Key.E,
+            modifiers: ModifierKeys.Control,
+            targetAction: () => _ = vm.Edit()
         );
     }
 
