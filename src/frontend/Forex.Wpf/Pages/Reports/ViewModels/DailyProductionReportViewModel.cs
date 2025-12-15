@@ -132,7 +132,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
                 var vm = new ProductionItemViewModel
                 {
                     RowNumber = rowNum++,
-                    Date = entry.Date,
+                    Date = entry.Date.ToLocalTime(),
                     Code = product.Code,
                     Name = product.Name,
                     Type = entry.ProductType?.Type ?? "-",

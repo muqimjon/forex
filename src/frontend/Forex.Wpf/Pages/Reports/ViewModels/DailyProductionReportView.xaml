@@ -231,6 +231,25 @@
             </DataGrid.ColumnHeaderStyle>
 
             <DataGrid.Columns>
+                <DataGridTemplateColumn Width="60" Header="T/r">
+                    <DataGridTemplateColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTemplateColumn.CellStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding
+                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},
+                                    Converter={StaticResource IndexConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
                 <!--  Sana — o‘rtada  -->
                 <DataGridTextColumn
                     Width="120"

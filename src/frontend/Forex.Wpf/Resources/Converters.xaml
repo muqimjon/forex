@@ -19,5 +19,6 @@
     <conv:BalanceToColorConverter x:Key="BalanceToColorConverter" />
     <conv:IsNotNewRowConverter x:Key="IsNotNewRowConverter" />
     <conv:ArrayMultiValueConverter x:Key="ArrayMultiValueConverter" />
+    <conv:IndexConverter x:Key="IndexConverter" />
 
 </ResourceDictionary>

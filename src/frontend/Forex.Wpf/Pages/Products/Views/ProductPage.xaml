@@ -229,7 +229,7 @@
                 Margin="2,0,0,0"
                 md:ButtonAssist.CornerRadius="4"
                 Background="#FF6B6B"
-                    BorderBrush="#D32F2F"
+                BorderBrush="#D32F2F"
                 Command="{Binding DataContext.CancelCommand, ElementName=RootPage}"
                 Content="Bekor qilish"
                 Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -271,6 +271,25 @@
                 </DataGrid.Resources>
 
                 <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="60" Header="T/r">
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding
+                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},
+                                    Converter={StaticResource IndexConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                     <DataGridTextColumn
                         Width="100"
                         Binding="{Binding Date, Mode=TwoWay, StringFormat={}{0:dd.MM.yyyy}}"
