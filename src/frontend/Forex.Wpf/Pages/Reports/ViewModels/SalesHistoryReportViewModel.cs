@@ -158,7 +158,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             Padding = new Thickness(15, 8, 15, 8),
             HorizontalAlignment = HorizontalAlignment.Right
         };
-        shareButton.Click += async (s, e) => await ShareAsPdfAsync(doc);
 
         var toolbar = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
         toolbar.Children.Add(shareButton);
@@ -307,8 +306,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
     }
 
 
-
-    // PDF yaratish
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
@@ -352,25 +349,24 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             Margin = new Thickness(0, 0, 0, 25)
         });
 
-        // JADVAL — Oxirgi ustun (Umumiy summa) ham sig‘adi!
+        // JADVAL
         var table = new Grid();
 
-        // ENG MUHIM: Ustun enlarini oxirgi millimetrgacha hisobladim
+        // Ustun enlari
         double[] widths = {
-        56,   // Sana
-        80,  // Mijoz
-        52,   // Kodi
-        60,  // Nomi
-        58,   // Razmer
-        60,   // Donasi
-        60,   // Qopdagi
-        52,   // Jami
-        50,   // O‘lchov
-        70,   // Narxi
-        100   // Umumiy summa — ENDI TO‘LIQ SIG‘ADI!
+        56,    // 0. Sana
+        80,    // 1. Mijoz
+        52,    // 2. Kodi
+        60,    // 3. Nomi
+        58,    // 4. Razmer
+        60,    // 5. Qop soni
+        60,    // 6. Donasi
+        52,    // 7. Jami
+        50,    // 8. O‘lchov
+        70,    // 9. Narxi
+        100    // 10. Umumiy summa
     };
 
-        // Jami en: 62+105+52+115+58+60+52+60+80+110 = 704px → to‘g‘ri keladi!
         foreach (var w in widths)
             table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
@@ -397,10 +393,27 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             );
         }
 
-        // JAMI QATOR — eng keng joyda
-        var totalAmount = FilteredItems.Sum(x => x.Amount);
+        // 💰 JAMI QATORNI HISOBLASH VA JOYLASHTIRISH 💰
+
+        // Yig'indilar
+        var totalBundleCount = FilteredItems.Sum(x => x.BundleCount); // Umumiy Qop soni
+        var totalTotalCount = FilteredItems.Sum(x => x.TotalCount);   // Umumiy Jami (soni)
+        var totalAmount = FilteredItems.Sum(x => x.Amount);           // Umumiy summa
+
+        // JAMI qatori (Header stili qo'llanadi)
         AddRow(table, true,
-            "JAMI:", "", "", "", "", "", "", "", "", "", $"{totalAmount:N2}"
+            // 0-4. Birinchi 5 ustun bo'sh
+            "JAMI:", "", "", "", "",
+            // 5. Qop soni ustunida umumiy qop soni chiqadi (N0 formatida)
+            totalBundleCount.ToString("N0"),
+            // 6. Donasi ustuni bo'sh (yoki "JAMI:" uchun qulay joy)
+            "",
+            // 7. Jami ustunida umumiy Jami (soni) chiqadi (N0 formatida)
+            totalTotalCount.ToString("N0"),
+            // 8-9. O'lchov va Narxi ustunlari bo'sh
+            "", "",
+            // 10. Umumiy summa ustunida umumiy pul qiymati chiqadi (N2 formatida)
+            $"{totalAmount:N2}"
         );
 
         stack.Children.Add(table);
@@ -413,7 +426,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
         return doc;
     }
-
+    // AddRow metodi o'zgarmaydi.
     private void AddRow(Grid grid, bool isHeader, params string[] cells)
     {
         int row = grid.RowDefinitions.Count;
@@ -421,16 +434,35 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
         for (int i = 0; i < cells.Length; i++)
         {
+            // 1. TextAlignment (Hizalanish) mantiqini aniqlash
+            TextAlignment alignment;
+
+            // Mijoz (1) va Nomi (3) chapda. Narxi (9) va Umumiy summa (10) o'ngda.
+            if (i == 1 || i == 3) // Mijoz, Nomi
+            {
+                alignment = TextAlignment.Left;
+            }
+            else if (i == 9 || i == 10) // Narxi, Umumiy summa
+            {
+                alignment = TextAlignment.Right;
+            }
+            else // Sana, Kodi, Razmer, Qop soni, Donasi, Jami, O‘lchov
+            {
+                alignment = TextAlignment.Center;
+            }
+
             var tb = new TextBlock
             {
                 Text = cells[i],
                 Padding = new Thickness(4, 5, 4, 5),
-                FontSize = isHeader ? 11 : 10.5,        // kichik font — sig‘ish uchun
+                FontSize = isHeader ? 11 : 10.5,
                 FontWeight = isHeader ? FontWeights.Bold : FontWeights.Medium,
-                TextAlignment = i >= 8 ? TextAlignment.Right : TextAlignment.Left,
+                TextAlignment = alignment, // <--- YANGI HIZALANISH QOIDASI
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.WrapWithOverflow
             };
+
+            // ... (Border mantiqlari o'zgarmaydi) ...
 
             var border = new Border
             {
@@ -445,27 +477,26 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             grid.Children.Add(border);
         }
     }
+    //private async Task ShareAsPdfAsync(FixedDocument doc)
+    //{
+    //    try
+    //    {
+    //        string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ForexReports");
+    //        Directory.CreateDirectory(folder);
+    //        string fileName = $"Savdo_{BeginDate:dd.MM.yyyy}-{EndDate:dd.MM.yyyy}.pdf";
+    //        string path = Path.Combine(folder, fileName);
 
-    private async Task ShareAsPdfAsync(FixedDocument doc)
-    {
-        try
-        {
-            string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ForexReports");
-            Directory.CreateDirectory(folder);
-            string fileName = $"Savdo_{BeginDate:dd.MM.yyyy}-{EndDate:dd.MM.yyyy}.pdf";
-            string path = Path.Combine(folder, fileName);
+    //        // PDF saqlash (PdfSharp yoki boshqa kutubxona kerak bo‘lsa keyinroq qo‘shiladi)
+    //        // Hozircha oddiy xabar
+    //        MessageBox.Show($"PDF saqlandi:\n{path}\nTelegram orqali ulashing!", "Tayyor", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // PDF saqlash (PdfSharp yoki boshqa kutubxona kerak bo‘lsa keyinroq qo‘shiladi)
-            // Hozircha oddiy xabar
-            MessageBox.Show($"PDF saqlandi:\n{path}\nTelegram orqali ulashing!", "Tayyor", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ulashishda xato: {ex.Message}");
-        }
-    }
+    //        Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        MessageBox.Show($"Ulashishda xato: {ex.Message}");
+    //    }
+    //}
 
     #endregion Private Methods
 }

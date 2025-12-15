@@ -1,6 +1,7 @@
 ﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
@@ -357,12 +358,10 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         }.ShowDialog();
     }
 
-    // ... (usinglar, konstantalar va model xususiyatlari o'zgarmadi) ...
-
     private FixedDocument CreateFixedDocument()
     {
-        var doc = new FixedDocument();
-
+        var doc = new FixedDocument(); // Shu ye
+        // ... (Konstantalar va boshlang'ich hisob-kitoblar o'zgarmadi) ...
         // Konstanta qiymatlar
         const double pageWidth = 793.7;
         const double pageHeight = 1122.5;
@@ -374,6 +373,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         const double headerHeight = 45;
         const double totalGridHeight = 45;
         const double lastBalanceHeight = 45;
+        const double minFinalSpace = 20; // JAMI va Qoldiq qatorlari orasidagi minimal bo'shliq
 
         // Ustun kengliklari
         double[] finalColWidths = { 90, 120, 120, 363.7 }; // Jami 693.7
@@ -386,8 +386,10 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         var totalDebit = Operations.Sum(x => x.Debit);
         var totalCredit = Operations.Sum(x => x.Credit);
 
-        // BOSHQA ELEMENTLARNI tsikldan TASHQARIDA YARATISHNI O'CHIRAMIZ!
-        // Bu elementlar endi tsikl ichida yaratiladi.
+        // Yagona ma'lumot qatorining minimal balandligi (taxminan 45px)
+        // JAMI qatori uchun ham shu balandlik ishlatiladi
+        const double requiredSpaceForFinalRows = totalGridHeight + lastBalanceHeight + 2 * minFinalSpace;
+
 
         // Har bir sahifani yaratish uchun tsikl
         while (currentIndex < allOperations.Count || pageNumber == 1)
@@ -400,7 +402,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             // 1. HEADER (Sarlavha, Mijoz, Davr)
             if (isFirstPage)
             {
-                // Bu StackPanel yangi yaratilgani uchun muammo yo'q
                 container.Children.Add(CreateTitleAndInfo(SelectedCustomer?.Name, BeginDate, EndDate));
                 currentY += initialHeaderHeight;
             }
@@ -408,18 +409,17 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             // 2. Boshlang'ich qoldiq (Faqat 1-sahifada)
             if (isFirstPage)
             {
-                // 💥 YECHIM 1: Elementni har safar yangidan yaratish
                 var initialBalanceGrid = CreateBalanceRow(finalColWidths, "Boshlang‘ich qoldiq", BeginBalance.ToString("N2"));
                 container.Children.Add(initialBalanceGrid);
                 currentY += balanceRowHeight;
             }
 
             // 3. Header qatori (Har bir sahifada)
-            // 💥 YECHIM 2: Elementni har safar yangidan yaratish
             var headerGrid = CreateRow(finalColWidths, true, "Sana", "Chiqim", "Kirim", "Izoh");
             container.Children.Add(headerGrid);
             currentY += headerHeight;
 
+            // Sahifada joriy ma'lumot qatorlari uchun mavjud balandlik
             double availableHeight = pageHeight - 2 * margin - currentY - footerHeight;
 
             int rowsAddedOnPage = 0;
@@ -427,15 +427,8 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             while (currentIndex < allOperations.Count)
             {
                 var op = allOperations[currentIndex];
-                double requiredHeight = CalculateRowHeight(finalColWidths[3], op.Description);
 
-                // Sig'masa yangi sahifaga o'tamiz
-                if (requiredHeight > availableHeight && rowsAddedOnPage > 0)
-                {
-                    break;
-                }
-
-                // Operatsiya qatorini yaratish
+                // Operatsiya qatorini yaratish (balandligini aniqlash uchun)
                 string debit = op.Debit > 0 ? op.Debit.ToString("N0") : "";
                 string credit = op.Credit > 0 ? op.Credit.ToString("N0") : "";
 
@@ -446,21 +439,34 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
                     op.Description
                 );
 
-                // Qatorning haqiqiy balandligini hisoblash (bu joy murakkab, shuning uchun minimal balandlikdan boshlaymiz)
-                // Agar sizning kodingizda avtomatik balandlikni hisoblash muammo bo'lsa, uni oddiy qiymatga tenglashtirish kerak.
-                // Hozirgi kodda bu hisob-kitob tashqarida bo'lgani uchun, ishonchli o'lchamni olamiz:
-
-                // Haqiqiy balandlikni topish uchun uni o'lchash (render qilmasdan)
+                // Qatorning haqiqiy balandligini o'lchash
                 operationRowGrid.Measure(new Size(workingWidth, double.MaxValue));
                 operationRowGrid.Arrange(new Rect(0, 0, workingWidth, operationRowGrid.DesiredSize.Height));
-                requiredHeight = operationRowGrid.DesiredSize.Height;
+                double requiredHeight = operationRowGrid.DesiredSize.Height;
 
-                // Xatolar uchun yana bir bor tekshirish
-                if (requiredHeight > availableHeight && rowsAddedOnPage > 0)
+                // 🛑 ENG MUHIM QISM: OXIRGI QATORLARGA JOY QOLDIRISHNI TEKSHIRISH
+                bool isLastOperation = (currentIndex == allOperations.Count - 1);
+
+                if (isLastOperation)
+                {
+                    // Agar bu oxirgi operatsiya bo'lsa, JAMI va Qoldiq uchun joy yetarlimi tekshiramiz.
+                    double neededSpace = requiredHeight + requiredSpaceForFinalRows;
+
+                    if (neededSpace > availableHeight && rowsAddedOnPage > 0)
+                    {
+                        // Oxirgi operatsiya va oxirgi qoldiqlar sig'masa,
+                        // ushbu operatsiyani keyingi sahifaga qoldiramiz.
+                        break;
+                    }
+                }
+                // Agar operatsiya qatori o'zi ham sig'masa, keyingi sahifaga o'tamiz
+                else if (requiredHeight > availableHeight && rowsAddedOnPage > 0)
                 {
                     break;
                 }
 
+
+                // Operatsiya qatorini qo'shish
                 container.Children.Add(operationRowGrid);
                 currentY += requiredHeight;
                 availableHeight -= requiredHeight;
@@ -471,35 +477,44 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             // 4. Jami va Oxirgi Qoldiq (Faqat oxirgi sahifada)
             bool isLastPage = (currentIndex >= allOperations.Count);
 
+            // Ma'lumot tsikli tugagan bo'lsa (yoki birinchi sahifada ma'lumot bo'lmasa)
             if (isLastPage)
             {
                 // JAMI
-                if (totalGridHeight < availableHeight)
-                {
-                    // 💥 YECHIM 3: Elementni har safar yangidan yaratish
-                    var totalGrid = CreateRow(finalColWidths, true, "JAMI",
-                        totalDebit > 0 ? totalDebit.ToString("N0") : "",
-                        totalCredit > 0 ? totalCredit.ToString("N0") : "",
-                        "");
-                    container.Children.Add(totalGrid);
-                    availableHeight -= totalGridHeight;
-                }
+                // Endi biz JAMI qatori uchun joy borligini avvaldan ta'minladik, shuning uchun shartsiz qo'shamiz
+                var totalGrid = CreateRow(finalColWidths, true, "JAMI",
+                    totalDebit > 0 ? totalDebit.ToString("N0") : "",
+                    totalCredit > 0 ? totalCredit.ToString("N0") : "",
+                    "");
+                container.Children.Add(totalGrid);
 
                 // Oxirgi Qoldiq
-                if (lastBalanceHeight < availableHeight)
-                {
-                    // 💥 YECHIM 4: Elementni har safar yangidan yaratish
-                    var lastBalanceGrid = CreateBalanceRow(finalColWidths, "Oxirgi qoldiq", LastBalance.ToString("N2"));
-                    container.Children.Add(lastBalanceGrid);
-                }
+                // Oldingi JAMI qator qo'shilgani va yetarli joy borligi uchun, buni ham shartsiz qo'shamiz
+                var lastBalanceGrid = CreateBalanceRow(finalColWidths, "Oxirgi qoldiq", LastBalance.ToString("N2"));
+                container.Children.Add(lastBalanceGrid);
             }
 
-            // ... (Sahifani qo'shish va Footer mantiqlari o'zgarmadi)
+            // Agar birinchi sahifada ma'lumot bo'lmasa (allOperations.Count == 0), uni ham qoldiqlar bilan saqlashimiz kerak.
+            if (allOperations.Count == 0 && isFirstPage)
+            {
+                // 0 operatsiya bo'lsa, Jami 0, Oxirgi qoldiq = Boshlang'ich qoldiq bo'ladi.
+
+                // JAMI 0
+                var totalGrid = CreateRow(finalColWidths, true, "JAMI", "", "", "");
+                container.Children.Add(totalGrid);
+
+                // Oxirgi Qoldiq (Boshlang'ich qoldiqqa teng)
+                var lastBalanceGrid = CreateBalanceRow(finalColWidths, "Oxirgi qoldiq", BeginBalance.ToString("N2"));
+                container.Children.Add(lastBalanceGrid);
+            }
+
+
+            // Sahifani qo'shish va Footer mantiqlari
             page.Children.Add(container);
 
-            // FOOTER: Sahifa raqamini joylashtirish
-            // Footer elementlari ham har safar yangidan yaratilishi kerak (UpdatePageFooter ichida shunday qilingan)
-            AddPageFooter(page, pageNumber, 0);
+            // Footer elementlari (Endi AddPageFooter emas, UpdatePageFooter ishlatiladi)
+            // AddPageFooter bu joyda ishlatilmasligi kerak, UpdatePageFooter tsikldan keyin ishlaydi
+            // AddPageFooter(page, pageNumber, 0); // Bu qatorni o'chiramiz/izohlaymiz
 
             var pc = new PageContent();
             ((IAddChild)pc).AddChild(page);
@@ -509,10 +524,9 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
             // Ma'lumot yo'q bo'lsa va bu birinchi sahifa bo'lsa, tsikldan chiqish
             if (allOperations.Count == 0 && isFirstPage) break;
-            // ...
         }
 
-        // ... (Footerlarni yakuniy to'g'rilash mantiqi o'zgarmadi)
+        // ... (Footerlarni yakuniy to'g'rilash mantiqi o'zgarmadi, bu juda muhim)
         int totalPages = doc.Pages.Count;
         for (int i = 0; i < totalPages; i++)
         {
@@ -525,11 +539,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         return doc;
     }
-    // ************************************************************************************
-    // YORDAMCHI METODLAR (Dinamik sahifalash uchun yangi qo'shimchalar)
-    // ************************************************************************************
-
-    // Header sarlavha va mijoz ma'lumotlarini yaratish
     private StackPanel CreateTitleAndInfo(string customerName, DateTime? beginDate, DateTime? endDate)
     {
         var stack = new StackPanel();
@@ -541,7 +550,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             FontSize = 20,
             FontWeight = FontWeights.Bold,
             TextAlignment = TextAlignment.Center,
-            Margin = new Thickness(0, 0, 0, 25),
+            Margin = new Thickness(0, 0, 0, 20),
             Foreground = new SolidColorBrush(Color.FromRgb(0, 102, 204))
         });
 
@@ -558,13 +567,12 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         {
             Text = $"Davr: {(beginDate?.ToString("dd.MM.yyyy") ?? "-")} — {(endDate?.ToString("dd.MM.yyyy") ?? "-")}",
             FontSize = 15,
-            Margin = new Thickness(0, 0, 0, 30)
+            Margin = new Thickness(0, 0, 0, 10)
         });
 
         return stack;
     }
 
-    // Qator balandligini hisoblash (TextWrappingni hisobga olgan holda)
     private double CalculateRowHeight(double commentColumnWidth, string description)
     {
         if (string.IsNullOrEmpty(description)) return 45; // Minimal balandlik (Padding 8 * 2 + Font 12 = ~45)
@@ -587,7 +595,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         return Math.Max(45, actualHeight);
     }
 
-    // Footer yaratish (Boshlang'ich joylashtirish)
     private void AddPageFooter(FixedPage page, int currentPage, int totalPages)
     {
         // Pastki o'ng qismga sahifalash ma'lumotini qo'shamiz (Faqat o'rnatish)
@@ -604,7 +611,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         page.Children.Add(pageInfo);
     }
 
-    // Footer raqamlarini yangilash
     private void UpdatePageFooter(FixedPage page, int currentPage, int totalPages)
     {
         const double margin = 50;
@@ -641,6 +647,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         page.Children.Add(pageInfo);
     }
+    
     private Grid CreateRow(double[] widths, bool isHeader, params string[] cells)
     {
         var grid = new Grid();
