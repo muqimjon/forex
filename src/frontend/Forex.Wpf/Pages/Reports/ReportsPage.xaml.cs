@@ -10,16 +10,12 @@
     public partial class ReportsPage : Page
     {
         private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
-        private bool _isInitialized = false;
 
         public ReportsPage()
         {
             InitializeComponent();
 
             DataContext = App.AppHost!.Services.GetRequiredService<ReportsPageViewModel>();
-
-            // Boshlang'ich flag
-            _isInitialized = true;
         }
 
         private void BtnBack_Click(object sender, RoutedEventArgs e)

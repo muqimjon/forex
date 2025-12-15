@@ -24,8 +24,7 @@ public sealed record UpdateTransactionCommand(
     : IRequest<bool>;
 
 public class UpdateTransactionCommandHandler(
-    IAppDbContext context,
-    IMapper mapper) : IRequestHandler<UpdateTransactionCommand, bool>
+    IAppDbContext context) : IRequestHandler<UpdateTransactionCommand, bool>
 {
     public async Task<bool> Handle(UpdateTransactionCommand request, CancellationToken cancellationToken)
     {
