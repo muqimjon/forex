@@ -111,7 +111,7 @@
                 ItemsSource="{Binding Product.ProductTypes}"
                 Label="Razmer"
                 SelectedItem="{Binding Product.SelectedType, UpdateSourceTrigger=PropertyChanged}" />
-            
+
             <!--  Qoplar soni  -->
             <controls:FloatingInput
                 x:Name="tbxBundle"
@@ -170,6 +170,24 @@
                 SelectionMode="Single"
                 SelectionUnit="FullRow">
                 <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="60" Header="T/r">
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding
+                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},
+                                    Converter={StaticResource IndexConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn
                         Width="*"
                         MinWidth="80"

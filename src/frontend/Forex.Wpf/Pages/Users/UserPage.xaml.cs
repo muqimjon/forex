@@ -28,6 +28,7 @@ public partial class UserPage : Page
     private List<UserResponse> rawUsers = [];
     private ObservableCollection<UserResponse> filteredUsers = [];
     private bool isCreatingNewUser = false; // 🔴 Yangi user qo'shish jarayonini kuzatish
+    private UserResponse currentUser; // Class darajasida e'lon qiling
 
     public UserPage()
     {
@@ -43,14 +44,6 @@ public partial class UserPage : Page
         tbDebt.LostFocus += TbNumeric_LostFocus;
         tbAccount.GotFocus += TextBox_GotFocus_SelectAll;
         tbDebt.GotFocus += TextBox_GotFocus_SelectAll;
-
-        // 🔴 Input maydonlariga focus berilganda yangi yaratish rejimiga o'tish
-        //txtName.GotFocus += InputField_GotFocus;
-        //txtPhone.GotFocus += InputField_GotFocus;
-        //txtAddress.GotFocus += InputField_GotFocus;
-        //txtDescription.GotFocus += InputField_GotFocus;
-        //tbDebt.GotFocus += InputField_GotFocus;
-        //tbAccount.GotFocus += InputField_GotFocus;
 
         LoadValyutaType();
         LoadUsers();
@@ -438,7 +431,6 @@ public partial class UserPage : Page
         }
     }
 
-    private UserResponse currentUser; // Class darajasida e'lon qiling
 
     private async void LoadingUser(long userId)
     {

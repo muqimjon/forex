@@ -258,34 +258,19 @@
             IsReadOnly="True"
             ItemsSource="{Binding filteredUsers}">
 
-            <!--  Barcha headerlar uchun umumiy style  -->
-            <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                    <Setter Property="Height" Value="35" />
-                    <Setter Property="Background" Value="{DynamicResource SecondaryBackground}" />
-                    <Setter Property="Foreground" Value="Black" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                    <Setter Property="FontSize" Value="14" />
-                    <Setter Property="BorderBrush" Value="LightGray" />
-                    <Setter Property="BorderThickness" Value="0,0,1,1" />
-                    <Setter Property="Padding" Value="8,5" />
-                </Style>
-            </DataGrid.ColumnHeaderStyle>
-
-            <!--  Cell style  -->
-            <DataGrid.CellStyle>
-                <Style TargetType="DataGridCell">
-                    <Setter Property="Padding" Value="8" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                    <Setter Property="BorderThickness" Value="0,0,1,0" />
-                    <Setter Property="BorderBrush" Value="LightGray" />
-                </Style>
-            </DataGrid.CellStyle>
-
             <DataGrid.Columns>
-                <!--  Nomi - Markazda  -->
+
+                <DataGridTemplateColumn Width="50" Header="T/r">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Converter={StaticResource IndexConverter}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Name}"
@@ -300,7 +285,6 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Telefon - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Phone}"
@@ -315,7 +299,6 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Manzil - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Address}"
@@ -330,7 +313,6 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Izoh - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Description}"
@@ -345,7 +327,6 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Rol - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Role}"
@@ -359,7 +340,6 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Hisob qoldiq - O'ng tomonda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding FirstBalance, StringFormat={}{0:N2}}"
@@ -370,12 +350,10 @@
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                             <Setter Property="Padding" Value="0,0,15,0" />
-                            <!--  O'ng tomondan padding  -->
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Valyuta turi - Markazda  -->
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding FirstCurrencyName}"
@@ -389,7 +367,6 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <!--  Amallar - Markazda  -->
                 <DataGridTemplateColumn Width="90" Header="Amallar">
                     <DataGridTemplateColumn.CellStyle>
                         <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="DataGridCell">
@@ -403,7 +380,6 @@
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             Orientation="Horizontal">
-                                            <!--  EDIT BUTTON  -->
                                             <Button
                                                 x:Name="btnEdit"
                                                 Width="30"
@@ -422,7 +398,6 @@
                                                     Height="16"
                                                     Kind="Pencil" />
                                             </Button>
-                                            <!--  DELETE BUTTON  -->
                                             <Button
                                                 x:Name="btnDelete"
                                                 Width="30"
@@ -449,6 +424,7 @@
                         </Style>
                     </DataGridTemplateColumn.CellStyle>
                 </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
