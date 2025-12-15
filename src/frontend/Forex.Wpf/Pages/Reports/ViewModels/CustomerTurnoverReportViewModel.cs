@@ -74,7 +74,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         var requset = new TurnoverRequest
         (
             UserId: SelectedCustomer.Id,
-            Begin: begin,
+            Begin: begin.ToUniversalTime(),
             End: end
         );
 
@@ -121,7 +121,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             Operations.Add(new TurnoversViewModel
             {
                 Id = op.Id,
-                Date = op.Date,
+                Date = op.Date.ToLocalTime(),
                 Description = op.Description ?? "Izoh yo‘q",
                 Debit = debit,
                 Credit = credit

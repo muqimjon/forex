@@ -203,6 +203,32 @@
             SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
 
             <DataGrid.Columns>
+                <DataGridTemplateColumn Width="60" Header="T/r">
+
+                    <DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Style>
+                    </DataGridTemplateColumn.HeaderStyle>
+
+                    <DataGridTemplateColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        </Style>
+                    </DataGridTemplateColumn.CellStyle>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="{Binding
+                                RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},
+                                Converter={StaticResource IndexConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn
                     Width="110"
                     Binding="{Binding Date, StringFormat=dd.MM.yyyy}"

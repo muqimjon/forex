@@ -98,7 +98,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
                     _allItems.Add(new SaleHistoryItemViewModel
                     {
-                        Date = sale.Date,
+                        Date = sale.Date.ToLocalTime(),
                         Customer = sale.Customer?.Name ?? "-",
                         Code = product.Code ?? "-",
                         ProductName = product.Name ?? "-",
