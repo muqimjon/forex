@@ -9,7 +9,6 @@
     Title="HomePage"
     d:DesignHeight="580"
     d:DesignWidth="810"
-    Loaded="Page_Loaded"
     mc:Ignorable="d">
 
     <StackPanel Background="{DynamicResource PrimaryBackground}">

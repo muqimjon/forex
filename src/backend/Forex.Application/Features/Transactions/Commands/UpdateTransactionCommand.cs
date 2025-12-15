@@ -1,6 +1,5 @@
 ﻿namespace Forex.Application.Features.Transactions.Commands;
 
-using AutoMapper;
 using Forex.Application.Commons.Exceptions;
 using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;

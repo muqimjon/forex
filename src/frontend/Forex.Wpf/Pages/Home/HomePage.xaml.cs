@@ -26,12 +26,15 @@ public partial class HomePage : Page
     {
         InitializeComponent();
         DataContext = AuthStore.Instance;
+
+        Loaded += Page_Loaded;
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        if (Application.Current.MainWindow is Window mainWindow)
-            WindowResizer.AnimateToSize(mainWindow, 810, 580);
+        ResizeWindow();
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
 
         //var userAccountService = App.AppHost!.Services.GetRequiredService<IApiUserAccount>();
         //var allAccountsResult = await userAccountService.GetAllAsync();
@@ -58,6 +61,32 @@ public partial class HomePage : Page
         //    tbWarning.Foreground = Brushes.Green;
         //}
     }
+
+    private void RegisterGlobalShortcuts()
+    {
+        //throw new NotImplementedException();
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        FocusNavigator.RegisterElements(
+        [
+            btnSale,
+            btnCash,
+            btnProduct,
+            btnSemiProductEntry,
+            btnUser,
+            btnReports,
+            btnSettings,
+        ]);
+    }
+
+    private static void ResizeWindow()
+    {
+        if (Application.Current.MainWindow is Window mainWindow)
+            WindowResizer.AnimateToSize(mainWindow, 810, 580);
+    }
+
     private void BtnUser_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new UserPage());
 
