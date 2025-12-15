@@ -1,6 +1,5 @@
 ﻿namespace Forex.Wpf.Resources.UserControls;
 
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

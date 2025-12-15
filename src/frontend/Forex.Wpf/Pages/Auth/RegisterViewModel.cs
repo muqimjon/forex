@@ -4,7 +4,6 @@ using Forex.ClientService.Extensions;
 using Forex.ClientService.Interfaces;
 using Forex.ClientService.Services;
 using Forex.Wpf.Pages.Common;
-using System.Threading.Tasks;
 
 public class RegisterViewModel(IApiAuth apiAuth) : ViewModelBase
 {

@@ -9,13 +9,12 @@ using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
-using System.Windows;                    // WPF uchun
-using System.Windows.Controls;           // Border (WPF) uchun
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
 
-// DebtorCreditorReportViewModel.cs
 public partial class DebtorCreditorReportViewModel : ViewModelBase
 {
     private readonly ForexClient _client;

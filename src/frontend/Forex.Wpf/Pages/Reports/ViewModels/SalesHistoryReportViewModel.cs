@@ -7,7 +7,6 @@ using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
-using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

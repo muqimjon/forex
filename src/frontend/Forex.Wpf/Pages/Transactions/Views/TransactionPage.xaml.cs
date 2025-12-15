@@ -5,7 +5,6 @@ using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.Transactions.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;

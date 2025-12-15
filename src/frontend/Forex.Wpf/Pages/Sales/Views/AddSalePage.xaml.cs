@@ -6,7 +6,6 @@ using Forex.Wpf.Pages.Sales.ViewModels;
 using Forex.Wpf.ViewModels;
 using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

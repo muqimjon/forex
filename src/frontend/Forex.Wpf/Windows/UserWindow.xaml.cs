@@ -9,7 +9,6 @@ using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
