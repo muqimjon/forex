@@ -1,5 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.SemiProducts.Views;
 
+using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Home;
 using Forex.Wpf.Pages.SemiProducts.ViewModels;
 using Forex.Wpf.Windows;
@@ -18,6 +19,24 @@ public partial class SemiProductPage : Page
     {
         InitializeComponent();
         DataContext = App.AppHost!.Services.GetRequiredService<SemiProductPageViewModel>();
+
+        Loaded += Page_Loaded;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        // pass
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        ShortcutAttacher.RegisterShortcut(btnBack, Key.Escape);
     }
 
     private void NumericTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

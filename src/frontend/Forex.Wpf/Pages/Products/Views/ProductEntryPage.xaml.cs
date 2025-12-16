@@ -8,10 +8,8 @@ using Forex.Wpf.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
-/// <summary>
-/// Interaction logic for ProductEntryPage.xaml
-/// </summary>
 public partial class ProductEntryPage : Page
 {
     private static MainWindow Main => (MainWindow)Application.Current.MainWindow;
@@ -26,19 +24,49 @@ public partial class ProductEntryPage : Page
         // LostFocus event'larini ulash
         cbxProductCode.LostFocus += CbxProductCode_LostFocus;
         cbxProductName.LostFocus += CbxProductName_LostFocus;
-        cbxRazmerType.LostFocus += CbxRazmerType_LostFocus;
+        cbxProductType.LostFocus += CbxRazmerType_LostFocus;
 
-        // Add button click'dan keyin fokusni qaytarish uchun event ulash
-        addButton.Click += AddButton_Click;
+        Loaded += ProductEntryPage_Loaded;
     }
 
-    private void AddButton_Click(object sender, RoutedEventArgs e)
+    private void ProductEntryPage_Loaded(object sender, RoutedEventArgs e)
     {
-        // Add komandasi bajarilgandan keyin fokusni qaytarish
-        Dispatcher.BeginInvoke(new Action(() =>
-        {
-            cbxProductCode.comboBox.Focus();
-        }), System.Windows.Threading.DispatcherPriority.Input);
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        List<UIElement> focusElements =
+        [
+            date.text,
+            cbxProductCode.combobox,
+            cbxProductName.combobox,
+            cbxProductionOrigin.combobox,
+            cbxProductType.combobox,
+            tbxBundle.inputBox,
+            tbxBundleItemCount.inputBox,
+            tbxQuantity.inputBox,
+            tbxCostPrice.inputBox,
+            btnAdd
+        ];
+
+        FocusNavigator.RegisterElements(focusElements);
+        FocusNavigator.SetFocusRedirect(btnAdd, cbxProductCode.combobox);
+    }
+
+    private void RegisterGlobalShortcuts()
+    {
+        ShortcutAttacher.RegisterShortcut(
+            key: Key.Enter,
+            modifiers: ModifierKeys.Control,
+            targetButton: btnSubmit
+        );
+
+        ShortcutAttacher.RegisterShortcut(
+            key: Key.Escape,
+            targetButton: btnBack
+        );
     }
 
     private async void CbxProductCode_LostFocus(object sender, RoutedEventArgs e)

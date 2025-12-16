@@ -1,7 +1,7 @@
-﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
+﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
 
-using global::Forex.ClientService;
-using global::Forex.Wpf.Pages.Common;
+using Forex.ClientService;
+using Forex.Wpf.Pages.Common;
 
 // EmployeeBalanceReportViewModel.cs
 public partial class EmployeeBalanceReportViewModel : ViewModelBase

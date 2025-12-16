@@ -29,7 +29,7 @@
             CornerRadius="4">
 
             <ComboBox
-                x:Name="comboBox"
+                x:Name="combobox"
                 VerticalAlignment="Center"
                 VerticalContentAlignment="Center"
                 Background="Transparent"

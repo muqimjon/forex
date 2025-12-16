@@ -2,7 +2,6 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-
 public partial class FinishedStockItemViewModel : ObservableObject
 {
     [ObservableProperty] private string code = "-";

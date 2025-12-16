@@ -27,7 +27,7 @@
                 FontSize="20"
                 FontWeight="Bold"
                 Foreground="{StaticResource SecondaryTextColor}" />
-            <Button
+            <Button x:Name="btnBack"
                 Padding="8,4"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
@@ -421,7 +421,7 @@
                     Visibility="{Binding Transaction.IsDebtor, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <!--  To'lash/Yangilash tugmasi  -->
-                <Button
+                <Button x:Name="btnSubmit"
                     Grid.Row="4"
                     Grid.Column="2"
                     Height="28"
@@ -436,7 +436,7 @@
                     Foreground="{StaticResource SuccessButtonForeground}" />
 
                 <!--  Bekor qilish tugmasi (faqat edit rejimida)  -->
-                <Button
+                <Button x:Name="btnCancel"
                     Grid.Row="4"
                     Grid.Column="3"
                     Height="28"

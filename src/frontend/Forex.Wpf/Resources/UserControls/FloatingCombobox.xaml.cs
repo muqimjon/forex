@@ -152,5 +152,5 @@ public partial class FloatingComboBox : UserControl
     }
 
     // Ichki ComboBox'ga to'g'ridan-to'g'ri kirish kerak bo'lsa
-    public ComboBox ComboBox => comboBox;
+    public ComboBox ComboBox => combobox;
 }

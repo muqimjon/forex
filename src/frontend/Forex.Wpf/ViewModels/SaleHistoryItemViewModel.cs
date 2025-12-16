@@ -1,4 +1,4 @@
-﻿namespace Forex.Wpf.Pages.Sales.ViewModels;
+﻿namespace Forex.Wpf.ViewModels;
 
 public class SaleHistoryItemViewModel
 {

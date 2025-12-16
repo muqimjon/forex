@@ -33,7 +33,7 @@
             md:ElevationAssist.Elevation="Dp4"
             UniformCornerRadius="4">
             <TabControl
-                x:Name="ReportsTab"
+                x:Name="tabReports"
                 md:ColorZoneAssist.Mode="PrimaryLight"
                 FontSize="15"
                 FontWeight="Medium"

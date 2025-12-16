@@ -15,6 +15,7 @@ using Forex.Wpf.Windows;
 using Forex.Wpf.Windows.OverdueAccountsWindow;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 /// <summary>
 /// Interaction logic for HomePage.xaml
@@ -26,12 +27,15 @@ public partial class HomePage : Page
     {
         InitializeComponent();
         DataContext = AuthStore.Instance;
+
+        Loaded += Page_Loaded;
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        if (Application.Current.MainWindow is Window mainWindow)
-            WindowResizer.AnimateToSize(mainWindow, 810, 580);
+        this.ResizeWindow(810, 580);
+        RegisterFocusNavigation();
+        RegisterGlobalShortcuts();
 
         //var userAccountService = App.AppHost!.Services.GetRequiredService<IApiUserAccount>();
         //var allAccountsResult = await userAccountService.GetAllAsync();
@@ -58,6 +62,32 @@ public partial class HomePage : Page
         //    tbWarning.Foreground = Brushes.Green;
         //}
     }
+
+    private void RegisterGlobalShortcuts()
+    {
+        btnSale.RegisterShortcut(Key.F1);
+        btnCash.RegisterShortcut(Key.F2);
+        btnProduct.RegisterShortcut(Key.F3);
+        btnSemiProductEntry.RegisterShortcut(Key.F4);
+        btnUser.RegisterShortcut(Key.F5);
+        btnReports.RegisterShortcut(Key.F6);
+        btnSettings.RegisterShortcut(Key.F7);
+    }
+
+    private void RegisterFocusNavigation()
+    {
+        FocusNavigator.RegisterElements(
+        [
+            btnSale,
+            btnCash,
+            btnProduct,
+            btnSemiProductEntry,
+            btnUser,
+            btnReports,
+            btnSettings,
+        ]);
+    }
+
     private void BtnUser_Click(object sender, RoutedEventArgs e)
         => Main.NavigateTo(new UserPage());
 

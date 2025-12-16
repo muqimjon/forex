@@ -14,15 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using NavigationService = Common.Services.NavigationService;
-
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
         AddClientLayer(services, config);
-        AddUiLayer(services);           // ← faqat bitta chaqiruv
+        AddUiLayer(services);
         AddCommonServices(services);
         return services;
     }
