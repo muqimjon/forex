@@ -159,11 +159,12 @@
                     <TextBlock VerticalAlignment="Center">🗜</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
                         Ishlab<LineBreak />
-                        chiqarish</TextBlock>
+                    chiqarish</TextBlock>
                 </StackPanel>
             </Button>
 
             <Button
+                Visibility="Collapsed"
                 x:Name="btnSemiProductEntry"
                 Height="120"
                 MinWidth="220"
@@ -180,7 +181,7 @@
                     <TextBlock VerticalAlignment="Center">📦</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
                         Yarim tayyor<LineBreak />
-                        mahsulot</TextBlock>
+                    mahsulot</TextBlock>
                 </StackPanel>
             </Button>
 
