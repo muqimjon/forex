@@ -472,7 +472,6 @@
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="HorizontalContentAlignment" Value="Center" />
                             <Setter Property="FontWeight" Value="SemiBold" />
-                            <Setter Property="Background" Value="#FFE6F0FF" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
@@ -484,7 +483,6 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
