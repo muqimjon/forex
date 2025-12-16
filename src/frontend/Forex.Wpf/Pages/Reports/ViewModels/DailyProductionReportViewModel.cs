@@ -22,11 +22,11 @@ public partial class DailyProductionReportViewModel : ViewModelBase
     private readonly CommonReportDataService _commonData;
 
     [ObservableProperty]
-    private ObservableCollection<ProductViewModel> availableProducts = new();
+    private ObservableCollection<ProductViewModel> availableProducts = [];
 
     [ObservableProperty] private ObservableCollection<ProductionItemViewModel> items = [];
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime beginDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     // Yuqoridagi jami ko‘rsatkichlar
@@ -86,11 +86,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
             {
                 Filters = new()
                 {
-                    ["date"] =
-                [
-                    $">={BeginDate:dd.MM.yyyy}",
-                    $"<{EndDate.AddDays(1):dd.MM.yyyy}"
-                ],
+                    ["date"] = [$">={BeginDate}", $"<{EndDate.AddDays(1)}"],
                     ["productType"] = ["include:product"]
                 }
             };
@@ -168,7 +164,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
     private void ClearFilter()
     {
         SelectedCode = null;
-        BeginDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        BeginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
         EndDate = DateTime.Today;
         LoadDataCommand.Execute(null);
     }

@@ -25,7 +25,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
 
     [ObservableProperty] private UserViewModel? selectedCustomer;
-    [ObservableProperty] private DateTime beginDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public CustomerSalesRatingViewModel(ForexClient client, CommonReportDataService commonData)

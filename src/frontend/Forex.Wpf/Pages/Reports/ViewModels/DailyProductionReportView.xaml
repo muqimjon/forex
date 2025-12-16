@@ -51,7 +51,7 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         Orientation="Horizontal">
-                        <controls:UserCalendar
+                        <controls:UserCalendar x:Name="dateBegin"
                             Width="120"
                             Height="30"
                             SelectedDate="{Binding BeginDate, Mode=TwoWay}" />
@@ -59,7 +59,7 @@
                             Margin="8,0"
                             VerticalAlignment="Center"
                             Text="dan" />
-                        <controls:UserCalendar
+						<controls:UserCalendar x:Name="dateEnd"
                             Width="120"
                             Height="30"
                             SelectedDate="{Binding EndDate, Mode=TwoWay}" />
@@ -83,7 +83,7 @@
                         BorderBrush="#CCCCCC"
                         BorderThickness="2"
                         CornerRadius="4">
-                        <ComboBox
+                        <ComboBox x:Name="cbxCustomer"
                             Padding="3"
                             BorderThickness="0"
                             DisplayMemberPath="Code"
@@ -99,7 +99,7 @@
                     Grid.Column="1"
                     Margin="20,0,15,0"
                     VerticalAlignment="Center">
-                    <Button
+                    <Button x:Name="btnPreview"
                         Height="30"
                         Margin="0,5"
                         md:ButtonAssist.CornerRadius="4"
@@ -108,7 +108,7 @@
                         Command="{Binding PreviewCommand}"
                         Content="Ko‘rish"
                         Foreground="White" />
-                    <Button
+                    <Button x:Name="btnClear"
                         Height="30"
                         Margin="0,5"
                         md:ButtonAssist.CornerRadius="4"
@@ -123,7 +123,7 @@
                     Grid.Column="2"
                     Margin="0"
                     VerticalAlignment="Center">
-                    <Button
+                    <Button x:Name="btnPrint"
                         Height="30"
                         Margin="0,5"
                         md:ButtonAssist.CornerRadius="4"
@@ -132,7 +132,7 @@
                         Command="{Binding PrintCommand}"
                         Content="Pechat"
                         Foreground="White" />
-                    <Button
+                    <Button x:Name="btnExport"
                         Height="30"
                         Margin="0,5"
                         md:ButtonAssist.CornerRadius="4"

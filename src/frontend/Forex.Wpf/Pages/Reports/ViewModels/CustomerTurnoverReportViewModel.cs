@@ -1,7 +1,6 @@
 ﻿namespace Forex.Wpf.Pages.Reports.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
@@ -27,8 +26,8 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     private readonly CommonReportDataService _commonData;
 
     [ObservableProperty] private UserViewModel? selectedCustomer;
-    [ObservableProperty] private DateTime? _beginDate = DateTime.Today;
-    [ObservableProperty] private DateTime? _endDate = DateTime.Today.AddDays(1).AddMinutes(-1);
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
 
@@ -66,16 +65,13 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
             return;
         }
 
-        var begin = BeginDate ?? DateTime.Today.AddMonths(-1);
-        var end = EndDate ?? DateTime.Today;
-
         Operations.Clear();
 
         var requset = new TurnoverRequest
         (
             UserId: SelectedCustomer.Id,
-            Begin: begin.ToUniversalTime(),
-            End: end
+            Begin: BeginDate.ToUniversalTime(),
+            End: EndDate
         );
 
         var response = await _client.OperationRecords
@@ -646,7 +642,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         page.Children.Add(pageInfo);
     }
-    
+
     private Grid CreateRow(double[] widths, bool isHeader, params string[] cells)
     {
         var grid = new Grid();
@@ -849,5 +845,5 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         }
     }
 
-        #endregion Private Helpers
+    #endregion Private Helpers
 }

@@ -9,8 +9,6 @@ using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -19,29 +17,29 @@ using System.Windows.Media;
 
 public partial class SalesHistoryReportViewModel : ViewModelBase
 {
-    private readonly ForexClient _client;
-    private readonly CommonReportDataService _commonData;
+    private readonly ForexClient client;
+    private readonly CommonReportDataService commonData;
 
     // Asosiy ma'lumotlar (serverdan 1 marta olinadi)
-    private readonly ObservableCollection<SaleHistoryItemViewModel> _allItems = [];
+    private readonly ObservableCollection<SaleHistoryItemViewModel> allItems = [];
 
     // UI da ko‘rinadigan (filtrlangan)
     [ObservableProperty]
     private ObservableCollection<SaleHistoryItemViewModel> filteredItems = [];
 
-    public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
-    public ObservableCollection<ProductViewModel> AvailableProducts => _commonData.AvailableProducts;
+    public ObservableCollection<UserViewModel> AvailableCustomers => commonData.AvailableCustomers;
+    public ObservableCollection<ProductViewModel> AvailableProducts => commonData.AvailableProducts;
 
     [ObservableProperty] private UserViewModel? selectedCustomer;
     [ObservableProperty] private ProductViewModel? selectedProduct;
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime beginDate = DateTime.Today;
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public SalesHistoryReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
-        _client = client;
-        _commonData = commonData;
+        this.client = client;
+        this.commonData = commonData;
 
         // Har qanday filtr o‘zgarsa → darrov filtrla
         PropertyChanged += (_, e) =>
@@ -59,7 +57,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
     public async Task LoadAsync()
     {
         IsLoading = true;
-        _allItems.Clear();
+        allItems.Clear();
         FilteredItems.Clear();
 
         try
@@ -78,7 +76,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                 }
             };
 
-            var response = await _client.Sales.Filter(request).Handle(l => IsLoading = l);
+            var response = await client.Sales.Filter(request).Handle(l => IsLoading = l);
 
             if (!response.IsSuccess || response.Data == null)
             {
@@ -95,7 +93,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                     var product = item.ProductType?.Product;
                     if (product == null) continue;
 
-                    _allItems.Add(new SaleHistoryItemViewModel
+                    allItems.Add(new SaleHistoryItemViewModel
                     {
                         Date = sale.Date.ToLocalTime(),
                         Customer = sale.Customer?.Name ?? "-",
@@ -277,7 +275,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
     private void ApplyFilters()
     {
-        var result = _allItems.AsEnumerable();
+        var result = allItems.AsEnumerable();
 
         if (SelectedCustomer != null)
             result = result.Where(x => x.Customer == SelectedCustomer.Name);

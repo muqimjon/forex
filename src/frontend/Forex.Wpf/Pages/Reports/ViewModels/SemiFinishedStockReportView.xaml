@@ -43,7 +43,7 @@
                     BorderBrush="#CCCCCC"
                     BorderThickness="2"
                     CornerRadius="4">
-                    <ComboBox
+                    <ComboBox x:Name="cbxSemiProductCode"
                         Width="200"
                         DisplayMemberPath="Code"
                         FontSize="14"
@@ -52,7 +52,7 @@
                         SelectedItem="{Binding SelectedCode, Mode=TwoWay}" />
                 </Border>
 
-                <TextBlock
+                <TextBlock x:Name="cbxSemiProductName"
                     Grid.Row="1"
                     Grid.Column="0"
                     Margin="5,0"
@@ -82,12 +82,12 @@
                 Margin="40,0"
                 VerticalAlignment="Center"
                 Orientation="Vertical">
-                <Button
+                <Button x:Name="btnPreview"
                     Height="29"
                     Margin="0,2"
                     Command="{Binding RefreshCommand}"
                     Content="Ko‘rish" />
-                <Button
+                <Button x:Name="btnClear"
                     Height="29"
                     Margin="0,2"
                     Command="{Binding ClearFilterCommand}"
@@ -98,12 +98,12 @@
                 Margin="10,0"
                 VerticalAlignment="Center"
                 Orientation="Vertical">
-                <Button
+                <Button x:Name="btnPrint"
                     Height="29"
                     Margin="0,2"
                     Command="{Binding PrintCommand}"
                     Content="Pechat" />
-                <Button
+                <Button x:Name="btnExport"
                     Height="29"
                     Margin="0,2"
                     Command="{Binding ExportToExcelCommand}"

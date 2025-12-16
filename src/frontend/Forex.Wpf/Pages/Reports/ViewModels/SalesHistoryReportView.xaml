@@ -48,7 +48,7 @@
                     BorderBrush="#CCCCCC"
                     BorderThickness="2"
                     CornerRadius="4">
-                    <ComboBox
+                    <ComboBox x:Name="cbxCustomer"
                         Padding="3"
                         BorderThickness="0"
                         DisplayMemberPath="Name"
@@ -73,7 +73,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <controls:UserCalendar
+                    <controls:UserCalendar x:Name="dateBegin"
                         Grid.Column="0"
                         Width="110"
                         Height="30"
@@ -83,7 +83,7 @@
                         Margin="2,0"
                         VerticalAlignment="Center"
                         Text="dan" />
-                    <controls:UserCalendar
+					<controls:UserCalendar x:Name="dateEnd"
                         Grid.Column="2"
                         Width="110"
                         Height="30"
@@ -93,7 +93,7 @@
                         Margin="2,0,0,0"
                         VerticalAlignment="Center"
                         Text="gacha" />
-                    <Button
+                    <Button x:Name="btnReload"
                         Grid.Column="4"
                         Width="36"
                         Height="30"
@@ -105,7 +105,7 @@
                         BorderThickness="0"
                         Command="{Binding FilterCommand}"
                         Foreground="White"
-                        ToolTip="Filtr">
+                        ToolTip="Filter">
 
                         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Viewbox Width="18" Height="18">
@@ -146,7 +146,7 @@
                     BorderBrush="#CCCCCC"
                     BorderThickness="2"
                     CornerRadius="4">
-                    <ComboBox
+                    <ComboBox x:Name="cbxProductCode"
                         Width="180"
                         Padding="3"
                         BorderThickness="0"
@@ -170,7 +170,7 @@
                     BorderBrush="#CCCCCC"
                     BorderThickness="2"
                     CornerRadius="4">
-                    <ComboBox
+                    <ComboBox x:Name="cbxProductName"
                         Width="180"
                         Padding="3"
                         BorderThickness="0"
@@ -186,7 +186,7 @@
                 Grid.Column="2"
                 Margin="20,5,10,0"
                 Orientation="Vertical">
-                <Button
+                <Button x:Name="btnPreview"
                     Height="29"
                     Margin="0,3"
                     md:ButtonAssist.CornerRadius="4"
@@ -195,7 +195,7 @@
                     Command="{Binding PreviewCommand}"
                     Content="Ko‘rish"
                     Foreground="White" />
-                <Button
+                <Button x:Name="btnClear"
                     Height="29"
                     Margin="0,3"
                     md:ButtonAssist.CornerRadius="4"
@@ -209,7 +209,7 @@
                 Grid.Column="3"
                 Margin="0,5"
                 Orientation="Vertical">
-                <Button
+                <Button x:Name="btnPrint"
                     Height="29"
                     Margin="0,3"
                     md:ButtonAssist.CornerRadius="4"
@@ -218,7 +218,7 @@
                     Command="{Binding PrintCommand}"
                     Content="Pechat"
                     Foreground="White" />
-                <Button
+                <Button x:Name="btnExport"
                     Height="29"
                     Margin="0,3"
                     md:ButtonAssist.CornerRadius="4"
