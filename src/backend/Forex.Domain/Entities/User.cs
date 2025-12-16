@@ -27,7 +27,7 @@ public class User : Auditable
 
     // Autentifikatsiya
     public string? PasswordHash { get; set; }
-    public string? PasswordSalt { get; set; }
+    public string? Username { get; set; }
     public bool IsActive { get; set; } = true;
     public bool TwoFactorEnabled { get; set; }
     public DateTime? LastLoginDate { get; set; }

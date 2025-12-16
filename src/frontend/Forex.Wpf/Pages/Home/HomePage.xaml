@@ -143,7 +143,6 @@
 
             <Button
                 x:Name="btnProcess"
-                Visibility="Collapsed"
                 Height="120"
                 MinWidth="220"
                 Margin="10"
@@ -154,17 +153,17 @@
                 FontSize="24"
                 FontWeight="Medium"
                 Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}"
+                Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock VerticalAlignment="Center">🗜</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
                         Ishlab<LineBreak />
-                    chiqarish</TextBlock>
+                        chiqarish</TextBlock>
                 </StackPanel>
             </Button>
 
             <Button
-                Visibility="Collapsed"
                 x:Name="btnSemiProductEntry"
                 Height="120"
                 MinWidth="220"
@@ -176,12 +175,13 @@
                 FontSize="24"
                 FontWeight="Medium"
                 Foreground="{DynamicResource MainMenuTextColor}"
-                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}">
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}"
+                Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock VerticalAlignment="Center">📦</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
                         Yarim tayyor<LineBreak />
-                    mahsulot</TextBlock>
+                        mahsulot</TextBlock>
                 </StackPanel>
             </Button>
 
