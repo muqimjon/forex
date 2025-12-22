@@ -17,6 +17,9 @@ public class JwtTokenGenerator(IConfiguration config) : IJwtTokenGenerator
         if (!string.IsNullOrWhiteSpace(user.Name))
             claims.Add(new Claim(ClaimTypes.Name, user.Name));
 
+        if (!string.IsNullOrWhiteSpace(user.Username))
+            claims.Add(new Claim("username", user.Username));
+            
         claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
 
         if (!string.IsNullOrWhiteSpace(user.Email))

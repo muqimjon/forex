@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:views="clr-namespace:Forex.Wpf.Pages.Reports.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     Title="Hisobotlar"
     Background="#F8F9FA">
 
@@ -51,6 +52,11 @@
                 </TabItem>
                 <!--  3. Mijoz aylanmasi  -->
                 <TabItem Header="Mijoz aylanmasi">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="IsVisibleChanged">
+                            <i:InvokeCommandAction Command="{Binding CustomerTurnoverVM.PreviewCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <views:CustomerTurnoverReportView DataContext="{Binding CustomerTurnoverVM}" />
                 </TabItem>
                 <!--  4. Debitor va Kreditor  -->

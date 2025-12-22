@@ -11,8 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 public record LoginCommand(
-    string EmailOrPhone,
-    string Password)
+    string? Username,
+    string? Password)
     : IRequest<AuthResponse>;
 
 public class LoginCommandHandler(
@@ -25,10 +25,10 @@ public class LoginCommandHandler(
     public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await context.Users.FirstOrDefaultAsync(
-            u => u.Phone == request.EmailOrPhone || u.Email == request.EmailOrPhone,
+            u =>  u.Username == request.Username,
             cancellationToken);
 
-        if (user is null || !hasher.VerifyPassword(user.PasswordHash!, request.Password))
+        if (user is null || !hasher.VerifyPassword(user.PasswordHash!, request.Password!))
             throw new ConflictException("Login yoki parol noto‘g‘ri.");
 
         var roles = new List<string> { user.Role.ToString() };

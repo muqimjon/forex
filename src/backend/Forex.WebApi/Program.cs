@@ -11,6 +11,7 @@ var app = builder.Build();
 app.UseInfrastructure(); // HTTPS, CORS, Auth
 app.UseOpenApiDocumentation(); // Scalar UI
 
+await app.UseSeedData();
 app.MapControllers();
 
 app.Run();

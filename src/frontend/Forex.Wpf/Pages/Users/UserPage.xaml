@@ -217,7 +217,10 @@
                     TextChanged="TbAccount_TextChanged" />
             </Border>
 
-            <StackPanel Orientation="Horizontal" x:Name="pnlEmployeeAccess" Visibility="Collapsed">
+            <StackPanel
+                x:Name="pnlEmployeeAccess"
+                Orientation="Horizontal"
+                Visibility="Collapsed">
                 <ToggleButton
                     x:Name="tglHasAccess"
                     Margin="5,0"
