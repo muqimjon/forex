@@ -132,16 +132,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         var doc = CreateFixedDocument();
         var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(20) };
 
-        var shareButton = new Button
-        {
-            Content = "Telegram’da ulashish",
-            Margin = new Thickness(10),
-            Padding = new Thickness(15, 8, 15, 8),
-            HorizontalAlignment = HorizontalAlignment.Right
-        };
-
         var toolbar = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-        toolbar.Children.Add(shareButton);
 
         var layout = new DockPanel();
         DockPanel.SetDock(toolbar, Dock.Top);
@@ -295,119 +286,191 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         const double pageWidth = 794;
         const double pageHeight = 1123;
 
-        var page = new FixedPage
+        // Marginlar
+        const double marginHorizontal = 45; // Chap/O'ng
+        const double marginVertical = 40;   // Yuqori/Past
+
+        // Ish maydoni
+        const double contentWidth = pageWidth - 2 * marginHorizontal; // 704px
+        const double contentHeight = pageHeight - 2 * marginVertical; // 1043px
+
+        // Header/Title uchun zarur bo'lgan balandlik (taxminan 80-100)
+        // Sarlavha (20) + Davr (15) + Marginlar
+        const double fixedHeaderHeight = 100; // Taxminiy joy
+
+        // Har bir ma'lumot qatorining balandligi
+        const double rowHeight = 25; // Taxminiy (AddRowdagi Padding 5+5+FontSize taxm 10 = 20-25px)
+
+        // Jami qatorining balandligi
+        const double footerRowHeight = 30;
+
+        // Birinchi sahifada ma'lumotlar uchun qolgan balandlik
+        double availableHeightForData = contentHeight - fixedHeaderHeight;
+
+        // Birinchi sahifada sig'adigan maksimal ma'lumot qatorlari soni
+        int maxDataRowsPerPage = (int)Math.Floor(availableHeightForData / rowHeight);
+
+        // Agar maxDataRowsPerPage juda kichik bo'lsa (tepasi katta joy egallagan bo'lsa)
+        if (maxDataRowsPerPage < 1) maxDataRowsPerPage = 1;
+
+
+        var allItems = FilteredItems.ToList();
+        int processedItems = 0;
+        int currentRowIndex = 0; // Ma'lumot qatori indeksi
+
+        // ******************** JAMI HISOBLAR ********************
+        var totalBundleCount = allItems.Sum(x => x.BundleCount);
+        var totalTotalCount = allItems.Sum(x => x.TotalCount);
+        var totalAmount = allItems.Sum(x => x.Amount);
+        // ********************************************************
+
+        // Jami qatori oxirgi sahifada joylashishi uchun umumiy sahifalar sonini hisoblash
+        // Jadval sarlavhasi (Header) har bir sahifada takrorlanadi.
+
+        // Ma'lumot qatorlari soni + 1 (Jami qatori)
+        int dataRowsPlusTotalRow = allItems.Count + 1;
+
+        // Sahifalar soni
+        int totalPages = (int)Math.Ceiling((double)dataRowsPlusTotalRow / maxDataRowsPerPage);
+
+
+        for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
-            Width = pageWidth,
-            Height = pageHeight,
-            Background = Brushes.White
-        };
+            var page = new FixedPage
+            {
+                Width = pageWidth,
+                Height = pageHeight,
+                Background = Brushes.White
+            };
 
-        // Asosiy konteyner — 45px har tomondan chekka
-        var container = new Grid
-        {
-            Width = pageWidth - 90,  // 794 - 90 = 704px ish maydoni
-            Margin = new Thickness(45, 40, 45, 40)
-        };
+            // Asosiy konteyner
+            var container = new Grid
+            {
+                Width = contentWidth,
+                Margin = new Thickness(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
+            };
 
-        var stack = new StackPanel();
+            var stack = new StackPanel();
 
-        // SARLAVHA
-        stack.Children.Add(new TextBlock
-        {
-            Text = "SAVDO TARIXI HISOBOTI",
-            FontSize = 20,
-            FontWeight = FontWeights.Bold,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 0, 0, 8),
-            Foreground = Brushes.DarkBlue
-        });
+            // 1. SARLAVHA va DAVR (Faqat birinchi sahifada yoki har bir sahifada)
+            // Hisobot bo'lgani uchun har bir sahifada asosiy ma'lumotlarni qoldiramiz
+            if (pageIndex == 0) // Faqat birinchi sahifada bo'lsin
+            {
+                stack.Children.Add(new TextBlock
+                {
+                    Text = "SAVDO TARIXI HISOBOTI",
+                    FontSize = 20,
+                    FontWeight = FontWeights.Bold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 0, 0, 8),
+                    Foreground = Brushes.DarkBlue
+                });
 
-        stack.Children.Add(new TextBlock
-        {
-            Text = $"Davr: {BeginDate.ToString("dd.MM.yyyy") ?? "-"} — {(EndDate.ToString("dd.MM.yyyy") ?? "-")}",
-            FontSize = 15,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 0, 0, 25)
-        });
+                stack.Children.Add(new TextBlock
+                {
+                    Text = $"Davr: {BeginDate.ToString("dd.MM.yyyy") ?? "-"} — {(EndDate.ToString("dd.MM.yyyy") ?? "-")}",
+                    FontSize = 15,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 0, 0, 25)
+                });
+            }
 
-        // JADVAL
-        var table = new Grid();
+            // JADVAL
+            var table = new Grid();
 
-        // Ustun enlari
-        double[] widths = {
-        56,    // 0. Sana
-        80,    // 1. Mijoz
-        52,    // 2. Kodi
-        60,    // 3. Nomi
-        58,    // 4. Razmer
-        60,    // 5. Qop soni
-        60,    // 6. Donasi
-        52,    // 7. Jami
-        50,    // 8. O‘lchov
-        70,    // 9. Narxi
-        100    // 10. Umumiy summa
-    };
+            // Ustun enlari avvalgidek qoladi
+            double[] widths = { 56, 80, 52, 60, 58, 60, 60, 52, 50, 70, 100 };
+            foreach (var w in widths)
+                table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-        foreach (var w in widths)
-            table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
+            // Header (Har bir sahifada takrorlanadi)
+            AddRow(table, true,
+                "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Qop soni",
+                "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa");
 
-        // Header
-        AddRow(table, true,
-            "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Qop soni",
-            "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa");
 
-        // Ma'lumotlar
-        foreach (var item in FilteredItems)
-        {
-            AddRow(table, false,
-                item.Date.ToString("dd.MM.yyyy"),
-                item.Customer,
-                item.Code,
-                item.ProductName,
-                item.Type,
-                item.BundleCount.ToString("N0"),
-                item.BundleItemCount.ToString("N0"),
-                item.TotalCount.ToString("N0"),
-                item.UnitMeasure,
-                item.UnitPrice.ToString("N2"),
-                item.Amount.ToString("N2")
-            );
+            // 2. Ma'lumotlar qatorlarini qo'shish
+
+            // Birinchi sahifada 1 qator header uchun ketdi.
+            // Ikkinchi va keyingi sahifalarda ham 1 qator header uchun ketadi.
+            // maxRowsForCurrentPage quyidagi formula bilan topiladi:
+            int maxRowsForCurrentPage;
+
+            if (pageIndex == totalPages - 1) // Oxirgi sahifa
+            {
+                // Qolgan elementlar soni + JAMI qatori (1 qator)
+                maxRowsForCurrentPage = allItems.Count - processedItems + 1;
+            }
+            else // Boshqa sahifalar
+            {
+                // Har bir sahifada sig'adigan maksimal ma'lumot qatorlari soni (Header hisoblangan)
+                maxRowsForCurrentPage = maxDataRowsPerPage;
+            }
+
+            // Shu sahifaga sig'adigan ma'lumot qatorlari soni (JAMI qatorini hisobga olmaganda)
+            int itemsToTake = Math.Min(maxRowsForCurrentPage, allItems.Count - processedItems);
+
+            var pageItems = allItems.Skip(processedItems).Take(itemsToTake).ToList();
+
+
+            foreach (var item in pageItems)
+            {
+                AddRow(table, false,
+                    item.Date.ToString("dd.MM.yyyy"),
+                    item.Customer,
+                    item.Code,
+                    item.ProductName,
+                    item.Type,
+                    item.BundleCount.ToString("N0"),
+                    item.BundleItemCount.ToString("N0"),
+                    item.TotalCount.ToString("N0"),
+                    item.UnitMeasure,
+                    item.UnitPrice.ToString("N2"),
+                    item.Amount.ToString("N2")
+                );
+                currentRowIndex++;
+            }
+
+            processedItems += pageItems.Count;
+
+
+            // 3. JAMI QATORNI JOYLASHTIRISH (Faqat oxirgi sahifada)
+            if (pageIndex == totalPages - 1)
+            {
+                // JAMI qatori
+                AddRow(table, true,
+                    // 0-4. Birinchi 5 ustun birlashtiriladi (AddRow da Grid.SetColumnSpan yo'qligi uchun:
+                    // Birinchi ustun JAMI so'zini qabul qiladi, qolganlari bo'sh)
+                    "JAMI:", "", "", "", "",
+
+                    // 5. Qop soni
+                    totalBundleCount.ToString("N0"),
+
+                    // 6. Donasi ustuni bo'sh
+                    "",
+
+                    // 7. Jami
+                    totalTotalCount.ToString("N0"),
+
+                    // 8-9. Bo'sh
+                    "", "",
+
+                    // 10. Umumiy summa (Qalinroq chiqarish uchun AddRow stili ishlatiladi)
+                    $"{totalAmount:N2}"
+                );
+            }
+
+            stack.Children.Add(table);
+            container.Children.Add(stack);
+            page.Children.Add(container);
+
+            var pageContent = new PageContent();
+            ((IAddChild)pageContent).AddChild(page);
+            doc.Pages.Add(pageContent);
         }
-
-        // 💰 JAMI QATORNI HISOBLASH VA JOYLASHTIRISH 💰
-
-        // Yig'indilar
-        var totalBundleCount = FilteredItems.Sum(x => x.BundleCount); // Umumiy Qop soni
-        var totalTotalCount = FilteredItems.Sum(x => x.TotalCount);   // Umumiy Jami (soni)
-        var totalAmount = FilteredItems.Sum(x => x.Amount);           // Umumiy summa
-
-        // JAMI qatori (Header stili qo'llanadi)
-        AddRow(table, true,
-            // 0-4. Birinchi 5 ustun bo'sh
-            "JAMI:", "", "", "", "",
-            // 5. Qop soni ustunida umumiy qop soni chiqadi (N0 formatida)
-            totalBundleCount.ToString("N0"),
-            // 6. Donasi ustuni bo'sh (yoki "JAMI:" uchun qulay joy)
-            "",
-            // 7. Jami ustunida umumiy Jami (soni) chiqadi (N0 formatida)
-            totalTotalCount.ToString("N0"),
-            // 8-9. O'lchov va Narxi ustunlari bo'sh
-            "", "",
-            // 10. Umumiy summa ustunida umumiy pul qiymati chiqadi (N2 formatida)
-            $"{totalAmount:N2}"
-        );
-
-        stack.Children.Add(table);
-        container.Children.Add(stack);
-        page.Children.Add(container);
-
-        var pageContent = new PageContent();
-        ((IAddChild)pageContent).AddChild(page);
-        doc.Pages.Add(pageContent);
 
         return doc;
     }
-    // AddRow metodi o'zgarmaydi.
     private void AddRow(Grid grid, bool isHeader, params string[] cells)
     {
         int row = grid.RowDefinitions.Count;
@@ -458,26 +521,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             grid.Children.Add(border);
         }
     }
-    //private async Task ShareAsPdfAsync(FixedDocument doc)
-    //{
-    //    try
-    //    {
-    //        string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ForexReports");
-    //        Directory.CreateDirectory(folder);
-    //        string fileName = $"Savdo_{BeginDate:dd.MM.yyyy}-{EndDate:dd.MM.yyyy}.pdf";
-    //        string path = Path.Combine(folder, fileName);
-
-    //        // PDF saqlash (PdfSharp yoki boshqa kutubxona kerak bo‘lsa keyinroq qo‘shiladi)
-    //        // Hozircha oddiy xabar
-    //        MessageBox.Show($"PDF saqlandi:\n{path}\nTelegram orqali ulashing!", "Tayyor", MessageBoxButton.OK, MessageBoxImage.Information);
-
-    //        Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        MessageBox.Show($"Ulashishda xato: {ex.Message}");
-    //    }
-    //}
 
     #endregion Private Methods
 }

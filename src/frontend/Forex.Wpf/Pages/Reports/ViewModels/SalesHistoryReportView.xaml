@@ -271,9 +271,7 @@
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                Text="{Binding
-                                RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},
-                                Converter={StaticResource IndexConverter}}"/>
+                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Converter={StaticResource IndexConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
 

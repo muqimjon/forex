@@ -216,6 +216,51 @@
                     PreviewTextInput="NumericTextBox_PreviewTextInput"
                     TextChanged="TbAccount_TextChanged" />
             </Border>
+
+            <StackPanel Orientation="Horizontal" x:Name="pnlEmployeeAccess" Visibility="Collapsed">
+                <ToggleButton
+                    x:Name="tglHasAccess"
+                    Margin="5,0"
+                    Content="🗝"
+                    Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                    ToolTip="Tizimga kirish uchun login parol biriktirish" />
+
+                <Border
+                    x:Name="brLogin"
+                    Width="130"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="{Binding IsChecked, ElementName=tglHasAccess, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBox
+                        x:Name="txtUsername"
+                        Width="125"
+                        Padding="3,1,2,1"
+                        md:HintAssist.Hint="Username"
+                        BorderThickness="0"
+                        FontSize="16" />
+                </Border>
+
+                <Border
+                    x:Name="brPassword"
+                    Width="130"
+                    Margin="1,0,1,2"
+                    Background="{DynamicResource SelectedBackground}"
+                    BorderBrush="{DynamicResource SelectedBorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="{Binding IsChecked, ElementName=tglHasAccess, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <PasswordBox
+                        x:Name="txtPassword"
+                        Width="125"
+                        Padding="3,1,2,1"
+                        md:HintAssist.Hint="Parol"
+                        BorderThickness="0"
+                        FontSize="16" />
+                </Border>
+            </StackPanel>
             <Button
                 x:Name="btnSave"
                 MinWidth="50"

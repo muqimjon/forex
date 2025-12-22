@@ -284,28 +284,31 @@ public partial class UserPage : Page
 
         if (cbRole.SelectedItem is not string role || string.IsNullOrWhiteSpace(role))
         {
-            brValutaType.Visibility = Visibility.Collapsed;
-            brDebt.Visibility = Visibility.Collapsed;
-            brAccount.Visibility = Visibility.Collapsed;
-            btnSave.Visibility = Visibility.Collapsed;
+            // ... mavjud collapsed kodlari ...
+            pnlEmployeeAccess.Visibility = Visibility.Collapsed; // Qo'shildi
             return;
         }
 
-        // 🔴 "User" rollida hech narsa ko'rinmaydi
         bool isUser = role.Equals("User", StringComparison.OrdinalIgnoreCase);
+        // Hodim ekanligini tekshirish (Enum nomiga qarab: Employee yoki Hodim)
+        bool isEmployee = role.Equals("Hodim", StringComparison.OrdinalIgnoreCase);
 
         brDebt.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         brValutaType.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         brAccount.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         btnSave.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
 
-        // 🔴 Rol o'zgarganda yangi yaratish rejimini tozalash
+        // 🔴 Faqat hodim tanlanganda Toggle ko'rinadi
+        pnlEmployeeAccess.Visibility = isEmployee ? Visibility.Visible : Visibility.Collapsed;
+
+        // Agar hodimlikdan boshqa rolga o'tsa, toggleni o'chirib qo'yamiz
+        if (!isEmployee) tglHasAccess.IsChecked = false;
+
         if (!isCreatingNewUser && !isUser)
         {
             dgUsers.SelectedItem = null;
         }
     }
-
     private async void BtnSave_Click(object sender, RoutedEventArgs e)
     {
         if (!ValidateUserFields())
