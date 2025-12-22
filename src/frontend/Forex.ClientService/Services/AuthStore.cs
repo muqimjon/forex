@@ -7,6 +7,7 @@ public class AuthStore : INotifyPropertyChanged
 {
     private string token = string.Empty;
     private string fullName = string.Empty;
+    private string username = string.Empty; // Yangi maydon
     private long userId;
 
     public string Token
@@ -30,6 +31,18 @@ public class AuthStore : INotifyPropertyChanged
         }
     }
 
+    // Adminlikni tekshirish uchun juda muhim
+    public string Username
+    {
+        get => username;
+        private set
+        {
+            username = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsAdmin)); // Adminlik o'zgarganda UI xabar topishi uchun
+        }
+    }
+
     public long UserId
     {
         get => userId;
@@ -42,10 +55,15 @@ public class AuthStore : INotifyPropertyChanged
 
     public bool IsAuthenticated => !string.IsNullOrWhiteSpace(Token);
 
-    public void SetAuth(string token, string fullName, long userId)
+    // UI-da Admin panellarini ko'rsatish/yashirish uchun qulay helper
+    public bool IsAdmin => Username?.ToLower() == "admin";
+
+    // SetAuth metodiga username parametrini qo'shdik
+    public void SetAuth(string token, string fullName, string username, long userId)
     {
         Token = token;
         FullName = fullName;
+        Username = username;
         UserId = userId;
     }
 
@@ -53,6 +71,7 @@ public class AuthStore : INotifyPropertyChanged
     {
         Token = string.Empty;
         FullName = string.Empty;
+        Username = string.Empty;
         UserId = 0;
     }
 

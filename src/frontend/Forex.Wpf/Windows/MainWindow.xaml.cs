@@ -2,6 +2,7 @@
 
 using Forex.ClientService;
 using Forex.Wpf.Common.Services;
+using Forex.Wpf.Pages.Auth; // Login sahifasi uchun namespace
 using Forex.Wpf.Pages.Home;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,14 +15,20 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        // Spinner (yuklanish indikatori) xizmatini ishga tushirish
         SpinnerService.Init(this);
 
-        Loaded += (_, _) => NavigateTo(new HomePage());
+        // 🔥 O'ZGARTIRILGAN JOY:
+        // Dastur yuklanishi bilan HomePage ga emas, LoginPage ga yuboramiz
+        Loaded += (_, _) => NavigateTo(new LoginPage());
     }
 
+    // Sahifalararo harakatlanish uchun yordamchi metod
     public void NavigateTo(Page page)
     {
-        Console.WriteLine($"Navigating to: {page.GetType().Name}");
+        // Debug uchun qaysi sahifaga o'tilayotganini ko'rsatadi
+        System.Diagnostics.Debug.WriteLine($"Navigating to: {page.GetType().Name}");
+
         MainFrame.Navigate(page);
     }
 
