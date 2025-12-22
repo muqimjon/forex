@@ -6,8 +6,6 @@ using Forex.Application.Commons.Interfaces;
 using Forex.Application.Commons.Models;
 using Forex.Application.Features.Sales.DTOs;
 using MediatR;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 public record SaleFilterQuery : FilteringRequest, IRequest<IReadOnlyCollection<SaleDto>>;
 
@@ -18,10 +16,6 @@ public class SaleFilterQueryHandler(
     : IRequestHandler<SaleFilterQuery, IReadOnlyCollection<SaleDto>>
 {
     public async Task<IReadOnlyCollection<SaleDto>> Handle(SaleFilterQuery request, CancellationToken cancellationToken)
-
-    {
-        var a = mapper.Map<IReadOnlyCollection<SaleDto>>(await context.Sales
+        => mapper.Map<IReadOnlyCollection<SaleDto>>(await context.Sales
             .ToPagedListAsync(request, writer, cancellationToken));
-        return a;
-    }
 }

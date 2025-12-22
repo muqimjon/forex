@@ -60,66 +60,51 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         allItems.Clear();
         FilteredItems.Clear();
 
-        try
+        var request = new FilteringRequest
         {
-            var request = new FilteringRequest
+            Filters = new()
             {
-                Filters = new()
-                {
-                    ["date"] =
-                [
-                    $">={BeginDate:dd-MM-yyyy}",
-                    $"<{EndDate.AddDays(1):dd-MM-yyyy}"
-                ],
-                    ["customer"] = ["include"],
-                    ["saleItems"] = ["include:productType.product.unitMeasure"]
-                }
-            };
-
-            var response = await client.Sales.Filter(request).Handle(l => IsLoading = l);
-
-            if (!response.IsSuccess || response.Data == null)
-            {
-                ErrorMessage = "Sotuvlar yuklanmadi";
-                return;
+                ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
+                ["customer"] = ["include"],
+                ["saleItems"] = ["include:productType.product.unitMeasure"]
             }
+        };
 
-            foreach (var sale in response.Data)
+        var response = await client.Sales.Filter(request).Handle(l => IsLoading = l);
+
+        if (!response.IsSuccess)
+        {
+            ErrorMessage = "Sotuvlar yuklanmadi";
+            return;
+        }
+
+        foreach (var sale in response.Data)
+        {
+            if (sale.SaleItems == null) continue;
+
+            foreach (var item in sale.SaleItems)
             {
-                if (sale.SaleItems == null) continue;
+                var product = item.ProductType?.Product;
+                if (product == null) continue;
 
-                foreach (var item in sale.SaleItems)
+                allItems.Add(new SaleHistoryItemViewModel
                 {
-                    var product = item.ProductType?.Product;
-                    if (product == null) continue;
-
-                    allItems.Add(new SaleHistoryItemViewModel
-                    {
-                        Date = sale.Date.ToLocalTime(),
-                        Customer = sale.Customer?.Name ?? "-",
-                        Code = product.Code ?? "-",
-                        ProductName = product.Name ?? "-",
-                        Type = item.ProductType?.Type ?? "-",
-                        BundleCount = item.BundleCount,
-                        BundleItemCount = item.ProductType?.BundleItemCount ?? 0,
-                        TotalCount = item.TotalCount,
-                        UnitMeasure = product.UnitMeasure?.Name ?? "dona",
-                        UnitPrice = item.UnitPrice,
-                        Amount = item.Amount
-                    });
-                }
+                    Date = sale.Date.ToLocalTime(),
+                    Customer = sale.Customer?.Name ?? "-",
+                    Code = product.Code ?? "-",
+                    ProductName = product.Name ?? "-",
+                    Type = item.ProductType?.Type ?? "-",
+                    BundleCount = item.BundleCount,
+                    BundleItemCount = item.ProductType?.BundleItemCount ?? 0,
+                    TotalCount = item.TotalCount,
+                    UnitMeasure = product.UnitMeasure?.Name ?? "dona",
+                    UnitPrice = item.UnitPrice,
+                    Amount = item.Amount
+                });
             }
+        }
 
-            ApplyFilters();
-        }
-        catch (System.Exception ex)
-        {
-            ErrorMessage = ex.Message;
-        }
-        finally
-        {
-            IsLoading = false;
-        }
+        ApplyFilters();
     }
 
     [RelayCommand]
@@ -130,7 +115,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         SelectedCode = null;
         BeginDate = DateTime.Today;
         EndDate = DateTime.Today;
-        // ApplyFilters avto ishlaydi
     }
 
     [RelayCommand]

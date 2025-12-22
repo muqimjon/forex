@@ -50,11 +50,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
             {
                 Filters = new()
                 {
-                    ["date"] =
-                [
-                    $">={BeginDate:dd.MM.yyyy}",
-                    $"<{EndDate.AddDays(1):dd.MM.yyyy}"
-                ],
+                    ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                     ["customer"] = ["include"],
                     ["saleItems"] = ["include:productType.product"]
                 }
@@ -119,7 +115,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
         catch (Exception ex)
         {
             MessageBox.Show($"Xatolik: {ex.Message}");
-            CustomerSales = new ObservableCollection<CustomerSaleViewModel>();
+            CustomerSales = [];
         }
         finally
         {

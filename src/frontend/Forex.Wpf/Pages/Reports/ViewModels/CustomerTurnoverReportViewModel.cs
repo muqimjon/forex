@@ -38,6 +38,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     [ObservableProperty] private decimal _beginBalance;
     [ObservableProperty] private decimal _lastBalance;
     private List<OperationRecordDto> _originalRecords = [];
+
     public CustomerTurnoverReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
         _client = client;
