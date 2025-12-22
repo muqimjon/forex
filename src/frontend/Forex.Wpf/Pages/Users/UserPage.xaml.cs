@@ -25,8 +25,8 @@ public partial class UserPage : Page
 
     private List<UserResponse> rawUsers = [];
     private ObservableCollection<UserResponse> filteredUsers = [];
-    private bool isCreatingNewUser = false; // 🔴 Yangi user qo'shish jarayonini kuzatish
-    private UserResponse currentUser; // Class darajasida e'lon qiling
+    private bool isCreatingNewUser = false; 
+    private UserResponse currentUser;
 
     public UserPage()
     {
@@ -118,15 +118,15 @@ public partial class UserPage : Page
     private async void BtnUpdate_Click(object sender, RoutedEventArgs e)
     {
         btnUpdate.IsEnabled = false;
+        if (!ValidateUserFields() || !ValidateAdminRestrictions())
+        {
+            btnUpdate.IsEnabled = true;
+            return;
+        }
+
         try
         {
-            // Faqat currentUser ni tekshirish
-            if (currentUser == null)
-            {
-                MessageBox.Show("Foydalanuvchi tanlanmagan.", "Xato",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+            if (currentUser == null) return;
 
             var updateUser = new UserRequest
             {
@@ -136,20 +136,18 @@ public partial class UserPage : Page
                 Address = txtAddress.Text.Trim(),
                 Description = txtDescription.Text.Trim(),
                 Role = Enum.TryParse<UserRole>(cbRole.SelectedItem?.ToString(), out var role) ? role : currentUser.Role,
+
+                // 🔴 Admin hodimni tahrirlayotgan bo'lsa, yangi login va parolni olamiz
+                UserName = (tglHasAccess.IsChecked == true) ? txtUsername.Text.Trim() : currentUser.UserName,
+                // Parol bo'sh bo'lsa, bazadagi eski parol qolaveradi (null yuborilsa o'zgarmaydi)
+                Password = (tglHasAccess.IsChecked == true && !string.IsNullOrWhiteSpace(txtPassword.Password))
+                            ? txtPassword.Password.Trim() : null,
+
                 Accounts = []
             };
 
-            // Accountlarni to'g'ri yangilash
-            if (currentUser.Accounts != null && currentUser.Accounts.Count > 0)
-            {
-                updateUser.Accounts.Add(new UserAccount
-                {
-                    CurrencyId = (long)cbxValutaType.SelectedValue,
-                    OpeningBalance = GetOpeningBalance(),
-                    Discount = 0
-                });
-            }
-            else if (cbxValutaType.SelectedValue != null)
+            // Accountni saqlash... (sizning kodingiz)
+            if (cbxValutaType.SelectedValue != null)
             {
                 updateUser.Accounts.Add(new UserAccount
                 {
@@ -163,30 +161,21 @@ public partial class UserPage : Page
 
             if (response.IsSuccess)
             {
-                MessageBox.Show("Foydalanuvchi muvaffaqiyatli yangilandi.", "Muvaffaqiyat",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Muvaffaqiyatli yangilandi.", "Ok", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadUsers();
-            }
-            else
-            {
-                MessageBox.Show("Yangilashda xatolik yuz berdi.", "Xato",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                ClearForm();
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Yangilashda xatolik:\n" + ex.Message, "Error",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Xatolik: " + ex.Message);
         }
         finally
         {
             btnUpdate.IsEnabled = true;
-            isCreatingNewUser = false;
-            btnSave.Visibility = GetSaveButtonVisibility();
             btnUpdate.Visibility = Visibility.Collapsed;
-            dgUsers.SelectedItem = null;
-            currentUser = null; // Tozalash
-            ClearForm();
+            btnSave.Visibility = GetSaveButtonVisibility();
+            currentUser = null;
         }
     }
     private async void LoadValyutaType()
@@ -278,41 +267,60 @@ public partial class UserPage : Page
         ApplyFilters();
     }
 
+    // AuthStore orqali tizimga kirgan odamni tekshiramiz
+    private bool IsLoggedInAsAdmin =>
+        ClientService.Services.AuthStore.Instance.Username?.ToLower() == "admin";
     private void CbRole_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         ApplyFilters();
 
-        if (cbRole.SelectedItem is not string role || string.IsNullOrWhiteSpace(role))
-        {
-            // ... mavjud collapsed kodlari ...
-            pnlEmployeeAccess.Visibility = Visibility.Collapsed; // Qo'shildi
-            return;
-        }
+        if (cbRole.SelectedItem is not string role) return;
 
         bool isUser = role.Equals("User", StringComparison.OrdinalIgnoreCase);
-        // Hodim ekanligini tekshirish (Enum nomiga qarab: Employee yoki Hodim)
         bool isEmployee = role.Equals("Hodim", StringComparison.OrdinalIgnoreCase);
 
+        // Vizual bloklar boshqaruvi
         brDebt.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         brValutaType.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         brAccount.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
         btnSave.Visibility = isUser ? Visibility.Collapsed : Visibility.Visible;
 
-        // 🔴 Faqat hodim tanlanganda Toggle ko'rinadi
-        pnlEmployeeAccess.Visibility = isEmployee ? Visibility.Visible : Visibility.Collapsed;
-
-        // Agar hodimlikdan boshqa rolga o'tsa, toggleni o'chirib qo'yamiz
-        if (!isEmployee) tglHasAccess.IsChecked = false;
-
-        if (!isCreatingNewUser && !isUser)
+        // 🔴 SHART: Admin kirgan bo'lsa VA "Hodim" tanlansa Toggle chiqadi
+        if (IsLoggedInAsAdmin && isEmployee)
         {
-            dgUsers.SelectedItem = null;
+            pnlEmployeeAccess.Visibility = Visibility.Visible;
         }
+        else
+        {
+            pnlEmployeeAccess.Visibility = Visibility.Collapsed;
+            tglHasAccess.IsChecked = false;
+            txtUsername.Text = "";
+            txtPassword.Password = "";
+        }
+    }
+
+    private bool ValidateAdminRestrictions()
+    {
+        if (tglHasAccess.IsChecked == true)
+        {
+            string inputUsername = txtUsername.Text.Trim().ToLower();
+
+            // Agar yangi odam bo'lsa yoki tahrirlanayotgan odam eski admin bo'lmasa
+            if (inputUsername == "admin")
+            {
+                if (currentUser == null || currentUser.UserName?.ToLower() != "admin")
+                {
+                    MessageBox.Show("Yangi hodim uchun 'admin' loginini tanlash mumkin emas!",
+                        "Taqiq", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     private async void BtnSave_Click(object sender, RoutedEventArgs e)
     {
-        if (!ValidateUserFields())
-            return;
+        if (!ValidateUserFields() || !ValidateAdminRestrictions()) return;
 
         var roleText = cbRole.SelectedItem?.ToString();
 
@@ -330,6 +338,8 @@ public partial class UserPage : Page
             Address = txtAddress.Text.Trim(),
             Description = txtDescription.Text.Trim(),
             Role = role,
+            UserName = txtUsername.Text.Trim(),
+            Password = txtPassword.Password.Trim(),
             Accounts = [
                 new()
                 {
@@ -461,48 +471,51 @@ public partial class UserPage : Page
         }
     }
 
-
     private async void LoadingUser(long userId)
     {
-        isCreatingNewUser = false; // 🔴 Edit rejimiga o'tish
+        isCreatingNewUser = false;
 
         var exitUser = await client.Users.GetById(userId);
-        currentUser = exitUser.Data; // Saqlab qo'yish
-        // Foydalanuvchini DataGrid'da tanlash
+        currentUser = exitUser.Data;
+        if (currentUser == null) return;
+
         dgUsers.SelectedItem = currentUser;
 
-        cbRole.SelectedItem = currentUser!.Role.ToString();
+        // Formani to'ldirish
+        cbRole.SelectedItem = currentUser.Role.ToString();
         txtName.Text = currentUser.Name;
         txtPhone.Text = currentUser.Phone;
         txtAddress.Text = currentUser.Address;
         txtDescription.Text = currentUser.Description;
 
+        // 🔴 SHU YERDA MANTIQ O'ZGARADI:
+        // 1. Tizimga kirgan odam ADMIN bo'lsa
+        // 2. Tahrirlanayotgan odam HODIM bo'lsa (yoki o'sha tahrirlanayotgan odamning o'zi admin bo'lsa)
+        bool isEmployee = currentUser.Role == UserRole.Hodim;
+        bool isEditingAdminSelf = currentUser.UserName?.ToLower() == "admin";
+
+        if (IsLoggedInAsAdmin && (isEmployee || isEditingAdminSelf))
+        {
+            pnlEmployeeAccess.Visibility = Visibility.Visible;
+            txtUsername.Text = currentUser.UserName; // Bazadagi logini
+            txtPassword.Password = ""; // Parolni xavfsizlik uchun bo'sh ko'rsatamiz
+
+            // Agar logini bo'lsa, toggleni yoqib qo'yamiz
+            tglHasAccess.IsChecked = !string.IsNullOrEmpty(currentUser.UserName);
+        }
+        else
+        {
+            pnlEmployeeAccess.Visibility = Visibility.Collapsed;
+            tglHasAccess.IsChecked = false;
+        }
+
+        // Accountlar qismi... (o'zgarishsiz qoladi)
         if (currentUser.Accounts != null && currentUser.Accounts.Count > 0)
         {
             var account = currentUser.Accounts[0];
             cbxValutaType.SelectedValue = account.CurrencyId;
-
-            if (account.Balance < 0)
-            {
-                tbDebt.Text = Math.Abs(account.Balance).ToString("N2");
-                tbAccount.Text = "";
-            }
-            else if (account.OpeningBalance > 0)
-            {
-                tbAccount.Text = account.Balance.ToString("N2");
-                tbDebt.Text = "";
-            }
-            else
-            {
-                tbDebt.Text = "";
-                tbAccount.Text = "";
-            }
-        }
-        else
-        {
-            cbxValutaType.SelectedIndex = 0;
-            tbDebt.Text = "";
-            tbAccount.Text = "";
+            if (account.Balance < 0) { tbDebt.Text = Math.Abs(account.Balance).ToString("N2"); tbAccount.Text = ""; }
+            else if (account.Balance > 0) { tbAccount.Text = account.Balance.ToString("N2"); tbDebt.Text = ""; }
         }
 
         btnSave.Visibility = Visibility.Collapsed;

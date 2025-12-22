@@ -31,14 +31,18 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        // 1. Hostni ishga tushiramiz
         await AppHost!.StartAsync();
 
+        // 2. DI konteynerdan MainWindow ni olamiz
+        // Eslatma: MainWindow xizmatlar (Services) ichida ro'yxatdan o'tgan bo'lishi kerak
         var mainWindow = AppHost.Services.GetRequiredService<Windows.MainWindow>();
+
+        // 3. Oynani ko'rsatamiz
         mainWindow.Show();
 
         base.OnStartup(e);
     }
-
     protected override async void OnExit(ExitEventArgs e)
     {
         await AppHost!.StopAsync();

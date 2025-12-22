@@ -54,18 +54,64 @@
                         FontSize="16"
                         Foreground="White"
                         Text="{Binding FullName}" />
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border x:Name="pnlProfileMenu"
+                                Visibility="Collapsed"
+                                Background="White"
+                                CornerRadius="10"
+                                Margin="0,0,8,0"
+                                Padding="5,2"
+                                md:ElevationAssist.Elevation="Dp16">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource MaterialDesignIconButton}"
+                                        Width="30" Height="30" Padding="0"
+                                        Click="BtnChangePhoto_Click"
+                                        ToolTip="Rasmni almashtirish">
+                                    <md:PackIcon Kind="DotsHorizontal" Foreground="#FF4FC3F7" Width="22" Height="22"/>
+                                </Button>
+
+                                <Separator Style="{StaticResource MaterialDesignDarkSeparator}"
+                                           Margin="4,5" />
+
+                                <PasswordBox x:Name="txtNewPassword"
+                                             Width="110"
+                                             Height="25"
+                                             Padding="3 0"
+                                             BorderThickness="1"
+                                             BorderBrush="Gray"
+                                             FontSize="13"
+                                             md:HintAssist.Hint="Yangi parol"
+                                             Style="{StaticResource MaterialDesignRevealPasswordBox}"
+                                             VerticalContentAlignment="Center"/>
+
+                                <Button Content="OK"
+                                        Margin="5,0,0,0"
+                                        Padding="8,0" Height="28"
+                                        Click="BtnSavePassword_Click"
+                                        Style="{StaticResource  MaterialDesignFlatDarkBgButton}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Button x:Name="btnProfile" Click="BtnProfile_Click" Padding="0" Background="Transparent" BorderThickness="0">
+                            <Grid>
+                                <Ellipse Width="35" Height="32" Stroke="White" StrokeThickness="0">
+                                    <Ellipse.Fill>
+                                        <ImageBrush x:Name="imgProfile" ImageSource="/Resources/Assets/profile.jpg" Stretch="UniformToFill"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+
                     <Button
-                        Margin="5,0"
+                        Margin="8,0"
                         Padding="6,2"
                         md:ButtonAssist.CornerRadius="6"
                         Background="Snow"
                         BorderThickness="0"
                         Click="BtnOverdue_Click"
-                        FontSize="16"
-                        FontWeight="SemiBold"
-                        Foreground="White"
                         ToolTip="Mijozlar qarzini to'lash muddatidan kechikayotganligi to'g'risida ogohlantirish!">
-
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                             <TextBlock
                                 x:Name="tbWarning"
@@ -87,6 +133,7 @@
                         Foreground="White"
                         IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}"
                         ToolTip="Chiqish" />
+
                 </StackPanel>
             </Grid>
         </Border>
@@ -159,7 +206,7 @@
                     <TextBlock VerticalAlignment="Center">🗜</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
                         Ishlab<LineBreak />
-                        chiqarish</TextBlock>
+                    chiqarish</TextBlock>
                 </StackPanel>
             </Button>
 
@@ -181,7 +228,7 @@
                     <TextBlock VerticalAlignment="Center">📦</TextBlock>
                     <TextBlock TextAlignment="Center" TextWrapping="Wrap">
                         Yarim tayyor<LineBreak />
-                        mahsulot</TextBlock>
+                    mahsulot</TextBlock>
                 </StackPanel>
             </Button>
 

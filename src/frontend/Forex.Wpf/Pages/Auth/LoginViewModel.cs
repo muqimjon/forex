@@ -9,13 +9,13 @@ public class LoginViewModel(IApiAuth apiAuth) : ViewModelBase
 {
     public async Task<bool> LoginAsync(string login, string password)
     {
-        if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
-        {
-            ErrorMessage = "Login va parol majburiy.";
-            return false;
-        }
+        //if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+        //{
+        //    ErrorMessage = "Login va parol majburiy.";
+        //    return false;
+        //}
 
-        var resp = await apiAuth.Login(new() { EmailOrPhone = login, Password = password })
+        var resp = await apiAuth.Login(new() { Username = login, Password = password })
             .Handle(isLoading => IsLoading = isLoading);
 
         if (resp.StatusCode != 200)
@@ -30,9 +30,14 @@ public class LoginViewModel(IApiAuth apiAuth) : ViewModelBase
         }
 
         var loginResp = resp.Data;
-        AuthStore.Instance.SetAuth(loginResp.Token, loginResp.User.Name, loginResp.User.Id);
-        SuccessMessage = $"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi";
 
+        AuthStore.Instance.SetAuth(
+            loginResp.Token,
+            loginResp.User.Name,
+            login,
+            loginResp.User.Id);
+
+        SuccessMessage = $"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi";
         return true;
     }
 }

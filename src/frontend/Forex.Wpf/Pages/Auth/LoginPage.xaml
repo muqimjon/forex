@@ -12,7 +12,7 @@
     Loaded="Page_Loaded"
     mc:Ignorable="d">
 
-    <Grid Background="#1E1E2F">
+    <Grid Background="{DynamicResource PrimaryBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -33,13 +33,13 @@
                     FontSize="24"
                     FontWeight="Bold"
                     Foreground="White"
-                    Text="Welcome back 👋" />
+                    Text="Forex tizimiga hush kelibsiz!" />
 
                 <TextBox
                     x:Name="tbLogin"
                     Margin="0,0,0,10"
                     Padding="8"
-                    md:HintAssist.Hint="Email yoki telefon"
+                    md:HintAssist.Hint="Username"
                     Background="#3A3A55"
                     BorderThickness="0"
                     FontSize="16"
@@ -69,19 +69,18 @@
                     BorderThickness="0"
                     Click="BtnLogin_Click"
                     Content="🔐 Login"
-                    
                     FontWeight="Bold"
                     Foreground="White"
                     IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolToBoolConverter}}" />
 
                 <!--<Button
-                    x:Name="btnGoRegister"
-                    Margin="0,10,0,0"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="BtnGoRegister_Click"
-                    Content="Create account"
-                    Foreground="#AABBDD" />-->
+                x:Name="btnGoRegister"
+                Margin="0,10,0,0"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="BtnGoRegister_Click"
+                Content="Create account"
+                Foreground="#AABBDD" />-->
 
                 <TextBlock
                     x:Name="lblError"

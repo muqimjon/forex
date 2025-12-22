@@ -37,11 +37,16 @@ public partial class LoginPage : Page
     private async void BtnLogin_Click(object sender, RoutedEventArgs e)
     {
         lblError.Visibility = Visibility.Collapsed;
+        string login = tbLogin.Text.Trim();
+        string password = pbPassword.Password;
 
-        var success = await viewModel.LoginAsync(tbLogin.Text.Trim(), pbPassword.Password);
+        var success = await viewModel.LoginAsync(login, password);
 
         if (success)
+        {
+            // MainWindow ichidagi Frame orqali HomePage ga o'tish
             NavigationService?.Navigate(new HomePage());
+        }
         else
         {
             lblError.Text = viewModel.ErrorMessage;
@@ -54,6 +59,3 @@ public partial class LoginPage : Page
         NavigationService?.Navigate(new RegisterPage());
     }
 }
-
-
-

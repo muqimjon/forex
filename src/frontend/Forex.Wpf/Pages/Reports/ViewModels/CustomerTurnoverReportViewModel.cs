@@ -132,6 +132,16 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     #region Commands
 
     [RelayCommand]
+    private async Task OnTabSelectedAsync()
+    {
+        // Agar mijoz tanlangan bo'lsa va ma'lumotlar hali yuklanmagan bo'lsa (yoki yangilash kerak bo'lsa)
+        if (SelectedCustomer != null)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+    [RelayCommand]
     private void Preview()
     {
         if (Operations.Count == 0)

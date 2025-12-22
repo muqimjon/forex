@@ -1,7 +1,9 @@
 ﻿namespace Forex.WebApi;
 
 using Forex.Application;
+using Forex.Application.Commons.Interfaces;
 using Forex.Infrastructure;
+using Forex.Infrastructure.Persistence;
 using Forex.WebApi.Conventions;
 using Forex.WebApi.Extensions;
 using Forex.WebApi.Middlewares;
@@ -120,6 +122,26 @@ public static class DependencyInjection
                       .AllowAnyMethod()
                       .AllowAnyHeader());
         });
+    }
+
+    public static async Task UseSeedData(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<IAppDbContext>();
+            var hasher = services.GetRequiredService<IPasswordHasher>();
+
+            // Biz boya yozgan Initializer klassini chaqiramiz
+            await AppDbContextInitializer.SeedDataAsync(context, hasher);
+        }
+        catch (Exception ex)
+        {
+            // Log qilish ixtiyoriy
+            var logger = services.GetRequiredService<ILogger<WebApplication>>();
+            logger.LogError(ex, "Seed data yuklashda xatolik!");
+        }
     }
 
     #endregion
