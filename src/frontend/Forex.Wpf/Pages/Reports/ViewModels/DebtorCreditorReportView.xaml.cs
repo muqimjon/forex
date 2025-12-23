@@ -41,4 +41,17 @@ public partial class DebtorCreditorReportView : UserControl
     {
         btnPrint.RegisterShortcut(Key.P, ModifierKeys.Control);
     }
+
+    private void TextBlock_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (sender is TextBlock textBlock)
+        {
+            // DataGridRow klassi System.Windows.Controls ichida
+            var row = DataGridRow.GetRowContainingElement(textBlock);
+            if (row != null)
+            {
+                textBlock.Text = (row.GetIndex() + 1).ToString();
+            }
+        }
+    }
 }

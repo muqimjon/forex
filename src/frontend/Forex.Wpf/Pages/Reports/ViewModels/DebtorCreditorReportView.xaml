@@ -113,6 +113,7 @@
         <DataGrid
             Grid.Row="1"
             Margin="10,5"
+            VirtualizingStackPanel.VirtualizationMode="Standard"
             AlternatingRowBackground="#F5F5F5"
             AutoGenerateColumns="False"
             BorderBrush="#DDDDDD"
@@ -132,23 +133,15 @@
             </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="60" Header="T/r">
-                    <DataGridTemplateColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="HorizontalAlignment" Value="Center" />
-                        </Style>
-                    </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Text="{Binding
-                                RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},
-                                Converter={StaticResource IndexConverter}}"/>
+                            <TextBlock HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
+                                       Converter={StaticResource IndexConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
                 <!--  Mijoz  -->
                 <DataGridTextColumn
                     Width="*"

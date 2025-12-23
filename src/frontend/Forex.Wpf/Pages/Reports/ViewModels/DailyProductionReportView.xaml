@@ -219,6 +219,8 @@
             Margin="10,5,10,5"
             AlternatingRowBackground="#F5F5F5"
             AutoGenerateColumns="False"
+            VirtualizingStackPanel.VirtualizationMode="Standard"
+            EnableRowVirtualization="True"
             FontSize="14"
             IsReadOnly="True"
             ItemsSource="{Binding Items}" Grid.ColumnSpan="2">
@@ -232,24 +234,15 @@
 
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="60" Header="T/r">
-                    <DataGridTemplateColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="HorizontalAlignment" Value="Center" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                        </Style>
-                    </DataGridTemplateColumn.CellStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Text="{Binding
-                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},
-                                    Converter={StaticResource IndexConverter}}"/>
+                            <TextBlock HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
+                                       Converter={StaticResource IndexConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
                 <!--  Sana — o‘rtada  -->
                 <DataGridTextColumn
                     Width="120"

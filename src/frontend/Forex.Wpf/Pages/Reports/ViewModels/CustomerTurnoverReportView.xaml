@@ -195,6 +195,8 @@
             AlternatingRowBackground="#F8F9FA"
             AutoGenerateColumns="False"
             FontSize="14"
+            VirtualizingStackPanel.VirtualizationMode="Standard"
+          EnableRowVirtualization="True"
             GridLinesVisibility="Horizontal"
             HeadersVisibility="Column"
             IsReadOnly="True"
@@ -204,26 +206,12 @@
 
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="60" Header="T/r">
-
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                        </Style>
-                    </DataGridTemplateColumn.HeaderStyle>
-
-                    <DataGridTemplateColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="HorizontalAlignment" Value="Stretch" />
-                        </Style>
-                    </DataGridTemplateColumn.CellStyle>
-
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Converter={StaticResource IndexConverter}}" />
+                            <TextBlock HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, 
+                                      Converter={StaticResource IndexConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
