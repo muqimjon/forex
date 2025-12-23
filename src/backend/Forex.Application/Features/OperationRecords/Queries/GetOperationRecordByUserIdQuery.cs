@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Forex.Application.Commons.Exceptions;
+using Forex.Application.Commons.Extensions;
 using Forex.Application.Commons.Interfaces;
 using Forex.Application.Features.OperationRecords.DTOs;
 using Forex.Domain.Entities;
@@ -29,8 +30,8 @@ public class GetOperationRecordByUserIdQueryHandler(IAppDbContext _context, IMap
         var beginBalance = CalculateBalance(openingBalance, allRecords, request.Begin, isEndDate: false);
         var endBalance = CalculateBalance(openingBalance, allRecords, request.End, isEndDate: true);
 
-        var operationsInRange = MapOperationRecords(
-            FilterOperationRecordsInRange(allRecords, request.Begin, request.End)
+        var operationsInRange = mapper.Map<List<OperationRecordDto>>(
+        FilterOperationRecordsInRange(allRecords, request.Begin, request.End)
         );
 
         return new OperationRecordTurnoverDto
@@ -62,28 +63,19 @@ public class GetOperationRecordByUserIdQueryHandler(IAppDbContext _context, IMap
             .ToListAsync(ct);
     }
 
-    private decimal CalculateBalance(decimal openingBalance, List<OperationRecord> all, DateTime date, bool isEndDate)
+    private static decimal CalculateBalance(decimal openingBalance, List<OperationRecord> all, DateTime date, bool isEndDate)
     {
         var turnover = all
-            .Where(or => isEndDate ? or.Date <= date : or.Date < date)
+            .Where(or => isEndDate ? or.Date <= date.ToUtcSafe() : or.Date < date.ToUtcSafe())
             .Sum(or => or.Amount);
 
         return openingBalance + turnover;
     }
 
-    private List<OperationRecord> FilterOperationRecordsInRange(
+    private static List<OperationRecord> FilterOperationRecordsInRange(
         List<OperationRecord> all,
         DateTime begin,
-        DateTime end)
-    {
-        return all
-            .Where(or => or.Date >= begin && or.Date <= end)
-            .OrderBy(or => or.Date)
-            .ToList();
-    }
-
-    private List<OperationRecordDto> MapOperationRecords(List<OperationRecord> records)
-    {
-        return mapper.Map<List<OperationRecordDto>>(records);
-    }
+        DateTime end) => [.. all
+            .Where(or => or.Date >= begin.ToUtcSafe() && or.Date <= end.AddDays(1).ToUtcSafe())
+            .OrderBy(or => or.Date)];
 }

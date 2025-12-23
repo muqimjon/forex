@@ -18,15 +18,15 @@ using System.Windows.Media;
 
 public partial class DailyProductionReportViewModel : ViewModelBase
 {
-    private readonly ForexClient _client;
+    private readonly ForexClient client;
     private readonly CommonReportDataService _commonData;
 
     [ObservableProperty]
-    private ObservableCollection<ProductViewModel> availableProducts = new();
+    private ObservableCollection<ProductViewModel> availableProducts = [];
 
     [ObservableProperty] private ObservableCollection<ProductionItemViewModel> items = [];
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime beginDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     // Yuqoridagi jami ko‘rsatkichlar
@@ -36,7 +36,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
 
     public DailyProductionReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
-        _client = client;
+        this.client = client;
         _commonData = commonData;
         _ = LoadProductsAsync();
 
@@ -53,7 +53,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
     {
         try
         {
-            var response = await _client.Products.GetAllAsync();
+            var response = await client.Products.GetAllAsync();
             if (response.IsSuccess && response.Data != null)
             {
                 var products = response.Data
@@ -86,19 +86,15 @@ public partial class DailyProductionReportViewModel : ViewModelBase
             {
                 Filters = new()
                 {
-                    ["date"] =
-                [
-                    $">={BeginDate:dd.MM.yyyy}",
-                    $"<{EndDate.AddDays(1):dd.MM.yyyy}"
-                ],
+                    ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                     ["productType"] = ["include:product"]
                 }
             };
 
-            var response = await _client.ProductEntries.Filter(request).Handle(l => IsLoading = l);
+            var response = await client.ProductEntries.Filter(request).Handle(l => IsLoading = l);
             if (!response.IsSuccess)
             {
-                ErrorMessage = "Ma'lumot yuklanmadi";
+                ErrorMessage = "Mahsulotlar kirimi tarixi yuklanmadi";
                 return;
             }
 
@@ -168,7 +164,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
     private void ClearFilter()
     {
         SelectedCode = null;
-        BeginDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        BeginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
         EndDate = DateTime.Today;
         LoadDataCommand.Execute(null);
     }

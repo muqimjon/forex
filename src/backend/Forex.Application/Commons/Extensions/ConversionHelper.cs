@@ -8,24 +8,49 @@ public static class ConversionHelper
 {
     private static readonly string[] DateFormats =
     [
-        "yyyy-MM-dd HH:mm:ss",
-        "yyyy-MM-dd",
-        "yyyy/M/d HH:mm",
-        "yyyy/M/d",
-        "M/d/yyyy HH:mm",
-        "M/d/yyyy",
-        "d/M/yyyy HH:mm",
-        "d/M/yyyy",
-        "dd.MM.yyyy HH:mm",
-        "dd.MM.yyyy",
-        "yyyy-MM-ddTHH:mm:ss",
+        // 1. ISO 8601 & Round-trip (ToString("O") uchun - Eng birinchi turishi shart)
+        "yyyy-MM-ddTHH:mm:ss.FFFFFFFK",
+        "yyyy-MM-ddTHH:mm:ss.fffffffzzz",
         "yyyy-MM-ddTHH:mm:ssZ",
         "yyyy-MM-ddTHH:mm:sszzz",
-        "MMM d, yyyy",
-        "MMMM d yyyy",
-        "d MMM yyyy",
+        "yyyy-MM-ddTHH:mm:ss",
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd",
+
+        // 2. Nuqtali (O‘zbekiston/Yevropa) - Nuqta bo'lgani uchun boshqalar bilan chalkashmaydi
+        "d.M.yyyy HH:mm:ss",
+        "d.M.yyyy HH:mm",
+        "d.M.yyyy",
         "dd.MM.yyyy.HH:mm:ss",
-        "dd-MM-yyyy",
+
+        // 3. Yil birinchi keladigan (Custom) - Yil birinchi kelsa adashish ehtimoli 0%
+        "yyyy/M/d HH:mm:ss",
+        "yyyy/M/d HH:mm",
+        "yyyy/M/d",
+        "yyyy-M-d HH:mm:ss",
+        "yyyy-M-d HH:mm",
+        "yyyy-M-d",
+
+        // 4. Chiziqchali (Kun birinchi) - O'zbekistonda ko'p qo'llaniladi
+        "d-M-yyyy HH:mm:ss",
+        "d-M-yyyy HH:mm",
+        "d-M-yyyy",
+
+        // 5. Sleshli (Xalqaro - Kun birinchi) 
+        "d/M/yyyy HH:mm:ss",
+        "d/M/yyyy HH:mm",
+        "d/M/yyyy",
+
+        // 6. Sleshli (AQSH - Oy birinchi) - ENG OXIRIDA
+        // Chunki 10/11/2025 kelsa, yuqoridagi "Kun birinchi" qoidasi ustunlik qilishi kerak
+        "M/d/yyyy HH:mm:ss",
+        "M/d/yyyy HH:mm",
+        "M/d/yyyy",
+
+        // 7. Matnli formatlar
+        "d MMM yyyy",
+        "MMM d, yyyy",
+        "MMMM d yyyy"
     ];
 
     public static object? TryConvert(object value, Type targetType)

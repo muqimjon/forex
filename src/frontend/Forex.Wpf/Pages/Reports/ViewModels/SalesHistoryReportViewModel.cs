@@ -17,29 +17,29 @@ using System.Windows.Media;
 
 public partial class SalesHistoryReportViewModel : ViewModelBase
 {
-    private readonly ForexClient _client;
-    private readonly CommonReportDataService _commonData;
+    private readonly ForexClient client;
+    private readonly CommonReportDataService commonData;
 
     // Asosiy ma'lumotlar (serverdan 1 marta olinadi)
-    private readonly ObservableCollection<SaleHistoryItemViewModel> _allItems = [];
+    private readonly ObservableCollection<SaleHistoryItemViewModel> allItems = [];
 
     // UI da ko‘rinadigan (filtrlangan)
     [ObservableProperty]
     private ObservableCollection<SaleHistoryItemViewModel> filteredItems = [];
 
-    public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
-    public ObservableCollection<ProductViewModel> AvailableProducts => _commonData.AvailableProducts;
+    public ObservableCollection<UserViewModel> AvailableCustomers => commonData.AvailableCustomers;
+    public ObservableCollection<ProductViewModel> AvailableProducts => commonData.AvailableProducts;
 
     [ObservableProperty] private UserViewModel? selectedCustomer;
     [ObservableProperty] private ProductViewModel? selectedProduct;
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime beginDate = DateTime.Today;
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public SalesHistoryReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
-        _client = client;
-        _commonData = commonData;
+        this.client = client;
+        this.commonData = commonData;
 
         // Har qanday filtr o‘zgarsa → darrov filtrla
         PropertyChanged += (_, e) =>
@@ -57,69 +57,54 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
     public async Task LoadAsync()
     {
         IsLoading = true;
-        _allItems.Clear();
+        allItems.Clear();
         FilteredItems.Clear();
 
-        try
+        var request = new FilteringRequest
         {
-            var request = new FilteringRequest
+            Filters = new()
             {
-                Filters = new()
-                {
-                    ["date"] =
-                [
-                    $">={BeginDate:dd-MM-yyyy}",
-                    $"<{EndDate.AddDays(1):dd-MM-yyyy}"
-                ],
-                    ["customer"] = ["include"],
-                    ["saleItems"] = ["include:productType.product.unitMeasure"]
-                }
-            };
-
-            var response = await _client.Sales.Filter(request).Handle(l => IsLoading = l);
-
-            if (!response.IsSuccess || response.Data == null)
-            {
-                ErrorMessage = "Sotuvlar yuklanmadi";
-                return;
+                ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
+                ["customer"] = ["include"],
+                ["saleItems"] = ["include:productType.product.unitMeasure"]
             }
+        };
 
-            foreach (var sale in response.Data)
+        var response = await client.Sales.Filter(request).Handle(l => IsLoading = l);
+
+        if (!response.IsSuccess)
+        {
+            ErrorMessage = "Sotuvlar yuklanmadi";
+            return;
+        }
+
+        foreach (var sale in response.Data)
+        {
+            if (sale.SaleItems == null) continue;
+
+            foreach (var item in sale.SaleItems)
             {
-                if (sale.SaleItems == null) continue;
+                var product = item.ProductType?.Product;
+                if (product == null) continue;
 
-                foreach (var item in sale.SaleItems)
+                allItems.Add(new SaleHistoryItemViewModel
                 {
-                    var product = item.ProductType?.Product;
-                    if (product == null) continue;
-
-                    _allItems.Add(new SaleHistoryItemViewModel
-                    {
-                        Date = sale.Date.ToLocalTime(),
-                        Customer = sale.Customer?.Name ?? "-",
-                        Code = product.Code ?? "-",
-                        ProductName = product.Name ?? "-",
-                        Type = item.ProductType?.Type ?? "-",
-                        BundleCount = item.BundleCount,
-                        BundleItemCount = item.ProductType?.BundleItemCount ?? 0,
-                        TotalCount = item.TotalCount,
-                        UnitMeasure = product.UnitMeasure?.Name ?? "dona",
-                        UnitPrice = item.UnitPrice,
-                        Amount = item.Amount
-                    });
-                }
+                    Date = sale.Date.ToLocalTime(),
+                    Customer = sale.Customer?.Name ?? "-",
+                    Code = product.Code ?? "-",
+                    ProductName = product.Name ?? "-",
+                    Type = item.ProductType?.Type ?? "-",
+                    BundleCount = item.BundleCount,
+                    BundleItemCount = item.ProductType?.BundleItemCount ?? 0,
+                    TotalCount = item.TotalCount,
+                    UnitMeasure = product.UnitMeasure?.Name ?? "dona",
+                    UnitPrice = item.UnitPrice,
+                    Amount = item.Amount
+                });
             }
+        }
 
-            ApplyFilters();
-        }
-        catch (System.Exception ex)
-        {
-            ErrorMessage = ex.Message;
-        }
-        finally
-        {
-            IsLoading = false;
-        }
+        ApplyFilters();
     }
 
     [RelayCommand]
@@ -130,7 +115,6 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
         SelectedCode = null;
         BeginDate = DateTime.Today;
         EndDate = DateTime.Today;
-        // ApplyFilters avto ishlaydi
     }
 
     [RelayCommand]
@@ -266,7 +250,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
     private void ApplyFilters()
     {
-        var result = _allItems.AsEnumerable();
+        var result = allItems.AsEnumerable();
 
         if (SelectedCustomer != null)
             result = result.Where(x => x.Customer == SelectedCustomer.Name);

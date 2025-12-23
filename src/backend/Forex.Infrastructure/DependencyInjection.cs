@@ -33,8 +33,12 @@ public static class DependencyInjection
     private static void AddDbContext(this IServiceCollection services, IConfiguration conf)
     {
         services.AddScoped<AuditInterceptor>();
+
+        var connectionString = conf.GetConnectionString("forex")
+                               ?? conf.GetConnectionString("DefaultConnection");
+
         services.AddDbContext<IAppDbContext, AppDbContext>((sp, options) =>
-            options.UseNpgsql(conf.GetConnectionString("DefaultConnection"))
+            options.UseNpgsql(connectionString)
                    .AddInterceptors(sp.GetRequiredService<AuditInterceptor>()));
     }
 

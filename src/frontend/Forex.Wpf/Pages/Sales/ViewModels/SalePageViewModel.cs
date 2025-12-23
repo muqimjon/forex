@@ -33,7 +33,7 @@ public partial class SalePageViewModel : ViewModelBase, INavigationAware
     [ObservableProperty] private ObservableCollection<UserViewModel> availableCustomers = [];
     [ObservableProperty] private SaleViewModel? selectedSale;
 
-    [ObservableProperty] private DateTime beginDate = DateTime.Today;
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
     [ObservableProperty] private UserViewModel? selectedCustomer;
 
@@ -76,11 +76,7 @@ public partial class SalePageViewModel : ViewModelBase, INavigationAware
         {
             Filters = new()
             {
-                ["date"] =
-                [
-                    $">={BeginDate:dd-MM-yyyy}",
-                    $"<{EndDate.AddDays(1):dd-MM-yyyy}"
-                ],
+                ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                 ["customer"] = ["include"],
                 ["saleItems"] = ["include:productType.product"]
             }

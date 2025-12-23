@@ -25,7 +25,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
 
     [ObservableProperty] private UserViewModel? selectedCustomer;
-    [ObservableProperty] private DateTime beginDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public CustomerSalesRatingViewModel(ForexClient client, CommonReportDataService commonData)
@@ -50,11 +50,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
             {
                 Filters = new()
                 {
-                    ["date"] =
-                [
-                    $">={BeginDate:dd.MM.yyyy}",
-                    $"<{EndDate.AddDays(1):dd.MM.yyyy}"
-                ],
+                    ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                     ["customer"] = ["include"],
                     ["saleItems"] = ["include:productType.product"]
                 }
@@ -119,7 +115,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
         catch (Exception ex)
         {
             MessageBox.Show($"Xatolik: {ex.Message}");
-            CustomerSales = new ObservableCollection<CustomerSaleViewModel>();
+            CustomerSales = [];
         }
         finally
         {

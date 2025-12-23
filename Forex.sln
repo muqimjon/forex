@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11304.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forex.Wpf", "src\frontend\Forex.Wpf\Forex.Wpf.csproj", "{7ED22239-2617-4FBE-AE5D-87D8E70D425A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forex.ClientService", "src\frontend\Forex.ClientService\Forex.ClientService.csproj", "{554E7256-D8B3-4FDB-AF1B-FE90915A0CB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forex.AppHost", "src\Forex.AppHost\Forex.AppHost.csproj", "{7BA8D2E2-9089-47A2-848A-3EF2359C4E37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{554E7256-D8B3-4FDB-AF1B-FE90915A0CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{554E7256-D8B3-4FDB-AF1B-FE90915A0CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{554E7256-D8B3-4FDB-AF1B-FE90915A0CB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BA8D2E2-9089-47A2-848A-3EF2359C4E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BA8D2E2-9089-47A2-848A-3EF2359C4E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BA8D2E2-9089-47A2-848A-3EF2359C4E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BA8D2E2-9089-47A2-848A-3EF2359C4E37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +70,7 @@ Global
 		{1DA31A5A-2F3C-4612-9E6A-A64059EDE38C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{7ED22239-2617-4FBE-AE5D-87D8E70D425A} = {1DA31A5A-2F3C-4612-9E6A-A64059EDE38C}
 		{554E7256-D8B3-4FDB-AF1B-FE90915A0CB9} = {1DA31A5A-2F3C-4612-9E6A-A64059EDE38C}
+		{7BA8D2E2-9089-47A2-848A-3EF2359C4E37} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68EE427E-D5C1-4E8A-B597-D8916D90924C}

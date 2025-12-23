@@ -48,7 +48,7 @@ public partial class TransactionPageViewModel : ViewModelBase
     [ObservableProperty] private UserViewModel? selectedFilterUser;
 
     public static IEnumerable<PaymentMethod> AvailablePaymentMethods => Enum.GetValues<PaymentMethod>();
-    [ObservableProperty] private DateTime beginDate = DateTime.Today;
+    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     // UI-specific computed properties
@@ -77,18 +77,13 @@ public partial class TransactionPageViewModel : ViewModelBase
         {
             Filters = new()
             {
-                ["date"] =
-                [
-                    $">={BeginDate:dd-MM-yyyy}",
-                    $"<{EndDate.AddDays(1):dd-MM-yyyy}"
-                ],
+                ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                 ["user"] = ["include"],
                 ["currency"] = ["include"],
                 ["shopAccount"] = ["include"]
             }
         };
 
-        // User filter qo'shish
         if (SelectedFilterUser != null)
         {
             request.Filters["userId"] = [$"={SelectedFilterUser.Id}"];
@@ -102,7 +97,6 @@ public partial class TransactionPageViewModel : ViewModelBase
             List<TransactionResponse> ordered = response.Data.OrderByDescending(t => t.Date).ToList();
             Transactions = mapper.Map<ObservableCollection<TransactionViewModel>>(ordered);
 
-            // Income/Expense UI binding uchun
             foreach (var trans in Transactions)
             {
                 if (trans.IsIncome)
@@ -151,7 +145,7 @@ public partial class TransactionPageViewModel : ViewModelBase
 
     private async Task LoadUsersAsync()
     {
-        Response<List<UserResponse>> response = await client.Users.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
+        var response = await client.Users.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {

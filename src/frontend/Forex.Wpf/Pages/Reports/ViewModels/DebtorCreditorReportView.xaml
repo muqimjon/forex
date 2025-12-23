@@ -42,7 +42,7 @@
                     BorderBrush="#CCCCCC"
                     BorderThickness="2"
                     CornerRadius="4">
-                    <ComboBox
+                    <ComboBox x:Name="cbxCustomer"
                         Padding="3"
                         BorderThickness="0"
                         DisplayMemberPath="Name"
@@ -58,7 +58,7 @@
                 Margin="30,0,0,0"
                 VerticalAlignment="Center"
                 Orientation="Vertical">
-                <Button
+                <Button x:Name="btnPreview"
                     Height="32"
                     Margin="0,4"
                     md:ButtonAssist.CornerRadius="6"
@@ -69,7 +69,7 @@
                     FontSize="14"
                     FontWeight="SemiBold"
                     Foreground="White" />
-                <Button
+                <Button x:Name="btnClear"
                     Height="32"
                     Margin="0,4"
                     md:ButtonAssist.CornerRadius="6"
@@ -86,7 +86,7 @@
                 Margin="15,0"
                 VerticalAlignment="Center"
                 Orientation="Vertical">
-                <Button
+                <Button x:Name="btnPrint"
                     Height="32"
                     Margin="0,4"
                     md:ButtonAssist.CornerRadius="6"
@@ -97,7 +97,7 @@
                     FontSize="14"
                     FontWeight="SemiBold"
                     Foreground="White" />
-                <Button
+                <Button x:Name="btnExport"
                     Height="32"
                     Margin="0,4"
                     md:ButtonAssist.CornerRadius="6"
