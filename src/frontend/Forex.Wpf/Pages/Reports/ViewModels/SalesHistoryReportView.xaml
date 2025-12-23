@@ -235,6 +235,8 @@
             Grid.Row="1"
             Margin="10,5"
             AlternatingRowBackground="#F8F9FA"
+            VirtualizingStackPanel.VirtualizationMode="Standard"
+            EnableRowVirtualization="True"
             AutoGenerateColumns="False"
             BorderBrush="#DDDDDD"
             BorderThickness="1"
@@ -247,35 +249,17 @@
             RowHeaderWidth="0">
 
             <DataGrid.Columns>
-
-
-
                 <DataGridTemplateColumn Width="60" Header="T/r">
-
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                        </Style>
-                    </DataGridTemplateColumn.HeaderStyle>
-
-                    <DataGridTemplateColumn.CellStyle>
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="HorizontalAlignment" Value="Stretch" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                        </Style>
-                    </DataGridTemplateColumn.CellStyle>
-
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Converter={StaticResource IndexConverter}}" />
+                            <TextBlock HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
+                                       Converter={StaticResource IndexConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-
                 </DataGridTemplateColumn>
+
                 <!--  1. Sana — O‘rtada (header + qiymat)  -->
                 <DataGridTextColumn
                     Width="0.8*"

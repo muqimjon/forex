@@ -11,5 +11,4 @@ public partial class FinishedStockReportView : UserControl
     {
         InitializeComponent();
     }
-
 }

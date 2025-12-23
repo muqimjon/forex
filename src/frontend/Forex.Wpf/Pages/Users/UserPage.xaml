@@ -298,6 +298,8 @@
             x:Name="dgUsers"
             Grid.Row="2"
             Margin="0"
+            VirtualizingStackPanel.VirtualizationMode="Standard"
+            EnableRowVirtualization="True"
             AutoGenerateColumns="False"
             BorderBrush="Gray"
             BorderThickness="1"
@@ -308,17 +310,16 @@
 
             <DataGrid.Columns>
 
-                <DataGridTemplateColumn Width="50" Header="T/r">
+                <DataGridTemplateColumn Width="60" Header="T/r">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Converter={StaticResource IndexConverter}}" />
+                            <TextBlock HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, 
+                                      Converter={StaticResource IndexConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Name}"
