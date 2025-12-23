@@ -237,7 +237,7 @@ public partial class AddSalePageViewModel : ViewModelBase
 
         SaleRequest request = new()
         {
-            Date = Date,
+            Date = Date == DateTime.Today ? DateTime.Now : Date,
             CustomerId = Customer?.Id ?? 0,
             TotalAmount = FinalAmount ?? 0,
             Note = Note,

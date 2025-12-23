@@ -16,7 +16,7 @@
             FontSize="14"
             Foreground="{DynamicResource PrimaryTextColor}"
             Style="{StaticResource FloatingLabelStyle}"
-            Tag="{Binding ElementName=comboBox}"
+            Tag="{Binding ElementName=combobox}"
             Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
         <!--  Inner ComboBox bound to the UserControl dependency properties  -->

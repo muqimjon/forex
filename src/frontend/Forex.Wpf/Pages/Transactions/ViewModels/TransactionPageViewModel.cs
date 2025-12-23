@@ -145,7 +145,7 @@ public partial class TransactionPageViewModel : ViewModelBase
 
     private async Task LoadUsersAsync()
     {
-        Response<List<UserResponse>> response = await client.Users.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
+        var response = await client.Users.GetAllAsync().Handle(isLoading => IsLoading = isLoading);
 
         if (response.IsSuccess)
         {

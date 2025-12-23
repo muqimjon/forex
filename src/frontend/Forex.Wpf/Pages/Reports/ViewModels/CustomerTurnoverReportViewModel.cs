@@ -71,7 +71,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         var requset = new TurnoverRequest
         (
             UserId: SelectedCustomer.Id,
-            Begin: BeginDate.ToUniversalTime(),
+            Begin: BeginDate,
             End: EndDate
         );
 

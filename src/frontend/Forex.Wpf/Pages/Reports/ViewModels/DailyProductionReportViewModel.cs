@@ -86,11 +86,10 @@ public partial class DailyProductionReportViewModel : ViewModelBase
             {
                 Filters = new()
                 {
-                    ["date"] = [$">={BeginDate:dd-MM-yyyy}", $"<{EndDate.AddDays(1):dd-MM-yyyy}"],
+                    ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                     ["productType"] = ["include:product"]
                 }
             };
-
 
             var response = await client.ProductEntries.Filter(request).Handle(l => IsLoading = l);
             if (!response.IsSuccess)
