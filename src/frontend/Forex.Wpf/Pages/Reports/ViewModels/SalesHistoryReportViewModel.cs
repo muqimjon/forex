@@ -67,7 +67,9 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                 ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                 ["customer"] = ["include"],
                 ["saleItems"] = ["include:productType.product.unitMeasure"]
-            }
+            },
+            Descending = true,
+            SortBy = "date"
         };
 
         var response = await client.Sales.Filter(request).Handle(l => IsLoading = l);
