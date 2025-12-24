@@ -382,7 +382,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         const double minFinalSpace = 20; // JAMI va Qoldiq qatorlari orasidagi minimal bo'shliq
 
         // Ustun kengliklari
-        double[] finalColWidths = { 90, 120, 120, 363.7 }; // Jami 693.7
+        double[] finalColWidths = { 80, 100, 100, 413.7 }; // Jami 693.7
 
         var allOperations = Operations.ToList();
         int currentIndex = 0;
