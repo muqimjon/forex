@@ -7,15 +7,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="LoginPage"
-    d:DesignHeight="600"
-    d:DesignWidth="650"
+    d:DesignHeight="700"
+    d:DesignWidth="800"
     Loaded="Page_Loaded"
     mc:Ignorable="d">
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="pack://application:,,,/Resources/Assets/bekson.png"
-                        Stretch="Uniform" />
+            <ImageBrush ImageSource="pack://application:,,,/Resources/Assets/bekson.png" Stretch="UniformToFill" />
         </Grid.Background>
 
         <Grid.RowDefinitions>
@@ -39,7 +38,7 @@
 
         <Border Background="#AA000000">
             <Border.Effect>
-                <BlurEffect Radius="5"/>
+                <BlurEffect Radius="5" />
             </Border.Effect>
         </Border>
 
@@ -50,9 +49,9 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Background="#CC2D2D44"
-            CornerRadius="12"
             BorderBrush="#44FFFFFF"
             BorderThickness="1"
+            CornerRadius="12"
             Opacity="2">
 
             <StackPanel>

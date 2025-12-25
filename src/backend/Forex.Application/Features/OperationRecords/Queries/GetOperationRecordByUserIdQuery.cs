@@ -66,7 +66,7 @@ public class GetOperationRecordByUserIdQueryHandler(IAppDbContext _context, IMap
     private static decimal CalculateBalance(decimal openingBalance, List<OperationRecord> all, DateTime date, bool isEndDate)
     {
         var turnover = all
-            .Where(or => isEndDate ? or.Date <= date.ToUtcSafe() : or.Date < date.ToUtcSafe())
+            .Where(or => isEndDate ? or.Date < date.AddDays(1).ToUtcSafe() : or.Date < date.ToUtcSafe())
             .Sum(or => or.Amount);
 
         return openingBalance + turnover;
@@ -76,6 +76,6 @@ public class GetOperationRecordByUserIdQueryHandler(IAppDbContext _context, IMap
         List<OperationRecord> all,
         DateTime begin,
         DateTime end) => [.. all
-            .Where(or => or.Date >= begin.ToUtcSafe() && or.Date <= end.AddDays(1).ToUtcSafe())
+            .Where(or => or.Date >= begin.ToUtcSafe() && or.Date < end.AddDays(1).ToUtcSafe())
             .OrderBy(or => or.Date)];
 }

@@ -33,7 +33,7 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
     [ObservableProperty] private UserViewModel? selectedCustomer;
     [ObservableProperty] private ProductViewModel? selectedProduct;
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = DateTime.Today.AddDays(-7);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public SalesHistoryReportViewModel(ForexClient client, CommonReportDataService commonData)
