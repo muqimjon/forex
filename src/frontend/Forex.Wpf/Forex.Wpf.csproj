@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Assets\bekson.png" />
     <None Remove="Resources\Assets\default.png" />
     <None Remove="Resources\Assets\logo.png" />
     <None Remove="Resources\Assets\profile.jpg" />
@@ -26,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Assets\bekson.png" />
     <Resource Include="Resources\Assets\default.jpg" />
   </ItemGroup>
 
