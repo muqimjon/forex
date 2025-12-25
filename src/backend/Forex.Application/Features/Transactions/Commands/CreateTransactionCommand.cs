@@ -171,7 +171,10 @@ public class CreateTransactionCommandHandler(
 
         if (transaction.PaymentMethod == PaymentMethod.Naqd)
         {
-            shopAccount.Balance += transaction.Amount;
+            if (transaction.IsIncome)
+                shopAccount.Balance += transaction.Amount;
+            else
+                shopAccount.Balance -= transaction.Amount;
             if (shopAccount.Balance < 0)
                 throw new ConflictException("Do'kon kassasida mablag' yetarli emas!");
         }
