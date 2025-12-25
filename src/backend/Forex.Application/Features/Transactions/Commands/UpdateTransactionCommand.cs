@@ -144,8 +144,10 @@ public class UpdateTransactionCommandHandler(
 
         var amountInUZS = transaction.Amount * transaction.ExchangeRate;
         var delta = amountInUZS + transaction.Discount;
-
-        userAccount.Balance -= delta;
+        if(transaction.IsIncome)
+            userAccount.Balance -= delta;
+        else
+            userAccount.Balance += delta;
     }
 
     private static void RevertShopAccount(Transaction transaction)
@@ -156,7 +158,10 @@ public class UpdateTransactionCommandHandler(
 
         if (transaction.PaymentMethod == PaymentMethod.Naqd)
         {
-            shopAccount.Balance -= transaction.Amount;
+            if(transaction.IsIncome)
+                shopAccount.Balance -= transaction.Amount;
+            else
+                shopAccount.Balance += transaction.Amount;
         }
     }
 
@@ -193,7 +198,10 @@ public class UpdateTransactionCommandHandler(
         var delta = amountInUZS + request.Discount;
 
         userAccount.DueDate = DateTime.SpecifyKind(request.DueDate, DateTimeKind.Utc);
-        userAccount.Balance += delta;
+        if (request.IsIncome)
+            userAccount.Balance += delta;
+        else
+            userAccount.Balance -= delta;
     }
 
     private static void UpdateShopAccount(Transaction transaction, UpdateTransactionCommand request)
@@ -214,7 +222,10 @@ public class UpdateTransactionCommandHandler(
 
         if (request.PaymentMethod == PaymentMethod.Naqd)
         {
-            shopAccount.Balance += request.Amount;
+            if(transaction.IsIncome)
+                shopAccount.Balance += request.Amount;
+            else
+                shopAccount.Balance -= request.Amount;
             if (shopAccount.Balance < 0)
                 throw new ConflictException("Do'kon kassasida mablag' yetarli emas!");
         }
