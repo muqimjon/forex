@@ -48,8 +48,8 @@ public class UpdateUserCommandHandler(
         if (!string.IsNullOrWhiteSpace(request.Username) && !isAdmin)
             throw new AppException($"Sizda {request.Username}ni o'zgartirish huquqi yo'q!");
 
-            // 3. Ism o'zgarayotgan bo'lsa, bazada boshqa odamda yo'qligini tekshirish
-            var normalizedNewName = request.Name.ToNormalized();
+        // 3. Ism o'zgarayotgan bo'lsa, bazada boshqa odamda yo'qligini tekshirish
+        var normalizedNewName = request.Name.ToNormalized();
         if (user.NormalizedName != normalizedNewName)
         {
             var nameExists = await context.Users.AnyAsync(u => u.NormalizedName == normalizedNewName && u.Id != user.Id, cancellationToken);

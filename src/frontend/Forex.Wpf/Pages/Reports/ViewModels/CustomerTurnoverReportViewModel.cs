@@ -480,47 +480,30 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
                 rowsAddedOnPage++;
             }
 
-            // 4. Jami va Oxirgi Qoldiq (Faqat oxirgi sahifada)
             bool isLastPage = (currentIndex >= allOperations.Count);
 
-            // Ma'lumot tsikli tugagan bo'lsa (yoki birinchi sahifada ma'lumot bo'lmasa)
             if (isLastPage)
             {
-                // JAMI
-                // Endi biz JAMI qatori uchun joy borligini avvaldan ta'minladik, shuning uchun shartsiz qo'shamiz
                 var totalGrid = CreateRow(finalColWidths, true, "JAMI",
                     totalDebit > 0 ? totalDebit.ToString("N0") : "",
                     totalCredit > 0 ? totalCredit.ToString("N0") : "",
                     "");
                 container.Children.Add(totalGrid);
 
-                // Oxirgi Qoldiq
-                // Oldingi JAMI qator qo'shilgani va yetarli joy borligi uchun, buni ham shartsiz qo'shamiz
                 var lastBalanceGrid = CreateBalanceRow(finalColWidths, "Oxirgi qoldiq", LastBalance.ToString("N2"));
                 container.Children.Add(lastBalanceGrid);
             }
 
-            // Agar birinchi sahifada ma'lumot bo'lmasa (allOperations.Count == 0), uni ham qoldiqlar bilan saqlashimiz kerak.
             if (allOperations.Count == 0 && isFirstPage)
             {
-                // 0 operatsiya bo'lsa, Jami 0, Oxirgi qoldiq = Boshlang'ich qoldiq bo'ladi.
-
-                // JAMI 0
                 var totalGrid = CreateRow(finalColWidths, true, "JAMI", "", "", "");
                 container.Children.Add(totalGrid);
 
-                // Oxirgi Qoldiq (Boshlang'ich qoldiqqa teng)
                 var lastBalanceGrid = CreateBalanceRow(finalColWidths, "Oxirgi qoldiq", BeginBalance.ToString("N2"));
                 container.Children.Add(lastBalanceGrid);
             }
 
-
-            // Sahifani qo'shish va Footer mantiqlari
             page.Children.Add(container);
-
-            // Footer elementlari (Endi AddPageFooter emas, UpdatePageFooter ishlatiladi)
-            // AddPageFooter bu joyda ishlatilmasligi kerak, UpdatePageFooter tsikldan keyin ishlaydi
-            // AddPageFooter(page, pageNumber, 0); // Bu qatorni o'chiramiz/izohlaymiz
 
             var pc = new PageContent();
             ((IAddChild)pc).AddChild(page);

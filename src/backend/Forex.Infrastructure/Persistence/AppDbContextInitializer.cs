@@ -21,7 +21,7 @@ public static class AppDbContextInitializer
                 Name = "System Admin",
                 Username = "admin",
                 Email = "admin@forex.uz",
-                Role = UserRole.Hodim, 
+                Role = UserRole.Hodim,
                 PasswordHash = hasher.HashPassword("741"),
                 NormalizedName = "SYSTEM ADMIN"
             };

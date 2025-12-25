@@ -34,10 +34,11 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
     [ObservableProperty] private ObservableCollection<ProductEntryViewModel> productEntries = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
     public string[] ProductionOrigins { get; set; } = Enum.GetNames<ProductionOrigin>();
-    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = DateTime.Today.AddDays(-7);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
     [ObservableProperty] private ProductEntryViewModel currentProductEntry = new();
     [ObservableProperty] private ProductEntryViewModel? selectedProductEntry = default;
+    [ObservableProperty] private string selectedImageFile = string.Empty;
 
     #region Load Data
 
@@ -186,7 +187,6 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
                 return;
         }
 
-        // BACKUP YARATISH - Edit boshida
         _backupProductEntry = new ProductEntryViewModel
         {
             Id = SelectedProductEntry.Id,
@@ -198,7 +198,6 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             ProductType = SelectedProductEntry.ProductType
         };
 
-        // ... qolgan kod o'zgarishsiz davom etadi
         if (!AvailableProducts.Any())
         {
             await LoadProductsAsync();
@@ -342,11 +341,8 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
     [RelayCommand]
     private async Task Update()
     {
-        if (CurrentProductEntry is null || CurrentProductEntry.Id <= 0)
-        {
-            ErrorMessage = "Yangilanishi kerak bo'lgan ma'lumot tanlanmagan!";
-            return;
-        }
+        // Removed ID check to allow new entries
+
 
         if (CurrentProductEntry.Product is null)
         {
@@ -378,52 +374,126 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             return;
         }
 
-        var request = new ProductEntryRequest
+        // ... Validation checks ... same as before ...
+
+        string? uploadedImagePath = null;
+        if (!string.IsNullOrWhiteSpace(SelectedImageFile))
         {
-            Id = CurrentProductEntry.Id,
-            Date = CurrentProductEntry.Date,
-            Count = CurrentProductEntry.Count,
-            BundleItemCount = CurrentProductEntry.Product.SelectedType.BundleItemCount!.Value,
-            PreparationCostPerUnit = 0,
-            UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice!.Value,
-            ProductionOrigin = CurrentProductEntry.ProductionOrigin,
-            Product = new ProductRequest
+            try
             {
-                Id = CurrentProductEntry.Product.Id,
-                Code = CurrentProductEntry.Product.Code,
-                Name = CurrentProductEntry.Product.Name,
-                ProductionOrigin = CurrentProductEntry.ProductionOrigin,
-                ProductTypes =
-                [
-                    new() {
-                    Id = CurrentProductEntry.Product.SelectedType.Id,
-                    Type = CurrentProductEntry.Product.SelectedType.Type,
-                    BundleItemCount = (int)CurrentProductEntry.Product.SelectedType.BundleItemCount.Value,
-                    UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice.Value,
-                    ProductTypeItems = []
+                var extension = System.IO.Path.GetExtension(SelectedImageFile);
+                var presignedResponse = await client.ProductEntries.GetPresignedUrl(extension);
+
+                if (presignedResponse.IsSuccess && presignedResponse.Data is not null)
+                {
+                    var fileService = new Forex.ClientService.Services.FileStorage.Minio.MinioFileStorageService(
+                        default!, // Client not needed for presigned upload
+                        default!  // Options not needed
+                    );
+
+                    using var stream = System.IO.File.OpenRead(SelectedImageFile);
+                    await fileService.UploadToPresignedUrlAsync(presignedResponse.Data.Url, stream);
+                    uploadedImagePath = presignedResponse.Data.Key;
                 }
-                ]
             }
-        };
-
-        var response = await client.ProductEntries.Update(request)
-            .Handle(isLoading => IsLoading = isLoading);
-
-        if (response.IsSuccess)
-        {
-            SuccessMessage = "Mahsulot kirimi muvaffaqiyatli yangilandi!";
-
-            IsEditing = false;
-            ClearCurrentEntry();
-
-            // BACKUP'NI TOZALASH
-            _backupProductEntry = null;
-
-            await LoadProductEntriesAsync();
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Rasm yuklashda xatolik: {ex.Message}";
+                return;
+            }
         }
+
+        // CREATE NEW
+        if (CurrentProductEntry.Id <= 0)
+        {
+            var createRequest = new CreateProductEntryWithImageCommandRequest
+            {
+                Command = new ProductEntryCommandRequest
+                {
+                    Date = CurrentProductEntry.Date,
+                    Count = (int)(CurrentProductEntry.Count ?? 0),
+                    BundleItemCount = (int)(CurrentProductEntry.Product.SelectedType.BundleItemCount ?? 0),
+                    PreparationCostPerUnit = 0,
+                    UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice ?? 0,
+                    ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+                    Product = new ProductCommandRequest
+                    {
+                        Id = CurrentProductEntry.Product.Id,
+                        Code = CurrentProductEntry.Product.Code,
+                        Name = CurrentProductEntry.Product.Name,
+                        ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+                        ImagePath = uploadedImagePath,
+                        ProductTypes =
+                        [
+                            new() {
+                                Id = CurrentProductEntry.Product.SelectedType.Id,
+                                Type = CurrentProductEntry.Product.SelectedType.Type
+                            }
+                        ]
+                    }
+                }
+            };
+
+            var response = await client.ProductEntries.EntryWithImage(createRequest)
+                .Handle(isLoading => IsLoading = isLoading);
+
+            if (response.IsSuccess)
+            {
+                SuccessMessage = "Mahsulot kirimi muvaffaqiyatli saqlandi!";
+                ClearCurrentEntry();
+                await LoadProductEntriesAsync();
+            }
+            else
+            {
+                ErrorMessage = response.Message ?? "Saqlashda xatolik";
+            }
+        }
+        // UPDATE EXISTING
         else
         {
-            ErrorMessage = response.Message ?? "Mahsulot kirimini yangilashda xatolik";
+            var request = new ProductEntryRequest
+            {
+                Id = CurrentProductEntry.Id,
+                Date = CurrentProductEntry.Date,
+                Count = CurrentProductEntry.Count!.Value,
+                BundleItemCount = CurrentProductEntry.Product.SelectedType.BundleItemCount!.Value,
+                PreparationCostPerUnit = 0,
+                UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice!.Value,
+                ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+                Product = new ProductRequest
+                {
+                    Id = CurrentProductEntry.Product.Id,
+                    Code = CurrentProductEntry.Product.Code,
+                    Name = CurrentProductEntry.Product.Name, // TODO: Image update logic if needed
+                    ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+                    ProductTypes =
+                    [
+                        new() {
+                            Id = CurrentProductEntry.Product.SelectedType.Id,
+                            Type = CurrentProductEntry.Product.SelectedType.Type,
+                            BundleItemCount = (int)CurrentProductEntry.Product.SelectedType.BundleItemCount.Value,
+                            UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice.Value,
+                            ProductTypeItems = []
+                        }
+                    ]
+                }
+            };
+
+            var response = await client.ProductEntries.Update(request)
+                .Handle(isLoading => IsLoading = isLoading);
+
+            if (response.IsSuccess)
+            {
+                SuccessMessage = "Mahsulot kirimi muvaffaqiyatli yangilandi!";
+                IsEditing = false;
+                _backupProductEntry = null; // Clear backup
+                ClearCurrentEntry();
+                await LoadProductEntriesAsync();
+            }
+            else
+            {
+                ErrorMessage = response.Message ?? "Mahsulot kirimini yangilashda xatolik";
+            }
         }
     }
 
@@ -439,7 +509,9 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
         CurrentProductEntry.Product = null;
         CurrentProductEntry.BundleCount = null;
         CurrentProductEntry.Count = null;
+        CurrentProductEntry.Count = null;
         CurrentProductEntry.ProductionOriginName = null!;
+        SelectedImageFile = string.Empty;
 
         CurrentProductEntry.PropertyChanged += OnCurrentProductEntryPropertyChanged;
     }

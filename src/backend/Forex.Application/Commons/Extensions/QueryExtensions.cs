@@ -68,9 +68,9 @@ public static class QueryExtensions
 
         if (raw.StartsWith(">=")) { op = ">="; value = raw[2..]; }
         else if (raw.StartsWith("<=")) { op = "<="; value = raw[2..]; }
-        else if (raw.StartsWith(">")) { op = ">"; value = raw[1..]; }
-        else if (raw.StartsWith("<")) { op = "<"; value = raw[1..]; }
-        else if (raw.StartsWith("!")) { op = "not"; value = raw[1..]; }
+        else if (raw.StartsWith('>')) { op = ">"; value = raw[1..]; }
+        else if (raw.StartsWith('<')) { op = "<"; value = raw[1..]; }
+        else if (raw.StartsWith('!')) { op = "not"; value = raw[1..]; }
         else if (raw.StartsWith("in:", StringComparison.OrdinalIgnoreCase)) { op = "in"; value = raw[3..]; }
         else if (raw.StartsWith("contains:", StringComparison.OrdinalIgnoreCase)) { op = "contains"; value = raw[9..]; }
         else if (raw.StartsWith("starts:", StringComparison.OrdinalIgnoreCase)) { op = "starts"; value = raw[7..]; }
@@ -141,72 +141,56 @@ public static class QueryExtensions
         };
     }
 
-    private static Expression BuildDateTimeCondition(Expression member, string value, string op, Type targetType, double? timezoneOffset)
+    private static BinaryExpression BuildDateTimeCondition(Expression member, string value, string op, Type targetType, double? timezoneOffset)
     {
-        value = value.Trim().Replace("-", ".").Replace("/", ".").Replace(" ", ".");
-
+        value = value.Trim();
         DateTimeOffset parsedStart;
         DateTimeOffset parsedEnd;
 
-        if (value.Contains('Z') || value.Contains('+') ||
-            value.Contains('-') && value.LastIndexOf('-') > 4)
+        TimeSpan offset = timezoneOffset.HasValue
+            ? TimeSpan.FromHours(timezoneOffset.Value)
+            : TimeSpan.Zero;
+
+        string[] dayFormats = ["yyyy-MM-dd", "dd.MM.yyyy", "yyyy/MM/dd"];
+        string[] monthFormats = ["yyyy-MM", "MM.yyyy", "yyyy/MM"];
+        string[] yearFormats = ["yyyy"];
+
+        if (DateTimeOffset.TryParseExact(value, dayFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dtDay))
         {
-            if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dto))
-            {
-                parsedStart = dto;
-                parsedEnd = parsedStart.AddSeconds(1);
-            }
-            else
-            {
-                parsedStart = ConversionHelper.ParseFlexibleDateTimeOffset(value);
-                parsedEnd = parsedStart.AddSeconds(1);
-            }
+            parsedStart = new DateTimeOffset(dtDay.Year, dtDay.Month, dtDay.Day, 0, 0, 0, offset);
+            parsedEnd = parsedStart.AddDays(1);
+        }
+        else if (DateTimeOffset.TryParseExact(value, monthFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dtMonth))
+        {
+            parsedStart = new DateTimeOffset(dtMonth.Year, dtMonth.Month, 1, 0, 0, 0, offset);
+            parsedEnd = parsedStart.AddMonths(1);
+        }
+        else if (DateTimeOffset.TryParseExact(value, yearFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dtYear))
+        {
+            parsedStart = new DateTimeOffset(dtYear.Year, 1, 1, 0, 0, 0, offset);
+            parsedEnd = parsedStart.AddYears(1);
         }
         else
         {
-            TimeSpan offsetToApply = timezoneOffset.HasValue
-                ? TimeSpan.FromHours(timezoneOffset.Value)
-                : TimeSpan.Zero;
+            parsedStart = ConversionHelper.ParseFlexibleDateTimeOffset(value);
 
-            if (DateTimeOffset.TryParseExact(value, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtDay))
+            if (parsedStart.Offset == TimeSpan.Zero && !value.EndsWith('Z'))
             {
-                parsedStart = new DateTimeOffset(dtDay.Year, dtDay.Month, dtDay.Day, 0, 0, 0, offsetToApply);
-                parsedEnd = parsedStart.AddDays(1);
+                parsedStart = new DateTimeOffset(parsedStart.DateTime, offset);
             }
-            else if (DateTimeOffset.TryParseExact(value, "MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtMonth))
-            {
-                parsedStart = new DateTimeOffset(dtMonth.Year, dtMonth.Month, 1, 0, 0, 0, offsetToApply);
-                parsedEnd = parsedStart.AddMonths(1);
-            }
-            else if (DateTimeOffset.TryParseExact(value, "yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var dtYear))
-            {
-                parsedStart = new DateTimeOffset(dtYear.Year, 1, 1, 0, 0, 0, offsetToApply);
-                parsedEnd = parsedStart.AddYears(1);
-            }
-            else
-            {
-                var flexDt = ConversionHelper.ParseFlexibleDate(value);
-                parsedStart = new DateTimeOffset(flexDt, offsetToApply);
-                parsedEnd = parsedStart.AddSeconds(1);
-            }
+            parsedEnd = parsedStart.AddSeconds(1);
         }
 
-        parsedStart = parsedStart.ToUniversalTime();
-        parsedEnd = parsedEnd.ToUniversalTime();
+        var utcStart = parsedStart.ToUniversalTime();
+        var utcEnd = parsedEnd.ToUniversalTime();
 
-        Expression startConst;
-        Expression endConst;
+        Expression startConst = targetType == typeof(DateTime)
+            ? Expression.Constant(utcStart.UtcDateTime, typeof(DateTime))
+            : Expression.Constant(utcStart, typeof(DateTimeOffset));
 
-        if (targetType == typeof(DateTime))
-        {
-            startConst = Expression.Constant(parsedStart.UtcDateTime, typeof(DateTime));
-            endConst = Expression.Constant(parsedEnd.UtcDateTime, typeof(DateTime));
-        }
-        else
-        {
-            startConst = Expression.Constant(parsedStart, typeof(DateTimeOffset));
-            endConst = Expression.Constant(parsedEnd, typeof(DateTimeOffset));
-        }
+        Expression endConst = targetType == typeof(DateTime)
+            ? Expression.Constant(utcEnd.UtcDateTime, typeof(DateTime))
+            : Expression.Constant(utcEnd, typeof(DateTimeOffset));
 
         return op switch
         {

@@ -18,4 +18,10 @@ public interface IApiProductEntries
 
     [Post("/product-entries/filter")]
     Task<Response<List<ProductEntryResponse>>> Filter(FilteringRequest request);
+
+    [Post("/product-entries/image-entry")]
+    Task<Response<long>> EntryWithImage(CreateProductEntryWithImageCommandRequest request);
+
+    [Get("/product-entries/presigned-url")]
+    Task<Response<PresignedUrlResponse>> GetPresignedUrl([AliasAs("extension")] string extension);
 }

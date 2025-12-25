@@ -25,7 +25,7 @@ public class LoginCommandHandler(
     public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await context.Users.FirstOrDefaultAsync(
-            u =>  u.Username == request.Username,
+            u => u.Username == request.Username,
             cancellationToken);
 
         if (user is null || !hasher.VerifyPassword(user.PasswordHash!, request.Password!))

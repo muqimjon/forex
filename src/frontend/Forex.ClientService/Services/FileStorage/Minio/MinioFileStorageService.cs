@@ -63,4 +63,14 @@ public class MinioFileStorageService(IMinioClient client, MinioOptions options)
             .WithBucket(bucketName)
             .WithObject(fileName), cancellationToken);
     }
+
+    public async Task UploadToPresignedUrlAsync(string url, Stream stream, CancellationToken cancellationToken = default)
+    {
+        using var httpClient = new HttpClient();
+        var content = new StreamContent(stream);
+        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream"); // Or detect content type
+
+        var response = await httpClient.PutAsync(url, content, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
 }

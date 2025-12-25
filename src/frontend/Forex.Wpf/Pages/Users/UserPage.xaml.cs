@@ -25,7 +25,7 @@ public partial class UserPage : Page
 
     private List<UserResponse> rawUsers = [];
     private ObservableCollection<UserResponse> filteredUsers = [];
-    private bool isCreatingNewUser = false; 
+    private bool isCreatingNewUser = false;
     private UserResponse currentUser;
 
     public UserPage()

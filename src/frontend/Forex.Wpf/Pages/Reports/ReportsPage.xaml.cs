@@ -54,5 +54,4 @@ public partial class ReportsPage : Page
         else
             Main.NavigateTo(new HomePage());
     }
-
 }

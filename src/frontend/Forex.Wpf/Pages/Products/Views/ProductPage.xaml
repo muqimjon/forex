@@ -129,8 +129,9 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -214,9 +215,17 @@
                 Label="Tan narxi"
                 Text="{Binding DataContext.CurrentProductEntry.Product.SelectedType.UnitPrice, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}" />
 
+            <!--  Rasm  -->
+            <controls:FloatingFileInput
+                x:Name="fileInput"
+                Grid.Column="8"
+                Margin="2,0"
+                Label="Rasm"
+                FileName="{Binding DataContext.SelectedImageFile, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
             <Button
                 x:Name="btnAdd"
-                Grid.Column="8"
+                Grid.Column="9"
                 Height="30"
                 Margin="2,0,0,0"
                 md:ButtonAssist.CornerRadius="4"
@@ -227,7 +236,7 @@
 
             <Button
                 x:Name="btnCancel"
-                Grid.Column="9"
+                Grid.Column="10"
                 Height="30"
                 Margin="2,0,0,0"
                 md:ButtonAssist.CornerRadius="4"

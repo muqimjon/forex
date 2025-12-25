@@ -24,4 +24,12 @@ public class ProductEntriesController : BaseController
     [HttpPost("filter")]
     public async Task<IActionResult> GetFiltered(ProductEntryFilterQuery query)
         => Ok(new Response { Data = await Mediator.Send(query) });
+
+    [HttpPost("image-entry")]
+    public async Task<IActionResult> EntryWithImage(CreateProductEntryWithImageCommand command)
+        => Ok(new Response { Data = await Mediator.Send(command) });
+
+    [HttpGet("presigned-url")]
+    public async Task<IActionResult> GetPresignedUrl([FromQuery] string extension)
+        => Ok(new Response { Data = await Mediator.Send(new GetPresignedUrlQuery("", extension)) });
 }

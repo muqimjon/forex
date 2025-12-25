@@ -63,4 +63,29 @@ public class MinioFileStorageService(IMinioClient client, MinioOptions options) 
             .WithBucket(bucketName)
             .WithObject(fileName), cancellationToken);
     }
+
+    public async Task<string> GetPresignedUrlAsync(string fileName, int expiryInSeconds = 3600)
+    {
+        await EnsurePublicBucketAsync(default);
+
+        return await client.PresignedPutObjectAsync(new PresignedPutObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(fileName)
+            .WithExpiry(expiryInSeconds));
+    }
+
+    public async Task<bool> FileExistsAsync(string fileName, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await client.StatObjectAsync(new StatObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(fileName), cancellationToken);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

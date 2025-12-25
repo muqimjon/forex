@@ -343,17 +343,27 @@ public static class FocusNavigator
 
     public static void FocusElement(UIElement element)
     {
-        element.Focus();
+        if (element == null) return;
 
-        switch (element)
+        element.Dispatcher.BeginInvoke(new Action(() =>
         {
-            case TextBox tb: tb.SelectAll(); break;
+            element.Focus();
 
-            case ComboBox { IsEditable: true } cb:
-                if (cb.Template.FindName("PART_EditableTextBox", cb) is TextBox innerTextBox)
-                    innerTextBox.SelectAll();
-                break;
-        }
+            switch (element)
+            {
+                case TextBox tb:
+                    tb.SelectAll();
+                    break;
+
+                case ComboBox { IsEditable: true } cb:
+                    if (cb.Template.FindName("PART_EditableTextBox", cb) is TextBox innerTextBox)
+                    {
+                        innerTextBox.Focus();
+                        innerTextBox.SelectAll();
+                    }
+                    break;
+            }
+        }), DispatcherPriority.Input);
     }
 
     private static void CleanupContext(FocusContext context)

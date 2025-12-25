@@ -11,7 +11,6 @@ using Forex.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using System.Threading.Tasks;
 
 public record CreateSaleCommand(
     DateTime Date,
@@ -84,7 +83,7 @@ public class CreateSaleCommandHandler(
             text.AppendLine($"Kodi: {productType.Product.Code} ({productType.Type}), Soni: {item.TotalCount}, Narxi: {item.UnitPrice}, Jami: {item.Amount} UZS");
         }
 
-        return text.ToString();
+        return text.ToString().TrimEnd();
     }
 
     private async Task<UserAccount> GetOrCreateUserAccountAsync(long customerId, decimal initialBalance, CancellationToken ct)

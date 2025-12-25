@@ -6,9 +6,7 @@ using System.Text.Json;
 
 public static class ConversionHelper
 {
-    private static readonly string[] DateFormats =
-    [
-        // 1. ISO 8601 & Round-trip (ToString("O") uchun - Eng birinchi turishi shart)
+    private static readonly string[] DateFormats = [
         "yyyy-MM-ddTHH:mm:ss.FFFFFFFK",
         "yyyy-MM-ddTHH:mm:ss.fffffffzzz",
         "yyyy-MM-ddTHH:mm:ssZ",
@@ -16,42 +14,63 @@ public static class ConversionHelper
         "yyyy-MM-ddTHH:mm:ss",
         "yyyy-MM-dd HH:mm:ss",
         "yyyy-MM-dd",
-
-        // 2. Nuqtali (O‘zbekiston/Yevropa) - Nuqta bo'lgani uchun boshqalar bilan chalkashmaydi
         "d.M.yyyy HH:mm:ss",
         "d.M.yyyy HH:mm",
         "d.M.yyyy",
-        "dd.MM.yyyy.HH:mm:ss",
-
-        // 3. Yil birinchi keladigan (Custom) - Yil birinchi kelsa adashish ehtimoli 0%
+        "dd.MM.yyyy HH:mm:ss",
         "yyyy/M/d HH:mm:ss",
         "yyyy/M/d HH:mm",
         "yyyy/M/d",
         "yyyy-M-d HH:mm:ss",
         "yyyy-M-d HH:mm",
         "yyyy-M-d",
-
-        // 4. Chiziqchali (Kun birinchi) - O'zbekistonda ko'p qo'llaniladi
         "d-M-yyyy HH:mm:ss",
         "d-M-yyyy HH:mm",
         "d-M-yyyy",
-
-        // 5. Sleshli (Xalqaro - Kun birinchi) 
         "d/M/yyyy HH:mm:ss",
         "d/M/yyyy HH:mm",
         "d/M/yyyy",
-
-        // 6. Sleshli (AQSH - Oy birinchi) - ENG OXIRIDA
-        // Chunki 10/11/2025 kelsa, yuqoridagi "Kun birinchi" qoidasi ustunlik qilishi kerak
         "M/d/yyyy HH:mm:ss",
         "M/d/yyyy HH:mm",
         "M/d/yyyy",
-
-        // 7. Matnli formatlar
         "d MMM yyyy",
         "MMM d, yyyy",
         "MMMM d yyyy"
     ];
+
+    public static DateTime ParseFlexibleDate(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            throw new AppException("Sana qiymati bo‘sh bo‘lishi mumkin emas.");
+
+        // Dockerda xato bermasligi uchun AssumeLocal o'rniga None
+        foreach (var format in DateFormats)
+            if (DateTime.TryParseExact(input, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+                return parsed;
+
+        if (DateTime.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.None, out var fallback))
+            return fallback;
+
+        throw new AppException($"'{input}' — tanilgan sana formatlariga mos emas.");
+    }
+
+    public static DateTimeOffset ParseFlexibleDateTimeOffset(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            throw new AppException("Sana qiymati bo‘sh bo‘lishi mumkin emas.");
+
+        if (DateTimeOffset.TryParseExact(input, "yyyy-MM-ddTHH:mm:ss.fffffffK", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var isoParsed))
+            return isoParsed;
+
+        foreach (var format in DateFormats)
+            if (DateTimeOffset.TryParseExact(input, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+                return parsed;
+
+        if (DateTimeOffset.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.None, out var fallback))
+            return fallback;
+
+        return new DateTimeOffset(ParseFlexibleDate(input), TimeSpan.Zero);
+    }
 
     public static object? TryConvert(object value, Type targetType)
     {
@@ -101,34 +120,4 @@ public static class ConversionHelper
         JsonValueKind.Null => null,
         _ => json.ToString()
     };
-
-    public static DateTime ParseFlexibleDate(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            throw new AppException("Sana qiymati bo‘sh yoki null bo‘lishi mumkin emas.");
-
-        foreach (var format in DateFormats)
-            if (DateTime.TryParseExact(input, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
-                return parsed;
-
-        if (DateTime.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var fallback))
-            return fallback;
-
-        throw new AppException($"'{input}' — tanilgan sana formatlariga mos emas.");
-    }
-
-    public static DateTimeOffset ParseFlexibleDateTimeOffset(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            throw new AppException("Sana qiymati bo‘sh yoki null bo‘lishi mumkin emas.");
-
-        foreach (var format in DateFormats)
-            if (DateTimeOffset.TryParseExact(input, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var parsed))
-                return parsed;
-
-        if (DateTimeOffset.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var fallback))
-            return fallback;
-
-        return new DateTimeOffset(ParseFlexibleDate(input));
-    }
 }

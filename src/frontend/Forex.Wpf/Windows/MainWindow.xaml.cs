@@ -2,8 +2,7 @@
 
 using Forex.ClientService;
 using Forex.Wpf.Common.Services;
-using Forex.Wpf.Pages.Auth; // Login sahifasi uchun namespace
-using Forex.Wpf.Pages.Home;
+using Forex.Wpf.Pages.Auth;
 using System.Windows;
 using System.Windows.Controls;
 
