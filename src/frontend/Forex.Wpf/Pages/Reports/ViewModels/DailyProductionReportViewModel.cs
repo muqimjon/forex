@@ -9,6 +9,7 @@ using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
+using MapsterMapper;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,13 +21,14 @@ public partial class DailyProductionReportViewModel : ViewModelBase
 {
     private readonly ForexClient client;
     private readonly CommonReportDataService _commonData;
+    private readonly IMapper mapper;
 
     [ObservableProperty]
     private ObservableCollection<ProductViewModel> availableProducts = [];
 
     [ObservableProperty] private ObservableCollection<ProductionItemViewModel> items = [];
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = DateTime.Today.AddDays(-7);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     // Yuqoridagi jami ko‘rsatkichlar
@@ -34,9 +36,10 @@ public partial class DailyProductionReportViewModel : ViewModelBase
     [ObservableProperty] private decimal aralashAmount;
     [ObservableProperty] private decimal evaAmount;
 
-    public DailyProductionReportViewModel(ForexClient client, CommonReportDataService commonData)
+    public DailyProductionReportViewModel(ForexClient client, CommonReportDataService commonData, IMapper mapper)
     {
         this.client = client;
+        this.mapper = mapper;
         _commonData = commonData;
         _ = LoadProductsAsync();
 
@@ -51,27 +54,15 @@ public partial class DailyProductionReportViewModel : ViewModelBase
 
     private async Task LoadProductsAsync()
     {
-        try
-        {
-            var response = await client.Products.GetAllAsync();
-            if (response.IsSuccess && response.Data != null)
-            {
-                var products = response.Data
-                    .Select(p => new ProductViewModel
-                    {
-                        Id = p.Id,
-                        Code = p.Code,
-                        Name = p.Name
-                    })
-                    .OrderBy(p => p.Code)
-                    .ToList();
 
-                AvailableProducts = new ObservableCollection<ProductViewModel>(products);
-            }
-        }
-        catch (Exception ex)
+        var response = await client.Products.GetAllAsync().Handle(l => IsLoading = l);
+        if (response.IsSuccess)
         {
-            MessageBox.Show($"Mahsulotlar yuklanmadi: {ex.Message}");
+            AvailableProducts = mapper.Map<ObservableCollection<ProductViewModel>>(response.Data);
+        }
+        else
+        {
+            ErrorMessage = response.Message ?? "Mahsulotlar yuklanmadi";
         }
     }
 
@@ -88,7 +79,9 @@ public partial class DailyProductionReportViewModel : ViewModelBase
                 {
                     ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"],
                     ["productType"] = ["include:product"]
-                }
+                },
+                Descending = true,
+                SortBy = "date"
             };
 
             var response = await client.ProductEntries.Filter(request).Handle(l => IsLoading = l);

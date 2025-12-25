@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
+		<IsPublishable>true</IsPublishable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<NoWarn>$(NoWarn);SYSLIB1045</NoWarn>
 	</PropertyGroup>

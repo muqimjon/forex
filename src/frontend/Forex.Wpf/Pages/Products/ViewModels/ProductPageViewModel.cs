@@ -67,7 +67,9 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             {
                 ["producttype"] = ["include:product"],
                 ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"]
-            }
+            },
+            Descending = true,
+            SortBy = "date"
         };
 
         var response = await client.ProductEntries.Filter(request)

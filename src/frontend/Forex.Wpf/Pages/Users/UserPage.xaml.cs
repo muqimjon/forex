@@ -208,9 +208,9 @@ public partial class UserPage : Page
             {
                 Filters = new()
                 {
-                    ["accounts"] = ["include"],
                     ["accounts"] = ["include:currency"]
-                }
+                },
+                Descending = true
             };
 
             var response = await client.Users.Filter(request).Handle();

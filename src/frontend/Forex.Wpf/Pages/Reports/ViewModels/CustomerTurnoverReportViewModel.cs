@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Requests;
-using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Pages.Common;
 using Forex.Wpf.ViewModels;
 using PdfSharp.Drawing;
@@ -26,7 +25,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
     private readonly CommonReportDataService _commonData;
 
     [ObservableProperty] private UserViewModel? selectedCustomer;
-    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = DateTime.Today;
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
@@ -37,7 +36,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
     [ObservableProperty] private decimal _beginBalance;
     [ObservableProperty] private decimal _lastBalance;
-    private List<OperationRecordDto> _originalRecords = [];
 
     public CustomerTurnoverReportViewModel(ForexClient client, CommonReportDataService commonData)
     {
@@ -85,12 +83,11 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
 
         var data = response.Data;
 
-        _originalRecords = [.. data.OperationRecords];
 
         BeginBalance = data.BeginBalance;
         LastBalance = data.EndBalance;
 
-        foreach (var op in data.OperationRecords)
+        foreach (var op in data.OperationRecords.OrderBy(o => o.Date)) 
         {
             decimal debit = 0;
             decimal credit = 0;
@@ -382,7 +379,7 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         const double minFinalSpace = 20; // JAMI va Qoldiq qatorlari orasidagi minimal bo'shliq
 
         // Ustun kengliklari
-        double[] finalColWidths = { 90, 120, 120, 363.7 }; // Jami 693.7
+        double[] finalColWidths = { 80, 100, 100, 413.7 }; // Jami 693.7
 
         var allOperations = Operations.ToList();
         int currentIndex = 0;
