@@ -105,31 +105,6 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         finally { IsLoading = false; }
     }
 
-    #endregion Commands
-
-    private void ApplyFilters()
-    {
-        var result = _allItems.AsEnumerable();
-
-        if (SelectedProduct != null)
-            result = result.Where(x => x.Name == SelectedProduct.Name);
-
-        if (SelectedCode != null)
-            result = result.Where(x => x.Code == SelectedCode.Code);
-
-        Items = new ObservableCollection<FinishedStockItemViewModel>(result);
-    }
-
-    // 🔵 Tozalash
-    [RelayCommand]
-    private void ClearFilter()
-    {
-        SelectedCode = null;
-        SelectedProduct = null;
-        // ApplyFilters avtomatik ishlaydi
-    }
-
-    // 🔵 PRINT
     [RelayCommand]
     private void Print()
     {
@@ -146,7 +121,6 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         }
     }
 
-    // 🔵 EXCEL EXPORT
     [RelayCommand]
     private void ExportToExcel()
     {
@@ -221,7 +195,6 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         }
     }
 
-    // 🔵 PREVIEW
     [RelayCommand]
     private void Preview()
     {
@@ -246,57 +219,78 @@ public partial class FinishedStockReportViewModel : ViewModelBase
         window.ShowDialog();
     }
 
+    [RelayCommand]
+    private void ClearFilter()
+    {
+        SelectedCode = null;
+        SelectedProduct = null;
+        // ApplyFilters avtomatik ishlaydi
+    }
+
+    #endregion Commands
+
+    private void ApplyFilters()
+    {
+        var result = _allItems.AsEnumerable();
+
+        if (SelectedProduct != null)
+            result = result.Where(x => x.Name == SelectedProduct.Name);
+
+        if (SelectedCode != null)
+            result = result.Where(x => x.Code == SelectedCode.Code);
+
+        Items = new ObservableCollection<FinishedStockItemViewModel>(result);
+    }
+
     // PDF/Print uchun document yaratish (PASTDAN 25mm BO‘SH JOY!)
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
-
-        // A4 format (96 DPI)
         double pageWidth = 793.7;
         double pageHeight = 1122.5;
 
-        // Margins (mm → px)
-        double marginTop = 38;      // 10 mm
-        double marginBottom = 38;   // 10 mm
-        double marginLeft = 30;     // 8 mm
-        double marginRight = 30;    // 8 mm
-
-        // Title + Date qatorlari balandligi
-        double titleHeight = 40;
-        double dateHeight = 30;
-
-        // Jadvalning bitta qatorining balandligi
-        double rowHeight = 25;
+        double marginTop = 38, marginBottom = 38, marginLeft = 30, marginRight = 30;
+        double titleHeight = 40, dateHeight = 30, rowHeight = 25;
 
         var items = Items.ToList();
         var totalSum = items.Sum(i => i.TotalAmount);
 
-        // Jadval uchun mavjud bo'sh balandlik
-        double tableAvailableHeight =
-            pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
-
-        // Nechta qator sig'adi?
+        double tableAvailableHeight = pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
         int rowsPerPage = (int)(tableAvailableHeight / rowHeight);
         if (rowsPerPage < 1) rowsPerPage = 1;
 
-        // 2 ta qatorni keyingi sahifaga o‘tkazish uchun +2 qo‘shamiz
-        int totalPages = (int)Math.Ceiling((items.Count + 2) / (double)rowsPerPage);
+        // Sahifalarga bo'lish logikasi (Har bir sahifada oxirgi 2 tani surishni hisobga olgan holda)
+        List<List<int>> pagesMapping = new List<List<int>>();
+        int currentItemIndex = 0;
+
+        while (currentItemIndex < items.Count)
+        {
+            int rowsThisPage = rowsPerPage;
+
+            // Agar bu oxirgi sahifa bo'lmasa va qolgan qatorlar soni sahifa sig'imidan ko'p bo'lsa
+            // oxirgi 2 qatorni keyingi sahifaga qoldiramiz
+            if (currentItemIndex + rowsThisPage < items.Count)
+            {
+                rowsThisPage -= 2;
+            }
+
+            var pageItems = new List<int>();
+            for (int i = 0; i < rowsThisPage && currentItemIndex < items.Count; i++)
+            {
+                pageItems.Add(currentItemIndex);
+                currentItemIndex++;
+            }
+            pagesMapping.Add(pageItems);
+        }
+
+        int totalPages = pagesMapping.Count;
 
         for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
-            var page = new FixedPage
-            {
-                Width = pageWidth,
-                Height = pageHeight,
-                Background = Brushes.White
-            };
+            var page = new FixedPage { Width = pageWidth, Height = pageHeight, Background = Brushes.White };
+            var container = new StackPanel { Margin = new Thickness(marginLeft, marginTop, marginRight, marginBottom) };
 
-            var container = new StackPanel
-            {
-                Margin = new Thickness(marginLeft, marginTop, marginRight, marginBottom)
-            };
-
-            // 🟦 1-qator: Sarlavha
+            // 1-qator: Sarlavha
             container.Children.Add(new TextBlock
             {
                 Text = "Mavjud mahsulotlar qoldig‘i",
@@ -306,7 +300,7 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 Margin = new Thickness(0, 0, 0, 5)
             });
 
-            // 🟦 2-qator: Sana
+            // 2-qator: Sana
             container.Children.Add(new TextBlock
             {
                 Text = $"Sana: {DateTime.Today:dd.MM.yyyy}   |   Sahifa {pageIndex + 1} / {totalPages}",
@@ -315,53 +309,20 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                 Margin = new Thickness(0, 0, 0, 10)
             });
 
-            // 🟦 3-qator: JADVAL
             var table = new Grid();
+            double[] widths = { 35, 70, 130, 70, 70, 70, 70, 80, 135 };
+            foreach (var w in widths) table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-            // ⭐ yangi T/r ustuni qo‘shildi
-            double[] widths = { 30, 70, 130, 70, 70, 70, 70, 80, 140 };
-            foreach (var w in widths)
-                table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
+            // Header
+            AddRow(table, true, "T/r", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
 
-            // Header qatori — T/r bilan birga
-            AddRow(table, true,
-                "T/r", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Narxi", "Umumiy");
-
-            // ——————————————————————————————————————
-            // ⭐ 1-sahifadagi oxirgi 2 qatorni keyingi sahifaga o‘tkazish
-            // ——————————————————————————————————————
-            int effectiveRows = rowsPerPage;
-
-            if (pageIndex == 0 && totalPages > 1)
-                effectiveRows -= 2;   // Birinchi sahifa 2 qator kam oladi
-
-            // Qaysi itemdan boshlash?
-            int start;
-
-            if (pageIndex == 0)
+            // Qatorlarni qo'shish
+            foreach (int itemIdx in pagesMapping[pageIndex])
             {
-                start = 0;
-            }
-            else
-            {
-                // Birinchi sahifadagi -2 qator kompensatsiya qilingan
-                start = (rowsPerPage - 2) + (pageIndex - 1) * rowsPerPage;
-            }
-
-            int count = Math.Min(effectiveRows, items.Count - start);
-
-            // ⭐ Qatorlarni qo‘shish (T/r bilan)
-            for (int i = 0; i < count; i++)
-            {
-                var x = items[start + i];
-
-                int number = start + i + 1; // RAQAM
-
+                var x = items[itemIdx];
                 AddRow(table, false,
-                    number.ToString(),   // ⭐ T/r
-                    x.Code,
-                    x.Name,
-                    x.Type,
+                    (itemIdx + 1).ToString(),
+                    x.Code, x.Name, x.Type,
                     x.BundleCount?.ToString() ?? "0",
                     x.BundleItemCount.ToString(),
                     x.TotalCount.ToString("N0"),
@@ -369,14 +330,13 @@ public partial class FinishedStockReportViewModel : ViewModelBase
                     x.TotalAmount.ToString("N2"));
             }
 
-            // ⭐ Oxirgi sahifaga JAMI qo‘shish
+            // Oxirgi sahifaga JAMI qo'shish
             if (pageIndex == totalPages - 1)
             {
                 AddRow(table, true, "", "JAMI:", "", "", "", "", "", "", totalSum.ToString("N2"));
             }
 
             container.Children.Add(table);
-
             page.Children.Add(container);
             var pc = new PageContent();
             ((IAddChild)pc).AddChild(page);

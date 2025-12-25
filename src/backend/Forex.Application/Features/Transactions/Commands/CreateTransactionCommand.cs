@@ -90,7 +90,7 @@ public class CreateTransactionCommandHandler(
 
         transaction.OperationRecord = new()
         {
-            Amount = amount,
+            Amount = transaction.IsIncome ? amount : -amount,
             Date = transaction.Date,
             Description = description,
             Type = OperationType.Transaction
@@ -110,14 +110,15 @@ public class CreateTransactionCommandHandler(
 
         var isWithDiscount = transaction.Discount > 0;
 
-        return transaction.PaymentMethod switch
+        return (transaction.PaymentMethod switch
         {
             PaymentMethod.Naqd => $"Naqd to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
             PaymentMethod.Plastik => $"Karta to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
             PaymentMethod.HisobRaqam => $"Hisob raqam orqali to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
             PaymentMethod.MobilIlova => $"Online to'lov: {transaction.Amount} {currency.Code}, Kurs: {transaction.ExchangeRate} UZS{(isWithDiscount ? $", Chegirma: {transaction.Discount} UZS" : string.Empty)}",
             _ => "Noma'lum to'lov usuli",
-        };
+        }) +"\n"
+        + transaction.Description;
     }
 
     private async Task UpdateUserAccountAsync(CreateTransactionCommand request, Transaction transaction, CancellationToken cancellationToken)
@@ -146,7 +147,11 @@ public class CreateTransactionCommandHandler(
         var delta = amountInUZS + request.Discount;
 
         userAccount.DueDate = DateTime.SpecifyKind(request.DueDate, DateTimeKind.Utc);
-        userAccount.Balance += delta;
+
+        if (request.IsIncome)
+            userAccount.Balance += delta;
+        else
+            userAccount.Balance -= delta;
     }
 
     private static void UpdateShopAccount(Transaction transaction)

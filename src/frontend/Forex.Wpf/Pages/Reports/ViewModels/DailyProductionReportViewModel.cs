@@ -28,7 +28,7 @@ public partial class DailyProductionReportViewModel : ViewModelBase
 
     [ObservableProperty] private ObservableCollection<ProductionItemViewModel> items = [];
     [ObservableProperty] private ProductViewModel? selectedCode;
-    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = DateTime.Today.AddDays(-7);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     // Yuqoridagi jami ko‘rsatkichlar
