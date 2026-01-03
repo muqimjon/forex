@@ -25,7 +25,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
     public ObservableCollection<UserViewModel> AvailableCustomers => _commonData.AvailableCustomers;
 
     [ObservableProperty] private UserViewModel? selectedCustomer;
-    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = DateTime.Today.AddDays(-7);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     public CustomerSalesRatingViewModel(ForexClient client, CommonReportDataService commonData)
@@ -263,16 +263,18 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
         double dateHeight = 30;
         double rowHeight = 25;
 
+        // Ma'lumotlarni saralangan holda olamiz
         var items = CustomerSales.ToList();
         double total = items.Sum(x => x.TotalCount);
 
         double tableAvailableHeight =
-            pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
+            pageHeight - marginTop - marginBottom - titleHeight - dateHeight - 30; // 30 footer uchun joy
 
         int rowsPerPage = (int)(tableAvailableHeight / rowHeight);
         if (rowsPerPage < 1) rowsPerPage = 1;
 
-        int totalPages = (int)Math.Ceiling((items.Count + 2) / (double)rowsPerPage);
+        int totalPages = (int)Math.Ceiling(items.Count / (double)rowsPerPage);
+        if (totalPages == 0) totalPages = 1;
 
         for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
         {
@@ -283,10 +285,17 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
                 Background = Brushes.White
             };
 
-            var container = new StackPanel
+            // Asosiy konteyner sifatida Grid ishlatamiz (footer pastda turishi uchun)
+            var mainGrid = new Grid
             {
+                Width = pageWidth - marginLeft - marginRight,
+                Height = pageHeight - marginTop - marginBottom,
                 Margin = new Thickness(marginLeft, marginTop, marginRight, marginBottom)
             };
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Kontent
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Footer uchun
+
+            var container = new StackPanel();
 
             // Title
             container.Children.Add(new TextBlock
@@ -298,18 +307,18 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
                 Margin = new Thickness(0, 0, 0, 5)
             });
 
-            // Date + Page index
+            // Davr oralig'i (Sen aytgan o'zgarish)
             container.Children.Add(new TextBlock
             {
-                Text = $"Sana: {DateTime.Today:dd.MM.yyyy}   |   Sahifa {pageIndex + 1} / {totalPages}",
+                Text = $"Davr oralig'i: {BeginDate:dd.MM.yyyy} dan {EndDate:dd.MM.yyyy} gacha",
                 FontSize = 14,
                 Foreground = Brushes.Gray,
+                HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(0, 0, 0, 10)
             });
 
             // Table
             var table = new Grid();
-
             double[] widths = { 50, 250, 100, 100, 100, 120 };
             foreach (var w in widths)
                 table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
@@ -324,7 +333,7 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
                 var x = items[start + i];
 
                 AddRow(table, false,
-                    x.RowNumber.ToString(),
+                    (start + i + 1).ToString(), // ⭐ T/R 1 dan boshlab tartiblandi
                     x.CustomerName,
                     x.ReadyCount.ToString("N0"),
                     x.MixedCount.ToString("N0"),
@@ -332,13 +341,29 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
                     x.TotalCount.ToString("N0"));
             }
 
+            // Oxirgi betda JAMI qatori
             if (pageIndex == totalPages - 1)
             {
                 AddRow(table, true, "", "JAMI:", "", "", "", total.ToString("N0"));
             }
 
             container.Children.Add(table);
-            page.Children.Add(container);
+            Grid.SetRow(container, 0);
+            mainGrid.Children.Add(container);
+
+            // ⭐ Sahifa raqami (O'ng taraf eng past qismda)
+            var footerPageNum = new TextBlock
+            {
+                Text = $"{pageIndex + 1} - bet / {totalPages}",
+                FontSize = 11,
+                Foreground = Brushes.DarkGray,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom
+            };
+            Grid.SetRow(footerPageNum, 1);
+            mainGrid.Children.Add(footerPageNum);
+
+            page.Children.Add(mainGrid);
 
             var pc = new PageContent();
             ((IAddChild)pc).AddChild(page);
@@ -347,7 +372,6 @@ public partial class CustomerSalesRatingViewModel : ViewModelBase
 
         return doc;
     }
-
     private void AddRow(Grid grid, bool isHeader, params string[] values)
     {
         int row = grid.RowDefinitions.Count;

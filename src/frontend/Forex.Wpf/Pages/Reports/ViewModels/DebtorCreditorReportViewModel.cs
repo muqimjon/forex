@@ -223,7 +223,6 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
 
         var doc = CreateFixedDocument();
         var viewer = new DocumentViewer { Document = doc, Margin = new Thickness(20) };
-
         var window = new Window
         {
             Title = "Debitor va Kreditorlar hisoboti",
@@ -238,18 +237,10 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
-
-        double pageWidth = 793.7;
-        double pageHeight = 1122.5;
-
-        double marginTop = 60;
-        double marginBottom = 80;
-        double marginLeft = 40;
-        double marginRight = 40;
-
-        double titleHeight = 50;
-        double dateHeight = 35;
-        double rowHeight = 28;
+        const double pageWidth = 793.7;
+        const double pageHeight = 1122.5;
+        const double margin = 40;
+        const double bottomReservedSpace = 80;
 
         var items = FilteredItems.ToList();
         if (!items.Any()) return doc;
@@ -258,126 +249,156 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
         var totalCreditor = items.Sum(x => x.CreditorAmount);
         var totalBalance = totalDebtor - totalCreditor;
 
-        double availableHeight = pageHeight - marginTop - marginBottom - titleHeight - dateHeight;
-        int rowsPerPage = (int)(availableHeight / rowHeight);
-        if (rowsPerPage < 10) rowsPerPage = 10;
+        int currentIndex = 0;
+        int pageNumber = 1;
+        bool totalsAdded = false;
 
-        int totalPages = (int)Math.Ceiling((items.Count + 3.0) / rowsPerPage);
-
-        // 2-sahifadan 1-sahifaga qo‘shiladigan qatorlar soni — ENDI 11 TA!
-        const int extraRowsFromSecondPage = 11;
-
-        for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
+        while (currentIndex < items.Count || !totalsAdded)
         {
-            var page = new FixedPage
+            var page = new FixedPage { Width = pageWidth, Height = pageHeight, Background = Brushes.White };
+            double currentTop = margin;
+
+            // 1. SARLAVHA - SAHIFA O'RTASIDA
+            if (pageNumber == 1)
             {
-                Width = pageWidth,
-                Height = pageHeight,
-                Background = Brushes.White
-            };
+                var title = new TextBlock
+                {
+                    Text = "DEBITOR VA KREDITORLAR HISOBOTI",
+                    FontSize = 22,
+                    FontWeight = FontWeights.ExtraBold,
+                    TextAlignment = TextAlignment.Center, // Matnni o'zini o'rtaga olish
+                    Width = pageWidth - 2 * margin // Sahifa kengligi bo'yicha
+                };
+                FixedPage.SetLeft(title, margin);
+                FixedPage.SetTop(title, currentTop);
+                page.Children.Add(title);
+                currentTop += 50;
 
-            var container = new StackPanel
+                var dateInfo = new TextBlock
+                {
+                    Text = $"Sana: {DateTime.Today:dd.MM.yyyy}",
+                    FontSize = 14,
+                    Foreground = Brushes.Gray,
+                    TextAlignment = TextAlignment.Center, // Sanani ham o'rtaga olish
+                    Width = pageWidth - 2 * margin
+                };
+                FixedPage.SetLeft(dateInfo, margin);
+                FixedPage.SetTop(dateInfo, currentTop);
+                page.Children.Add(dateInfo);
+                currentTop += 40;
+            }
+            else
             {
-                Margin = new Thickness(marginLeft, marginTop, marginRight, marginBottom)
-            };
-
-            container.Children.Add(new TextBlock
-            {
-                Text = "DEBITOR VA KREDITORLAR HISOBOTI",
-                FontSize = 22,
-                FontWeight = FontWeights.Bold,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 8)
-            });
-
-            container.Children.Add(new TextBlock
-            {
-                Text = $"Sana: {DateTime.Today:dd.MM.yyyy} | Sahifa {pageIndex + 1} / {totalPages}",
-                FontSize = 14,
-                Foreground = Brushes.Gray,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 15)
-            });
-
-            var table = new Grid();
-            double[] widths = { 40, 170, 130, 120, 120, 120 };
-            foreach (var w in widths)
-                table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
-
-            AddRow(table, true, "T/r", "Mijoz nomi", "Telefon", "Manzil", "Debitor", "Kreditor");
-
-            int effectiveRows = rowsPerPage;
-            int extraRowsThisPage = 0;
-
-            if (pageIndex == 0 && totalPages > 1)
-            {
-                effectiveRows -= 3;
-                extraRowsThisPage = extraRowsFromSecondPage; // 11 ta qator qo‘shiladi
+                currentTop += 20;
             }
 
-            int startIndex = pageIndex == 0
-                ? 0
-                : (rowsPerPage - 3 + extraRowsFromSecondPage) + (pageIndex - 1) * rowsPerPage;
+            // 2. JADVAL
+            var grid = new Grid { Width = pageWidth - 2 * margin };
+            double[] widths = { 45, 150, 130, 135, 125, 125 };
+            foreach (var w in widths)
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-            int count = Math.Min(effectiveRows + extraRowsThisPage, items.Count - startIndex);
+            AddRow(grid, true, "T/r", "Mijoz nomi", "Telefon", "Manzil", "Debitor", "Kreditor");
 
-            for (int i = 0; i < count; i++)
+            while (currentIndex < items.Count)
             {
-                var item = items[startIndex + i];
-                int tr = startIndex + i + 1;
+                var item = items[currentIndex];
+                var tempGrid = new Grid { Width = grid.Width };
+                foreach (var col in grid.ColumnDefinitions)
+                    tempGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = col.Width });
 
                 string deb = item.DebtorAmount > 0 ? item.DebtorAmount.ToString("N0") : "";
                 string kred = item.CreditorAmount > 0 ? item.CreditorAmount.ToString("N0") : "";
 
-                AddRow(table, false,
-                    tr.ToString(),
-                    item.Name ?? "-",
-                    item.Phone ?? "-",
-                    item.Address ?? "-",
-                    deb,
-                    kred);
+                AddRow(tempGrid, false, (currentIndex + 1).ToString(), item.Name ?? "-", item.Phone ?? "-", item.Address ?? "-", deb, kred);
+                tempGrid.Measure(new Size(grid.Width, double.PositiveInfinity));
+                double rowHeight = tempGrid.DesiredSize.Height;
+
+                grid.Measure(new Size(grid.Width, double.PositiveInfinity));
+                if (currentTop + grid.DesiredSize.Height + rowHeight > pageHeight - bottomReservedSpace)
+                    break;
+
+                AddRow(grid, false, (currentIndex + 1).ToString(), item.Name ?? "-", item.Phone ?? "-", item.Address ?? "-", deb, kred);
+                currentIndex++;
             }
 
-            if (pageIndex == totalPages - 1 && items.Any())
+            // 3. JAMI VA BALANS (OXIRGI BETDA)
+            // 3. JAMI VA BALANS (OXIRGI BETDA)
+            if (currentIndex == items.Count && !totalsAdded)
             {
-                AddRow(table, false, "", "", "", "", "", "");
-                AddRow(table, true, "", "JAMI:", "", "", totalDebtor.ToString("N0"), totalCreditor.ToString("N0"));
+                // Odatiy JAMI qatori (avvalgidek qolaveradi)
+                AddRow(grid, true, "", "JAMI:", "", "", totalDebtor.ToString("N0"), totalCreditor.ToString("N0"));
 
-                string balanceText = totalBalance >= 0 ? $"+{totalBalance:N0}" : totalBalance.ToString("N0");
+                // --- UMUMIY BALANSNI JADVALNING OXIRGI QATORI SIFATIDA QO'SHISH ---
+                string balanceValue = totalBalance >= 0 ? $"+{totalBalance:N2}" : totalBalance.ToString("N2");
                 Brush balanceColor = totalBalance >= 0 ? Brushes.Green : Brushes.Red;
 
-                var balanceBorder = new Border
+                // Yangi qator yaratamiz
+                int lastRowIndex = grid.RowDefinitions.Count;
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                // 1. Dastlabki 4 ta ustunni (T/r, Nomi, Telefon, Manzil) birlashtirib "UMUMIY BALANS" yozamiz
+                var lblBorder = new Border
                 {
                     BorderBrush = Brushes.Black,
-                    BorderThickness = new Thickness(1.5),
+                    BorderThickness = new Thickness(1.2, 0, 0.5, 1.2), // Pastki va chap cheti qalinroq
                     Background = Brushes.AliceBlue,
-                    Padding = new Thickness(10)
+                    Padding = new Thickness(10, 8, 10, 8),
+                    Child = new TextBlock
+                    {
+                        Text = "UMUMIY BALANS:",
+                        FontSize = 16,
+                        FontWeight = FontWeights.ExtraBold,
+                        TextAlignment = TextAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
                 };
-                var tbBalance = new TextBlock
+                Grid.SetRow(lblBorder, lastRowIndex);
+                Grid.SetColumn(lblBorder, 0);
+                Grid.SetColumnSpan(lblBorder, 4); // 4 ta ustunni birlashtirish
+                grid.Children.Add(lblBorder);
+
+                // 2. Oxirgi 2 ta ustunni (Debitor, Kreditor) birlashtirib qiymatni yozamiz
+                var valBorder = new Border
                 {
-                    Text = $"UMUMIY BALANS: {balanceText}",
-                    FontSize = 16,
-                    FontWeight = FontWeights.ExtraBold,
-                    Foreground = balanceColor,
-                    TextAlignment = TextAlignment.Right
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(0, 0, 1.2, 1.2), // Pastki va o'ng cheti qalinroq
+                    Background = Brushes.AliceBlue,
+                    Padding = new Thickness(10, 8, 20, 8), // O'ngdan 20px padding (kesilib qolmasligi uchun)
+                    Child = new TextBlock
+                    {
+                        Text = balanceValue,
+                        FontSize = 16,
+                        FontWeight = FontWeights.ExtraBold,
+                        Foreground = balanceColor,
+                        TextAlignment = TextAlignment.Right,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
                 };
-                balanceBorder.Child = tbBalance;
+                Grid.SetRow(valBorder, lastRowIndex);
+                Grid.SetColumn(valBorder, 4);
+                Grid.SetColumnSpan(valBorder, 2); // 2 ta ustunni birlashtirish
+                grid.Children.Add(valBorder);
 
-                int balanceRow = table.RowDefinitions.Count;
-                table.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                Grid.SetRow(balanceBorder, balanceRow);
-                Grid.SetColumnSpan(balanceBorder, 6);
-                table.Children.Add(balanceBorder);
+                totalsAdded = true;
             }
+            FixedPage.SetLeft(grid, margin);
+            FixedPage.SetTop(grid, currentTop);
+            page.Children.Add(grid);
 
-            container.Children.Add(table);
-            page.Children.Add(container);
+            // FOOTER
+            var footer = new TextBlock { Text = $"{pageNumber}-bet / [total]", FontSize = 11, FontWeight = FontWeights.Bold, Foreground = Brushes.Gray, TextAlignment = TextAlignment.Right, Width = 200 };
+            FixedPage.SetLeft(footer, pageWidth - margin - 200);
+            FixedPage.SetTop(footer, pageHeight - 40);
+            page.Children.Add(footer);
 
             var pageContent = new PageContent();
             ((IAddChild)pageContent).AddChild(page);
             doc.Pages.Add(pageContent);
+            pageNumber++;
         }
 
+        UpdatePageNumbers(doc);
         return doc;
     }
     private void AddRow(Grid grid, bool isHeader, params string[] values)
@@ -387,14 +408,16 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
 
         for (int i = 0; i < values.Length; i++)
         {
-            TextAlignment align = isHeader ? TextAlignment.Center :
-                i == 0 ? TextAlignment.Center :
-                i >= 4 ? TextAlignment.Right : TextAlignment.Left;
+            TextAlignment align = isHeader
+                ? TextAlignment.Center
+                : i == 0 ? TextAlignment.Center
+                : i >= 4 ? TextAlignment.Right
+                : TextAlignment.Left;
 
             var tb = new TextBlock
             {
                 Text = values[i],
-                Padding = new Thickness(6, 3, 6, 3),
+                Padding = new Thickness(6, 4, 6, 4),
                 FontSize = isHeader ? 13 : 12,
                 FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
                 TextAlignment = align,
@@ -404,7 +427,7 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
             var border = new Border
             {
                 BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(isHeader ? 1 : 0.5),
+                BorderThickness = new Thickness(isHeader ? 1.2 : 0.5),
                 Background = isHeader ? Brushes.LightGray : Brushes.Transparent,
                 Child = tb
             };
@@ -412,6 +435,20 @@ public partial class DebtorCreditorReportViewModel : ViewModelBase
             Grid.SetRow(border, row);
             Grid.SetColumn(border, i);
             grid.Children.Add(border);
+        }
+    }
+
+    private void UpdatePageNumbers(FixedDocument doc)
+    {
+        int totalPages = doc.Pages.Count;
+        foreach (PageContent pc in doc.Pages)
+        {
+            var page = (FixedPage)pc.Child;
+            foreach (var child in page.Children.OfType<TextBlock>())
+            {
+                if (child.Text.Contains("[total]"))
+                    child.Text = child.Text.Replace("[total]", totalPages.ToString());
+            }
         }
     }
     #endregion

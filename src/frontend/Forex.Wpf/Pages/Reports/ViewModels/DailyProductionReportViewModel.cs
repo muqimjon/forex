@@ -324,142 +324,198 @@ public partial class DailyProductionReportViewModel : ViewModelBase
         window.ShowDialog();
     }
 
-    // A4 PDF/Print hujjat — to‘liq, chiroyli, sahifalarga bo‘linadi
-    // FixedDocument va AddRow metodlarini to‘liq almashtiring:
-
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
         const double pageWidth = 793.7;
         const double pageHeight = 1122.5;
-        double margin = 40;
+        const double margin = 30;
+        const double bottomReservedSpace = 60; // Pastdagi "bet/3" va bo'sh joy uchun zaxira
 
         var itemsList = Items.ToList();
         if (!itemsList.Any()) return doc;
 
-        // 1-sahifada faqat 33 ta qator chiqadi
-        const int firstPageRows = 33;
-        const int otherPagesRows = 50; // 2 va undan keyingi sahifalar — 50 ta qator
+        int currentItemIndex = 0;
+        int pageNumber = 1;
 
-        int totalPages = 1 + (int)Math.Ceiling((itemsList.Count - firstPageRows) / (double)otherPagesRows);
-        if (itemsList.Count <= firstPageRows) totalPages = 1;
+        // Sahifalar sonini taxminiy hisoblash (faqat umumiy raqam uchun)
+        int estimatedTotal = 1 + (int)Math.Ceiling(Math.Max(0, itemsList.Count - 25) / 40.0);
 
-        for (int p = 0; p < totalPages; p++)
+        while (currentItemIndex < itemsList.Count)
         {
-            var page = new FixedPage
+            var page = new FixedPage { Width = pageWidth, Height = pageHeight, Background = Brushes.White };
+
+            // 1. Sarlavha (faqat 1-betda)
+            double currentTop = 25;
+            if (pageNumber == 1)
             {
-                Width = pageWidth,
-                Height = pageHeight,
-                Background = System.Windows.Media.Brushes.White
-            };
-
-            // =================== SARLAVHA + DAVR ===================
-            var headerPanel = new StackPanel
+                var header = CreateHeader(pageWidth, margin);
+                FixedPage.SetTop(header, currentTop);
+                FixedPage.SetLeft(header, margin);
+                page.Children.Add(header);
+                currentTop = 110; // Jadval boshlanish nuqtasi
+            }
+            else
             {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(margin, 25, margin, 10)
-            };
+                currentTop = 35; // Keyingi betlarda jadval teparoqdan boshlanadi
+            }
 
-            var title = new TextBlock
-            {
-                Text = "KUNLIK ISHLAB CHIQARISH HISOBOTI",
-                FontSize = 22,
-                FontWeight = FontWeights.ExtraBold,
-                Foreground = new SolidColorBrush(Color.FromRgb(0, 70, 130)),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(170, 10, 0, 12)
-            };
-
-            var period = new TextBlock
-            {
-                Text = $"Davri: {BeginDate:dd.MM.yyyy} — {EndDate:dd.MM.yyyy} | Sahifa {p + 1} / {totalPages}",
-                FontSize = 16,
-                FontWeight = FontWeights.SemiBold,
-                Foreground = new SolidColorBrush(Color.FromRgb(40, 40, 40)),
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-
-            headerPanel.Children.Add(title);
-            headerPanel.Children.Add(period);
-            page.Children.Add(headerPanel);
-
-            // =================== JADVAL ===================
-            var grid = new Grid
-            {
-                Margin = new Thickness(margin, 100, margin, 10)
-            };
-
+            // 2. Jadval obyekti
+            var grid = new Grid { Width = pageWidth - (margin * 2) };
             double[] widths = { 40, 80, 60, 115, 70, 70, 70, 90, 120 };
-            foreach (var w in widths)
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
+            foreach (var w in widths) grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-            AddRow(grid, true,
-                "T/r", "Sana", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Tayyorlanish usuli");
+            // Sarlavha qatorini qo'shish
+            AddRow(grid, true, "T/r", "Sana", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "Tayyorlanish usuli");
 
-            // Qaysi sahifadagi qatorlar sonini hisoblaymiz
-            int rowsThisPage = p == 0 ? firstPageRows : otherPagesRows;
-            int startIndex = p == 0 ? 0 : firstPageRows + (p - 1) * otherPagesRows;
-            int count = Math.Min(rowsThisPage, itemsList.Count - startIndex);
-
-            count = Math.Min(rowsThisPage, itemsList.Count - startIndex);
-
-            for (int i = 0; i < count; i++)
+            // 3. Qatorlarni birma-bir o'lchab qo'shish
+            while (currentItemIndex < itemsList.Count)
             {
-                var x = itemsList[startIndex + i];
+                var item = itemsList[currentItemIndex];
+
+                // Vaqtincha bitta qator yaratib o'lchaymiz
+                var tempGrid = new Grid { Width = grid.Width };
+                foreach (var col in grid.ColumnDefinitions)
+                    tempGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = col.Width });
+
+                AddRow(tempGrid, false,
+                    (currentItemIndex + 1).ToString(),
+                    item.Date.ToString("dd.MM.yyyy"),
+                    item.Code, item.Name, item.Type,
+                    item.BundleCount.ToString("N0"),
+                    item.BundleItemCount.ToString("N0"),
+                    item.TotalCount.ToString("N0"),
+                    item.ProductionType);
+
+                tempGrid.Measure(new Size(grid.Width, double.PositiveInfinity));
+                double rowHeight = tempGrid.DesiredSize.Height;
+
+                // Agar bu qator qo'shilsa, sahifadan chiqib ketadimi?
+                // pageHeight - bottomReservedSpace (60) - currentTop = qolgan bo'sh joy
+                if (currentTop + grid.DesiredSize.Height + rowHeight > pageHeight - bottomReservedSpace)
+                {
+                    break; // Sahifada joy qolmadi, keyingi sahifaga o'tamiz
+                }
+
+                // Joy bo'lsa, asosiy gridga qo'shamiz
                 AddRow(grid, false,
-                    (startIndex + i + 1).ToString(),
-                    x.Date.ToString("dd.MM.yyyy"),
-                    x.Code,
-                    x.Name,
-                    x.Type,
-                    x.BundleCount.ToString("N0"),
-                    x.BundleItemCount.ToString("N0"),
-                    x.TotalCount.ToString("N0"),
-                    x.ProductionType);
+                    (currentItemIndex + 1).ToString(),
+                    item.Date.ToString("dd.MM.yyyy"),
+                    item.Code, item.Name, item.Type,
+                    item.BundleCount.ToString("N0"),
+                    item.BundleItemCount.ToString("N0"),
+                    item.TotalCount.ToString("N0"),
+                    item.ProductionType);
+
+                grid.Measure(new Size(grid.Width, double.PositiveInfinity));
+                currentItemIndex++;
             }
 
-            // =================== OXIRGI SAHIFADA JAMI ===================
-            if (p == totalPages - 1)
+            // 4. Oxirgi sahifada "JAMI" blokini tekshirib qo'shish
+            if (currentItemIndex == itemsList.Count)
             {
-                AddRow(grid, false, "", "", "", "", "", "", "", "", "");
+                var totalBlock = CreateTotalBlock(grid.Width);
+                totalBlock.Measure(new Size(grid.Width, double.PositiveInfinity));
 
-                var totalBorder = new Border
+                // Agar JAMI bloki sig'masa, uni yangi sahifaga o'tkazish kerak bo'ladi (kamdan-kam holat)
+                if (currentTop + grid.DesiredSize.Height + totalBlock.DesiredSize.Height > pageHeight - bottomReservedSpace)
                 {
-                    BorderBrush = System.Windows.Media.Brushes.Black,
-                    BorderThickness = new Thickness(2.5),
-                    Background = new SolidColorBrush(Color.FromRgb(220, 255, 220)),
-                    Padding = new Thickness(30, 18, 30, 18),
-                    CornerRadius = new CornerRadius(15),
-                    Margin = new Thickness(0, 30, 0, 20)
-                };
-
-                var totalText = new TextBlock
+                    // JAMI sig'madi, uni chiqarish uchun pastdagi loop yana bir marta aylanadi
+                }
+                else
                 {
-                    Text = $"JAMI: Tayyor: {TayyorAmount:N0} | Aralash: {AralashAmount:N0} | Eva: {EvaAmount:N0}",
-                    FontSize = 18,
-                    FontWeight = FontWeights.ExtraBold,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0, 110, 0)),
-                    TextAlignment = TextAlignment.Center
-                };
-
-                totalBorder.Child = totalText;
-
-                int totalRowIndex = grid.RowDefinitions.Count;
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                Grid.SetRow(totalBorder, totalRowIndex);
-                Grid.SetColumnSpan(totalBorder, 9);
-                grid.Children.Add(totalBorder);
+                    int totalRowIndex = grid.RowDefinitions.Count;
+                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                    Grid.SetRow(totalBlock, totalRowIndex);
+                    Grid.SetColumnSpan(totalBlock, 9);
+                    grid.Children.Add(totalBlock);
+                }
             }
 
+            // Gridni sahifaga joylash
+            FixedPage.SetTop(grid, currentTop);
+            FixedPage.SetLeft(grid, margin);
             page.Children.Add(grid);
+
+            // 5. Sahifa raqami (O'NG PASTDA)
+            var footer = new TextBlock
+            {
+                Text = $"{pageNumber}-bet / [jami]", // Jami sahifani keyin update qilamiz
+                FontSize = 11,
+                FontWeight = FontWeights.Bold,
+                TextAlignment = TextAlignment.Right,
+                Width = 200
+            };
+            FixedPage.SetTop(footer, pageHeight - 35);
+            FixedPage.SetLeft(footer, pageWidth - margin - 200);
+            page.Children.Add(footer);
 
             var pageContent = new PageContent();
             ((IAddChild)pageContent).AddChild(page);
             doc.Pages.Add(pageContent);
+
+            pageNumber++;
+        }
+
+        // Sahifalar sonini to'g'rilash (Footerlarni update qilish)
+        int finalTotal = doc.Pages.Count;
+        foreach (var pContent in doc.Pages)
+        {
+            var fPage = pContent.Child;
+            foreach (var child in fPage.Children)
+            {
+                if (child is TextBlock tb && tb.Text.Contains("-bet / [jami]"))
+                {
+                    tb.Text = tb.Text.Replace("[jami]", finalTotal.ToString());
+                }
+            }
         }
 
         return doc;
+    }
+
+    private FrameworkElement CreateHeader(double pageWidth, double margin)
+    {
+        var panel = new StackPanel { Width = pageWidth - (margin * 2) };
+        panel.Children.Add(new TextBlock
+        {
+            Text = "KUNLIK ISHLAB CHIQARISH HISOBOTI",
+            FontSize = 22,
+            FontWeight = FontWeights.ExtraBold,
+            Foreground = new SolidColorBrush(Color.FromRgb(0, 70, 130)),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 10)
+        });
+        panel.Children.Add(new TextBlock
+        {
+            Text = $"Davri: {BeginDate:dd.MM.yyyy} — {EndDate:dd.MM.yyyy}",
+            FontSize = 16,
+            FontWeight = FontWeights.SemiBold,
+            HorizontalAlignment = HorizontalAlignment.Left
+        });
+        return panel;
+    }
+
+    private Border CreateTotalBlock(double width)
+    {
+        var border = new Border
+        {
+            BorderBrush = Brushes.Black,
+            BorderThickness = new Thickness(2),
+            Background = new SolidColorBrush(Color.FromRgb(225, 245, 225)),
+            Padding = new Thickness(20, 10, 20, 10),
+            CornerRadius = new CornerRadius(10),
+            Margin = new Thickness(0, 15, 0, 0)
+        };
+        border.Child = new TextBlock
+        {
+            Text = $"JAMI: Tayyor: {TayyorAmount:N0} | Aralash: {AralashAmount:N0} | Eva: {EvaAmount:N0}",
+            FontSize = 16,
+            FontWeight = FontWeights.Bold,
+            Foreground = new SolidColorBrush(Color.FromRgb(0, 100, 0)),
+            TextAlignment = TextAlignment.Center
+        };
+        return border;
     }
     private void AddRow(Grid grid, bool isHeader, params string[] values)
     {

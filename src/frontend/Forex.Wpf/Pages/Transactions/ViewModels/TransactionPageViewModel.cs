@@ -48,7 +48,7 @@ public partial class TransactionPageViewModel : ViewModelBase
     [ObservableProperty] private UserViewModel? selectedFilterUser;
 
     public static IEnumerable<PaymentMethod> AvailablePaymentMethods => Enum.GetValues<PaymentMethod>();
-    [ObservableProperty] private DateTime beginDate = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    [ObservableProperty] private DateTime beginDate = DateTime.Today.AddDays(-7);
     [ObservableProperty] private DateTime endDate = DateTime.Today;
 
     // UI-specific computed properties
