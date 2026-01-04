@@ -190,10 +190,10 @@
                     <DataGridTemplateColumn Width="60" Header="T/r">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock HorizontalAlignment="Center" 
-                       VerticalAlignment="Center"
-                       Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, 
-                                      Converter={StaticResource IndexConverter}}" />
+                                <TextBlock HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
+                                           Converter={StaticResource IndexConverter}}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -230,7 +230,7 @@
                         Binding="{Binding Note}"
                         Header="Izoh" />
 
-                    <DataGridTemplateColumn Width="90" Header="Amallar">
+                    <DataGridTemplateColumn Width="110" Header="Amallar">
                         <DataGridTemplateColumn.HeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -247,6 +247,21 @@
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
                                                 Orientation="Horizontal">
+                                                <Button
+                                                    x:Name="btnPrint"
+                                                    Width="30"
+                                                    Height="26"
+                                                    Margin="2,0"
+                                                    Padding="0"
+                                                    Background="#2196F3"
+                                                    Click="BtnPrintSale_Click"
+                                                    Tag="{Binding}"
+                                                    ToolTip="Chop etish">
+                                                    <md:PackIcon
+                                                        Width="16"
+                                                        Height="16"
+                                                        Kind="Printer" />
+                                                </Button>
                                                 <!--  EDIT BUTTON  -->
                                                 <Button
                                                     x:Name="btnEdit"
