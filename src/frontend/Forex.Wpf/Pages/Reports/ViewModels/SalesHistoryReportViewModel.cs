@@ -283,80 +283,29 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
     private FixedDocument CreateFixedDocument()
     {
         var doc = new FixedDocument();
-
-        // A4 (96 dpi) — aniq o‘lcham
         const double pageWidth = 794;
         const double pageHeight = 1123;
+        const double marginHorizontal = 45;
+        const double marginVertical = 25;
+        const double contentWidth = pageWidth - (2 * marginHorizontal);
+        const double contentHeight = pageHeight - (2 * marginVertical);
 
-        // Marginlar
-        const double marginHorizontal = 45; // Chap/O'ng
-        const double marginVertical = 40;   // Yuqori/Past
-
-        // Ish maydoni
-        const double contentWidth = pageWidth - 2 * marginHorizontal; // 704px
-        const double contentHeight = pageHeight - 2 * marginVertical; // 1043px
-
-        // Header/Title uchun zarur bo'lgan balandlik (taxminan 80-100)
-        // Sarlavha (20) + Davr (15) + Marginlar
-        const double fixedHeaderHeight = 100; // Taxminiy joy
-
-        // Har bir ma'lumot qatorining balandligi
-        const double rowHeight = 25; // Taxminiy (AddRowdagi Padding 5+5+FontSize taxm 10 = 20-25px)
-
-        // Jami qatorining balandligi
-        const double footerRowHeight = 30;
-
-        // Birinchi sahifada ma'lumotlar uchun qolgan balandlik
-        double availableHeightForData = contentHeight - fixedHeaderHeight;
-
-        // Birinchi sahifada sig'adigan maksimal ma'lumot qatorlari soni
-        int maxDataRowsPerPage = (int)Math.Floor(availableHeightForData / rowHeight);
-
-        // Agar maxDataRowsPerPage juda kichik bo'lsa (tepasi katta joy egallagan bo'lsa)
-        if (maxDataRowsPerPage < 1) maxDataRowsPerPage = 1;
-
+        // Oxirgi sahifada zaxira qilinadigan joy (pikselda)
+        // 2-3 ta qator uchun taxminan 70-80 piksel
+        const double reservedSpaceAtBottom = 80;
 
         var allItems = FilteredItems.ToList();
         int processedItems = 0;
-        int currentRowIndex = 0; // Ma'lumot qatori indeksi
+        int pageIndex = 0;
 
-        // ******************** JAMI HISOBLAR ********************
-        var totalBundleCount = allItems.Sum(x => x.BundleCount);
-        var totalTotalCount = allItems.Sum(x => x.TotalCount);
-        var totalAmount = allItems.Sum(x => x.Amount);
-        // ********************************************************
-
-        // Jami qatori oxirgi sahifada joylashishi uchun umumiy sahifalar sonini hisoblash
-        // Jadval sarlavhasi (Header) har bir sahifada takrorlanadi.
-
-        // Ma'lumot qatorlari soni + 1 (Jami qatori)
-        int dataRowsPlusTotalRow = allItems.Count + 1;
-
-        // Sahifalar soni
-        int totalPages = (int)Math.Ceiling((double)dataRowsPlusTotalRow / maxDataRowsPerPage);
-
-
-        for (int pageIndex = 0; pageIndex < totalPages; pageIndex++)
+        while (processedItems < allItems.Count)
         {
-            var page = new FixedPage
-            {
-                Width = pageWidth,
-                Height = pageHeight,
-                Background = Brushes.White
-            };
-
-            // Asosiy konteyner
-            var container = new Grid
-            {
-                Width = contentWidth,
-                Margin = new Thickness(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
-            };
-
+            var page = new FixedPage { Width = pageWidth, Height = pageHeight, Background = Brushes.White };
+            var container = new Grid { Width = contentWidth, Margin = new Thickness(marginHorizontal, marginVertical, marginHorizontal, marginVertical) };
             var stack = new StackPanel();
 
-            // 1. SARLAVHA va DAVR (Faqat birinchi sahifada yoki har bir sahifada)
-            // Hisobot bo'lgani uchun har bir sahifada asosiy ma'lumotlarni qoldiramiz
-            if (pageIndex == 0) // Faqat birinchi sahifada bo'lsin
+            // 1. Sarlavha (faqat 1-betda)
+            if (pageIndex == 0)
             {
                 stack.Children.Add(new TextBlock
                 {
@@ -367,99 +316,72 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                     Margin = new Thickness(0, 0, 0, 8),
                     Foreground = Brushes.DarkBlue
                 });
-
                 stack.Children.Add(new TextBlock
                 {
-                    Text = $"Davr: {BeginDate.ToString("dd.MM.yyyy") ?? "-"} — {(EndDate.ToString("dd.MM.yyyy") ?? "-")}",
+                    Text = string.Format("Davr: {0:dd.MM.yyyy} — {1:dd.MM.yyyy}", BeginDate, EndDate),
                     FontSize = 15,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 25)
                 });
             }
 
-            // JADVAL
-            var table = new Grid();
-
-            // Ustun enlari avvalgidek qoladi
+            // 2. Jadval yaratish
+            var table = new Grid { Width = contentWidth };
             double[] widths = { 56, 80, 52, 60, 58, 60, 60, 52, 50, 70, 100 };
             foreach (var w in widths)
                 table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w) });
 
-            // Header (Har bir sahifada takrorlanadi)
-            AddRow(table, true,
-                "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Qop soni",
-                "Donasi", "Jami", "O‘lchov", "Narxi", "Umumiy summa");
+            // Header qo'shish
+            AddRow(table, true, "Sana", "Mijoz", "Kodi", "Nomi", "Razmer", "Qop soni", "Donasi", "Jami", "O'lchov", "Narxi", "Umumiy summa");
 
-
-            // 2. Ma'lumotlar qatorlarini qo'shish
-
-            // Birinchi sahifada 1 qator header uchun ketdi.
-            // Ikkinchi va keyingi sahifalarda ham 1 qator header uchun ketadi.
-            // maxRowsForCurrentPage quyidagi formula bilan topiladi:
-            int maxRowsForCurrentPage;
-
-            if (pageIndex == totalPages - 1) // Oxirgi sahifa
+            // 3. Qatorlarni birma-bir tekshirib qo'shish
+            while (processedItems < allItems.Count)
             {
-                // Qolgan elementlar soni + JAMI qatori (1 qator)
-                maxRowsForCurrentPage = allItems.Count - processedItems + 1;
-            }
-            else // Boshqa sahifalar
-            {
-                // Har bir sahifada sig'adigan maksimal ma'lumot qatorlari soni (Header hisoblangan)
-                maxRowsForCurrentPage = maxDataRowsPerPage;
-            }
+                var item = allItems[processedItems];
 
-            // Shu sahifaga sig'adigan ma'lumot qatorlari soni (JAMI qatorini hisobga olmaganda)
-            int itemsToTake = Math.Min(maxRowsForCurrentPage, allItems.Count - processedItems);
+                // Vaqtincha qatorni hisoblaymiz (sig'ishini tekshirish uchun)
+                // Bu yerda jadvalning joriy balandligini o'lchaymiz
+                stack.Children.Add(table);
+                stack.Measure(new Size(contentWidth, double.PositiveInfinity));
+                double currentTableHeight = stack.DesiredSize.Height;
+                stack.Children.Remove(table); // Qayta olib tashlaymiz
 
-            var pageItems = allItems.Skip(processedItems).Take(itemsToTake).ToList();
+                // Oxirgi qator bo'lishi mumkinligini tekshiramiz
+                double limit = contentHeight - (processedItems == allItems.Count - 1 ? reservedSpaceAtBottom : 30);
 
+                if (currentTableHeight + 30 > limit) // 30 - keyingi qator uchun taxminiy joy
+                {
+                    // Joy qolmadi, keyingi sahifaga o'tamiz
+                    break;
+                }
 
-            foreach (var item in pageItems)
-            {
                 AddRow(table, false,
                     item.Date.ToString("dd.MM.yyyy"),
-                    item.Customer,
-                    item.Code,
-                    item.ProductName,
-                    item.Type,
+                    item.Customer ?? "",
+                    item.Code ?? "",
+                    item.ProductName ?? "",
+                    item.Type ?? "",
                     item.BundleCount.ToString("N0"),
                     item.BundleItemCount.ToString("N0"),
                     item.TotalCount.ToString("N0"),
-                    item.UnitMeasure,
+                    item.UnitMeasure ?? "",
                     item.UnitPrice.ToString("N2"),
                     item.Amount.ToString("N2")
                 );
-                currentRowIndex++;
+                processedItems++;
             }
 
-            processedItems += pageItems.Count;
-
-
-            // 3. JAMI QATORNI JOYLASHTIRISH (Faqat oxirgi sahifada)
-            if (pageIndex == totalPages - 1)
+            // 4. JAMI qatori (faqat oxirgi sahifada)
+            if (processedItems >= allItems.Count)
             {
-                // JAMI qatori
-                AddRow(table, true,
-                    // 0-4. Birinchi 5 ustun birlashtiriladi (AddRow da Grid.SetColumnSpan yo'qligi uchun:
-                    // Birinchi ustun JAMI so'zini qabul qiladi, qolganlari bo'sh)
-                    "JAMI:", "", "", "", "",
+                var totalBundleCount = allItems.Sum(x => x.BundleCount);
+                var totalTotalCount = allItems.Sum(x => x.TotalCount);
+                var totalAmount = allItems.Sum(x => x.Amount);
 
-                    // 5. Qop soni
-                    totalBundleCount.ToString("N0"),
-
-                    // 6. Donasi ustuni bo'sh
-                    "",
-
-                    // 7. Jami
-                    totalTotalCount.ToString("N0"),
-
-                    // 8-9. Bo'sh
-                    "", "",
-
-                    // 10. Umumiy summa (Qalinroq chiqarish uchun AddRow stili ishlatiladi)
-                    $"{totalAmount:N2}"
-                );
+                AddRow(table, true, "JAMI:", "", "", "", "",
+                    totalBundleCount.ToString("N0"), "",
+                    totalTotalCount.ToString("N0"), "", "",
+                    totalAmount.ToString("N2"));
             }
 
             stack.Children.Add(table);
@@ -469,8 +391,8 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             var pageContent = new PageContent();
             ((IAddChild)pageContent).AddChild(page);
             doc.Pages.Add(pageContent);
+            pageIndex++;
         }
-
         return doc;
     }
     private void AddRow(Grid grid, bool isHeader, params string[] cells)
@@ -480,21 +402,19 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
 
         for (int i = 0; i < cells.Length; i++)
         {
-            // 1. TextAlignment (Hizalanish) mantiqini aniqlash
             TextAlignment alignment;
 
-            // Mijoz (1) va Nomi (3) chapda. Narxi (9) va Umumiy summa (10) o'ngda.
-            if (i == 1 || i == 3) // Mijoz, Nomi
-            {
-                alignment = TextAlignment.Left;
-            }
-            else if (i == 9 || i == 10) // Narxi, Umumiy summa
-            {
-                alignment = TextAlignment.Right;
-            }
-            else // Sana, Kodi, Razmer, Qop soni, Donasi, Jami, O‘lchov
+            // --- YANGI: Agar Header bo'lsa hamma ustunlar o'rtada (Center) ---
+            if (isHeader)
             {
                 alignment = TextAlignment.Center;
+            }
+            else
+            {
+                // Ma'lumot qatorlari uchun eski hizalanish qoidalari
+                if (i == 1 || i == 3) alignment = TextAlignment.Left;
+                else if (i == 9 || i == 10) alignment = TextAlignment.Right;
+                else alignment = TextAlignment.Center;
             }
 
             var tb = new TextBlock
@@ -503,12 +423,10 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
                 Padding = new Thickness(4, 5, 4, 5),
                 FontSize = isHeader ? 11 : 10.5,
                 FontWeight = isHeader ? FontWeights.Bold : FontWeights.Medium,
-                TextAlignment = alignment, // <--- YANGI HIZALANISH QOIDASI
+                TextAlignment = alignment,
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.WrapWithOverflow
             };
-
-            // ... (Border mantiqlari o'zgarmaydi) ...
 
             var border = new Border
             {
@@ -523,6 +441,5 @@ public partial class SalesHistoryReportViewModel : ViewModelBase
             grid.Children.Add(border);
         }
     }
-
     #endregion Private Methods
 }

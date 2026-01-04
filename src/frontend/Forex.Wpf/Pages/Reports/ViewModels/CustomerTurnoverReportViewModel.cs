@@ -559,44 +559,6 @@ public partial class CustomerTurnoverReportViewModel : ViewModelBase
         return stack;
     }
 
-    private double CalculateRowHeight(double commentColumnWidth, string description)
-    {
-        if (string.IsNullOrEmpty(description)) return 45; // Minimal balandlik (Padding 8 * 2 + Font 12 = ~45)
-
-        // Taxminiy o'lchash mantiqi (Sizning oldingi kodingizdan soddalashtirilgan)
-        var tempTextBlock = new TextBlock
-        {
-            Text = description,
-            Width = commentColumnWidth - 20, // Padding 8*2 = 16 (taxminan 20)
-            TextWrapping = TextWrapping.Wrap,
-            FontSize = 12,
-            Padding = new Thickness(8),
-        };
-
-        tempTextBlock.Measure(new Size(commentColumnWidth, double.MaxValue));
-
-        double actualHeight = tempTextBlock.DesiredSize.Height;
-
-        // Minimal balandlikni qaytarish (45: Padding 8,8 + Font size 12)
-        return Math.Max(45, actualHeight);
-    }
-
-    private void AddPageFooter(FixedPage page, int currentPage, int totalPages)
-    {
-        // Pastki o'ng qismga sahifalash ma'lumotini qo'shamiz (Faqat o'rnatish)
-        var pageInfo = new TextBlock
-        {
-            Text = $"{currentPage}-bet / {totalPages}",
-            FontSize = 12,
-            FontWeight = FontWeights.Bold,
-        };
-
-        FixedPage.SetRight(pageInfo, 50);
-        FixedPage.SetBottom(pageInfo, 20);
-
-        page.Children.Add(pageInfo);
-    }
-
     private void UpdatePageFooter(FixedPage page, int currentPage, int totalPages)
     {
         const double margin = 50;

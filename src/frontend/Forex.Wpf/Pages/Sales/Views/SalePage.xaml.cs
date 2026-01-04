@@ -56,7 +56,20 @@ public partial class SalePage : Page
         // Yangi savdo qo'shish - bo'sh sahifa
         Main.NavigateTo(new AddSalePage());
     }
+    private async void BtnPrintSale_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.Tag is not SaleViewModel sale)
+            return;
 
+        // 1. ServiceProvider'dan VM'ni olamiz
+        var printVm = App.AppHost!.Services.GetRequiredService<AddSalePageViewModel>();
+
+        // 2. Savdo ma'lumotlarini (SaleItems va barcha detallari bilan) yuklaymiz
+        await printVm.LoadSaleForEditAsync(sale.Id);
+
+        // 3. Metodni to'g'ridan-to'g'ri chaqiramiz (chunki u endi public)
+        printVm.ShowPrintPreview();
+    }
     private async void BtnEditSale_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button button || button.Tag is not SaleViewModel sale)
