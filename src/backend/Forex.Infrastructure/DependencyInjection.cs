@@ -1,11 +1,12 @@
 ﻿namespace Forex.Infrastructure;
 
-using Forex.Application.Commons.Interfaces;
-using Forex.Infrastructure.FileStorage.Minio;
+using Forex.Application.Common.Interfaces;
+using Forex.Infrastructure.Background;
 using Forex.Infrastructure.Identity;
 using Forex.Infrastructure.Persistence;
 using Forex.Infrastructure.Persistence.Interceptors;
 using Forex.Infrastructure.Security;
+using Forex.Infrastructure.Storage;
 using Forex.Infrastructure.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ public static class DependencyInjection
         services.AddDbContext(conf);
         services.AddFileStorage(conf);
         services.AddIdentity();
+        services.AddHostedService<FileCleanupBackgroundService>();
         services.AddScoped<IPagingMetadataWriter, HttpPagingMetadataWriter>();
     }
 
@@ -44,15 +46,19 @@ public static class DependencyInjection
 
     public static void AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
-        var options = configuration.GetSection("Minio").Get<MinioOptions>()!;
+        var options = configuration.GetSection("Minio").Get<MinioStorageOptions>()!;
 
         var minioClient = new MinioClient()
             .WithEndpoint(options.Endpoint)
-            .WithCredentials(options.AccessKey, options.SecretKey)
-            .Build();
+            .WithCredentials(options.AccessKey, options.SecretKey);
+
+        if (options.UseSsl)
+        {
+            minioClient = minioClient.WithSSL();
+        }
 
         services.AddSingleton(options);
-        services.AddSingleton(minioClient);
+        services.AddSingleton<IMinioClient>(minioClient.Build());
         services.AddScoped<IFileStorageService, MinioFileStorageService>();
     }
 }

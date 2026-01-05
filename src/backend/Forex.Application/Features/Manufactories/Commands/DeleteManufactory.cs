@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Manufactories.Commands;
 
-using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Exceptions;
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

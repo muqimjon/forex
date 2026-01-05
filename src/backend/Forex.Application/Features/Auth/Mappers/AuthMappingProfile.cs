@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Auth.Mappers;
 
 using AutoMapper;
-using Forex.Application.Commons.Extensions;
+using Forex.Application.Common.Extensions;
 using Forex.Application.Features.Auth.Commands;
 using Forex.Domain.Entities;
 

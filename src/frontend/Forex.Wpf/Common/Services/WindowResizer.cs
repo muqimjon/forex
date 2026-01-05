@@ -1,367 +1,232 @@
 ﻿namespace Forex.Wpf.Common.Services;
 
-using Forex.Wpf.Common.Enums;
-using System.Threading;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Threading;
 
-public static class WindowResizer
+public static class WindowResizeService
 {
-    #region Private Classes
-
-    private class ResizeState
+    private sealed class State
     {
-        public double TargetWidth { get; set; }
-        public double TargetHeight { get; set; }
-        public bool HasResized { get; set; }
-        public ResizeBehavior Behavior { get; set; }
+        public bool Applied;
+        public bool Always;
     }
 
-    #endregion
+    private static readonly Dictionary<Window, Dictionary<object, State>> Cache = new();
+    private static readonly object Sync = new();
 
-    #region Private Fields
+    #region Code-behind API
 
-    private static readonly Dictionary<Window, Dictionary<object, ResizeState>> States = new();
-    private static readonly Lock _lock = new();
-
-    #endregion
-
-    #region Extension Methods
-
-    /// <summary>
-    /// Page/UserControl uchun Window ni avtomatik resize qiladi
-    /// </summary>
     public static void ResizeWindow(
-        this FrameworkElement element,
+        this FrameworkElement source,
         double width,
         double height,
-        ResizeBehavior behavior = ResizeBehavior.Once,
-        double duration = 0.4,
+        bool always = false,
+        bool lockSize = false,
+        double duration = 0.35,
         bool center = true)
     {
-        if (element is null)
+        if (source == null || width <= 0 || height <= 0)
             return;
 
-        // Dispatcher orqali UI thread da ishlash
-        element.Dispatcher.BeginInvoke(new Action(() =>
+        void run()
         {
-            if (element.IsLoaded)
-            {
-                PerformResize(element, width, height, behavior, duration, center);
-            }
-            else
-            {
-                void handler(object? s, RoutedEventArgs e)
-                {
-                    element.Loaded -= handler;
-                    // Biroz kechiktirib ishga tushirish (rendering tugashi uchun)
-                    element.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        PerformResize(element, width, height, behavior, duration, center);
-                    }), DispatcherPriority.Loaded);
-                }
-                element.Loaded += handler;
-            }
-        }), DispatcherPriority.Loaded);
-    }
+            var window = Window.GetWindow(source);
+            if (window == null)
+                return;
 
-    /// <summary>
-    /// Window uchun to'g'ridan-to'g'ri resize
-    /// </summary>
-    public static void ResizeWindow(
-        this Window window,
-        double width,
-        double height,
-        object? context = null,
-        ResizeBehavior behavior = ResizeBehavior.Once,
-        double duration = 0.4,
-        bool center = true)
-    {
-        if (window is null)
-            return;
+            Apply(window, source, width, height, always, lockSize, duration, center);
+        }
 
-        context ??= window;
-
-        window.Dispatcher.BeginInvoke(new Action(() =>
-        {
-            AnimateResize(window, width, height, context, behavior, duration, center);
-        }), DispatcherPriority.Loaded);
+        if (source.IsLoaded)
+            run();
+        else
+            source.Loaded += (_, _) => run();
     }
 
     #endregion
 
-    #region Private Methods
+    #region XAML API
 
-    private static void PerformResize(
-        FrameworkElement element,
-        double width,
-        double height,
-        ResizeBehavior behavior,
-        double duration,
-        bool center)
+    public static readonly DependencyProperty WidthProperty =
+        Register("Width", 0d);
+
+    public static readonly DependencyProperty HeightProperty =
+        Register("Height", 0d);
+
+    public static readonly DependencyProperty AlwaysProperty =
+        Register("Always", false);
+
+    public static readonly DependencyProperty LockProperty =
+        Register("Lock", false);
+
+    public static readonly DependencyProperty DurationProperty =
+        Register("Duration", 0.35);
+
+    public static readonly DependencyProperty CenterProperty =
+        Register("Center", true);
+
+    private static readonly DependencyProperty InitializedProperty =
+        DependencyProperty.RegisterAttached(
+            "Initialized",
+            typeof(bool),
+            typeof(WindowResizeService),
+            new PropertyMetadata(false));
+
+    public static double GetWidth(DependencyObject o) => (double)o.GetValue(WidthProperty);
+    public static void SetWidth(DependencyObject o, double v) => o.SetValue(WidthProperty, v);
+
+    public static double GetHeight(DependencyObject o) => (double)o.GetValue(HeightProperty);
+    public static void SetHeight(DependencyObject o, double v) => o.SetValue(HeightProperty, v);
+
+    public static bool GetAlways(DependencyObject o) => (bool)o.GetValue(AlwaysProperty);
+    public static void SetAlways(DependencyObject o, bool v) => o.SetValue(AlwaysProperty, v);
+
+    public static bool GetLock(DependencyObject o) => (bool)o.GetValue(LockProperty);
+    public static void SetLock(DependencyObject o, bool v) => o.SetValue(LockProperty, v);
+
+    public static double GetDuration(DependencyObject o) => (double)o.GetValue(DurationProperty);
+    public static void SetDuration(DependencyObject o, double v) => o.SetValue(DurationProperty, v);
+
+    public static bool GetCenter(DependencyObject o) => (bool)o.GetValue(CenterProperty);
+    public static void SetCenter(DependencyObject o, bool v) => o.SetValue(CenterProperty, v);
+
+    private static DependencyProperty Register(string name, object def) =>
+        DependencyProperty.RegisterAttached(
+            name,
+            def.GetType(),
+            typeof(WindowResizeService),
+            new PropertyMetadata(def, OnAttachedChanged));
+
+    private static void OnAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs _)
     {
-        var window = FindWindow(element);
-        if (window is null)
+        if (d is not FrameworkElement e)
             return;
 
-        AnimateResize(window, width, height, element, behavior, duration, center);
+        e.Unloaded += (_, _) =>
+        {
+            var window = Window.GetWindow(e);
+            if (window == null) return;
+
+            lock (Sync)
+                if (Cache.TryGetValue(window, out var map))
+                    map.Remove(e);
+        };
+
+        if ((bool)e.GetValue(InitializedProperty))
+            return;
+
+        e.SetValue(InitializedProperty, true);
+
+        e.Loaded += (_, _) =>
+            e.ResizeWindow(
+                GetWidth(e),
+                GetHeight(e),
+                GetAlways(e),
+                GetLock(e),
+                GetDuration(e),
+                GetCenter(e));
     }
 
-    private static void AnimateResize(
+    #endregion
+
+    #region Core
+
+    private static void Apply(
         Window window,
-        double targetWidth,
-        double targetHeight,
-        object context,
-        ResizeBehavior behavior,
+        object ctx,
+        double w,
+        double h,
+        bool always,
+        bool lockSize,
         double duration,
         bool center)
     {
-        if (targetWidth <= 0 || targetHeight <= 0)
-            return;
-
-        lock (_lock)
+        lock (Sync)
         {
-            if (!States.TryGetValue(window, out var contextStates))
+            if (!Cache.TryGetValue(window, out var map))
             {
-                contextStates = new Dictionary<object, ResizeState>();
-                States[window] = contextStates;
-                SetupCleanup(window);
-            }
-
-            if (!contextStates.TryGetValue(context, out var state))
-            {
-                state = new ResizeState
+                map = [];
+                Cache[window] = map;
+                window.Closed += (_, _) =>
                 {
-                    TargetWidth = targetWidth,
-                    TargetHeight = targetHeight,
-                    HasResized = false,
-                    Behavior = behavior
+                    lock (Sync)
+                        Cache.Remove(window);
                 };
-                contextStates[context] = state;
             }
 
-            // Once rejimida va allaqachon resize qilingan bo'lsa
-            if (state.Behavior == ResizeBehavior.Once && state.HasResized)
+            if (!map.TryGetValue(ctx, out var state))
+                map[ctx] = state = new();
+
+            state.Always = always;
+
+            if (state.Applied && !state.Always)
                 return;
 
-            // Faqat kichik bo'lsa resize qilish
-            double currentWidth = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
-            double currentHeight = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
+            state.Applied = true;
 
-            bool needsResize = currentWidth < targetWidth || currentHeight < targetHeight;
-
-            if (!needsResize && state.HasResized)
-                return;
-
-            ExecuteAnimation(window, targetWidth, targetHeight, duration, center);
-            state.HasResized = true;
+            Animate(window, w, h, duration, center, lockSize);
         }
     }
 
-    private static void ExecuteAnimation(
+    private static void Animate(
         Window window,
-        double targetWidth,
-        double targetHeight,
+        double w,
+        double h,
         double duration,
-        bool center)
+        bool center,
+        bool lockSize)
     {
-        // Hozirgi o'lchamlarni olish
-        double currentWidth = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
-        double currentHeight = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
-        double currentLeft = window.Left;
-        double currentTop = window.Top;
+        var cw = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
+        var ch = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
 
-        // Agar current va target bir xil bo'lsa, chiqib ketamiz
-        if (Math.Abs(currentWidth - targetWidth) < 1 && Math.Abs(currentHeight - targetHeight) < 1)
+        if (Math.Abs(cw - w) < 1 && Math.Abs(ch - h) < 1)
             return;
 
-        // WindowStartupLocation ni Manual ga o'zgartirish
-        if (window.WindowStartupLocation != WindowStartupLocation.Manual)
-            window.WindowStartupLocation = WindowStartupLocation.Manual;
-
-        // SizeToContent ni o'chirish
         window.SizeToContent = SizeToContent.Manual;
+        window.WindowStartupLocation = WindowStartupLocation.Manual;
 
-        var animDuration = new Duration(TimeSpan.FromSeconds(duration));
-        var easing = new CubicEase { EasingMode = EasingMode.EaseInOut };
-
-        // Width animatsiya
-        var widthAnimation = new DoubleAnimation
+        if (lockSize)
         {
-            From = currentWidth,
-            To = targetWidth,
-            Duration = animDuration,
-            EasingFunction = easing,
-            FillBehavior = FillBehavior.Stop
-        };
-
-        // Height animatsiya
-        var heightAnimation = new DoubleAnimation
+            window.ResizeMode = ResizeMode.NoResize;
+            window.MinWidth = window.MaxWidth = w;
+            window.MinHeight = window.MaxHeight = h;
+        }
+        else
         {
-            From = currentHeight,
-            To = targetHeight,
-            Duration = animDuration,
-            EasingFunction = easing,
-            FillBehavior = FillBehavior.Stop
-        };
-
-        // Animatsiya tugagach qiymatni o'rnatish
-        widthAnimation.Completed += (s, e) =>
-        {
-            window.BeginAnimation(FrameworkElement.WidthProperty, null);
-            window.Width = targetWidth;
-        };
-
-        heightAnimation.Completed += (s, e) =>
-        {
-            window.BeginAnimation(FrameworkElement.HeightProperty, null);
-            window.Height = targetHeight;
-        };
-
-        // Markazlash
-        if (center)
-        {
-            double deltaWidth = targetWidth - currentWidth;
-            double deltaHeight = targetHeight - currentHeight;
-
-            double targetLeft = currentLeft - deltaWidth / 2;
-            double targetTop = currentTop - deltaHeight / 2;
-
-            // Ekrandan chiqib ketmasligini ta'minlash
-            var screen = System.Windows.Forms.Screen.FromHandle(
-                new System.Windows.Interop.WindowInteropHelper(window).Handle);
-
-            if (screen != null)
-            {
-                double maxLeft = screen.WorkingArea.Right - targetWidth;
-                double maxTop = screen.WorkingArea.Bottom - targetHeight;
-
-                targetLeft = Math.Max(screen.WorkingArea.Left, Math.Min(targetLeft, maxLeft));
-                targetTop = Math.Max(screen.WorkingArea.Top, Math.Min(targetTop, maxTop));
-            }
-
-            var leftAnimation = new DoubleAnimation
-            {
-                From = currentLeft,
-                To = targetLeft,
-                Duration = animDuration,
-                EasingFunction = easing,
-                FillBehavior = FillBehavior.Stop
-            };
-
-            var topAnimation = new DoubleAnimation
-            {
-                From = currentTop,
-                To = targetTop,
-                Duration = animDuration,
-                EasingFunction = easing,
-                FillBehavior = FillBehavior.Stop
-            };
-
-            leftAnimation.Completed += (s, e) =>
-            {
-                window.BeginAnimation(Window.LeftProperty, null);
-                window.Left = targetLeft;
-            };
-
-            topAnimation.Completed += (s, e) =>
-            {
-                window.BeginAnimation(Window.TopProperty, null);
-                window.Top = targetTop;
-            };
-
-            window.BeginAnimation(Window.LeftProperty, leftAnimation);
-            window.BeginAnimation(Window.TopProperty, topAnimation);
+            window.ResizeMode = ResizeMode.CanResize;
+            window.MinWidth = window.MinHeight = 0;
+            window.MaxWidth = window.MaxHeight = double.PositiveInfinity;
         }
 
-        window.BeginAnimation(FrameworkElement.WidthProperty, widthAnimation);
-        window.BeginAnimation(FrameworkElement.HeightProperty, heightAnimation);
-    }
+        Animate(window, FrameworkElement.WidthProperty, cw, w, duration);
+        Animate(window, FrameworkElement.HeightProperty, ch, h, duration);
 
-    private static Window? FindWindow(DependencyObject element)
-    {
-        // Window.GetWindow - eng tezkor usul
-        if (element is FrameworkElement fe)
-        {
-            var window = Window.GetWindow(fe);
-            if (window != null)
-                return window;
-        }
-
-        // Visual tree orqali qidirish
-        var visualWindow = FindVisualParent<Window>(element);
-        if (visualWindow != null)
-            return visualWindow;
-
-        // Logical tree orqali qidirish
-        DependencyObject current = element;
-        while (current != null)
-        {
-            if (current is Window win)
-                return win;
-            current = LogicalTreeHelper.GetParent(current);
-        }
-
-        return null;
-    }
-
-    private static T? FindVisualParent<T>(DependencyObject element) where T : DependencyObject
-    {
-        while (element != null)
-        {
-            if (element is T parent)
-                return parent;
-            element = VisualTreeHelper.GetParent(element);
-        }
-        return null;
-    }
-
-    private static void SetupCleanup(Window window)
-    {
-        void handler(object? sender, EventArgs e)
-        {
-            window.Closed -= handler;
-            lock (_lock)
-            {
-                States.Remove(window);
-            }
-        }
-        window.Closed += handler;
-    }
-
-    #endregion
-
-    #region Public Utility Methods
-
-    /// <summary>
-    /// Context ni reset qilish
-    /// </summary>
-    public static void ResetContext(FrameworkElement element)
-    {
-        var window = FindWindow(element);
-        if (window == null)
+        if (!center)
             return;
 
-        lock (_lock)
-        {
-            if (States.TryGetValue(window, out var contextStates))
-            {
-                contextStates.Remove(element);
-            }
-        }
+        Animate(window, Window.LeftProperty, window.Left, window.Left - (w - cw) / 2, duration);
+        Animate(window, Window.TopProperty, window.Top, window.Top - (h - ch) / 2, duration);
     }
 
-    /// <summary>
-    /// Barcha holatlarni tozalash
-    /// </summary>
-    public static void ClearAll()
+    private static void Animate(
+        UIElement target,
+        DependencyProperty property,
+        double from,
+        double to,
+        double seconds)
     {
-        lock (_lock)
+        var anim = new DoubleAnimation(from, to, TimeSpan.FromSeconds(seconds))
         {
-            States.Clear();
-        }
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
+        };
+
+        anim.Completed += (_, _) =>
+        {
+            target.BeginAnimation(property, null);
+            target.SetValue(property, to);
+        };
+
+        target.BeginAnimation(property, anim);
     }
 
     #endregion

@@ -12,36 +12,23 @@
       Background="{DynamicResource PrimaryBackground}"
       mc:Ignorable="d">
 
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+	<Grid Margin="10">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
 
-        <!-- Header -->
-        <DockPanel Grid.Row="0" LastChildFill="False">
-            <Label
+		<!-- Header -->
+		<DockPanel Grid.Row="0" LastChildFill="False">
+			<Label
                 Content="📦 Mahsulotlarni boshqarish"
                 FontSize="18"
                 FontWeight="Bold"
                 Foreground="{StaticResource SecondaryTextColor}" />
 
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button
-                    x:Name="btnRedirectToAddPage"
-                    Padding="8,0"
-                    Margin="0,0,10,0"
-                    md:ButtonAssist.CornerRadius="4"
-                    md:ElevationAssist.Elevation="Dp24"
-                    Background="{StaticResource SuccessButtonBackground}"
-                    BorderBrush="{StaticResource SuccessButtonBorder}"
-                    Command="{Binding RedirectToAddPageCommand}"
-                    Content="➕ Kirim qilish"
-                    Foreground="{StaticResource SuccessButtonForeground}" />
-
-                <Button
+			<Button DockPanel.Dock="Right"
                     x:Name="btnBack"
                     Padding="8,0"
                     md:ButtonAssist.CornerRadius="4"
@@ -51,105 +38,62 @@
                     Click="BtnBack_Click"
                     Content="🔙 Orqaga"
                     Foreground="{StaticResource BackButtonForeground}" />
-            </StackPanel>
-        </DockPanel>
+		</DockPanel>
 
-        <!-- Filters -->
-        <Grid Grid.Row="1" Margin="0,10,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="439*"/>
-                <ColumnDefinition Width="140*"/>
-            </Grid.ColumnDefinitions>
+		<!-- Filters -->
+		<Grid Grid.Row="1" Margin="0,10,0,0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="10" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
 
-            <TextBlock
-                Text="Davr oralig'i:"
+			<TextBlock
+                Text="Sana:"
                 FontSize="16"
-                VerticalAlignment="Center"/>
+                VerticalAlignment="Center" />
 
-            <controls:UserCalendar
-                x:Name="dateBegin"
+			<controls:UserCalendar
+                x:Name="date"
                 Grid.Column="2"
-                Width="110"
-                Height="28"
-                HorizontalAlignment="Center"
-                FontSize="14"
-                SelectedDate="{Binding BeginDate, Mode=TwoWay}" Margin="0,2,0,2" />
-
-            <TextBlock
-                Grid.Column="3"
-                Text="dan"
+                Width="120"
+                Height="32"
+                HorizontalAlignment="Left"
                 FontSize="16"
-                VerticalAlignment="Center" Grid.ColumnSpan="3" Margin="5,0,10,0"/>
+                SelectedDate="{Binding BeginDate, Mode=TwoWay}" />
+		</Grid>
 
-            <controls:UserCalendar
-                x:Name="dateEnd"
-                Grid.Column="6"
-                Width="110"
-                Height="28"
-                HorizontalAlignment="Center"
-                FontSize="14"
-                SelectedDate="{Binding EndDate, Mode=TwoWay}" Margin="0,2,0,2" />
-
-            <TextBlock
-                Grid.Column="8"
-                Text="gacha"
-                FontSize="16"
-                VerticalAlignment="Center"/>
-
-            <Button
-                Grid.Column="10"
-                x:Name="btnRefresh"
-                Padding="8,0"
-                md:ButtonAssist.CornerRadius="4"
-                md:ElevationAssist.Elevation="Dp2"
-                Background="{DynamicResource BackButtonBackground}"
-                BorderBrush="{StaticResource BackButtonBorder}"
-                Command="{Binding FilterProductEntriesCommand}"
-                Content="🔍 Qidirish"
-                HorizontalAlignment="Center"
-                Foreground="{StaticResource BackButtonForeground}" />
-        </Grid>
-
-        <!-- Input Form -->
-        <Grid Grid.Row="2" Margin="0,17,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="120" />
-                <ColumnDefinition Width="1.3*" MinWidth="100" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+		<!-- Input Form -->
+		<Grid Grid.Row="2" Margin="0,17,0,0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" MaxWidth="120" />
+				<ColumnDefinition Width="1.3*" MinWidth="100" />
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
 
-            <!--  Mahsulot kodi  -->
-            <controls:FloatingComboBox
+			<!--  Mahsulot kodi  -->
+			<controls:FloatingComboBox
                 x:Name="cbxProductCode"
                 Margin="0,0,2,0"
                 DisplayMemberPath="Code"
-                IsEditable="False"
+                IsEditable="True"
                 IsTextSearchEnabled="True"
                 ItemsSource="{Binding DataContext.AvailableProducts, ElementName=RootPage}"
                 Label="Kodi"
                 SelectedItem="{Binding DataContext.CurrentProductEntry.Product, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Mahsulot nomi  -->
-            <controls:FloatingComboBox
+			<!--  Mahsulot nomi  -->
+			<controls:FloatingComboBox
                 x:Name="cbxProductName"
                 Grid.Column="1"
                 Margin="2,0"
@@ -160,8 +104,8 @@
                 Label="Nomi"
                 SelectedItem="{Binding DataContext.CurrentProductEntry.Product, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  tayyorlanish usuli  -->
-            <controls:FloatingComboBox
+			<!--  tayyorlanish usuli  -->
+			<controls:FloatingComboBox
                 x:Name="cbxProductionOrigin"
                 Grid.Column="2"
                 Margin="2,0"
@@ -170,8 +114,8 @@
                 Label="Tayyorlanish usuli"
                 SelectedItem="{Binding DataContext.CurrentProductEntry.ProductionOriginName, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Razmer  -->
-            <controls:FloatingComboBox
+			<!--  Razmer  -->
+			<controls:FloatingComboBox
                 x:Name="cbxProductType"
                 Grid.Column="3"
                 Margin="2,0"
@@ -182,24 +126,24 @@
                 Label="Razmer"
                 SelectedItem="{Binding DataContext.CurrentProductEntry.Product.SelectedType, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Qoplar soni  -->
-            <controls:FloatingInput
+			<!--  Qoplar soni  -->
+			<controls:FloatingInput
                 x:Name="tbxBundle"
                 Grid.Column="4"
                 Margin="2,0"
                 Label="Qop soni"
                 Text="{Binding DataContext.CurrentProductEntry.BundleCount, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Qopda nechta borligi  -->
-            <controls:FloatingInput
+			<!--  Qopda nechta borligi  -->
+			<controls:FloatingInput
                 x:Name="tbxBundleItemCount"
                 Grid.Column="5"
                 Margin="2,0"
                 Label="Donasi"
                 Text="{Binding DataContext.CurrentProductEntry.Product.SelectedType.BundleItemCount, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Jami soni  -->
-            <controls:FloatingInput
+			<!--  Jami soni  -->
+			<controls:FloatingInput
                 x:Name="tbxQuantity"
                 Grid.Column="6"
                 Margin="2,0"
@@ -207,23 +151,24 @@
                 Label="Jami soni"
                 Text="{Binding DataContext.CurrentProductEntry.Count, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Tannarxi  -->
-            <controls:FloatingInput
+			<!--  Tannarxi  -->
+			<controls:FloatingInput
                 x:Name="tbxCostPrice"
                 Grid.Column="7"
                 Margin="2,0"
                 Label="Tan narxi"
                 Text="{Binding DataContext.CurrentProductEntry.Product.SelectedType.UnitPrice, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}" />
 
-            <!--  Rasm  -->
-            <controls:FloatingFileInput
+			<!--  Rasm  -->
+			<controls:FloatingFileInput
                 x:Name="fileInput"
                 Grid.Column="8"
                 Margin="2,0"
                 Label="Rasm"
+                Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"
                 FileName="{Binding DataContext.SelectedImageFile, ElementName=RootPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <Button
+			<Button
                 x:Name="btnAdd"
                 Grid.Column="9"
                 Height="30"
@@ -234,7 +179,7 @@
                 Content="Saqlash"
                 FontSize="14" />
 
-            <Button
+			<Button
                 x:Name="btnCancel"
                 Grid.Column="10"
                 Height="30"
@@ -246,15 +191,9 @@
                 Content="Bekor qilish"
                 Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
                 FontSize="14" />
-        </Grid>
+		</Grid>
 
-        <!-- DataGrid -->
-        <Grid Grid.Row="3" Margin="0,5,0,5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="317*"/>
-                <ColumnDefinition Width="763*"/>
-            </Grid.ColumnDefinitions>
-            <DataGrid
+		<DataGrid Grid.Row="3" Margin="0 5 0 0"
                 x:Name="dataGrid"
                 AutoGenerateColumns="False"
                 BorderThickness="2"
@@ -270,110 +209,109 @@
                 SelectionUnit="FullRow"
                 AlternatingRowBackground="#F9F9F9"
                 HeadersVisibility="Column"
-                IsReadOnly="True" Grid.ColumnSpan="2">
+                IsReadOnly="True">
 
-                <DataGrid.Resources>
-                    <Style x:Key="RightAlignedCellStyle" TargetType="TextBlock">
-                        <Setter Property="TextAlignment" Value="Right" />
-                        <Setter Property="Padding" Value="0,0,5,0" />
-                    </Style>
+			<DataGrid.Resources>
+				<Style x:Key="RightAlignedCellStyle" TargetType="TextBlock">
+					<Setter Property="TextAlignment" Value="Right" />
+					<Setter Property="Padding" Value="0,0,5,0" />
+				</Style>
 
-                    <Style x:Key="CenterAlignedCellStyle" TargetType="TextBlock">
-                        <Setter Property="TextAlignment" Value="Center" />
-                    </Style>
+				<Style x:Key="CenterAlignedCellStyle" TargetType="TextBlock">
+					<Setter Property="TextAlignment" Value="Center" />
+				</Style>
 
-                    <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="HorizontalContentAlignment" Value="Center" />
-                        <Setter Property="FontWeight" Value="SemiBold" />
-                    </Style>
-                </DataGrid.Resources>
+				<Style TargetType="DataGridColumnHeader">
+					<Setter Property="HorizontalContentAlignment" Value="Center" />
+					<Setter Property="FontWeight" Value="SemiBold" />
+				</Style>
+			</DataGrid.Resources>
 
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="60" Header="T/r">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock HorizontalAlignment="Center"
+			<DataGrid.Columns>
+				<DataGridTemplateColumn Width="60" Header="T/r">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
                                            Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
                                            Converter={StaticResource IndexConverter}}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn
                         Width="100"
                         Binding="{Binding Date, Mode=TwoWay, StringFormat={}{0:dd.MM.yyyy}}"
                         ElementStyle="{StaticResource CenterAlignedCellStyle}"
                         Header="Sana" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="*"
                         MinWidth="80"
                         Binding="{Binding ProductType.Product.Code, Mode=TwoWay}"
                         Header="Kod" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="1.3*"
                         MinWidth="100"
                         Binding="{Binding ProductType.Product.Name}"
                         Header="Nomi" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="*"
                         MinWidth="100"
                         Binding="{Binding ProductionOrigin}"
                         ElementStyle="{StaticResource CenterAlignedCellStyle}"
                         Header="Tayyorlanish usuli" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="*"
                         Binding="{Binding ProductType.Type}"
                         ElementStyle="{StaticResource CenterAlignedCellStyle}"
                         Header="Razmer" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="*"
                         Binding="{Binding BundleCount, StringFormat={}{0:N0}}"
                         ElementStyle="{StaticResource RightAlignedCellStyle}"
                         Header="Qop soni" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="*"
                         Binding="{Binding ProductType.BundleItemCount, StringFormat={}{0:N0}}"
                         ElementStyle="{StaticResource RightAlignedCellStyle}"
                         Header="Donasi" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="*"
                         Binding="{Binding Count, StringFormat={}{0:N0}}"
                         ElementStyle="{StaticResource RightAlignedCellStyle}"
                         Header="Jami soni" />
 
-                    <DataGridTextColumn
+				<DataGridTextColumn
                         Width="*"
                         Binding="{Binding ProductType.UnitPrice, StringFormat={}{0:N0}}"
                         ElementStyle="{StaticResource RightAlignedCellStyle}"
                         Header="Tannarxi" />
 
-                    <DataGridTemplateColumn Width="90" Header="Amallar">
-                        <DataGridTemplateColumn.HeaderStyle>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                <Setter Property="FontWeight" Value="SemiBold" />
-                            </Style>
-                        </DataGridTemplateColumn.HeaderStyle>
-                        <DataGridTemplateColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Padding" Value="4"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="DataGridCell">
-                                            <StackPanel
+				<DataGridTemplateColumn Width="90" Header="Amallar">
+					<DataGridTemplateColumn.HeaderStyle>
+						<Style TargetType="DataGridColumnHeader">
+							<Setter Property="HorizontalContentAlignment" Value="Center" />
+							<Setter Property="FontWeight" Value="SemiBold" />
+						</Style>
+					</DataGridTemplateColumn.HeaderStyle>
+					<DataGridTemplateColumn.CellStyle>
+						<Style TargetType="DataGridCell">
+							<Setter Property="Padding" Value="4"/>
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="DataGridCell">
+										<StackPanel
                                                 Orientation="Horizontal"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center">
-                                                <!-- EDIT BUTTON -->
-                                                <Button
-                                                    Width="30"
+
+											<Button Width="30"
                                                     Height="26"
                                                     Margin="2,0"
                                                     Padding="0"
@@ -383,11 +321,10 @@
                                                     FontSize="12"
                                                     ToolTip="Tahrirlash"
                                                     Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}">
-                                                    <md:PackIcon Kind="Pencil" Width="16" Height="16"/>
-                                                </Button>
-                                                <!-- DELETE BUTTON -->
-                                                <Button
-                                                    Width="30"
+												<md:PackIcon Kind="Pencil" Width="16" Height="16"/>
+											</Button>
+
+											<Button Width="30"
                                                     Height="26"
                                                     Margin="2,0"
                                                     Padding="0"
@@ -398,17 +335,16 @@
                                                     ToolTip="O'chirish"
                                                     Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}">
-                                                    <md:PackIcon Kind="Delete" Width="16" Height="16"/>
-                                                </Button>
-                                            </StackPanel>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </DataGridTemplateColumn.CellStyle>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
-    </Grid>
+												<md:PackIcon Kind="Delete" Width="16" Height="16"/>
+											</Button>
+										</StackPanel>
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</DataGridTemplateColumn.CellStyle>
+				</DataGridTemplateColumn>
+			</DataGrid.Columns>
+		</DataGrid>
+	</Grid>
 </Page>

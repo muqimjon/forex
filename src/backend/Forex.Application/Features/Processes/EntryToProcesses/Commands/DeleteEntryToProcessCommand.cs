@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Processes.EntryToProcesses.Commands;
 
-using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Exceptions;
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities.Processes;
 using Forex.Domain.Entities.Products;
 using MediatR;

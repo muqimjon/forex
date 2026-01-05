@@ -1,9 +1,9 @@
 ﻿namespace Forex.Application.Features.Currencies.Queries;
 
 using AutoMapper;
-using Forex.Application.Commons.Extensions;
-using Forex.Application.Commons.Interfaces;
-using Forex.Application.Commons.Models;
+using Forex.Application.Common.Extensions;
+using Forex.Application.Common.Interfaces;
+using Forex.Application.Common.Models;
 using Forex.Application.Features.Currencies.DTOs;
 using MediatR;
 

@@ -13,7 +13,4 @@ public sealed record ProductRequest
     public ProductionOrigin ProductionOrigin { get; set; }
 
     public ICollection<ProductTypeRequest> ProductTypes { get; set; } = default!;
-
-    [JsonIgnore]
-    public byte[]? ImageBytes { get; set; }
 }

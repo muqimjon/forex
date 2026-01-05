@@ -1,8 +1,8 @@
 namespace Forex.Application.Features.Products.ProductEntries.Commands;
 
-using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Extensions;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Exceptions;
+using Forex.Application.Common.Extensions;
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;
 using MediatR;
@@ -17,14 +17,11 @@ public class CreateProductEntryWithImageCommandHandler(
 {
     public async Task<long> Handle(CreateProductEntryWithImageCommand request, CancellationToken cancellationToken)
     {
-        // 1. Validate Image if present (Moved from Wrapper)
         if (!string.IsNullOrWhiteSpace(request.Command.Product.ImagePath))
         {
             var exists = await fileStorage.FileExistsAsync(request.Command.Product.ImagePath, cancellationToken);
             if (!exists)
-            {
                 throw new AppException($"Image not found: {request.Command.Product.ImagePath}");
-            }
         }
 
         await context.BeginTransactionAsync(cancellationToken);
@@ -37,29 +34,21 @@ public class CreateProductEntryWithImageCommandHandler(
 
             var item = request.Command;
 
-            // Product ni olish yoki yaratish
             var product = await GetOrCreateProductAsync(item, defaultUnitMeasure, cancellationToken);
 
-            // ProductType ni olish yoki yaratish
             var productType = await GetOrCreateProductTypeAsync(item, product, defaultCurrency, cancellationToken);
 
-            // BundleItemCount va UnitPrice ni yangilash
             productType.BundleItemCount = item.BundleItemCount;
             productType.UnitPrice = item.UnitPrice;
 
-            // ProductionOrigin ni yangilash
             product.ProductionOrigin = item.ProductionOrigin;
 
-            // InProcess dan ayirish (agar mavjud bo'lsa)
             await TryDeductFromInProcessAsync(productType, item.Count, cancellationToken);
 
-            // ProductResidue ni yangilash
             var residue = await UpdateProductResidueAsync(productType, item.Count, shop, cancellationToken);
 
-            // CostPrice ni hisoblash
             var costPrice = CalculateCostPrice(productType);
 
-            // ProductEntry ni saqlash
             SaveProductEntry(item, productType, shop, residue, costPrice, defaultCurrency);
 
             await context.CommitTransactionAsync(cancellationToken);
@@ -136,25 +125,19 @@ public class CreateProductEntryWithImageCommandHandler(
         Product? product = null;
 
         if (item.Product.Id > 0)
-        {
             product = await context.Products
                 .Include(p => p.ProductTypes)
                 .FirstOrDefaultAsync(p => p.Id == item.Product.Id, ct);
-        }
 
         if (product is null && !string.IsNullOrWhiteSpace(item.Product.Code))
-        {
             product = await context.Products
                 .Include(p => p.ProductTypes)
                 .FirstOrDefaultAsync(p => p.Code == item.Product.Code, ct);
-        }
 
         if (product is null)
         {
             if (string.IsNullOrWhiteSpace(item.Product.Code) || string.IsNullOrWhiteSpace(item.Product.Name))
-            {
                 throw new AppException("Yangi mahsulot yaratish uchun Kod va Nom majburiy!");
-            }
 
             product = new Product
             {
@@ -180,9 +163,7 @@ public class CreateProductEntryWithImageCommandHandler(
             product.ProductionOrigin = item.ProductionOrigin;
 
             if (!string.IsNullOrWhiteSpace(item.Product.ImagePath))
-            {
                 product.ImagePath = item.Product.ImagePath;
-            }
         }
 
         return product;
@@ -257,9 +238,7 @@ public class CreateProductEntryWithImageCommandHandler(
             .FirstOrDefaultAsync(p => p.ProductTypeId == productType.Id, ct);
 
         if (inProcess is not null && inProcess.Count >= totalCount)
-        {
             inProcess.Count -= totalCount;
-        }
     }
 
     private async Task<ProductResidue> UpdateProductResidueAsync(
@@ -271,10 +250,8 @@ public class CreateProductEntryWithImageCommandHandler(
         ProductResidue? residue = null;
 
         if (productType.Id > 0)
-        {
             residue = await context.ProductResidues
                 .FirstOrDefaultAsync(r => r.ProductTypeId == productType.Id && r.ShopId == shop.Id, ct);
-        }
 
         if (residue is null)
         {
@@ -289,10 +266,7 @@ public class CreateProductEntryWithImageCommandHandler(
 
             productType.ProductResidue = residue;
         }
-        else
-        {
-            residue.Count += count;
-        }
+        else residue.Count += count;
 
         return residue;
     }
@@ -315,9 +289,7 @@ public class CreateProductEntryWithImageCommandHandler(
                 .FirstOrDefault();
 
             if (lastEntry is not null)
-            {
                 totalCostPrice += lastEntry.CostPrice * typeItem.Quantity;
-            }
         }
 
         return totalCostPrice;

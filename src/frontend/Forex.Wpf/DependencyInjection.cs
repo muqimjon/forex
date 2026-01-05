@@ -36,10 +36,12 @@ public static class DependencyInjection
         var assembly = Assembly.GetExecutingAssembly();
 
         // 1. Windows → Singleton
+        services.AddSingleton<MainWindow>();
+
         foreach (var window in assembly.GetTypes()
-                     .Where(t => t.IsClass && !t.IsAbstract && typeof(Window).IsAssignableFrom(t)))
+            .Where(t => typeof(Window).IsAssignableFrom(t) && t != typeof(MainWindow)))
         {
-            services.AddSingleton(window);
+            services.AddTransient(window);
         }
 
         // 2. Pages → Transient
@@ -67,8 +69,6 @@ public static class DependencyInjection
             provider.GetRequiredService<CustomerTurnoverReportViewModel>(),
             provider.GetRequiredService<CustomerSalesRatingViewModel>(),
             provider.GetRequiredService<DailyProductionReportViewModel>()
-
-
         ));
     }
 

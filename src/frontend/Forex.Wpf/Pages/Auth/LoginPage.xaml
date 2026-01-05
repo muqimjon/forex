@@ -9,7 +9,11 @@
     Title="LoginPage"
     d:DesignHeight="700"
     d:DesignWidth="800"
-    Loaded="Page_Loaded"
+    xmlns:service="clr-namespace:Forex.Wpf.Common.Services"
+    service:WindowResizeService.Width="650"
+    service:WindowResizeService.Height="700"
+    service:WindowResizeService.Always="True"
+    service:WindowResizeService.Lock="True"
     mc:Ignorable="d">
 
     <Grid>

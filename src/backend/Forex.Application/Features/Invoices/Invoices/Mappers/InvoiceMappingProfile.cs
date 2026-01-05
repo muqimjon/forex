@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Invoices.Invoices.Mappers;
 
 using AutoMapper;
-using Forex.Application.Commons.Extensions;
+using Forex.Application.Common.Extensions;
 using Forex.Application.Features.Invoices.Invoices.Commands;
 using Forex.Application.Features.Invoices.Invoices.DTOs;
 using Forex.Domain.Entities;

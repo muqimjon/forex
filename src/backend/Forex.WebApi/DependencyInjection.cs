@@ -1,7 +1,7 @@
 ﻿namespace Forex.WebApi;
 
 using Forex.Application;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Interfaces;
 using Forex.Infrastructure;
 using Forex.Infrastructure.Persistence;
 using Forex.WebApi.Conventions;

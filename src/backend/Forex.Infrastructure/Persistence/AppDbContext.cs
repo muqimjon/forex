@@ -1,6 +1,6 @@
 ﻿namespace Forex.Infrastructure.Persistence;
 
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Processes;
 using Forex.Domain.Entities.Products;
@@ -99,7 +99,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(new AuditInterceptor());
-
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

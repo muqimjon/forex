@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.OperationRecords.Queries;
 
 using AutoMapper;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Interfaces;
 using Forex.Application.Features.OperationRecords.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

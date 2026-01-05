@@ -1,9 +1,9 @@
 ﻿namespace Forex.Application.Features.Users.Commands;
 
 using AutoMapper;
-using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Extensions;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Exceptions;
+using Forex.Application.Common.Extensions;
+using Forex.Application.Common.Interfaces;
 using Forex.Application.Features.Accounts.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Enums;

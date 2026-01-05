@@ -29,9 +29,20 @@ public class NavigationService : INavigationService
 
     private void Frame_Navigated(object? sender, NavigationEventArgs e)
     {
-        if (e.Content is Page page && page.DataContext is INavigationAware aware)
-        {
+        if (e.Content is not Page page)
+            return;
+
+        if (page.DataContext is INavigationAware aware)
             aware.OnNavigatedTo();
+
+        if (page.DataContext is IWindowSizeAware size)
+        {
+            page.ResizeWindow(
+                size.WindowWidth,
+                size.WindowHeight,
+                size.Always,
+                size.LockSize,
+                center: size.Center);
         }
     }
 }

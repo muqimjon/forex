@@ -1,6 +1,6 @@
 ﻿namespace Forex.Infrastructure.Security;
 
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Interfaces;
 
 public class BcryptPasswordHasher : IPasswordHasher
 {

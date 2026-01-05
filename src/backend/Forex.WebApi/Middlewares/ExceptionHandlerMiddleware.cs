@@ -1,6 +1,6 @@
 ﻿namespace Forex.WebApi.Middlewares;
 
-using Forex.Application.Commons.Exceptions;
+using Forex.Application.Common.Exceptions;
 using Forex.WebApi.Models;
 
 public class ExceptionHandlerMiddleware(RequestDelegate next)

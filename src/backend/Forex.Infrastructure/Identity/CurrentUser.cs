@@ -1,6 +1,6 @@
 ﻿namespace Forex.Infrastructure.Identity;
 
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 

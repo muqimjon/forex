@@ -1,8 +1,8 @@
 ﻿namespace Forex.Application.Features.Sales.Commands;
 
 using AutoMapper;
-using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Exceptions;
+using Forex.Application.Common.Interfaces;
 using Forex.Application.Features.Sales.SaleItems.Commands;
 using Forex.Domain.Entities;
 using Forex.Domain.Entities.Products;

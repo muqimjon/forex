@@ -1,6 +1,6 @@
 ﻿namespace Forex.Infrastructure.Security;
 
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

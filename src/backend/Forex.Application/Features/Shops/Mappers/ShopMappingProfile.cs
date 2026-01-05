@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Shops.Mappers;
 
 using AutoMapper;
-using Forex.Application.Commons.Extensions;
+using Forex.Application.Common.Extensions;
 using Forex.Application.Features.Shops.Commands;
 using Forex.Application.Features.Shops.DTOs;
 using Forex.Domain.Entities;

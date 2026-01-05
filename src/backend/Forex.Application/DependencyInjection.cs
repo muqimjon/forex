@@ -1,7 +1,8 @@
 ﻿namespace Forex.Application;
 
 using FluentValidation;
-using Forex.Application.Commons.Validators;
+using Forex.Application.Common.Validators;
+
 using Forex.Application.Features.Users.Validators;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssemblyContaining<CreateUserCommandValidator>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
 
 
         return services;

@@ -1,6 +1,6 @@
 ﻿namespace Forex.Infrastructure.Persistence;
 
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Enums;
 using Microsoft.EntityFrameworkCore;

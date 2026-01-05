@@ -8,7 +8,7 @@ using Refit;
 public interface IApiProductEntries
 {
     [Post("/product-entries")]
-    Task<Response<long?>> Create(CreateProductEntryCommandRequest request);
+    Task<Response<long?>> Create(CreateProductEntryRequest request);
 
     [Put("/product-entries")]
     Task<Response<bool>> Update(ProductEntryRequest request);
@@ -19,9 +19,6 @@ public interface IApiProductEntries
     [Post("/product-entries/filter")]
     Task<Response<List<ProductEntryResponse>>> Filter(FilteringRequest request);
 
-    [Post("/product-entries/image-entry")]
-    Task<Response<long>> EntryWithImage(CreateProductEntryWithImageCommandRequest request);
-
-    [Get("/product-entries/presigned-url")]
-    Task<Response<PresignedUrlResponse>> GetPresignedUrl([AliasAs("extension")] string extension);
+    [Post("/product-entries/image/upload-url")]
+    Task<Response<PresignedUrlResponse>> GenerateUploadUrl([Body] GenerateUploadUrlRequest request);
 }

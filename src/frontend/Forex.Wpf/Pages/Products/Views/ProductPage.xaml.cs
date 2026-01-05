@@ -32,9 +32,7 @@ public partial class ProductPage : Page
     private void RegisterFocusNavigation()
     {
         FocusNavigator.RegisterElements([
-            dateBegin.text,
-            dateEnd.text,
-            btnRefresh,
+            date.text,
             cbxProductCode.combobox,
             cbxProductName.combobox,
             cbxProductionOrigin.combobox,
@@ -52,11 +50,6 @@ public partial class ProductPage : Page
     private void RegisterGlobalShortcuts()
     {
         ShortcutAttacher.RegisterShortcut(
-            targetButton: btnRefresh,
-            key: Key.F5
-        );
-
-        ShortcutAttacher.RegisterShortcut(
             targetButton: btnBack,
             key: Key.Escape
         );
@@ -65,11 +58,6 @@ public partial class ProductPage : Page
             targetButton: btnAdd,
             key: Key.Enter,
             modifiers: ModifierKeys.Control
-        );
-
-        ShortcutAttacher.RegisterShortcut(
-            targetButton: btnRedirectToAddPage,
-            key: Key.Add
         );
 
         ShortcutAttacher.RegisterShortcut(

@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Transactions.Commands;
 
-using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Exceptions;
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Enums;
 using MediatR;
@@ -58,6 +58,7 @@ public class DeleteTransactionCommandHandler(
 
         var amountInUZS = transaction.Amount * transaction.ExchangeRate;
         var delta = amountInUZS + transaction.Discount;
+
         if(transaction.IsIncome)
             userAccount.Balance -= delta;
         else
@@ -76,6 +77,7 @@ public class DeleteTransactionCommandHandler(
                 shopAccount.Balance -= transaction.Amount;
             else
                 shopAccount.Balance += transaction.Amount;
+
             if (shopAccount.Balance < 0)
                 throw new ConflictException("Do'kon kassasida mablag' yetarli emas!");
         }

@@ -1,8 +1,8 @@
 ﻿namespace Forex.Application.Features.Users.Commands;
 
-using Forex.Application.Commons.Exceptions;
-using Forex.Application.Commons.Extensions; // .ToNormalized() uchun
-using Forex.Application.Commons.Interfaces;
+using Forex.Application.Common.Exceptions;
+using Forex.Application.Common.Extensions; // .ToNormalized() uchun
+using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
 using Forex.Domain.Enums;
 using MediatR;

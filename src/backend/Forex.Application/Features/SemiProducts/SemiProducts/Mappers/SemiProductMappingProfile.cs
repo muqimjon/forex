@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.SemiProducts.SemiProducts.Mappers;
 
 using AutoMapper;
-using Forex.Application.Commons.Extensions;
+using Forex.Application.Common.Extensions;
 using Forex.Application.Features.SemiProducts.SemiProducts.Commands;
 using Forex.Application.Features.SemiProducts.SemiProducts.DTOs;
 using Forex.Domain.Entities.SemiProducts;

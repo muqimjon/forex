@@ -1,7 +1,7 @@
 ﻿namespace Forex.Infrastructure.Web;
 
-using Forex.Application.Commons.Interfaces;
-using Forex.Application.Commons.Models;
+using Forex.Application.Common.Interfaces;
+using Forex.Application.Common.Models;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 

@@ -9,7 +9,6 @@ using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
 using Forex.Wpf.Common.Interfaces;
 using Forex.Wpf.Pages.Common;
-using Forex.Wpf.Pages.Products.Views;
 using Forex.Wpf.ViewModels;
 using MapsterMapper;
 using System.Collections.ObjectModel;
@@ -34,8 +33,8 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
     [ObservableProperty] private ObservableCollection<ProductEntryViewModel> productEntries = [];
     [ObservableProperty] private ObservableCollection<ProductViewModel> availableProducts = [];
     public string[] ProductionOrigins { get; set; } = Enum.GetNames<ProductionOrigin>();
-    [ObservableProperty] private DateTime beginDate = DateTime.Today.AddDays(-7);
-    [ObservableProperty] private DateTime endDate = DateTime.Today;
+    [ObservableProperty] private DateTime beginDate = DateTime.Today;
+
     [ObservableProperty] private ProductEntryViewModel currentProductEntry = new();
     [ObservableProperty] private ProductEntryViewModel? selectedProductEntry = default;
     [ObservableProperty] private string selectedImageFile = string.Empty;
@@ -66,7 +65,7 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             Filters = new()
             {
                 ["producttype"] = ["include:product"],
-                ["date"] = [$">={BeginDate:o}", $"<{EndDate.AddDays(1):o}"]
+                ["date"] = [$">={BeginDate.Date:o}", $"<{BeginDate.Date.AddDays(1):o}"]
             },
             Descending = true,
             SortBy = "date"
@@ -111,6 +110,11 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
 
     #region Property Change Handlers
 
+    partial void OnBeginDateChanged(DateTime value)
+    {
+        _ = LoadProductEntriesAsync();
+    }
+
     private async void OnCurrentProductEntryPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ProductEntryViewModel.Product))
@@ -125,12 +129,6 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
     #endregion
 
     #region Commands
-
-    [RelayCommand]
-    private void RedirectToAddPage()
-    {
-        navigation.NavigateTo(new ProductEntryPage());
-    }
 
     [RelayCommand]
     private async Task FilterProductEntries()
@@ -343,9 +341,6 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
     [RelayCommand]
     private async Task Update()
     {
-        // Removed ID check to allow new entries
-
-
         if (CurrentProductEntry.Product is null)
         {
             WarningMessage = "Mahsulot tanlanmagan!";
@@ -376,67 +371,49 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
             return;
         }
 
-        // ... Validation checks ... same as before ...
-
         string? uploadedImagePath = null;
         if (!string.IsNullOrWhiteSpace(SelectedImageFile))
         {
-            try
+            uploadedImagePath = await UploadImageAsync(SelectedImageFile);
+            if (uploadedImagePath is null && !string.IsNullOrEmpty(ErrorMessage))
             {
-                var extension = System.IO.Path.GetExtension(SelectedImageFile);
-                var presignedResponse = await client.ProductEntries.GetPresignedUrl(extension);
-
-                if (presignedResponse.IsSuccess && presignedResponse.Data is not null)
-                {
-                    var fileService = new Forex.ClientService.Services.FileStorage.Minio.MinioFileStorageService(
-                        default!, // Client not needed for presigned upload
-                        default!  // Options not needed
-                    );
-
-                    using var stream = System.IO.File.OpenRead(SelectedImageFile);
-                    await fileService.UploadToPresignedUrlAsync(presignedResponse.Data.Url, stream);
-                    uploadedImagePath = presignedResponse.Data.Key;
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Rasm yuklashda xatolik: {ex.Message}";
                 return;
             }
         }
 
-        // CREATE NEW
-        if (CurrentProductEntry.Id <= 0)
+        var entryRequest = new ProductEntryRequest
         {
-            var createRequest = new CreateProductEntryWithImageCommandRequest
+            Date = CurrentProductEntry.Date,
+            Count = (int)(CurrentProductEntry.Count ?? 0),
+            BundleItemCount = (int)(CurrentProductEntry.Product.SelectedType.BundleItemCount ?? 0),
+            PreparationCostPerUnit = 0,
+            UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice ?? 0,
+            ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+            Product = new ProductRequest
             {
-                Command = new ProductEntryCommandRequest
-                {
-                    Date = CurrentProductEntry.Date,
-                    Count = (int)(CurrentProductEntry.Count ?? 0),
-                    BundleItemCount = (int)(CurrentProductEntry.Product.SelectedType.BundleItemCount ?? 0),
-                    PreparationCostPerUnit = 0,
-                    UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice ?? 0,
-                    ProductionOrigin = CurrentProductEntry.ProductionOrigin,
-                    Product = new ProductCommandRequest
-                    {
-                        Id = CurrentProductEntry.Product.Id,
-                        Code = CurrentProductEntry.Product.Code,
-                        Name = CurrentProductEntry.Product.Name,
-                        ProductionOrigin = CurrentProductEntry.ProductionOrigin,
-                        ImagePath = uploadedImagePath,
-                        ProductTypes =
-                        [
-                            new() {
-                                Id = CurrentProductEntry.Product.SelectedType.Id,
-                                Type = CurrentProductEntry.Product.SelectedType.Type
-                            }
-                        ]
+                Id = CurrentProductEntry.Product.Id,
+                Code = CurrentProductEntry.Product.Code,
+                Name = CurrentProductEntry.Product.Name,
+                ProductionOrigin = CurrentProductEntry.ProductionOrigin,
+                ImagePath = uploadedImagePath, 
+                ProductTypes =
+                [
+                    new() {
+                        Id = CurrentProductEntry.Product.SelectedType.Id,
+                        Type = CurrentProductEntry.Product.SelectedType.Type
                     }
-                }
+                ]
+            }
+        };
+
+        if (!IsEditing || CurrentProductEntry.Id <= 0)
+        {
+            var createRequest = new CreateProductEntryRequest
+            {
+                Command = entryRequest
             };
 
-            var response = await client.ProductEntries.EntryWithImage(createRequest)
+            var response = await client.ProductEntries.Create(createRequest)
                 .Handle(isLoading => IsLoading = isLoading);
 
             if (response.IsSuccess)
@@ -450,45 +427,18 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
                 ErrorMessage = response.Message ?? "Saqlashda xatolik";
             }
         }
-        // UPDATE EXISTING
         else
         {
-            var request = new ProductEntryRequest
-            {
-                Id = CurrentProductEntry.Id,
-                Date = CurrentProductEntry.Date,
-                Count = CurrentProductEntry.Count!.Value,
-                BundleItemCount = CurrentProductEntry.Product.SelectedType.BundleItemCount!.Value,
-                PreparationCostPerUnit = 0,
-                UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice!.Value,
-                ProductionOrigin = CurrentProductEntry.ProductionOrigin,
-                Product = new ProductRequest
-                {
-                    Id = CurrentProductEntry.Product.Id,
-                    Code = CurrentProductEntry.Product.Code,
-                    Name = CurrentProductEntry.Product.Name, // TODO: Image update logic if needed
-                    ProductionOrigin = CurrentProductEntry.ProductionOrigin,
-                    ProductTypes =
-                    [
-                        new() {
-                            Id = CurrentProductEntry.Product.SelectedType.Id,
-                            Type = CurrentProductEntry.Product.SelectedType.Type,
-                            BundleItemCount = (int)CurrentProductEntry.Product.SelectedType.BundleItemCount.Value,
-                            UnitPrice = CurrentProductEntry.Product.SelectedType.UnitPrice.Value,
-                            ProductTypeItems = []
-                        }
-                    ]
-                }
-            };
+            entryRequest.Id = CurrentProductEntry.Id;
 
-            var response = await client.ProductEntries.Update(request)
+            var response = await client.ProductEntries.Update(entryRequest)
                 .Handle(isLoading => IsLoading = isLoading);
 
             if (response.IsSuccess)
             {
                 SuccessMessage = "Mahsulot kirimi muvaffaqiyatli yangilandi!";
                 IsEditing = false;
-                _backupProductEntry = null; // Clear backup
+                _backupProductEntry = null;
                 ClearCurrentEntry();
                 await LoadProductEntriesAsync();
             }
@@ -497,6 +447,50 @@ public partial class ProductPageViewModel : ViewModelBase, INavigationAware
                 ErrorMessage = response.Message ?? "Mahsulot kirimini yangilashda xatolik";
             }
         }
+    }
+
+    private async Task<string?> UploadImageAsync(string filePath)
+    {
+        try
+        {
+            var extension = System.IO.Path.GetExtension(filePath);
+            var fileName = $"image{extension}";
+            
+            var presignedResponse = await client.ProductEntries.GenerateUploadUrl(new GenerateUploadUrlRequest { FileName = fileName });
+
+            if (presignedResponse.IsSuccess && presignedResponse.Data is not null)
+            {
+                using var httpClient = new System.Net.Http.HttpClient();
+                using var stream = System.IO.File.OpenRead(filePath);
+                var content = new System.Net.Http.StreamContent(stream);
+                
+                var contentType = extension.ToLowerInvariant() switch {
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    ".png" => "image/png",
+                    ".webp" => "image/webp",
+                    _ => "application/octet-stream"
+                };
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+
+                var uploadResult = await httpClient.PutAsync(presignedResponse.Data.Url, content);
+                
+                if (uploadResult.IsSuccessStatusCode)
+                {
+                    return presignedResponse.Data.Key;
+                }
+                else 
+                {
+                     ErrorMessage = $"Rasm yuklashda xatolik: {uploadResult.ReasonPhrase}";
+                     return null;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Rasm yuklashda xatolik: {ex.Message}";
+            return null;
+        }
+        return null;
     }
 
     #endregion

@@ -29,11 +29,6 @@ public partial class LoginPage : Page
             ]);
     }
 
-    private void Page_Loaded(object sender, RoutedEventArgs e)
-    {
-        this.ResizeWindow(500, 450);
-    }
-
     private async void BtnLogin_Click(object sender, RoutedEventArgs e)
     {
         lblError.Visibility = Visibility.Collapsed;

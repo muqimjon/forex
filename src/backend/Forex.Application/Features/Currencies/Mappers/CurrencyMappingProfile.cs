@@ -1,7 +1,7 @@
 ﻿namespace Forex.Application.Features.Currencies.Mappers;
 
 using AutoMapper;
-using Forex.Application.Commons.Extensions;
+using Forex.Application.Common.Extensions;
 using Forex.Application.Features.Currencies.Commands;
 using Forex.Application.Features.Currencies.DTOs;
 using Forex.Domain.Entities;

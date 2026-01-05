@@ -35,7 +35,6 @@ public partial class App : Application
         await AppHost!.StartAsync();
 
         // 2. DI konteynerdan MainWindow ni olamiz
-        // Eslatma: MainWindow xizmatlar (Services) ichida ro'yxatdan o'tgan bo'lishi kerak
         var mainWindow = AppHost.Services.GetRequiredService<Windows.MainWindow>();
 
         // 3. Oynani ko'rsatamiz
