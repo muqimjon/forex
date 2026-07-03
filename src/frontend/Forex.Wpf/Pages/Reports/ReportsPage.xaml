@@ -17,14 +17,26 @@
         <Button
             x:Name="btnBack"
             Grid.Row="0"
+            Height="38"
             Margin="0,0,0,10"
+            Padding="16,0"
             HorizontalAlignment="Right"
-            md:ButtonAssist.CornerRadius="4"
-            Background="{DynamicResource OtherBackground}"
-            BorderThickness="0"
+            md:ButtonAssist.CornerRadius="9"
+            Background="{DynamicResource SurfaceCard}"
+            BorderBrush="{DynamicResource HairlineBorder}"
+            BorderThickness="1"
             Click="BtnBack_Click"
-            Content="🔙 Orqaga"
-            ToolTip="Orqaga" />
+            Foreground="{DynamicResource InkSecondary}"
+            ToolTip="Orqaga">
+            <StackPanel Orientation="Horizontal">
+                <md:PackIcon
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center"
+                    Kind="ArrowLeft" />
+                <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="Orqaga" />
+            </StackPanel>
+        </Button>
 
         <!--  TabControl – MaterialDesign chiroyli ko‘rinishi  -->
         <md:Card
