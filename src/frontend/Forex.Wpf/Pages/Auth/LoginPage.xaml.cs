@@ -121,11 +121,6 @@ public partial class LoginPage : Page
         }
     }
 
-    private void BtnGoRegister_Click(object sender, RoutedEventArgs e)
-    {
-        NavigationService?.Navigate(new RegisterPage());
-    }
-
     public class SavedSession
     {
         public string Username { get; set; } = "";

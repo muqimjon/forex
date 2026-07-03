@@ -47,7 +47,7 @@ public static class DependencyInjection
 
     public static void UseOpenApiDocumentation(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+        if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
             app.MapScalarApiReference(opt =>
@@ -69,8 +69,17 @@ public static class DependencyInjection
         });
     }
 
+    private const string CompromisedJwtKey = "super_super_secret_key_12345_67890!@#";
+
     private static void AddJwtAuthentication(this IServiceCollection services, IConfiguration conf)
     {
+        var key = conf["Jwt:Key"];
+
+        if (string.IsNullOrWhiteSpace(key) || key.Length < 32 || key == CompromisedJwtKey)
+            throw new InvalidOperationException(
+                "Jwt:Key sozlanmagan, juda kalta yoki oshkor bo'lgan qiymat. " +
+                "Kamida 32 belgili kuchli maxfiy kalitni Jwt__Key muhit o'zgaruvchisi orqali bering.");
+
         services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -88,7 +97,7 @@ public static class DependencyInjection
                 ValidIssuer = conf["Jwt:Issuer"],
                 ValidAudience = conf["Jwt:Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(conf["Jwt:Key"]!)
+                    Encoding.UTF8.GetBytes(key)
                 )
             };
         });

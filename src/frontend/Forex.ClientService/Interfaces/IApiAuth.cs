@@ -12,7 +12,4 @@ public interface IApiAuth
 
     [Post("/api/auth/login")]
     Task<Response<LoginResponse>> Login([Body] LoginRequest request);
-
-    [Post("/api/auth/register")]
-    Task<Response<LoginResponse>> Register([Body] RegisterRequest request);
 }

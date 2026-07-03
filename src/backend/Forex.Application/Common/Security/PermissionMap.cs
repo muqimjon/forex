@@ -23,6 +23,12 @@ public static class PermissionMap
         return mask;
     }
 
+    // Har qanday ish bo'limiga ega operator (ruxsatsiz/AccessMask=0 token rad etiladi).
+    private static readonly long AnyOperational = M(
+        AccessPermissions.Sales, AccessPermissions.Returns, AccessPermissions.Payments,
+        AccessPermissions.Products, AccessPermissions.Barcode, AccessPermissions.Supply,
+        AccessPermissions.Users, AccessPermissions.Reports, AccessPermissions.Settings);
+
     public static readonly IReadOnlyDictionary<Type, long> Rules = new Dictionary<Type, long>
     {
         // ── Savdo (Sales) ──────────────────────────────────────────────
@@ -78,5 +84,20 @@ public static class PermissionMap
         // ── User boshqaruvi (Users) — Create/Delete (Update self-profil uchun ochiq) ──
         [typeof(Features.Users.Commands.CreateUserCommand)] = M(AccessPermissions.Users),
         [typeof(Features.Users.Commands.DeleteUserCommand)] = M(AccessPermissions.Users),
+
+        // User ro'yxati/tafsiloti PII va balanslarni qaytaradi — kamida bitta ish bo'limi shart
+        // (mijoz dropdownlari Savdo/To'lov/Ta'minot operatorlariga ochiq qoladi, ruxsatsiz token yopiladi).
+        [typeof(Features.Users.Queries.GetAllUsersQuery)] = AnyOperational,
+        [typeof(Features.Users.Queries.GetUserByIdQuery)] = AnyOperational,
+        [typeof(Features.Users.Queries.UserFilterQuery)] = AnyOperational,
+
+        // ── Ma'lumotnoma yozuvlari (Settings) — valyuta/kurs, do'kon, o'lchov birligi ──
+        [typeof(Features.Currencies.Commands.CreateCurrencyCommand)] = M(AccessPermissions.Settings),
+        [typeof(Features.Currencies.Commands.UpdateCurrencyCommand)] = M(AccessPermissions.Settings),
+        [typeof(Features.Currencies.Commands.UpdateAllCurrenciesCommand)] = M(AccessPermissions.Settings),
+        [typeof(Features.Shops.Commands.CreateShopCommand)] = M(AccessPermissions.Settings),
+        [typeof(Features.Shops.Commands.UpdateShopCommand)] = M(AccessPermissions.Settings),
+        [typeof(Features.UnitMeasures.Commands.CreateUnitMeasureCommand)] = M(AccessPermissions.Settings),
+        [typeof(Features.UnitMeasures.Commands.UpdateUnitMeasureCommand)] = M(AccessPermissions.Settings),
     };
 }

@@ -13,10 +13,6 @@ public class AuthController : BaseController
     public IActionResult Ping()
         => Ok(new Response { Data = "OK" });
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterCommand command)
-        => Ok(new Response { Data = await Mediator.Send(command, Ct) });
-
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
         => Ok(new Response { Data = await Mediator.Send(command, Ct) });
