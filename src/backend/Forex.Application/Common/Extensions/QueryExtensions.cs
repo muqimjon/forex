@@ -85,10 +85,15 @@ public static class QueryExtensions
 
         if (op == "in")
         {
-            var listValues = value.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(v => v.Trim())
-                .Select(v => ConversionHelper.TryConvert(v, targetType))
-                .ToList();
+            var listValues = new List<object?>();
+            foreach (var v in value.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()))
+            {
+                try { listValues.Add(ConversionHelper.TryConvert(v, targetType)); }
+                catch { }
+            }
+
+            if (listValues.Count == 0)
+                return null;
 
             var typedArray = Array.CreateInstance(targetType, listValues.Count);
 
@@ -260,18 +265,49 @@ public static class QueryExtensions
 
             foreach (var val in entry.Value)
             {
+                string? path = null;
+
                 if (val.Equals("include", StringComparison.OrdinalIgnoreCase))
-                    query = query.Include(prop.Name);
+                    path = prop.Name;
                 else if (val.StartsWith("include:", StringComparison.OrdinalIgnoreCase))
                 {
                     var segments = val["include:".Length..].Split('.')
                         .Select(s => string.IsNullOrEmpty(s) ? s : char.ToUpperInvariant(s[0]) + s[1..]);
-                    query = query.Include($"{prop.Name}.{string.Join('.', segments)}");
+                    path = $"{prop.Name}.{string.Join('.', segments)}";
                 }
+
+                // Faqat mavjud navigatsiya yo'llari — mijoz bergan noto'g'ri yo'l 500 bermaydi.
+                if (path is not null && IsValidNavigationPath(typeof(T), path))
+                    query = query.Include(path);
             }
         }
 
         return query;
+    }
+
+    private static bool IsValidNavigationPath(Type entityType, string path)
+    {
+        var current = entityType;
+
+        foreach (var segment in path.Split('.'))
+        {
+            var prop = current.GetProperty(segment,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+
+            if (prop is null)
+                return false;
+
+            var type = prop.PropertyType;
+            if (type.IsGenericType && typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
+                type = type.GetGenericArguments()[0];
+
+            if (!type.IsClass || type == typeof(string))
+                return false;
+
+            current = type;
+        }
+
+        return true;
     }
 
     #endregion

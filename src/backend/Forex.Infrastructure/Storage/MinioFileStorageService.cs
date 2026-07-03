@@ -6,15 +6,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
+using System.Text.RegularExpressions;
 
 public sealed class MinioFileStorageService : IFileStorageService
 {
-    private const int DefaultExpirySeconds = 3600;
+    private const int DefaultExpirySeconds = 600;
     private readonly MinioStorageOptions _options;
     private readonly FileUploadOptions _uploadOptions;
     private readonly IMinioClient _internalClient;
     private readonly ForexMinioClientFactory _clientFactory;
     private readonly ILogger<MinioFileStorageService> _logger;
+    private readonly Regex _tempKeyPattern;
 
     public MinioFileStorageService(
         IMinioClient internalClient,
@@ -28,6 +30,11 @@ public sealed class MinioFileStorageService : IFileStorageService
         _uploadOptions = uploadOptions.Value;
         _clientFactory = clientFactory;
         _logger = logger;
+
+        // Faqat server generatsiya qilgan shakl: {prefix}/temp/<folder>/<yyyyMMdd>/<12hex><ext>
+        _tempKeyPattern = new Regex(
+            $@"^{Regex.Escape(_options.Prefix)}/temp/[A-Za-z0-9_-]+/\d{{8}}/[0-9a-f]{{12}}\.[A-Za-z0-9]+$",
+            RegexOptions.Compiled);
     }
 
     public async Task<PresignedUploadResult> GeneratePresignedUploadUrlAsync(
@@ -166,11 +173,11 @@ public sealed class MinioFileStorageService : IFileStorageService
                 new MakeBucketArgs()
                     .WithBucket(_options.BucketName),
                 cancellationToken);
+        }
 
-            if (_options.EnablePublicRead)
-            {
-                await SetBucketPolicyAsync(cancellationToken);
-            }
+        if (_options.EnablePublicRead)
+        {
+            await SetBucketPolicyAsync(cancellationToken);
         }
     }
 
@@ -184,7 +191,7 @@ public sealed class MinioFileStorageService : IFileStorageService
                     "Effect": "Allow",
                     "Principal": {"AWS": "*"},
                     "Action": ["s3:GetObject"],
-                    "Resource": ["arn:aws:s3:::{{_options.BucketName}}/*"]
+                    "Resource": ["arn:aws:s3:::{{_options.BucketName}}/{{_options.Prefix}}/*"]
                 }
             ]
         }
@@ -213,9 +220,7 @@ public sealed class MinioFileStorageService : IFileStorageService
     }
 
     public bool IsTempKey(string? objectKey)
-        => !string.IsNullOrWhiteSpace(objectKey)
-           && objectKey.StartsWith(_options.Prefix, StringComparison.Ordinal)
-           && objectKey.Contains("/temp/", StringComparison.Ordinal);
+        => !string.IsNullOrWhiteSpace(objectKey) && _tempKeyPattern.IsMatch(objectKey);
 
     public string GetFullUrl(string? objectKey)
     {

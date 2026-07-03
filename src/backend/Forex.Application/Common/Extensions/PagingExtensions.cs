@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 public static class PagingExtensions
 {
+    private const int MaxPageSize = 500;
+    private const int MaxUnpagedItems = 10_000;
+
     public static async Task<IReadOnlyCollection<T>> ToPagedListAsync<T>(
         this IQueryable<T> query,
         FilteringRequest request,
@@ -16,10 +19,10 @@ public static class PagingExtensions
         var total = await filtered.CountAsync(cancellationToken);
 
         if (request.Page <= 0 || request.PageSize <= 0)
-            return await filtered.ToListAsync(cancellationToken);
+            return await filtered.Take(MaxUnpagedItems).ToListAsync(cancellationToken);
 
         var page = request.Page;
-        var pageSize = request.PageSize;
+        var pageSize = Math.Min(request.PageSize, MaxPageSize);
 
         var items = await filtered
             .Skip((page - 1) * pageSize)
