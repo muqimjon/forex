@@ -1,0 +1,195 @@
+<UserControl
+    x:Class="Forex.Wpf.Common.Controls.CommandPalette"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    d:DesignHeight="600"
+    d:DesignWidth="800"
+    Visibility="Collapsed"
+    PreviewKeyDown="Root_PreviewKeyDown"
+    mc:Ignorable="d">
+
+    <Grid x:Name="Backdrop" Background="{DynamicResource Scrim}" MouseDown="Backdrop_MouseDown">
+        <Border
+            Width="620"
+            MaxHeight="520"
+            Margin="0,110,0,0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            md:ElevationAssist.Elevation="Dp24"
+            Background="{DynamicResource SurfaceCard}"
+            BorderBrush="{DynamicResource HairlineBorder}"
+            BorderThickness="1"
+            CornerRadius="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--  Search  -->
+                <Grid Grid.Row="0" Height="58" Margin="18,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <md:PackIcon
+                        Grid.Column="0"
+                        Width="22"
+                        Height="22"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource InkMuted}"
+                        Kind="Magnify" />
+
+                    <Grid Grid.Column="1" Margin="12,0,0,0">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="{DynamicResource InkFaint}"
+                            IsHitTestVisible="False"
+                            Text="Buyruq yoki bo'lim qidiring…">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=search}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBox
+                            x:Name="search"
+                            VerticalContentAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            CaretBrush="{DynamicResource Accent}"
+                            FontSize="16"
+                            Foreground="{DynamicResource InkPrimary}"
+                            TextChanged="Search_TextChanged" />
+                    </Grid>
+
+                    <Border
+                        Grid.Column="2"
+                        Padding="8,3"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource SurfaceMuted}"
+                        CornerRadius="6">
+                        <TextBlock
+                            FontSize="11"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkFaint}"
+                            Text="Ctrl K" />
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="1" Height="1" Background="{DynamicResource HairlineBorder}" />
+
+                <!--  Results  -->
+                <ListBox
+                    x:Name="list"
+                    Grid.Row="2"
+                    Margin="8"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0,1" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="Item_Click" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border
+                                            x:Name="bd"
+                                            Padding="10,8"
+                                            Background="Transparent"
+                                            CornerRadius="10">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource SurfaceMuted}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentSoft}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Grid.Column="0"
+                                    Width="34"
+                                    Height="34"
+                                    Background="{DynamicResource AccentSoft}"
+                                    CornerRadius="9">
+                                    <md:PackIcon
+                                        Width="19"
+                                        Height="19"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="{DynamicResource Accent}"
+                                        Kind="{Binding Icon}" />
+                                </Border>
+
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="14.5"
+                                    Foreground="{DynamicResource InkPrimary}"
+                                    Text="{Binding Title}" />
+
+                                <TextBlock
+                                    Grid.Column="2"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{DynamicResource InkFaint}"
+                                    Text="{Binding Group}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!--  Hint bar  -->
+                <Border
+                    Grid.Row="3"
+                    Padding="16,9"
+                    Background="{DynamicResource SurfaceMuted}"
+                    BorderBrush="{DynamicResource HairlineBorder}"
+                    BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,16,16">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="12" Foreground="{DynamicResource InkFaint}" Text="↑ ↓  harakat" />
+                        <TextBlock Margin="16,0,0,0" FontSize="12" Foreground="{DynamicResource InkFaint}" Text="↵  o'tish" />
+                        <TextBlock Margin="16,0,0,0" FontSize="12" Foreground="{DynamicResource InkFaint}" Text="Esc  yopish" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

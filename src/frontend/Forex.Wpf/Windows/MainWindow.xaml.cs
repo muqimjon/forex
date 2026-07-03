@@ -5,6 +5,7 @@ using Forex.Wpf.Pages.Auth;
 using Forex.Wpf.Pages.Home;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 public partial class MainWindow : Window
 {
@@ -37,6 +38,15 @@ public partial class MainWindow : Window
         NavigateTo(new LoginPage());
     }
 
+
+    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.K && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            Palette.Toggle();
+            e.Handled = true;
+        }
+    }
 
     public void NavigateTo(Page page)
     {
