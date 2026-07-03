@@ -13,8 +13,8 @@ public static class BarcodeGenerator
         if (string.IsNullOrWhiteSpace(productType.QopBarcode))
             productType.QopBarcode = Build("Q", productType.Id);
 
-        if (string.IsNullOrWhiteSpace(productType.PachkaBarcode))
-            productType.PachkaBarcode = Build("T", productType.Id);
+        if (string.IsNullOrWhiteSpace(productType.PackBarcode))
+            productType.PackBarcode = Build("T", productType.Id);
     }
 
     private static string Build(string unit, long id)

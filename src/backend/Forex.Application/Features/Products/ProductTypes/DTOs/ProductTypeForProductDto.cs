@@ -10,11 +10,11 @@ public sealed record ProductTypeForProductDto
     public long Id { get; set; }
     public string Type { get; set; } = string.Empty;    //24-29, 30-35 , 36-41 razmeri
     public int BundleItemCount { get; set; }     // 24-29 to'plamda nechtadan mahsulot borligi
-    public int PachkaItemCount { get; set; }
+    public int PackItemCount { get; set; }
     public decimal UnitPrice { get; set; }
 
     public string? QopBarcode { get; set; }
-    public string? PachkaBarcode { get; set; }
+    public string? PackBarcode { get; set; }
 
     public long CurrencyId { get; set; }
     public CurrencyDto Currency { get; set; } = default!;

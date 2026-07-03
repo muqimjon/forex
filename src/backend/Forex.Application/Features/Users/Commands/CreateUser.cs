@@ -19,6 +19,7 @@ public record CreateUserCommand(
     string? Address,
     string? Description,
     string? Password,
+    long AccessMask,
     List<CreateUserAccountCommand> Accounts)
     : IRequest<long>;
 

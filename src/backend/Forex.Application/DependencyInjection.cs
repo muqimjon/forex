@@ -1,6 +1,7 @@
 ﻿namespace Forex.Application;
 
 using FluentValidation;
+using Forex.Application.Common.Security;
 using Forex.Application.Common.Validators;
 
 using Forex.Application.Features.Users.Validators;
@@ -17,6 +18,9 @@ public static class DependencyInjection
         services.AddAutoMapper(assembly);
 
         services.AddValidatorsFromAssemblyContaining<CreateUserCommandValidator>();
+
+        // Ruxsat tekshiruvi validatsiyadan oldin ishlaydi (huquqsiz so'rov validatsiyagacha rad etiladi).
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PermissionBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 

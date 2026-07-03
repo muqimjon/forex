@@ -16,5 +16,8 @@ public sealed record UserRequest
     public string? Password { get; set; }
     public string? TempImagePath { get; set; }
 
+    // Bo'lim ruxsatlari bitmask'i (faqat admin o'zgartira oladi).
+    public long AccessMask { get; set; }
+
     public List<UserAccount> Accounts { get; set; } = default!;
 }

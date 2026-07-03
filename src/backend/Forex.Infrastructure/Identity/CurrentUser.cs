@@ -19,4 +19,8 @@ public class CurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUse
 
     // Token ichidagi Name claim'idan loginni oladi (masalan: "admin")
     public string? Username => User?.FindFirstValue("username");
+
+    // Token ichidagi "perm" claim'idan bo'lim ruxsatlari bitmask'ini oladi (yo'q bo'lsa 0).
+    public long Permissions =>
+        long.TryParse(User?.FindFirstValue("perm"), out var mask) ? mask : 0;
 }

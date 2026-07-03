@@ -40,8 +40,8 @@ public static partial class DevKeyService
         var rawContent = $"{login}|{password}|{serialNumber}";
 
         using var aes = Aes.Create();
-        aes.Key = EncryptionKey;
-        aes.IV = InitializationVector;
+        //aes.Key = EncryptionKey;
+        //aes.IV = InitializationVector;
 
         using var encryptor = aes.CreateEncryptor();
         using var ms = new MemoryStream();
@@ -59,8 +59,8 @@ public static partial class DevKeyService
             var encryptedBytes = File.ReadAllBytes(filePath);
 
             using var aes = Aes.Create();
-            aes.Key = EncryptionKey;
-            aes.IV = InitializationVector;
+            //aes.Key = EncryptionKey;
+            //aes.IV = InitializationVector;
 
             using var decryptor = aes.CreateDecryptor();
             using var ms = new MemoryStream(encryptedBytes);

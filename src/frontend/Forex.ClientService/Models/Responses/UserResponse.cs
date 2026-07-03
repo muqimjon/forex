@@ -17,6 +17,9 @@ public sealed record UserResponse
     public string? Password { get; set; }
     public string? ProfileImageUrl { get; set; }
 
+    // Bo'lim ruxsatlari bitmask'i (login javobi va GetById shuni qaytaradi).
+    public long AccessMask { get; set; }
+
     public IList<UserAccountResponse> Accounts { get; set; } = default!;
 
     public long SettlementCurrencyId { get; set; }

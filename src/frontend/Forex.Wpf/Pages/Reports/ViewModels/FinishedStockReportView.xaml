@@ -61,6 +61,8 @@
                                 Margin="8,0,0,0"
                                 VerticalAlignment="Center"
                                 md:HintAssist.Hint="Kod yoki nom bo'yicha qidirish..."
+                                Background="Transparent"
+                                Foreground="{DynamicResource InkPrimary}"
                                 BorderThickness="0"
                                 FontSize="14"
                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />

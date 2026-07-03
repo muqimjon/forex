@@ -2,6 +2,7 @@
 
 using Forex.Application.Common.Interfaces;
 using Forex.Domain.Entities;
+using Forex.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -32,6 +33,10 @@ public class JwtTokenGenerator(IConfiguration config) : IJwtTokenGenerator
         {
             claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
         }
+
+        // Bo'lim ruxsatlari (bitmask). admin doim All oladi — o'zini qulflab qo'ymasligi uchun.
+        long permMask = user.Username == "admin" ? (long)AccessPermissions.All : user.AccessMask;
+        claims.Add(new Claim("perm", permMask.ToString()));
 
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(config["Jwt:Key"]!)

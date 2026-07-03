@@ -13,7 +13,7 @@ public class GenerateMissingBarcodesCommandHandler(IAppDbContext context)
     public async Task<int> Handle(GenerateMissingBarcodesCommand request, CancellationToken ct)
     {
         var types = await context.ProductTypes
-            .Where(t => t.QopBarcode == null || t.PachkaBarcode == null)
+            .Where(t => t.QopBarcode == null || t.PackBarcode == null)
             .ToListAsync(ct);
 
         foreach (var type in types)

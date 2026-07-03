@@ -123,6 +123,8 @@
     <SolidColorBrush x:Key="IconViolet" Color="#673AB7" />
     <SolidColorBrush x:Key="IconPink" Color="#B43E7C" />
     <SolidColorBrush x:Key="IconPinkSoft" Color="#FDECF3" />
+    <SolidColorBrush x:Key="IconBlue" Color="#1D6FB8" />
+    <SolidColorBrush x:Key="IconOrange" Color="#C2410C" />
 
     <!--  Kuchli chegara (hover/urg'u) va modal qoplama  -->
     <SolidColorBrush x:Key="BorderStrong" Color="#C7CFDD" />

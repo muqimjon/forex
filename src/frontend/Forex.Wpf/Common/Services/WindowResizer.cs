@@ -176,27 +176,40 @@ public static class WindowResizeService
         bool center,
         bool lockSize)
     {
-        var cw = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
-        var ch = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
-
-        if (Math.Abs(cw - w) < 1 && Math.Abs(ch - h) < 1)
-            return;
-
         window.SizeToContent = SizeToContent.Manual;
         window.WindowStartupLocation = WindowStartupLocation.Manual;
 
+        // LOCK holati (masalan login sahifasi): oyna doim statik o'lchamda, markazda,
+        // kattalashtirib bo'lmaydigan bo'lishi kerak — hatto avval maximize qilingan bo'lsa ham.
+        // Shu sabab animatsiyasiz, darhol qo'llaymiz va WindowState'ni Normal'ga qaytaramiz
+        // (aks holda maximize holatidan logout qilinganda oyna chap-yuqori burchakka yopishib qoladi).
         if (lockSize)
         {
+            if (window.WindowState != WindowState.Normal)
+                window.WindowState = WindowState.Normal;
+
             window.ResizeMode = ResizeMode.NoResize;
             window.MinWidth = window.MaxWidth = w;
             window.MinHeight = window.MaxHeight = h;
+            window.Width = w;
+            window.Height = h;
+
+            var area = SystemParameters.WorkArea;
+            window.Left = area.Left + (area.Width - w) / 2;
+            window.Top = area.Top + (area.Height - h) / 2;
+            return;
         }
-        else
-        {
-            window.ResizeMode = ResizeMode.CanResize;
-            window.MinWidth = window.MinHeight = 0;
-            window.MaxWidth = window.MaxHeight = double.PositiveInfinity;
-        }
+
+        // Erkin (resizable) sahifalar: avvalgidek animatsiya bilan.
+        var cw = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
+        var ch = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
+
+        window.ResizeMode = ResizeMode.CanResize;
+        window.MinWidth = window.MinHeight = 0;
+        window.MaxWidth = window.MaxHeight = double.PositiveInfinity;
+
+        if (Math.Abs(cw - w) < 1 && Math.Abs(ch - h) < 1)
+            return;
 
         Animate(window, FrameworkElement.WidthProperty, cw, w, duration);
         Animate(window, FrameworkElement.HeightProperty, ch, h, duration);

@@ -106,6 +106,8 @@
     <SolidColorBrush x:Key="IconViolet" Color="#A98BE8" />
     <SolidColorBrush x:Key="IconPink" Color="#E68AB8" />
     <SolidColorBrush x:Key="IconPinkSoft" Color="#3A2630" />
+    <SolidColorBrush x:Key="IconBlue" Color="#6BA6E8" />
+    <SolidColorBrush x:Key="IconOrange" Color="#F0885A" />
 
     <!--  Kuchli chegara va modal qoplama  -->
     <SolidColorBrush x:Key="BorderStrong" Color="#455065" />

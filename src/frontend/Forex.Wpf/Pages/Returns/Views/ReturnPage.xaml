@@ -1,0 +1,414 @@
+<Page
+    x:Class="Forex.Wpf.Pages.Returns.Views.ReturnPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Forex.Wpf.Resources.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+    x:Name="RootPage"
+    Title="ReturnPage"
+    d:DesignHeight="650"
+    d:DesignWidth="1100"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="2,0,0,4" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="{DynamicResource InkMuted}" />
+        </Style>
+
+        <Style x:Key="StatChip" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="18,12" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{DynamicResource SurfacePage}" TextElement.Foreground="{DynamicResource InkPrimary}">
+        <Grid Margin="18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!--  Header  -->
+            <Grid Grid.Row="0" Margin="2,0,2,4">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="42" Height="42" Background="{DynamicResource AccentSoft}" CornerRadius="11">
+                        <md:PackIcon
+                            Width="24" Height="24"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Foreground="{DynamicResource Accent}"
+                            Kind="KeyboardReturn" />
+                    </Border>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock FontSize="22" FontWeight="Bold" Foreground="{DynamicResource InkPrimary}" Text="Qaytarishlar" />
+                        <TextBlock FontSize="12" Foreground="{DynamicResource InkFaint}" Text="Qaytarishlar ro'yxati va dalolatnomalar" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button
+                        x:Name="btnAdd"
+                        Height="38" Margin="0,0,10,0" Padding="16,0"
+                        md:ButtonAssist.CornerRadius="9"
+                        md:ElevationAssist.Elevation="Dp2"
+                        Background="{DynamicResource SuccessStrong}"
+                        BorderThickness="0"
+                        Click="BtnAddReturn_Click"
+                        Foreground="{DynamicResource OnAccent}">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Width="18" Height="18" VerticalAlignment="Center" Kind="Plus" />
+                            <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="Yangi qaytarish" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="btnBack"
+                        Height="38" Padding="16,0"
+                        md:ButtonAssist.CornerRadius="9"
+                        Background="{DynamicResource SurfaceCard}"
+                        BorderBrush="{DynamicResource HairlineBorder}"
+                        BorderThickness="1"
+                        Click="BtnBack_Click"
+                        Foreground="{DynamicResource InkSecondary}">
+                        <StackPanel Orientation="Horizontal">
+                            <md:PackIcon Width="16" Height="16" VerticalAlignment="Center" Kind="ArrowLeft" />
+                            <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="Orqaga" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!--  Filter bar  -->
+            <Border
+                Grid.Row="1"
+                Margin="0,14,0,0" Padding="14,12"
+                Background="{DynamicResource SurfaceMuted}"
+                BorderBrush="{DynamicResource HairlineBorder}"
+                BorderThickness="1"
+                CornerRadius="11">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Boshlanish" />
+                        <controls:UserCalendar Width="120" Height="30" FontSize="14" SelectedDate="{Binding BeginDate, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                        <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Tugash" />
+                        <controls:UserCalendar Width="120" Height="30" FontSize="14" SelectedDate="{Binding EndDate, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Margin="0,0,12,0">
+                        <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Mijoz" />
+                        <controls:FloatingImageComboBox
+                            Width="220"
+                            IsEditable="True"
+                            IsTextSearchEnabled="False"
+                            ItemsSource="{Binding FilteredCustomers}"
+                            PrimaryTextMemberPath="Name"
+                            SecondaryTextMemberPath="PhoneAndAddress"
+                            SelectedItem="{Binding SelectedCustomer}"
+                            ShowImage="False"
+                            Text="{Binding CustomerSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" Margin="0,0,12,0">
+                        <TextBlock Style="{StaticResource FieldLabelStyle}" Text="" />
+                        <Button
+                            Height="30" Padding="14,0"
+                            md:ButtonAssist.CornerRadius="9"
+                            Background="{DynamicResource SurfaceCard}"
+                            BorderBrush="{DynamicResource HairlineBorder}"
+                            BorderThickness="1"
+                            Command="{Binding ClearFiltersCommand}"
+                            Foreground="{DynamicResource InkSecondary}"
+                            ToolTip="Filterlarni tozalash">
+                            <StackPanel Orientation="Horizontal">
+                                <md:PackIcon Width="16" Height="16" VerticalAlignment="Center" Kind="FilterRemoveOutline" />
+                                <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="Tozalash" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  DataGrid  -->
+            <DataGrid
+                x:Name="dataGrid"
+                Grid.Row="2"
+                Margin="0,14,0,0"
+                AutoGenerateColumns="False"
+                Background="{DynamicResource SurfaceCard}"
+                BorderBrush="{DynamicResource HairlineBorder}"
+                BorderThickness="1"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                ColumnHeaderHeight="40"
+                RowHeight="40"
+                GridLinesVisibility="Horizontal"
+                HorizontalGridLinesBrush="{DynamicResource GridLineBrush}"
+                VirtualizingStackPanel.VirtualizationMode="Standard"
+                EnableRowVirtualization="True"
+                FontSize="14"
+                HeadersVisibility="Column"
+                IsReadOnly="True"
+                ItemsSource="{Binding Returns}"
+                SelectedItem="{Binding SelectedReturn}"
+                SelectionMode="Single"
+                SelectionUnit="FullRow">
+
+                <DataGrid.InputBindings>
+                    <MouseBinding Gesture="LeftDoubleClick"
+                                  Command="{Binding PreviewReturnCommand}"
+                                  CommandParameter="{Binding SelectedReturn}" />
+                    <KeyBinding Key="Delete"
+                                Command="{Binding DeleteCommand}"
+                                CommandParameter="{Binding SelectedItem, ElementName=dataGrid}" />
+                </DataGrid.InputBindings>
+
+                <DataGrid.Resources>
+                    <Style x:Key="RightAlignedCellStyle" TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Right" />
+                        <Setter Property="Padding" Value="0,0,5,0" />
+                    </Style>
+                    <Style x:Key="CenterAlignedCellStyle" TargetType="TextBlock">
+                        <Setter Property="TextAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.ColumnHeaderStyle>
+                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="{DynamicResource GridHeaderBg}" />
+                        <Setter Property="Foreground" Value="{DynamicResource GridHeaderInk}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource HairlineBorder}" />
+                        <Setter Property="SeparatorBrush" Value="{DynamicResource HairlineBorder}" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="Padding" Value="10,0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="60" Header="T/r">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn
+                        Width="150"
+                        Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy HH:mm}}"
+                        ElementStyle="{StaticResource CenterAlignedCellStyle}"
+                        Header="Sana" />
+
+                    <DataGridTextColumn
+                        Width="2*"
+                        MinWidth="150"
+                        Binding="{Binding Customer.Name}"
+                        Header="Mijoz" />
+
+                    <DataGridTextColumn
+                        Width="*"
+                        MinWidth="100"
+                        Binding="{Binding TotalCount, StringFormat={}{0:N0}}"
+                        ElementStyle="{StaticResource RightAlignedCellStyle}"
+                        Header="Jami dona" />
+
+                    <DataGridTextColumn
+                        Width="1.2*"
+                        MinWidth="140"
+                        Binding="{Binding TotalAmount, StringFormat={}{0:N2}}"
+                        ElementStyle="{StaticResource RightAlignedCellStyle}"
+                        Header="Summa" />
+
+                    <DataGridTextColumn
+                        Width="2*"
+                        MinWidth="150"
+                        Binding="{Binding Note}"
+                        Header="Izoh" />
+
+                    <DataGridTemplateColumn Width="110" Header="Amallar">
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="4" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                                                <!--  FILE / PREVIEW  -->
+                                                <Button
+                                                    Command="{Binding DataContext.PreviewReturnCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    IsEnabled="{Binding DataContext.IsLoading, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                    Style="{StaticResource EditActionButton}"
+                                                    ToolTip="Dalolatnoma / chek">
+                                                    <md:PackIcon Width="16" Height="16" Kind="FilePdfBox" />
+                                                </Button>
+                                                <!--  DELETE  -->
+                                                <Button
+                                                    Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                    CommandParameter="{Binding}"
+                                                    IsEnabled="{Binding DataContext.IsLoading, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource InverseBoolToBoolConverter}}"
+                                                    Style="{StaticResource DeleteActionButton}"
+                                                    ToolTip="O'chirish">
+                                                    <md:PackIcon Width="16" Height="16" Kind="Delete" />
+                                                </Button>
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!--  Totals + Pagination  -->
+            <Border
+                Grid.Row="3"
+                Margin="0,14,0,0" Padding="12,10"
+                Background="{DynamicResource SurfaceCard}"
+                BorderBrush="{DynamicResource HairlineBorder}"
+                BorderThickness="1"
+                CornerRadius="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Background="{DynamicResource AccentSoft}" Style="{StaticResource StatChip}">
+                            <StackPanel>
+                                <TextBlock FontSize="12" Foreground="{DynamicResource InkSecondary}" Text="Qaytarishlar" />
+                                <TextBlock Margin="0,2,0,0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Accent}" Text="{Binding TotalCount, Mode=OneWay}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Background="{DynamicResource SuccessSoft}" Style="{StaticResource StatChip}">
+                            <StackPanel>
+                                <TextBlock FontSize="12" Foreground="{DynamicResource Success}" Text="Summa (so'm)" />
+                                <TextBlock Margin="0,2,0,0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Success}" Text="{Binding TotalReturnAmount, StringFormat={}{0:N2}, Mode=OneWay}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Background="{DynamicResource WarningSoft}" Style="{StaticResource StatChip}">
+                            <StackPanel>
+                                <TextBlock FontSize="12" Foreground="{DynamicResource Warning}" Text="Dona" />
+                                <TextBlock Margin="0,2,0,0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Warning}" Text="{Binding TotalItemsReturned, Mode=OneWay}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                        <Button
+                            Width="32" Height="32" Margin="2,0" Padding="0"
+                            md:ButtonAssist.CornerRadius="8"
+                            Background="Transparent" BorderBrush="{DynamicResource HairlineBorder}" BorderThickness="1"
+                            Command="{Binding GoToFirstPageCommand}" IsEnabled="{Binding CanGoPrevious}" ToolTip="Birinchi sahifa">
+                            <md:PackIcon Kind="ChevronDoubleLeft" />
+                        </Button>
+                        <Button
+                            Width="32" Height="32" Margin="2,0" Padding="0"
+                            md:ButtonAssist.CornerRadius="8"
+                            Background="Transparent" BorderBrush="{DynamicResource HairlineBorder}" BorderThickness="1"
+                            Command="{Binding GoToPreviousPageCommand}" IsEnabled="{Binding CanGoPrevious}" ToolTip="Oldingi sahifa">
+                            <md:PackIcon Kind="ChevronLeft" />
+                        </Button>
+
+                        <ItemsControl Margin="4,0" ItemsSource="{Binding VisiblePageNumbers}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Width="32" Height="32" Margin="1,0" Padding="0"
+                                        md:ButtonAssist.CornerRadius="8"
+                                        Command="{Binding DataContext.GoToPageCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                        CommandParameter="{Binding}"
+                                        Content="{Binding}">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource MaterialDesignFlatButton}" TargetType="Button">
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource HairlineBorder}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding}" Value="...">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                        <Setter Property="BorderThickness" Value="0" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <MultiBinding Converter="{StaticResource EqualityConverter}">
+                                                                <Binding />
+                                                                <Binding Path="DataContext.CurrentPage" RelativeSource="{RelativeSource AncestorType=Page}" />
+                                                            </MultiBinding>
+                                                        </DataTrigger.Binding>
+                                                        <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource OnAccent}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button
+                            Width="32" Height="32" Margin="2,0" Padding="0"
+                            md:ButtonAssist.CornerRadius="8"
+                            Background="Transparent" BorderBrush="{DynamicResource HairlineBorder}" BorderThickness="1"
+                            Command="{Binding GoToNextPageCommand}" IsEnabled="{Binding CanGoNext}" ToolTip="Keyingi sahifa">
+                            <md:PackIcon Kind="ChevronRight" />
+                        </Button>
+                        <Button
+                            Width="32" Height="32" Margin="2,0" Padding="0"
+                            md:ButtonAssist.CornerRadius="8"
+                            Background="Transparent" BorderBrush="{DynamicResource HairlineBorder}" BorderThickness="1"
+                            Command="{Binding GoToLastPageCommand}" IsEnabled="{Binding CanGoNext}" ToolTip="Oxirgi sahifa">
+                            <md:PackIcon Kind="ChevronDoubleRight" />
+                        </Button>
+
+                        <Border Margin="8,0,0,0" Padding="8,4"
+                                Background="{DynamicResource SurfacePage}" BorderBrush="{DynamicResource HairlineBorder}" BorderThickness="1" CornerRadius="8">
+                            <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource GridHeaderInk}">
+                                <Run Text="{Binding CurrentPage, Mode=OneWay}" />
+                                <Run Text=" / " />
+                                <Run Text="{Binding TotalPages, Mode=OneWay}" />
+                            </TextBlock>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

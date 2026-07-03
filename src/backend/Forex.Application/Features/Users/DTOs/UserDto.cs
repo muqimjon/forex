@@ -19,6 +19,9 @@ public sealed record UserDto
     public string? Password { get; set; }
     public string? ProfileImageUrl { get; set; }
 
+    // Bo'lim ruxsatlari bitmask'i (login javobi va GetById shuni qaytaradi).
+    public long AccessMask { get; set; }
+
     public long SettlementCurrencyId { get; set; }
     public CurrencyDto? SettlementCurrency { get; set; }
 

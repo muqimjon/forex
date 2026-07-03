@@ -122,7 +122,7 @@ public class UpdateSaleCommandHandler(
         var baseRate = currency is null || currency.IsDefault || currency.ExchangeRate == 0 ? 1m : currency.ExchangeRate;
         sale.BaseAmount = sale.TotalAmount * baseRate;
 
-        var description = await GenerateDescriptionAsync(saleItems, currencyCode, ct);
+        var description = await GenerateDescriptionAsync(saleItems, currencyCode, sale.Note, ct);
 
         var (rate, _) = await context.ApplyToSettlementAsync(
             sale.CustomerId, sale.CurrencyId, 1m, -sale.TotalAmount, ct);
@@ -140,9 +140,13 @@ public class UpdateSaleCommandHandler(
         context.Sales.Update(sale);
     }
 
-    private async Task<string> GenerateDescriptionAsync(List<SaleItem> saleItems, string currencyCode, CancellationToken ct)
+    private async Task<string> GenerateDescriptionAsync(List<SaleItem> saleItems, string currencyCode, string? note, CancellationToken ct)
     {
         var text = new StringBuilder();
+
+        // Birinchi qator — operatsiya savdo ekanini va izohni bildiradi; tagida mahsulotlar keladi.
+        text.AppendLine(string.IsNullOrWhiteSpace(note) ? "Savdo:" : $"Savdo: {note}");
+
         var productTypeIds = saleItems.Select(i => i.ProductTypeId).ToList();
 
         var productTypes = await context.ProductTypes
@@ -158,7 +162,7 @@ public class UpdateSaleCommandHandler(
             text.AppendLine($"Kodi: {productType.Product.Code} ({productType.Type}), Soni: {item.TotalCount}, Narxi: {item.UnitPrice}, Jami: {item.Amount} {currencyCode}");
         }
 
-        return text.ToString();
+        return text.ToString().TrimEnd();
     }
 
     private async Task<List<ProductResidue>> LoadProductResiduesAsync(List<long> productTypeIds, CancellationToken ct)
@@ -179,15 +183,14 @@ public class UpdateSaleCommandHandler(
             var residue = residues.FirstOrDefault(r => r.ProductTypeId == cmd.ProductTypeId)
                 ?? throw new NotFoundException(nameof(ProductResidue), nameof(cmd.ProductTypeId), cmd.ProductTypeId);
 
-            var entry = residue.ProductEntries.OrderByDescending(e => e.Date).FirstOrDefault()
-                ?? throw new NotFoundException(nameof(ProductEntry), nameof(residue.ProductTypeId), residue.ProductTypeId);
-
-            var totalCount = cmd.BundleCount * entry.BundleItemCount;
+            // Bundle size comes from the ProductType, not the last intake — no ProductEntry dependency.
+            var bundleItemCount = residue.ProductType.BundleItemCount;
+            var totalCount = cmd.BundleCount * bundleItemCount;
 
             items.Add(new SaleItem
             {
                 BundleCount = cmd.BundleCount,
-                BundleItemCount = entry.BundleItemCount,
+                BundleItemCount = bundleItemCount,
                 TotalCount = totalCount,
                 UnitPrice = cmd.UnitPrice,
                 Amount = cmd.Amount,
@@ -216,10 +219,7 @@ public class UpdateSaleCommandHandler(
         {
             var residue = residues.First(r => r.ProductTypeId == cmd.ProductTypeId);
 
-            var entry = residue.ProductEntries.OrderByDescending(e => e.Date).FirstOrDefault()
-                ?? throw new NotFoundException(nameof(ProductEntry), nameof(residue.ProductTypeId), residue.ProductTypeId);
-
-            var totalCount = cmd.BundleCount * entry.BundleItemCount;
+            var totalCount = cmd.BundleCount * residue.ProductType.BundleItemCount;
 
             if (residue.Count < totalCount)
                 throw new ForbiddenException($"Do'konda yetarli mahsulot mavjud emas, jami mahsulot soni {residue.Count}");

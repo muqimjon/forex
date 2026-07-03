@@ -34,6 +34,7 @@
                 Background="Transparent"
                 BorderThickness="0"
                 Foreground="{DynamicResource PrimaryTextColor}"
+                Style="{StaticResource MaterialDesignComboBox}"
                 md:TextFieldAssist.DecorationVisibility="Collapsed"
                 FontSize="14"
                 GotFocus="ComboBox_GotFocus"

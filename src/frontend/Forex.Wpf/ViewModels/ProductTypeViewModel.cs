@@ -10,10 +10,10 @@ public partial class ProductTypeViewModel : ViewModelBase
     public long ProductId { get; set; }
     [ObservableProperty] private string type = string.Empty;
     [ObservableProperty] private int? bundleItemCount;
-    [ObservableProperty] private int? pachkaItemCount;
+    [ObservableProperty] private int? packItemCount;
     [ObservableProperty] private decimal? unitPrice;
     [ObservableProperty] private string? qopBarcode;
-    [ObservableProperty] private string? pachkaBarcode;
+    [ObservableProperty] private string? packBarcode;
     [ObservableProperty] private ProductResidueResponse productResidue = default!;
     [ObservableProperty] private ICollection<ProductEntryResponse> productEntries = default!;
     [ObservableProperty] private bool isNew;

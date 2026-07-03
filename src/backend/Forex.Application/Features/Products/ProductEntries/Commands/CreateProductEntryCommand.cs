@@ -15,7 +15,7 @@ public class CreateProductEntryCommand : IRequest<long>
     public DateTime Date { get; set; }
     public int Count { get; set; }
     public int BundleItemCount { get; set; }
-    public int PachkaItemCount { get; set; }
+    public int PackItemCount { get; set; }
     public decimal PreparationCostPerUnit { get; set; }
     public decimal UnitPrice { get; set; }
     public ProductionOrigin ProductionOrigin { get; set; }
@@ -55,8 +55,8 @@ public class CreateProductEntryCommandHandler(
             var productType = await GetOrCreateProductTypeAsync(request, product, defaultCurrency, cancellationToken);
 
             productType.BundleItemCount = request.BundleItemCount;
-            if (request.PachkaItemCount > 0)
-                productType.PachkaItemCount = request.PachkaItemCount;
+            if (request.PackItemCount > 0)
+                productType.PackItemCount = request.PackItemCount;
             productType.UnitPrice = request.UnitPrice;
 
             product.ProductionOrigin = request.ProductionOrigin;

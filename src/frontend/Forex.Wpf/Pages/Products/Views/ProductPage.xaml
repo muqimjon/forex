@@ -32,6 +32,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -106,6 +107,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="120" />
                         <ColumnDefinition Width="*" MaxWidth="120" />
+                        <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -210,8 +212,16 @@
                     Text="{Binding CurrentProductEntry.BundleItemCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                     <controls:FloatingInput
-                    x:Name="tbxQuantity"
+                    x:Name="tbxPackItemCount"
                     Grid.Column="7"
+                    Margin="2,0"
+                    Label="To'plamda"
+                    IsReadOnly="{Binding CurrentProduct.SelectedType.Id, Converter={StaticResource NumberToBoolConverter}}"
+                    Text="{Binding CurrentProductEntry.PackItemCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <controls:FloatingInput
+                    x:Name="tbxQuantity"
+                    Grid.Column="8"
                     Margin="2,0"
                     IsReadOnly="True"
                     Label="Jami soni"
@@ -219,14 +229,14 @@
 
                     <controls:FloatingInput
                     x:Name="tbxCostPrice"
-                    Grid.Column="8"
+                    Grid.Column="9"
                     Margin="2,0"
                     Label="Tan narxi"
                     Text="{Binding CurrentProductEntry.UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0:N0}}" />
 
                     <controls:FloatingFileInput
                     x:Name="fileInput"
-                    Grid.Column="9"
+                    Grid.Column="10"
                     Margin="2,0"
                     MinWidth="100"
                     MaxWidth="150"
@@ -236,7 +246,7 @@
 
                     <Button
                     x:Name="btnAdd"
-                    Grid.Column="10"
+                    Grid.Column="11"
                     Height="32"
                     Margin="2,0,0,0"
                     Padding="16,0"
@@ -254,7 +264,7 @@
 
                     <Button
                     x:Name="btnCancel"
-                    Grid.Column="11"
+                    Grid.Column="12"
                     Height="32"
                     Margin="6,0,0,0"
                     Padding="14,0"
@@ -274,9 +284,209 @@
                 </Grid>
             </Border>
 
-            <!--  Filter bar  -->
+            <!--  Batch savat: skaner bilan jamlangan kirimlar (bo'sh bo'lsa yashiriladi)  -->
             <Border
                 Grid.Row="2"
+                Margin="0,14,0,0"
+                Padding="12,10"
+                Background="{DynamicResource SurfaceCard}"
+                BorderBrush="{DynamicResource Accent}"
+                BorderThickness="1.5"
+                CornerRadius="12"
+                md:ElevationAssist.Elevation="Dp1"
+                Visibility="{Binding HasCartItems, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Savat sarlavhasi + statistika + amallar  -->
+                    <Grid Grid.Row="0" Margin="2,0,2,8">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <md:PackIcon
+                                Width="20" Height="20"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource Accent}"
+                                Kind="CartArrowDown" />
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="15" FontWeight="SemiBold"
+                                Foreground="{DynamicResource InkPrimary}"
+                                Text="Jamlangan kirimlar (savat)" />
+                            <Border
+                                Margin="10,0,0,0" Padding="9,2"
+                                VerticalAlignment="Center"
+                                Background="{DynamicResource AccentSoft}"
+                                CornerRadius="8">
+                                <TextBlock FontSize="12" Foreground="{DynamicResource Accent}">
+                                    <Run Text="{Binding CartRowsCount, Mode=OneWay}" /><Run Text=" qator · " /><Run Text="{Binding CartTotalBundles, Mode=OneWay}" /><Run Text=" qop · " /><Run Text="{Binding CartTotalCount, StringFormat={}{0:N0}, Mode=OneWay}" /><Run Text=" dona · " /><Run Text="{Binding CartTotalValue, StringFormat={}{0:N0}, Mode=OneWay}" /><Run Text=" so'm" />
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button
+                                Height="32" Margin="0,0,8,0" Padding="12,0"
+                                md:ButtonAssist.CornerRadius="9"
+                                Background="{DynamicResource SurfaceCard}"
+                                BorderBrush="{DynamicResource Danger}"
+                                BorderThickness="1"
+                                Command="{Binding ClearCartCommand}"
+                                Foreground="{DynamicResource Danger}"
+                                ToolTip="Savatni tozalash">
+                                <StackPanel Orientation="Horizontal">
+                                    <md:PackIcon Width="16" Height="16" VerticalAlignment="Center" Kind="TrashCanOutline" />
+                                    <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="Tozalash" />
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                Height="32" Padding="18,0"
+                                md:ButtonAssist.CornerRadius="9"
+                                Background="{DynamicResource SuccessStrong}"
+                                BorderThickness="0"
+                                Command="{Binding SubmitBatchCommand}"
+                                Foreground="{DynamicResource OnAccent}"
+                                FontWeight="SemiBold">
+                                <StackPanel Orientation="Horizontal">
+                                    <md:PackIcon Width="16" Height="16" VerticalAlignment="Center" Kind="CheckBold" />
+                                    <TextBlock Margin="6,0,0,0" VerticalAlignment="Center">
+                                        <Run Text="Yakunlash (" /><Run Text="{Binding CartRowsCount, Mode=OneWay}" /><Run Text=")" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <DataGrid
+                        Grid.Row="1"
+                        MaxHeight="240"
+                        AutoGenerateColumns="False"
+                        Background="{DynamicResource SurfaceCard}"
+                        BorderBrush="{DynamicResource HairlineBorder}"
+                        BorderThickness="1"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        ColumnHeaderHeight="36"
+                        RowHeight="38"
+                        FontSize="14"
+                        GridLinesVisibility="Horizontal"
+                        HorizontalGridLinesBrush="{DynamicResource GridLineBrush}"
+                        ItemsSource="{Binding CartEntries}"
+                        HeadersVisibility="Column"
+                        AlternatingRowBackground="{DynamicResource SurfaceMuted}"
+                        SelectionMode="Single"
+                        SelectionUnit="Cell"
+                        IsReadOnly="False">
+
+                        <DataGrid.Resources>
+                            <Style x:Key="CartRightCell" TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right" />
+                                <Setter Property="Padding" Value="0,0,6,0" />
+                            </Style>
+                            <Style x:Key="CartCenterCell" TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center" />
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="{DynamicResource GridHeaderBg}" />
+                                <Setter Property="Foreground" Value="{DynamicResource GridHeaderInk}" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="Padding" Value="10,0" />
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Width="50" Header="T/r" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Text="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexConverter}}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn
+                                Width="100"
+                                Binding="{Binding ProductType.Product.Code}"
+                                Header="Kod"
+                                IsReadOnly="True" />
+
+                            <DataGridTextColumn
+                                Width="1.4*"
+                                MinWidth="110"
+                                Binding="{Binding ProductType.Product.Name}"
+                                Header="Nomi"
+                                IsReadOnly="True" />
+
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding ProductType.Type}"
+                                ElementStyle="{StaticResource CartCenterCell}"
+                                Header="Razmer"
+                                IsReadOnly="True" />
+
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding BundleCount, UpdateSourceTrigger=LostFocus}"
+                                ElementStyle="{StaticResource CartRightCell}"
+                                Header="Qop soni" />
+
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding BundleItemCount, StringFormat={}{0:N0}}"
+                                ElementStyle="{StaticResource CartRightCell}"
+                                Header="Donasi"
+                                IsReadOnly="True" />
+
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Count, StringFormat={}{0:N0}}"
+                                ElementStyle="{StaticResource CartRightCell}"
+                                Header="Jami soni"
+                                IsReadOnly="True" />
+
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding UnitPrice, UpdateSourceTrigger=LostFocus}"
+                                ElementStyle="{StaticResource CartRightCell}"
+                                Header="Tan narxi" />
+
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding TotalAmount, StringFormat={}{0:N0}}"
+                                ElementStyle="{StaticResource CartRightCell}"
+                                Header="Jami summa"
+                                IsReadOnly="True" />
+
+                            <DataGridTemplateColumn Width="56" Header="" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Command="{Binding DataContext.RemoveCartLineCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource DeleteActionButton}"
+                                            ToolTip="Savatdan olib tashlash">
+                                            <md:PackIcon Width="16" Height="16" Kind="Delete" />
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <!--  Filter bar  -->
+            <Border
+                Grid.Row="3"
                 Margin="0,14,0,0"
                 Padding="14,12"
                 Background="{DynamicResource SurfaceMuted}"
@@ -388,8 +598,8 @@
                 </Grid>
             </Border>
 
-            <!--  DataGrid  -->
-            <DataGrid Grid.Row="3"
+            <!--  DataGrid (kirim tarixi)  -->
+            <DataGrid Grid.Row="4"
                 x:Name="dataGrid"
                 Margin="0,14,0,0"
                 AutoGenerateColumns="False"
@@ -536,7 +746,7 @@
 
             <!--  Totals + Pagination  -->
             <Border
-                Grid.Row="4"
+                Grid.Row="5"
                 Margin="0,14,0,0"
                 Padding="12,10"
                 Background="{DynamicResource SurfaceCard}"

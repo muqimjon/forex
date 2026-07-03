@@ -138,7 +138,7 @@ public class UpdateProductCommandHandler(
 
                     existingType.Type = typeCmd.Type;
                     existingType.BundleItemCount = typeCmd.BundleItemCount;
-                    existingType.PachkaItemCount = typeCmd.PachkaItemCount;
+                    existingType.PackItemCount = typeCmd.PackItemCount;
                     existingType.UnitPrice = typeCmd.UnitPrice;
                 }
                 else
@@ -157,7 +157,7 @@ public class UpdateProductCommandHandler(
                     {
                         Type = typeCmd.Type,
                         BundleItemCount = typeCmd.BundleItemCount,
-                        PachkaItemCount = typeCmd.PachkaItemCount,
+                        PackItemCount = typeCmd.PackItemCount,
                         UnitPrice = typeCmd.UnitPrice,
                         ProductId = product.Id,
                         Product = product,
@@ -172,7 +172,7 @@ public class UpdateProductCommandHandler(
             await context.SaveAsync(ct);
 
             var typesNeedingBarcode = await context.ProductTypes
-                .Where(t => t.ProductId == product.Id && (t.QopBarcode == null || t.PachkaBarcode == null))
+                .Where(t => t.ProductId == product.Id && (t.QopBarcode == null || t.PackBarcode == null))
                 .ToListAsync(ct);
 
             foreach (var productType in typesNeedingBarcode)

@@ -68,6 +68,7 @@ public partial class ProductPageViewModel : ViewModelBase
         CurrentProduct = new();
         ProductEntriesView = CollectionViewSource.GetDefaultView(_productEntries);
         ProductEntriesView.Filter = obj => obj is ProductEntryViewModel e && MatchesSearch(e);
+        CartEntries.CollectionChanged += (_, _) => RecalculateCartTotals();
         _ = LoadDataAsync();
     }
 
@@ -76,6 +77,16 @@ public partial class ProductPageViewModel : ViewModelBase
     [ObservableProperty] private string productType = string.Empty;
     [ObservableProperty] private string productCode = string.Empty;
     [ObservableProperty] private ProductEntryViewModel currentProductEntry;
+
+    // ── Batch (jamlash) kirim savati ──────────────────────────────────────────
+    // Skaner qilinganda mahsulotlar shu savatga jamlanadi (har skanerda qop +1);
+    // "Yakunlash" bosilganda savatdagi barcha qatorlar serverga kirim qilinadi.
+    [ObservableProperty] private ObservableCollection<ProductEntryViewModel> cartEntries = [];
+    [ObservableProperty] private int cartRowsCount;
+    [ObservableProperty] private int cartTotalBundles;
+    [ObservableProperty] private int cartTotalCount;
+    [ObservableProperty] private decimal cartTotalValue;
+    public bool HasCartItems => CartEntries.Count > 0;
 
     public static IEnumerable<ProductionOrigin> ProductionOrigins => Enum.GetValues<ProductionOrigin>();
 
@@ -476,8 +487,10 @@ public partial class ProductPageViewModel : ViewModelBase
 
     #region Commands
 
+    // Skaner: barkodni topib savatga qo'shadi. Shu tur allaqachon savatda bo'lsa — qop soni +1,
+    // aks holda yangi qator (1 qop). Forma to'ldirilmaydi — tez ketma-ket skaner qilish uchun.
     [RelayCommand]
-    private void ScanFill(string? code)
+    private void ScanToCart(string? code)
     {
         var match = BarcodeResolver.Resolve(AvailableProducts, code);
         if (match is null)
@@ -486,11 +499,156 @@ public partial class ProductPageViewModel : ViewModelBase
             return;
         }
 
-        IsNewProductMode = false;
-        CurrentProduct = match.Product;
-        match.Product.SelectedType = match.ProductType;
-        ProductType = match.ProductType.Type;
-        ProductCode = match.Product.Code ?? string.Empty;
+        var product = match.Product;
+        var type = match.ProductType;
+        type.Product ??= product;
+
+        var existing = CartEntries.FirstOrDefault(e => e.ProductType?.Id == type.Id && type.Id > 0);
+        if (existing is not null)
+        {
+            existing.BundleCount = (existing.BundleCount ?? 0) + 1;
+        }
+        else
+        {
+            var entry = new ProductEntryViewModel
+            {
+                ProductType = type,
+                BundleItemCount = type.BundleItemCount,
+                PackItemCount = type.PackItemCount,
+                BundleCount = 1,
+                UnitPrice = type.UnitPrice,
+                ProductionOrigin = product.ProductionOrigin,
+                Date = CurrentProductEntry.Date
+            };
+            entry.Count = (entry.BundleCount ?? 0) * (entry.BundleItemCount ?? 0);
+            entry.TotalAmount = (entry.Count ?? 0) * (entry.UnitPrice ?? 0);
+            entry.PropertyChanged += OnCartEntryPropertyChanged;
+            CartEntries.Add(entry);
+        }
+
+        RecalculateCartTotals();
+        InfoMessage = $"Savatga qo'shildi: {product.Code} {type.Type}";
+    }
+
+    private void OnCartEntryPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not ProductEntryViewModel entry) return;
+
+        if (e.PropertyName is nameof(ProductEntryViewModel.BundleCount) or nameof(ProductEntryViewModel.BundleItemCount))
+        {
+            var count = (entry.BundleCount ?? 0) * (entry.BundleItemCount ?? 0);
+            if (entry.Count != count) { entry.Count = count; return; } // Count o'zgarishi qайta triggerlaydi
+        }
+
+        if (e.PropertyName is nameof(ProductEntryViewModel.Count) or nameof(ProductEntryViewModel.UnitPrice))
+            entry.TotalAmount = (entry.Count ?? 0) * (entry.UnitPrice ?? 0);
+
+        RecalculateCartTotals();
+    }
+
+    private void RecalculateCartTotals()
+    {
+        CartRowsCount = CartEntries.Count;
+        CartTotalBundles = CartEntries.Sum(e => e.BundleCount ?? 0);
+        CartTotalCount = CartEntries.Sum(e => e.Count ?? 0);
+        CartTotalValue = CartEntries.Sum(e => (e.Count ?? 0) * (e.UnitPrice ?? 0));
+        OnPropertyChanged(nameof(HasCartItems));
+    }
+
+    [RelayCommand]
+    private void RemoveCartLine(ProductEntryViewModel? entry)
+    {
+        if (entry is null) return;
+        entry.PropertyChanged -= OnCartEntryPropertyChanged;
+        CartEntries.Remove(entry);
+        RecalculateCartTotals();
+    }
+
+    [RelayCommand]
+    private void ClearCart()
+    {
+        if (CartEntries.Count == 0) return;
+        if (!Confirm("Savatdagi barcha qatorlarni tozalamoqchimisiz?")) return;
+
+        foreach (var e in CartEntries)
+            e.PropertyChanged -= OnCartEntryPropertyChanged;
+        CartEntries.Clear();
+        RecalculateCartTotals();
+    }
+
+    // Savatdagi barcha qatorlarni serverga kirim qiladi (backendda batch endpoint yo'q — birma-bir).
+    [RelayCommand]
+    private async Task SubmitBatch()
+    {
+        if (CartEntries.Count == 0)
+        {
+            WarningMessage = "Savat bo'sh!";
+            return;
+        }
+
+        var invalid = CartEntries.FirstOrDefault(e => (e.Count ?? 0) <= 0);
+        if (invalid is not null)
+        {
+            WarningMessage = $"'{invalid.ProductType?.Product?.Code} {invalid.ProductType?.Type}' — son noto'g'ri kiritilgan!";
+            return;
+        }
+
+        var lines = CartEntries.ToList();
+        var succeeded = new List<ProductEntryViewModel>();
+        var failed = new List<string>();
+
+        IsLoading = true;
+        try
+        {
+            foreach (var line in lines)
+            {
+                var type = line.ProductType;
+                var product = type?.Product;
+                if (type is null || product is null) { failed.Add("(noma'lum)"); continue; }
+
+                var req = new ProductEntryRequest
+                {
+                    Date = line.Date.Date == DateTime.Today ? DateTime.Now : line.Date,
+                    Count = line.Count ?? 0,
+                    BundleItemCount = line.BundleItemCount ?? 0,
+                    PackItemCount = line.PackItemCount ?? 0,
+                    UnitPrice = line.UnitPrice ?? 0,
+                    ProductionOrigin = line.ProductionOrigin ?? default,
+                    ProductTypeId = type.Id > 0 ? type.Id : null,
+                    Product = mapper.Map<ProductRequest>(product)
+                };
+                req.Product.ProductTypes = [type.Adapt<ProductTypeRequest>()];
+
+                var response = await client.ProductEntries.Create(req).Handle();
+                if (response.IsSuccess)
+                {
+                    line.Id = response.Data;
+                    line.Date = req.Date;
+                    line.PropertyChanged -= OnCartEntryPropertyChanged;
+                    _productEntries.Insert(0, line);
+                    succeeded.Add(line);
+                }
+                else
+                {
+                    failed.Add($"{product.Code} {type.Type}");
+                }
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+
+        foreach (var line in succeeded)
+            CartEntries.Remove(line);
+        RecalculateCartTotals();
+
+        if (failed.Count == 0)
+            SuccessMessage = $"{succeeded.Count} ta kirim muvaffaqiyatli saqlandi!";
+        else
+            ErrorMessage = $"{succeeded.Count} ta saqlandi, {failed.Count} tasida xatolik: {string.Join(", ", failed)}";
+
+        _ = LoadProductSummaryAsync();
     }
 
     [RelayCommand]
@@ -689,6 +847,7 @@ public partial class ProductPageViewModel : ViewModelBase
         {
             CurrentProductEntry.UnitPrice = CurrentProduct.SelectedType.UnitPrice;
             CurrentProductEntry.BundleItemCount = CurrentProduct.SelectedType.BundleItemCount;
+            CurrentProductEntry.PackItemCount = CurrentProduct.SelectedType.PackItemCount;
 
             if (CurrentProductEntry.BundleCount.HasValue && CurrentProductEntry.BundleItemCount.HasValue)
                 CurrentProductEntry.Count = CurrentProductEntry.BundleCount * CurrentProductEntry.BundleItemCount;

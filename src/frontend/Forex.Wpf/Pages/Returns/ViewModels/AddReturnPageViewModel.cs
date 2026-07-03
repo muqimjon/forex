@@ -6,6 +6,7 @@ using Forex.ClientService;
 using Forex.ClientService.Extensions;
 using Forex.ClientService.Models.Commons;
 using Forex.ClientService.Models.Requests;
+using Forex.ClientService.Models.Responses;
 using Forex.Wpf.Common.Interfaces;
 using Forex.Wpf.Common.Services;
 using Forex.Wpf.Pages.Common;
@@ -38,6 +39,15 @@ public partial class AddReturnPageViewModel : ViewModelBase
     private static readonly HttpClient _httpClient = new();
 
     private readonly Task? _initializationTask;
+
+    // Hujjatning zamonaviy rang palitrasi (savdo hujjati bilan bir xil — slate)
+    private static readonly Color DocInk = Color.FromRgb(0x1E, 0x29, 0x3B);
+    private static readonly Color DocMuted = Color.FromRgb(0x64, 0x74, 0x8B);
+    private static readonly Color DocLine = Color.FromRgb(0xD2, 0xDA, 0xE5);
+    private static readonly Color DocHeaderBg = Color.FromRgb(0xF1, 0xF5, 0xF9);
+    private static readonly Color DocHeaderFg = Color.FromRgb(0x47, 0x55, 0x69);
+    private static readonly Color DocAccent = Color.FromRgb(0x25, 0x63, 0xEB);
+    private static readonly Color DocZebra = Color.FromRgb(0xFA, 0xFB, 0xFC);
 
     public AddReturnPageViewModel(ForexClient client, IMapper mapper, INavigationService navigation, ReturnSessionService saleSession)
     {
@@ -82,7 +92,7 @@ public partial class AddReturnPageViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<SaleItemViewModel> saleItems = [];
     [ObservableProperty] private SaleItemViewModel? selectedSaleItem = default;
 
-    [ObservableProperty] private ObservableCollection<string> returnUnits = ["Qop", "Pachka", "Dona"];
+    [ObservableProperty] private ObservableCollection<string> returnUnits = ["Qop", "To'plam", "Dona"];
     [ObservableProperty] private string selectedReturnUnit = "Qop";
 
     [ObservableProperty] private UserViewModel? customer;
@@ -146,7 +156,41 @@ public partial class AddReturnPageViewModel : ViewModelBase
         if (e.PropertyName == nameof(SaleItemViewModel.Amount))
             RecalculateTotals();
         else if (e.PropertyName == nameof(SaleItemViewModel.ProductType))
+        {
             ConvertCurrentItemPrice();
+            // Razmer o'zgarsa, entry-row "Jami soni" ni tanlangan birlik bo'yicha qayta hisoblaymiz.
+            if (ReferenceEquals(sender, CurrentSaleItem) && !IsEditingItem)
+                RecalcCurrentItemTotal();
+        }
+        // Entry-row: miqdor kiritilganda "Jami soni" = miqdor × birlikdagi juft (Qop/To'plam/Dona bo'yicha).
+        // SaleItemViewModel'ning qop-asosli avto-hisobini shu yerda tuzatamiz.
+        else if (e.PropertyName == nameof(SaleItemViewModel.BundleCount)
+                 && ReferenceEquals(sender, CurrentSaleItem) && !IsEditingItem)
+        {
+            RecalcCurrentItemTotal();
+        }
+    }
+
+    // Entry-row uchun tanlangan birlik (Qop/To'plam/Dona) bo'yicha juft sonini hisoblaydi.
+    private void RecalcCurrentItemTotal()
+    {
+        var type = CurrentSaleItem.ProductType;
+        if (type is null) return;
+
+        var pairsPerUnit = SelectedReturnUnit switch
+        {
+            "To'plam" => type.PackItemCount ?? 0,
+            "Dona" => 1,
+            _ => type.BundleItemCount ?? 0
+        };
+
+        CurrentSaleItem.TotalCount = (CurrentSaleItem.BundleCount ?? 0) * pairsPerUnit;
+    }
+
+    partial void OnSelectedReturnUnitChanged(string value)
+    {
+        if (!IsEditingItem)
+            RecalcCurrentItemTotal();
     }
 
     partial void OnExchangeRateChanged(decimal? value)
@@ -514,6 +558,110 @@ public partial class AddReturnPageViewModel : ViewModelBase
         RecalculateTotals();
     }
 
+    // Qaytarishlar ro'yxatidan tanlangan qaytarishni yuklaydi (chek/dalolatnoma generatsiya qilish uchun).
+    public async Task LoadReturnForEditAsync(long returnId)
+    {
+        await EnsureInitializedAsync();
+
+        EditingSaleId = returnId;
+
+        SaleItems = new ObservableCollection<SaleItemViewModel>();
+        SaleItems.CollectionChanged += (s, e) => RecalculateTotals();
+
+        FilteringRequest request = new()
+        {
+            Filters = new()
+            {
+                ["id"] = [returnId.ToString()],
+                ["customer"] = ["include"],
+                ["returnItems"] = ["include:productType.product"]
+            }
+        };
+
+        var response = await client.Returns.Filter(request).Handle(isLoading => IsLoading = isLoading);
+
+        if (!response.IsSuccess || response.Data is null || response.Data.Count == 0)
+        {
+            ErrorMessage = response.Message ?? "Qaytarishni yuklashda xatolik!";
+            EditingSaleId = 0;
+            return;
+        }
+
+        var ret = response.Data.First();
+        Date = ret.Date;
+        Note = ret.Note ?? string.Empty;
+
+        var customer = AvailableCustomers.FirstOrDefault(c => c.Id == ret.CustomerId);
+        if (customer is not null) Customer = customer;
+
+        if (ret.ReturnItems is not null)
+        {
+            foreach (var ri in ret.ReturnItems)
+            {
+                var ptResp = ri.ProductType;
+                var pResp = ptResp?.Product;
+
+                ProductViewModel? productVM = null;
+                if (ptResp != null)
+                    productVM = AvailableProducts.FirstOrDefault(p => p.Id == ptResp.ProductId);
+                if (productVM == null && pResp != null)
+                {
+                    productVM = mapper.Map<ProductViewModel>(pResp);
+                    productVM.ProductTypes ??= [];
+                    AvailableProducts.Add(productVM);
+                }
+
+                ProductTypeViewModel? typeVM = null;
+                if (productVM != null && ptResp != null)
+                {
+                    typeVM = productVM.ProductTypes?.FirstOrDefault(pt => pt.Id == ptResp.Id);
+                    if (typeVM == null)
+                    {
+                        typeVM = mapper.Map<ProductTypeViewModel>(ptResp);
+                        productVM.ProductTypes ??= [];
+                        productVM.ProductTypes.Add(typeVM);
+                    }
+                }
+
+                if (productVM == null || typeVM == null) continue;
+
+                var item = new SaleItemViewModel
+                {
+                    Product = productVM,
+                    ProductType = typeVM,
+                    Unit = InferReturnUnit(ri, typeVM),
+                    BundleCount = ri.BundleCount,
+                    BundleItemCount = ri.BundleItemCount,
+                    TotalCount = ri.TotalCount,
+                    RestockCount = ri.RestockCount,
+                    UnitPrice = ri.UnitPrice,
+                    Amount = ri.Amount
+                };
+
+                item.PropertyChanged += SaleItemPropertyChanged;
+                SaleItems.Add(item);
+            }
+        }
+
+        RecalculateTotals();
+    }
+
+    // Saqlangan qaytarish qatoridan birlikni (Qop/To'plam/Dona) tiklaydi.
+    // RestockCount>0 → qop; aks holda birlikdagi juft soni orqali aniqlanadi.
+    private static string InferReturnUnit(ReturnItemResponse ri, ProductTypeViewModel type)
+    {
+        if (ri.RestockCount > 0) return "Qop";
+        if (ri.BundleItemCount <= 1) return "Dona";
+
+        var pack = type.PackItemCount ?? 0;
+        if (pack > 0 && ri.BundleItemCount == pack) return "To'plam";
+
+        var bundle = type.BundleItemCount ?? 0;
+        if (bundle > 0 && ri.BundleItemCount == bundle) return "Qop";
+
+        return "To'plam";
+    }
+
     #endregion Load data
 
     #region Commands
@@ -541,7 +689,7 @@ public partial class AddReturnPageViewModel : ViewModelBase
         var isQop = match.Unit == BarcodeUnit.Qop;
         var pairs = isQop
             ? match.ProductType.BundleItemCount ?? 0
-            : match.ProductType.PachkaItemCount ?? 0;
+            : match.ProductType.PackItemCount ?? 0;
 
         if (pairs <= 0)
         {
@@ -549,7 +697,8 @@ public partial class AddReturnPageViewModel : ViewModelBase
             return;
         }
 
-        AddReturnLine(match.Product, match.ProductType, pairs, isQop ? pairs : 0, null);
+        // Har skaner = 1 birlik (qop yoki to'plam).
+        AddReturnLine(match.Product, match.ProductType, isQop ? "Qop" : "To'plam", 1, pairs, isQop ? pairs : 0, null);
     }
 
     [RelayCommand]
@@ -580,7 +729,7 @@ public partial class AddReturnPageViewModel : ViewModelBase
         var isQop = SelectedReturnUnit == "Qop";
         var pairsPerUnit = SelectedReturnUnit switch
         {
-            "Pachka" => CurrentSaleItem.ProductType.PachkaItemCount ?? 0,
+            "To'plam" => CurrentSaleItem.ProductType.PackItemCount ?? 0,
             "Dona" => 1,
             _ => CurrentSaleItem.ProductType.BundleItemCount ?? 0
         };
@@ -592,7 +741,7 @@ public partial class AddReturnPageViewModel : ViewModelBase
         }
 
         var totalPairs = quantity * pairsPerUnit;
-        AddReturnLine(CurrentSaleItem.Product, CurrentSaleItem.ProductType, totalPairs, isQop ? totalPairs : 0, CurrentSaleItem.UnitPrice);
+        AddReturnLine(CurrentSaleItem.Product, CurrentSaleItem.ProductType, SelectedReturnUnit, quantity, pairsPerUnit, isQop ? totalPairs : 0, CurrentSaleItem.UnitPrice);
 
         IsEditingItem = false;
         OriginalItemIndex = -1;
@@ -600,23 +749,34 @@ public partial class AddReturnPageViewModel : ViewModelBase
         ClearCurrentSaleItem();
     }
 
-    private void AddReturnLine(ProductViewModel product, ProductTypeViewModel type, int totalPairs, int restockPairs, decimal? unitPrice)
+    // Qaytarish qatori — birlik (Qop/To'plam/Dona) bo'yicha alohida saqlanadi.
+    // Jami juft = miqdor × birlikdagi juft. TotalCount juft-asosli (asosiy manba);
+    // BundleCount faqat birlikdagi miqdorni ko'rsatish uchun (SaleItemViewModel'ning qop-asosli
+    // avto-hisobini bekor qilish uchun TotalCount undan keyin qayta o'rnatiladi).
+    private void AddReturnLine(ProductViewModel product, ProductTypeViewModel type, string unit, int quantity, int pairsPerUnit, int restockPairs, decimal? unitPrice)
     {
+        var totalPairs = quantity * pairsPerUnit;
         if (totalPairs <= 0) return;
 
-        var existing = SaleItems.FirstOrDefault(s => s.ProductType?.Id == type.Id);
+        var existing = SaleItems.FirstOrDefault(s => s.ProductType?.Id == type.Id && s.Unit == unit);
         if (existing is not null)
         {
-            existing.TotalCount = (existing.TotalCount ?? 0) + totalPairs;
-            existing.RestockCount = (existing.RestockCount ?? 0) + restockPairs;
+            var newTotal = (existing.TotalCount ?? 0) + totalPairs;
+            var newRestock = (existing.RestockCount ?? 0) + restockPairs;
+            existing.BundleCount = (existing.BundleCount ?? 0) + quantity; // qop-asosli avto-hisobni ishga tushiradi
+            existing.BundleItemCount = pairsPerUnit;
+            existing.TotalCount = newTotal;                                 // to'g'ri juft sonini tiklaymiz
+            existing.RestockCount = newRestock;
         }
         else
         {
-            var item = new SaleItemViewModel { Product = product, ProductType = type };
+            var item = new SaleItemViewModel { Product = product, ProductType = type, Unit = unit };
 
             var price = unitPrice ?? ConvertSomToCustomer(type.UnitPrice);
             if (price is not null) item.UnitPrice = price;
 
+            item.BundleCount = quantity;
+            item.BundleItemCount = pairsPerUnit;
             item.TotalCount = totalPairs;
             item.RestockCount = restockPairs;
             item.PropertyChanged += SaleItemPropertyChanged;
@@ -660,10 +820,10 @@ public partial class AddReturnPageViewModel : ViewModelBase
             OriginalItemIndex = SaleItems.IndexOf(SelectedSaleItem);
             IsEditingItem = true;
 
-            SelectedReturnUnit = "Dona";
+            SelectedReturnUnit = SelectedSaleItem.Unit ?? "Dona";
             CurrentSaleItem.Product = SelectedSaleItem.Product;
             CurrentSaleItem.ProductType = SelectedSaleItem.ProductType;
-            CurrentSaleItem.BundleCount = SelectedSaleItem.TotalCount;
+            CurrentSaleItem.BundleCount = SelectedSaleItem.BundleCount ?? SelectedSaleItem.TotalCount;
             CurrentSaleItem.UnitPrice = SelectedSaleItem.UnitPrice;
             CurrentSaleItem.Amount = SelectedSaleItem.Amount;
             CurrentSaleItem.TotalCount = SelectedSaleItem.TotalCount;
@@ -1006,11 +1166,13 @@ public partial class AddReturnPageViewModel : ViewModelBase
         const double pageWidth = 793.7;
         const double pageHeight = 1122.5;
         const double margin = 25;
-        const double footerSpace = 60;
 
-        // 8 ta ustun: T/r, Rasm, Kod/Nomi (birlashgan), Razmer, Qop soni, Jami soni, Narxi, Jami summa
-        string[] headers = { "T/r", "Rasm", "Kod / Nomi", "Razmer", "Qop soni", "Jami soni", "Narxi", "Jami summa" };
-        double[] widths = { 35, 140, 130, 75, 75, 85, 90, 113.7 };
+        // Oxirgi betda JAMI + mijoz qoldig'i qatori uchun zaxira balandlik.
+        double footerSpace = Customer?.Balance is not null ? 110 : 70;
+
+        // 9 ta ustun: T/r, Rasm, Kod/Nomi (birlashgan), Razmer, Birlik, Miqdor, Jami soni, Narxi, Jami summa
+        string[] headers = { "T/r", "Rasm", "Kod / Nomi", "Razmer", "Birlik", "Miqdor", "Jami soni", "Narxi", "Jami summa" };
+        double[] widths = { 32, 118, 120, 62, 58, 58, 68, 85, 142.7 };
         double tableWidth = pageWidth - margin * 2;
 
         decimal grandTotalAmount = SaleItems.Sum(x => x.Amount ?? 0);
@@ -1041,24 +1203,52 @@ public partial class AddReturnPageViewModel : ViewModelBase
                 var title = new TextBlock
                 {
                     Text = "Qaytarilgan mahsulotlar ro'yxati",
-                    FontSize = 20,
-                    FontWeight = FontWeights.ExtraBold,
+                    FontSize = 19,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = new SolidColorBrush(DocInk),
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    Margin = new Thickness(0, 0, 0, 5)
+                    Margin = new Thickness(0, 0, 0, 10)
                 };
                 title.Measure(new Size(tableWidth, double.PositiveInfinity));
                 container.Children.Add(title);
-                currentY += title.DesiredSize.Height + 5;
+                currentY += title.DesiredSize.Height + 10;
 
-                var info = new TextBlock
+                var infoGrid = new Grid { Margin = new Thickness(0, 0, 0, 8) };
+                infoGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                infoGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                var cust = new TextBlock { FontSize = 13, VerticalAlignment = VerticalAlignment.Center };
+                cust.Inlines.Add(new Run("Mijoz: ") { Foreground = new SolidColorBrush(DocMuted) });
+                cust.Inlines.Add(new Run((Customer?.Name ?? "Naqd").ToUpper()) { Foreground = new SolidColorBrush(DocInk), FontWeight = FontWeights.SemiBold });
+
+                var dt = new TextBlock { FontSize = 13, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
+                dt.Inlines.Add(new Run("Sana: ") { Foreground = new SolidColorBrush(DocMuted) });
+                dt.Inlines.Add(new Run($"{Date:dd.MM.yyyy}") { Foreground = new SolidColorBrush(DocInk), FontWeight = FontWeights.SemiBold });
+                Grid.SetColumn(dt, 1);
+
+                infoGrid.Children.Add(cust);
+                infoGrid.Children.Add(dt);
+                infoGrid.Measure(new Size(tableWidth, double.PositiveInfinity));
+                container.Children.Add(infoGrid);
+                currentY += infoGrid.DesiredSize.Height + 8;
+
+                // "Qaytarildi: {izoh}" — hujjat qaytarish ekanini bildiradi; tagida mahsulotlar keladi.
+                var noteBlock = new TextBlock { FontSize = 13, Margin = new Thickness(0, 0, 0, 8), TextWrapping = TextWrapping.Wrap };
+                noteBlock.Inlines.Add(new Run("Qaytarildi: ") { Foreground = new SolidColorBrush(DocMuted) });
+                noteBlock.Inlines.Add(new Run(string.IsNullOrWhiteSpace(Note) ? "—" : Note) { Foreground = new SolidColorBrush(DocInk), FontWeight = FontWeights.SemiBold });
+                noteBlock.Measure(new Size(tableWidth, double.PositiveInfinity));
+                container.Children.Add(noteBlock);
+                currentY += noteBlock.DesiredSize.Height + 8;
+
+                var divider = new Border
                 {
-                    Text = $"Mijoz: {Customer?.Name.ToUpper() ?? "Naqd"} | Sana: {Date:dd.MM.yyyy}",
-                    FontSize = 14,
-                    Margin = new Thickness(0, 0, 0, 10)
+                    Height = 2,
+                    Background = new SolidColorBrush(DocAccent),
+                    CornerRadius = new CornerRadius(1),
+                    Margin = new Thickness(0, 0, 0, 12)
                 };
-                info.Measure(new Size(tableWidth, double.PositiveInfinity));
-                container.Children.Add(info);
-                currentY += info.DesiredSize.Height + 10;
+                container.Children.Add(divider);
+                currentY += 14;
             }
 
             var grid = new Grid { Width = tableWidth };
@@ -1149,12 +1339,13 @@ public partial class AddReturnPageViewModel : ViewModelBase
                         isFirstInGroup = false;
                     }
                     
-                    // Ustunlar 1 ga kamaydi: Razmer=3, Qop soni=4, Jami soni=5, Narxi=6, Jami summa=7
+                    // 9 ustun: Razmer=3, Birlik=4, Miqdor=5, Jami soni=6, Narxi=7, Jami summa=8
                     AddCellToGrid(grid, item.ProductType?.Type ?? "", gridRow, 3, false, TextAlignment.Center);
-                    AddCellToGrid(grid, item.BundleCount?.ToString("N0") ?? "0", gridRow, 4, false, TextAlignment.Right);
-                    AddCellToGrid(grid, item.TotalCount?.ToString("N0") ?? "0", gridRow, 5, false, TextAlignment.Right);
-                    AddCellToGrid(grid, item.UnitPrice?.ToString("N2") ?? "0.00", gridRow, 6, false, TextAlignment.Right);
-                    AddCellToGrid(grid, item.Amount?.ToString("N2") ?? "0.00", gridRow, 7, false, TextAlignment.Right);
+                    AddCellToGrid(grid, item.Unit ?? "", gridRow, 4, false, TextAlignment.Center);
+                    AddCellToGrid(grid, item.BundleCount?.ToString("N0") ?? "0", gridRow, 5, false, TextAlignment.Right);
+                    AddCellToGrid(grid, item.TotalCount?.ToString("N0") ?? "0", gridRow, 6, false, TextAlignment.Right);
+                    AddCellToGrid(grid, item.UnitPrice?.ToString("N2") ?? "0.00", gridRow, 7, false, TextAlignment.Right);
+                    AddCellToGrid(grid, item.Amount?.ToString("N2") ?? "0.00", gridRow, 8, false, TextAlignment.Right);
 
                     gridRow++;
                     globalTr++;
@@ -1166,31 +1357,34 @@ public partial class AddReturnPageViewModel : ViewModelBase
             {
                 grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(35) });
 
-                // 8 ta ustun: JAMI 0-3 ustunlarni egallaydi (4 ta ustun)
+                var totalBg = new SolidColorBrush(DocHeaderBg);
+
+                // JAMI: 0-4 ustunlar (5 ta)
                 var totalLabel = CreateCell("JAMI:", true, TextAlignment.Right);
-                totalLabel.Background = new SolidColorBrush(Color.FromRgb(245, 245, 245));
+                totalLabel.Background = totalBg;
                 Grid.SetRow(totalLabel, gridRow);
                 Grid.SetColumn(totalLabel, 0);
-                Grid.SetColumnSpan(totalLabel, 4);
+                Grid.SetColumnSpan(totalLabel, 5);
                 grid.Children.Add(totalLabel);
 
-                // Qop soni: index 4, Jami soni: index 5
-                AddCellToGrid(grid, grandTotalBundle.ToString("N0"), gridRow, 4, true, TextAlignment.Right);
-                AddCellToGrid(grid, grandTotalCount.ToString("N0"), gridRow, 5, true, TextAlignment.Right);
+                // Miqdor: index 5, Jami soni: index 6
+                AddCellToGrid(grid, grandTotalBundle.ToString("N0"), gridRow, 5, true, TextAlignment.Right);
+                AddCellToGrid(grid, grandTotalCount.ToString("N0"), gridRow, 6, true, TextAlignment.Right);
 
-                // Narxi va Jami summa: 6-7 ustunlar (2 ta ustun)
+                // Narxi + Jami summa: 7-8 ustunlar (2 ta)
                 var totalSumCell = CreateCell(grandTotalAmount.ToString("N2"), true, TextAlignment.Right);
-                totalSumCell.Background = new SolidColorBrush(Color.FromRgb(245, 245, 245));
+                totalSumCell.Background = totalBg;
                 Grid.SetRow(totalSumCell, gridRow);
-                Grid.SetColumn(totalSumCell, 6);
+                Grid.SetColumn(totalSumCell, 7);
                 Grid.SetColumnSpan(totalSumCell, 2);
-                
+
                 if (totalSumCell.Child is TextBlock tbSum)
                 {
                     tbSum.FontSize = 14;
-                    tbSum.Foreground = new SolidColorBrush(Color.FromRgb(0, 50, 150));
+                    tbSum.FontWeight = FontWeights.Bold;
+                    tbSum.Foreground = new SolidColorBrush(DocAccent);
                 }
-                
+
                 grid.Children.Add(totalSumCell);
                 gridRow++;
                 
@@ -1203,7 +1397,7 @@ public partial class AddReturnPageViewModel : ViewModelBase
                     balanceLabel.Background = new SolidColorBrush(Color.FromRgb(230, 240, 255));
                     Grid.SetRow(balanceLabel, gridRow);
                     Grid.SetColumn(balanceLabel, 0);
-                    Grid.SetColumnSpan(balanceLabel, 6);
+                    Grid.SetColumnSpan(balanceLabel, 7);
                     grid.Children.Add(balanceLabel);
                     
                     var balanceValue = Customer.Balance.Value + grandTotalAmount;
@@ -1214,7 +1408,7 @@ public partial class AddReturnPageViewModel : ViewModelBase
                     var balanceCell = CreateCell(balanceText, true, TextAlignment.Right);
                     balanceCell.Background = new SolidColorBrush(Color.FromRgb(230, 240, 255));
                     Grid.SetRow(balanceCell, gridRow);
-                    Grid.SetColumn(balanceCell, 6);
+                    Grid.SetColumn(balanceCell, 7);
                     Grid.SetColumnSpan(balanceCell, 2);
                     
                     if (balanceCell.Child is TextBlock tbBal)
@@ -1261,11 +1455,12 @@ public partial class AddReturnPageViewModel : ViewModelBase
         var cells = new[]
         {
             ($"{item.Product?.Code ?? string.Empty}\n{item.Product?.Name ?? string.Empty}", widths[2]),
-            (item.ProductType?.Type ?? "",                               widths[3]),
-            (item.BundleCount?.ToString("N0") ?? "0",      widths[4]),
-            (item.TotalCount?.ToString("N0")  ?? "0",      widths[5]),
-            (item.UnitPrice?.ToString("N2")   ?? "0.00",   widths[6]),
-            (item.Amount?.ToString("N2")      ?? "0.00",   widths[7]),
+            (item.ProductType?.Type ?? "",                 widths[3]),
+            (item.Unit ?? "",                              widths[4]),
+            (item.BundleCount?.ToString("N0") ?? "0",      widths[5]),
+            (item.TotalCount?.ToString("N0")  ?? "0",      widths[6]),
+            (item.UnitPrice?.ToString("N2")   ?? "0.00",   widths[7]),
+            (item.Amount?.ToString("N2")      ?? "0.00",   widths[8]),
         };
 
         foreach (var (text, width) in cells)
@@ -1355,12 +1550,12 @@ public partial class AddReturnPageViewModel : ViewModelBase
     {
         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-        // 8 ta ustun: T/r, Rasm, Kod/Nomi, Razmer, Qop soni, Jami soni, Narxi, Jami summa
+        // 9 ta ustun: T/r, Rasm, Kod/Nomi, Razmer, Birlik, Miqdor, Jami soni, Narxi, Jami summa
         TextAlignment[] alignments =
         {
             TextAlignment.Center, TextAlignment.Center, TextAlignment.Left,
-            TextAlignment.Center, TextAlignment.Right, TextAlignment.Right,
-            TextAlignment.Right, TextAlignment.Right
+            TextAlignment.Center, TextAlignment.Center, TextAlignment.Right,
+            TextAlignment.Right, TextAlignment.Right, TextAlignment.Right
         };
 
         for (int i = 0; i < values.Length; i++)
@@ -1377,17 +1572,18 @@ public partial class AddReturnPageViewModel : ViewModelBase
     {
         var border = new Border
         {
-            BorderBrush = Brushes.Gray,
+            BorderBrush = new SolidColorBrush(DocLine),
             BorderThickness = new Thickness(0.5),
-            Background = isHeader ? new SolidColorBrush(Color.FromRgb(235, 235, 235)) : Brushes.White,
+            Background = isHeader ? new SolidColorBrush(DocHeaderBg) : Brushes.White,
             Padding = new Thickness(4, 5, 4, 5)
         };
 
         var tb = new TextBlock
         {
             Text = text,
-            FontSize = isHeader ? 13 : 12,
-            FontWeight = isHeader ? FontWeights.Bold : FontWeights.Normal,
+            FontSize = isHeader ? 12.5 : 12,
+            FontWeight = isHeader ? FontWeights.SemiBold : FontWeights.Normal,
+            Foreground = isHeader ? new SolidColorBrush(DocHeaderFg) : new SolidColorBrush(DocInk),
             TextAlignment = alignment,
             VerticalAlignment = VerticalAlignment.Center
         };

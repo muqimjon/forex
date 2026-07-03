@@ -57,7 +57,7 @@ public class CreateReturnCommandHandler(
             var baseRate = currency is null || currency.IsDefault || currency.ExchangeRate == 0 ? 1m : currency.ExchangeRate;
             @return.BaseAmount = @return.TotalAmount * baseRate;
 
-            var description = await GenerateDescription(returnItems, currencyCode, ct);
+            var description = await GenerateDescription(returnItems, currencyCode, @return.Note, ct);
 
             var (rate, _) = await context.ApplyToSettlementAsync(
                 @return.CustomerId, @return.CurrencyId, 1m, @return.TotalAmount, ct);
@@ -83,9 +83,13 @@ public class CreateReturnCommandHandler(
         }
     }
 
-    private async Task<string> GenerateDescription(List<ReturnItem> returnItems, string currencyCode, CancellationToken ct)
+    private async Task<string> GenerateDescription(List<ReturnItem> returnItems, string currencyCode, string? note, CancellationToken ct)
     {
         var text = new StringBuilder();
+
+        // Birinchi qator — operatsiya qaytarish ekanini va izohni bildiradi; tagida mahsulotlar keladi.
+        text.AppendLine(string.IsNullOrWhiteSpace(note) ? "Qaytarildi:" : $"Qaytarildi: {note}");
+
         var productTypeIds = returnItems.Select(i => i.ProductTypeId).ToList();
 
         var productTypes = await context.ProductTypes
@@ -98,7 +102,7 @@ public class CreateReturnCommandHandler(
             var productType = productTypes.FirstOrDefault(pt => pt.Id == item.ProductTypeId)
                 ?? throw new NotFoundException(nameof(ProductType), nameof(item.ProductTypeId), item.ProductTypeId);
 
-            text.AppendLine($"Qaytarildi — Kodi: {productType.Product.Code} ({productType.Type}), Soni: {item.TotalCount}, Narxi: {item.UnitPrice}, Jami: {item.Amount} {currencyCode}");
+            text.AppendLine($"Kodi: {productType.Product.Code} ({productType.Type}), Soni: {item.TotalCount}, Narxi: {item.UnitPrice}, Jami: {item.Amount} {currencyCode}");
         }
 
         return text.ToString().TrimEnd();

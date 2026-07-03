@@ -64,6 +64,7 @@
                             Background="Transparent"
                             BorderThickness="0"
                             Click="BtnNotifications_Click"
+                            Visibility="{Binding CanReports, Converter={StaticResource BoolToVisibilityConverter}}"
                             ToolTip="Bildirishnomalar">
                             <Grid>
                                 <md:PackIcon
@@ -323,11 +324,14 @@
             <WrapPanel Margin="35,20">
                 <Button
                     x:Name="btnSale"
+                    Visibility="{Binding CanSales, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
                     Background="{DynamicResource Teal}"
                     Click="BtnSale_Click"
                     FontSize="24"
@@ -339,11 +343,14 @@
 
                 <Button
                     x:Name="btnReturn"
+                    Visibility="{Binding CanReturns, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
                     Background="{DynamicResource Warning}"
                     Click="BtnReturn_Click"
                     FontSize="24"
@@ -355,12 +362,15 @@
 
                 <Button
                     x:Name="btnCash"
+                    Visibility="{Binding CanPayments, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
-                    Background="{DynamicResource Teal}"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
+                    Background="{DynamicResource IconBlue}"
                     Click="BtnCash_Click"
                     FontSize="24"
                     FontWeight="Medium"
@@ -371,11 +381,14 @@
 
                 <Button
                     x:Name="btnProduct"
+                    Visibility="{Binding CanProducts, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
                     Background="{DynamicResource Success}"
                     Click="BtnProduct_Click"
                     FontSize="24"
@@ -387,12 +400,15 @@
 
                 <Button
                     x:Name="btnBarcode"
+                    Visibility="{Binding CanBarcode, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
-                    Background="{DynamicResource Teal}"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
+                    Background="{DynamicResource IconPink}"
                     Click="BtnBarcode_Click"
                     FontSize="24"
                     FontWeight="Medium"
@@ -403,11 +419,14 @@
 
                 <Button
                     x:Name="btnSupply"
+                    Visibility="{Binding CanSupply, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
                     Background="{DynamicResource IconViolet}"
                     Click="BtnSupply_Click"
                     FontSize="24"
@@ -419,11 +438,14 @@
 
                 <Button
                     x:Name="btnUser"
+                    Visibility="{Binding CanUsers, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
                     Background="{DynamicResource Accent}"
                     Click="BtnUser_Click"
                     FontSize="24"
@@ -435,12 +457,15 @@
 
                 <Button
                     x:Name="btnReports"
+                    Visibility="{Binding CanReports, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
-                    Background="{DynamicResource IconViolet}"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
+                    Background="{DynamicResource IconOrange}"
                     Click="btnReports_Click"
                     FontSize="24"
                     FontWeight="Medium"
@@ -451,11 +476,14 @@
 
                 <Button
                     x:Name="btnSettings"
+                    Visibility="{Binding CanSettings, Converter={StaticResource BoolToVisibilityConverter}}"
                     Height="120"
                     MinWidth="220"
                     Margin="10"
                     md:ButtonAssist.CornerRadius="10"
                     md:ElevationAssist.Elevation="Dp24"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
                     Background="{DynamicResource Danger}"
                     Click="BtnSettings_Click"
                     FontSize="24"

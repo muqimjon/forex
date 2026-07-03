@@ -17,7 +17,17 @@ public static class LabelPrintService
     private const double MmToDip = 96.0 / 25.4;
     private const int MaxCopies = 500;
 
-    public static bool Print(IReadOnlyCollection<LabelItem> labels, string? printerName, int copies, double widthMm = 60, double heightMm = 40)
+    // Physical thermal label size (Xprinter XP-365B, 203 DPI). Roll: 58×40 mm.
+    private const double DefaultWidthMm = 58;
+    private const double DefaultHeightMm = 40;
+
+    // Fine-tune horizontal placement on the label (positive = shift content right, mm).
+    private const double HorizontalOffsetMm = 5.5;
+
+    // The printer feeds labels head-first, so the artwork must be rotated 180° to read upright.
+    private const double RotationDegrees = 180;
+
+    public static bool Print(IReadOnlyCollection<LabelItem> labels, string? printerName, int copies, double widthMm = DefaultWidthMm, double heightMm = DefaultHeightMm)
     {
         var valid = labels.Where(l => !string.IsNullOrWhiteSpace(l.Barcode)).ToList();
         if (valid.Count == 0)
@@ -53,7 +63,8 @@ public static class LabelPrintService
 
         try
         {
-            new PrintDialog { PrintQueue = queue }
+            var ticket = BuildTicket(queue, widthMm, heightMm);
+            new PrintDialog { PrintQueue = queue, PrintTicket = ticket }
                 .PrintDocument(BuildDocument(valid, Math.Clamp(copies, 1, MaxCopies), widthMm, heightMm).DocumentPaginator, "Yorliqlar");
         }
         catch (Exception ex)
@@ -65,7 +76,38 @@ public static class LabelPrintService
         return true;
     }
 
-    public static void ShowPreview(IReadOnlyCollection<LabelItem> labels, string? printerName, double widthMm = 60, double heightMm = 40)
+    // Tells the driver the exact label media size (in DIPs) so it feeds one 58×40 mm
+    // label per page from the left origin — otherwise the driver falls back to its wide
+    // default media, shifting content sideways and letting barcodes drift across the gap.
+    private static PrintTicket BuildTicket(PrintQueue queue, double widthMm, double heightMm)
+    {
+        var ticket = queue.DefaultPrintTicket ?? queue.UserPrintTicket ?? new PrintTicket();
+
+        ticket.PageMediaSize = new PageMediaSize(widthMm * MmToDip, heightMm * MmToDip);
+        ticket.PageOrientation = PageOrientation.Portrait;
+        ticket.OutputColor = OutputColor.Monochrome;
+        ticket.PageResolution = new PageResolution(203, 203);
+        ticket.PageBorderless = PageBorderless.Borderless;
+        ticket.CopyCount = 1;
+
+        try
+        {
+            var result = queue.MergeAndValidatePrintTicket(queue.DefaultPrintTicket, ticket);
+            if (result.ValidatedPrintTicket is not null)
+            {
+                result.ValidatedPrintTicket.PageMediaSize = new PageMediaSize(widthMm * MmToDip, heightMm * MmToDip);
+                return result.ValidatedPrintTicket;
+            }
+        }
+        catch
+        {
+            // Driver rejected validation — fall back to the raw ticket below.
+        }
+
+        return ticket;
+    }
+
+    public static void ShowPreview(IReadOnlyCollection<LabelItem> labels, string? printerName, double widthMm = DefaultWidthMm, double heightMm = DefaultHeightMm)
     {
         var valid = labels.Where(l => !string.IsNullOrWhiteSpace(l.Barcode)).ToList();
         if (valid.Count == 0)
@@ -142,7 +184,8 @@ public static class LabelPrintService
 
         foreach (var label in labels)
         {
-            var barcode = BarcodeImageService.Render(label.Barcode!);
+            // Render at high resolution so the bars stay crisp when scaled to the 203 DPI head.
+            var barcode = BarcodeImageService.Render(label.Barcode!, 600, 200);
             for (var i = 0; i < copies; i++)
             {
                 var page = new FixedPage { Width = pageWidth, Height = pageHeight, Background = Brushes.White };
@@ -159,25 +202,31 @@ public static class LabelPrintService
 
     private static UIElement BuildLabel(LabelItem label, ImageSource barcode, double pageWidth, double pageHeight)
     {
-        var ink = new SolidColorBrush(Color.FromRgb(0x12, 0x18, 0x22));
+        var ink = new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x00));
 
-        var panel = new StackPanel
-        {
-            Width = pageWidth - 10,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        };
+        // ~1.6 mm safe margin on every side keeps content off the label edges/gap.
+        var margin = 1.6 * MmToDip;
+        var offset = HorizontalOffsetMm * MmToDip;
 
-        panel.Children.Add(new TextBlock
+        var grid = new Grid();
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // title
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // size + unit
+        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // barcode fills the rest
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // human-readable code
+
+        var title = new TextBlock
         {
             Text = label.Title,
-            FontSize = 10,
-            FontWeight = FontWeights.SemiBold,
+            FontSize = 11,
+            FontWeight = FontWeights.Bold,
             Foreground = ink,
             TextAlignment = TextAlignment.Center,
             TextWrapping = TextWrapping.Wrap,
-            MaxHeight = 24
-        });
+            MaxHeight = 30,
+            TextTrimming = TextTrimming.CharacterEllipsis
+        };
+        Grid.SetRow(title, 0);
+        grid.Children.Add(title);
 
         var info = new StackPanel
         {
@@ -188,7 +237,7 @@ public static class LabelPrintService
         info.Children.Add(new TextBlock
         {
             Text = label.Size,
-            FontSize = 18,
+            FontSize = 17,
             FontWeight = FontWeights.Bold,
             Foreground = ink,
             VerticalAlignment = VerticalAlignment.Center
@@ -197,34 +246,56 @@ public static class LabelPrintService
         {
             Text = $"   {label.UnitLabel} · {label.Pairs} juft",
             FontSize = 11,
+            FontWeight = FontWeights.SemiBold,
             Foreground = ink,
-            VerticalAlignment = VerticalAlignment.Center
+            VerticalAlignment = VerticalAlignment.Bottom,
+            Margin = new Thickness(0, 0, 0, 2)
         });
-        panel.Children.Add(info);
+        Grid.SetRow(info, 1);
+        grid.Children.Add(info);
 
-        panel.Children.Add(new Image
+        var barcodeImage = new Image
         {
             Source = barcode,
-            Width = pageWidth - 20,
-            Height = 46,
-            Stretch = Stretch.Fill
-        });
+            Stretch = Stretch.Fill,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Margin = new Thickness(0, 1, 0, 1)
+        };
+        // Keep bars sharp on the thermal head rather than anti-aliasing them into grey.
+        RenderOptions.SetBitmapScalingMode(barcodeImage, BitmapScalingMode.NearestNeighbor);
+        RenderOptions.SetEdgeMode(barcodeImage, EdgeMode.Aliased);
+        Grid.SetRow(barcodeImage, 2);
+        grid.Children.Add(barcodeImage);
 
-        panel.Children.Add(new TextBlock
+        var codeText = new TextBlock
         {
             Text = label.Barcode,
             FontSize = 10,
+            FontWeight = FontWeights.SemiBold,
             FontFamily = new FontFamily("Consolas"),
             Foreground = ink,
-            TextAlignment = TextAlignment.Center,
-            Margin = new Thickness(0, 1, 0, 0)
-        });
-
-        return new Border
-        {
-            Width = pageWidth,
-            Height = pageHeight,
-            Child = panel
+            TextAlignment = TextAlignment.Center
         };
+        Grid.SetRow(codeText, 3);
+        grid.Children.Add(codeText);
+
+        var border = new Border
+        {
+            Width = pageWidth - offset,
+            Height = pageHeight,
+            Background = Brushes.White,
+            Padding = new Thickness(margin),
+            Child = grid,
+            // Flip in place around the label centre so orientation is fixed without moving the block.
+            RenderTransformOrigin = new Point(0.5, 0.5),
+            RenderTransform = new RotateTransform(RotationDegrees)
+        };
+
+        // Push the whole label block sideways; narrowing the width by the same amount
+        // keeps the right edge inside the page so nothing gets clipped.
+        FixedPage.SetLeft(border, offset);
+        FixedPage.SetTop(border, 0);
+        return border;
     }
 }

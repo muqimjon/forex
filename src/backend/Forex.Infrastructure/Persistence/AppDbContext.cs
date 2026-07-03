@@ -168,9 +168,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasFilter("\"QopBarcode\" IS NOT NULL AND \"QopBarcode\" <> ''");
 
         modelBuilder.Entity<ProductType>()
-            .HasIndex(p => p.PachkaBarcode)
+            .HasIndex(p => p.PackBarcode)
             .IsUnique()
-            .HasFilter("\"PachkaBarcode\" IS NOT NULL AND \"PachkaBarcode\" <> ''");
+            .HasFilter("\"PackBarcode\" IS NOT NULL AND \"PackBarcode\" <> ''");
 
         modelBuilder.Ignore<System.Transactions.Transaction>();
     }

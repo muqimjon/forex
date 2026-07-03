@@ -36,6 +36,7 @@
                 Background="Transparent"
                 BorderThickness="0"
                 Foreground="{DynamicResource PrimaryTextColor}"
+                Style="{StaticResource MaterialDesignComboBox}"
                 md:TextFieldAssist.DecorationVisibility="Collapsed"
                 DisplayMemberPath="{Binding DisplayMemberPath, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 DropDownOpened="ComboBox_DropDownOpened"

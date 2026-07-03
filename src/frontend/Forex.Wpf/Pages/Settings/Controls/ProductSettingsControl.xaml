@@ -178,10 +178,10 @@
 										</DataTemplate>
 									</DataGridTemplateColumn.CellTemplate>
 								</DataGridTemplateColumn>
-								<DataGridTemplateColumn Header="Pachkada (juft)" Width="*">
+								<DataGridTemplateColumn Header="To'plamda (juft)" Width="*">
 									<DataGridTemplateColumn.CellTemplate>
 										<DataTemplate>
-											<TextBox Text="{Binding PachkaItemCount, UpdateSourceTrigger=PropertyChanged}"
+											<TextBox Text="{Binding PackItemCount, UpdateSourceTrigger=PropertyChanged}"
 											         BorderThickness="0"
 											         Background="Transparent"
 											         VerticalContentAlignment="Center"

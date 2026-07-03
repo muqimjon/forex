@@ -87,6 +87,9 @@ public class CreateSaleCommandHandler(
     {
         StringBuilder text = new();
 
+        // Birinchi qator — operatsiya savdo ekanini va izohni bildiradi; tagida mahsulotlar keladi.
+        text.AppendLine(string.IsNullOrWhiteSpace(sale.Note) ? "Savdo:" : $"Savdo: {sale.Note}");
+
         foreach (var item in sale.SaleItems)
         {
             var productType = await context.ProductTypes
@@ -125,15 +128,15 @@ public class CreateSaleCommandHandler(
             var residue = residues.FirstOrDefault(r => r.ProductTypeId == cmd.ProductTypeId)
                 ?? throw new NotFoundException(nameof(ProductResidue), nameof(cmd.ProductTypeId), cmd.ProductTypeId);
 
-            var entry = residue.ProductEntries.LastOrDefault()
-                ?? throw new NotFoundException(nameof(ProductEntry), nameof(residue.ProductTypeId), residue.ProductTypeId);
-
-            var totalCount = cmd.BundleCount * entry.BundleItemCount;
+            // Bundle size comes from the ProductType definition, not the last stock intake:
+            // a sale must not depend on any ProductEntry existing (orphan/zero-stock residues break otherwise).
+            var bundleItemCount = residue.ProductType.BundleItemCount;
+            var totalCount = cmd.BundleCount * bundleItemCount;
 
             items.Add(new SaleItem
             {
                 BundleCount = cmd.BundleCount,
-                BundleItemCount = entry.BundleItemCount,
+                BundleItemCount = bundleItemCount,
                 TotalCount = totalCount,
                 UnitPrice = cmd.UnitPrice,
                 Amount = cmd.Amount,

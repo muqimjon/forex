@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Forex.Wpf.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
     Title="Yangi foydalanuvchi qo'shish"
     Width="400"
     Height="430"
@@ -57,9 +58,13 @@
             <ComboBox
                 x:Name="cbWindowRole"
                 Padding="4"
+                VerticalContentAlignment="Center"
+                md:TextFieldAssist.DecorationVisibility="Collapsed"
+                Background="Transparent"
                 BorderThickness="0"
                 FontSize="14"
-                IsEditable="False" />
+                IsEditable="False"
+                Style="{StaticResource MaterialDesignComboBox}" />
         </Border>
 
         <!--  Nomi  -->
@@ -144,9 +149,13 @@
             <ComboBox
                 x:Name="cbCurrency"
                 Padding="4"
+                VerticalContentAlignment="Center"
+                md:TextFieldAssist.DecorationVisibility="Collapsed"
+                Background="Transparent"
                 BorderThickness="0"
                 DisplayMemberPath="Code"
-                FontSize="14" />
+                FontSize="14"
+                Style="{StaticResource MaterialDesignComboBox}" />
         </Border>
 
         <!--  Boshlang‘ich balans  -->

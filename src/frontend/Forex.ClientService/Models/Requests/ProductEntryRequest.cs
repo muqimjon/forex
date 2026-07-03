@@ -8,7 +8,7 @@ public sealed record ProductEntryRequest
     public DateTime Date { get; set; }
     public int Count { get; set; }
     public int BundleItemCount { get; set; }
-    public int PachkaItemCount { get; set; }
+    public int PackItemCount { get; set; }
     public decimal PreparationCostPerUnit { get; set; }
     public decimal UnitPrice { get; set; }
     public ProductionOrigin ProductionOrigin { get; set; }

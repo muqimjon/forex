@@ -88,7 +88,8 @@ public partial class ProfileEditViewModel : ViewModelBase
                 AuthStore.Instance.Token,
                 FullName,
                 Username,
-                UserId);
+                UserId,
+                (long)AuthStore.Instance.Permissions); // mavjud ruxsatlarni saqlab qolamiz
 
             return true;
         }

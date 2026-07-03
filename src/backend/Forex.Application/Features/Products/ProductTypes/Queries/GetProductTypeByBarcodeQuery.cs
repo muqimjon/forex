@@ -17,7 +17,7 @@ public class GetProductTypeByBarcodeQueryHandler(IAppDbContext context, IMapper 
             .AsNoTracking()
             .Include(t => t.Product)
             .Include(t => t.ProductResidue)
-            .FirstOrDefaultAsync(t => t.QopBarcode == request.Code || t.PachkaBarcode == request.Code, ct);
+            .FirstOrDefaultAsync(t => t.QopBarcode == request.Code || t.PackBarcode == request.Code, ct);
 
         return entity is null ? null : mapper.Map<ProductTypeDto>(entity);
     }

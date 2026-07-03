@@ -41,12 +41,47 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!--  Modal ichidagi maydon (input/combo) uchun umumiy o'ram: fon+border custom, ichki chrome yashirin  -->
+        <Style x:Key="FieldShell" TargetType="Border">
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceMuted}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HairlineBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource InkMuted}" />
+            <Setter Property="Margin" Value="2,0,0,4" />
+        </Style>
+
+        <Style x:Key="ModalInput" TargetType="TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{DynamicResource InkPrimary}" />
+            <Setter Property="md:TextFieldAssist.DecorationVisibility" Value="Collapsed" />
+        </Style>
+
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource InkSecondary}" />
+            <Setter Property="Margin" Value="0,6,0,10" />
+        </Style>
     </Page.Resources>
 
     <Grid Background="{DynamicResource SurfacePage}" TextElement.Foreground="{DynamicResource InkPrimary}">
+
+        <!--  ===================== Asosiy kontent ===================== -->
         <Grid Margin="18">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -101,264 +136,8 @@
                 </Button>
             </Grid>
 
-            <!--  Edit form  -->
-            <Border
-                x:Name="brUserForm"
-                Grid.Row="1"
-                Margin="0,14,0,0"
-                Padding="14,12"
-                Background="{DynamicResource SurfaceCard}"
-                CornerRadius="14"
-                md:ElevationAssist.Elevation="Dp2"
-                Visibility="Collapsed">
-                <WrapPanel Orientation="Horizontal">
-                    <Border
-                        Width="120"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <ComboBox
-                            x:Name="cbRole"
-                            Width="105"
-                            Padding="5,1,2,1"
-                            md:HintAssist.Hint="Tanlash"
-                            BorderThickness="0"
-                            FontSize="16"
-                            IsEditable="False"
-                            IsTextSearchEnabled="False"
-                            StaysOpenOnEdit="True" />
-                    </Border>
-
-                    <Border
-                        Width="115"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="txtName"
-                            Width="112"
-                            Padding="3,1,2,1"
-                            md:HintAssist.Hint="Nomi"
-                            BorderThickness="0"
-                            FontSize="16" />
-                    </Border>
-
-                    <Border
-                        Width="145"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="txtPhone"
-                            Width="143"
-                            Padding="3,1,2,1"
-                            md:HintAssist.Hint="Telefon"
-                            BorderThickness="0"
-                            FontSize="16"
-                            TextChanged="TxtPhone_TextChanged" />
-                    </Border>
-
-                    <Border
-                        Width="200"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="txtAddress"
-                            Width="195"
-                            Padding="3,1,2,1"
-                            md:HintAssist.Hint="Manzil"
-                            BorderThickness="0"
-                            FontSize="16" />
-                    </Border>
-
-                    <Border
-                        Width="200"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4">
-                        <TextBox
-                            x:Name="txtDescription"
-                            Width="195"
-                            Padding="3,1,2,1"
-                            md:HintAssist.Hint="Izoh"
-                            BorderThickness="0"
-                            FontSize="16" />
-                    </Border>
-
-                    <Border
-                        x:Name="brValutaType"
-                        Width="120"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Visibility="Collapsed">
-                        <ComboBox
-                            x:Name="cbxValutaType"
-                            Width="105"
-                            Padding="3,1,2,1"
-                            md:HintAssist.Hint="Valyuta turi"
-                            BorderThickness="0"
-                            FontSize="16"
-                            IsEditable="False"
-                            IsTextSearchEnabled="False"
-                            StaysOpenOnEdit="True" />
-                    </Border>
-
-                    <Border
-                        x:Name="brDebt"
-                        Width="120"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Visibility="Collapsed">
-                        <TextBox
-                            x:Name="tbDebt"
-                            Width="115"
-                            Padding="3,1,2,1"
-                            md:HintAssist.Hint="Qarzdorlik"
-                            BorderThickness="0"
-                            DataObject.Pasting="NumericTextBox_Pasting"
-                            FontSize="16"
-                            Foreground="{DynamicResource Danger}"
-                            PreviewTextInput="NumericTextBox_PreviewTextInput"
-                            TextChanged="TbDebt_TextChanged" />
-                    </Border>
-
-                    <Border
-                        x:Name="brAccount"
-                        Width="120"
-                        Margin="1,0,1,2"
-                        Background="{DynamicResource SelectedBackground}"
-                        BorderBrush="{DynamicResource SelectedBorderColor}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Visibility="Collapsed">
-                        <TextBox
-                            x:Name="tbAccount"
-                            Width="115"
-                            Padding="3,1,2,1"
-                            md:HintAssist.Hint="Haqdorlik"
-                            BorderThickness="0"
-                            DataObject.Pasting="NumericTextBox_Pasting"
-                            FontSize="16"
-                            Foreground="{DynamicResource Success}"
-                            PreviewTextInput="NumericTextBox_PreviewTextInput"
-                            TextChanged="TbAccount_TextChanged" />
-                    </Border>
-
-                    <StackPanel
-                        x:Name="pnlEmployeeAccess"
-                        Orientation="Horizontal"
-                        Visibility="Collapsed">
-                        <ToggleButton
-                            x:Name="tglHasAccess"
-                            Margin="5,0"
-                            Content="🗝"
-                            Style="{StaticResource MaterialDesignActionLightToggleButton}"
-                            ToolTip="Tizimga kirish uchun login parol biriktirish" />
-
-                        <Border
-                            x:Name="brLogin"
-                            Width="130"
-                            Margin="1,0,1,2"
-                            Background="{DynamicResource SelectedBackground}"
-                            BorderBrush="{DynamicResource SelectedBorderColor}"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Visibility="{Binding IsChecked, ElementName=tglHasAccess, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <TextBox
-                                x:Name="txtUsername"
-                                Width="125"
-                                Padding="3,1,2,1"
-                                md:HintAssist.Hint="Username"
-                                BorderThickness="0"
-                                FontSize="16" />
-                        </Border>
-
-                        <Border
-                            x:Name="brPassword"
-                            Width="130"
-                            Margin="1,0,1,2"
-                            Background="{DynamicResource SelectedBackground}"
-                            BorderBrush="{DynamicResource SelectedBorderColor}"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Visibility="{Binding IsChecked, ElementName=tglHasAccess, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <PasswordBox
-                                x:Name="txtPassword"
-                                Width="125"
-                                Padding="3,1,2,1"
-                                md:HintAssist.Hint="Parol"
-                                BorderThickness="0"
-                                FontSize="16" />
-                        </Border>
-                    </StackPanel>
-
-                    <Button
-                        x:Name="btnSave"
-                        Height="32"
-                        MinWidth="50"
-                        Margin="3,0,0,2"
-                        Padding="14,0"
-                        md:ButtonAssist.CornerRadius="9"
-                        Background="{DynamicResource SuccessStrong}"
-                        BorderThickness="0"
-                        Content="💾 Saqlash"
-                        FontWeight="Bold"
-                        Foreground="{DynamicResource OnAccent}"
-                        ToolTip="Saqlash"
-                        Visibility="Collapsed" />
-
-                    <Button
-                        x:Name="btnUpdate"
-                        Height="32"
-                        MinWidth="50"
-                        Margin="3,0,0,2"
-                        Padding="14,0"
-                        md:ButtonAssist.CornerRadius="9"
-                        Background="{DynamicResource Accent}"
-                        BorderThickness="0"
-                        Content="🔄 Yangilash"
-                        FontWeight="Bold"
-                        Foreground="{DynamicResource OnAccent}"
-                        ToolTip="Yangilash"
-                        Visibility="Collapsed" />
-
-                    <Button
-                        x:Name="btnCancel"
-                        Height="32"
-                        MinWidth="50"
-                        Margin="3,0,0,2"
-                        Padding="14,0"
-                        md:ButtonAssist.CornerRadius="9"
-                        Background="{DynamicResource Danger}"
-                        BorderThickness="0"
-                        Click="BtnCancel_Click"
-                        Content="❌ Bekor qilish"
-                        FontWeight="Bold"
-                        Foreground="{DynamicResource OnAccent}"
-                        ToolTip="Bekor qilish"
-                        Visibility="Collapsed" />
-                </WrapPanel>
-            </Border>
-
             <!--  Role list (left) + users grid (right)  -->
-            <Grid Grid.Row="2" Margin="0,14,0,0">
+            <Grid Grid.Row="1" Margin="0,14,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="210" />
                     <ColumnDefinition Width="14" />
@@ -441,6 +220,7 @@
                                     Padding="0"
                                     VerticalContentAlignment="Center"
                                     md:HintAssist.Hint="Istalgan maydon bo'yicha qidirish.."
+                                    md:TextFieldAssist.DecorationVisibility="Collapsed"
                                     Background="Transparent"
                                     BorderThickness="0"
                                     FontSize="14" />
@@ -659,6 +439,375 @@
                     </Grid>
                 </Border>
             </Grid>
+        </Grid>
+
+        <!--  ===================== Tahrirlash modali ===================== -->
+        <Grid
+            x:Name="userEditOverlay"
+            Panel.ZIndex="100"
+            Background="{DynamicResource Scrim}"
+            Visibility="Collapsed">
+            <Border
+                Width="720"
+                MaxHeight="660"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                md:ElevationAssist.Elevation="Dp24"
+                Background="{DynamicResource SurfaceCard}"
+                CornerRadius="16">
+                <Grid Margin="26,22">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Modal header  -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal">
+                            <Border
+                                Width="40"
+                                Height="40"
+                                Background="{DynamicResource AccentSoft}"
+                                CornerRadius="11">
+                                <md:PackIcon
+                                    Width="22"
+                                    Height="22"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="{DynamicResource Accent}"
+                                    Kind="AccountEdit" />
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Foreground="{DynamicResource InkPrimary}"
+                                    Text="Foydalanuvchini tahrirlash" />
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{DynamicResource InkFaint}"
+                                    Text="Ma'lumot, hisob va tizim ruxsatlari" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Button
+                            Width="34"
+                            Height="34"
+                            Padding="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            md:ButtonAssist.CornerRadius="8"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Click="BtnCancel_Click"
+                            Foreground="{DynamicResource InkMuted}"
+                            ToolTip="Yopish">
+                            <md:PackIcon Width="20" Height="20" Kind="Close" />
+                        </Button>
+                    </Grid>
+
+                    <!--  Modal body  -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,0,6,0">
+
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="ASOSIY MA'LUMOT" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="14" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  Rol  -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Rol" />
+                                    <Border Style="{StaticResource FieldShell}">
+                                        <ComboBox
+                                            x:Name="cbRole"
+                                            VerticalContentAlignment="Center"
+                                            md:HintAssist.Hint="Tanlash"
+                                            md:TextFieldAssist.DecorationVisibility="Collapsed"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            FontSize="15"
+                                            IsEditable="False"
+                                            IsTextSearchEnabled="False"
+                                            Style="{StaticResource MaterialDesignComboBox}" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!--  Nomi  -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Nomi" />
+                                    <Border Style="{StaticResource FieldShell}">
+                                        <TextBox
+                                            x:Name="txtName"
+                                            md:HintAssist.Hint="Ism familiya"
+                                            Style="{StaticResource ModalInput}" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="14" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  Telefon  -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Telefon" />
+                                    <Border Style="{StaticResource FieldShell}">
+                                        <TextBox
+                                            x:Name="txtPhone"
+                                            md:HintAssist.Hint="+998 .."
+                                            Style="{StaticResource ModalInput}"
+                                            TextChanged="TxtPhone_TextChanged" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!--  Manzil  -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Manzil" />
+                                    <Border Style="{StaticResource FieldShell}">
+                                        <TextBox
+                                            x:Name="txtAddress"
+                                            md:HintAssist.Hint="Manzil"
+                                            Style="{StaticResource ModalInput}" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <!--  Izoh  -->
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Izoh" />
+                            <Border Style="{StaticResource FieldShell}">
+                                <TextBox
+                                    x:Name="txtDescription"
+                                    md:HintAssist.Hint="Qo'shimcha ma'lumot"
+                                    Style="{StaticResource ModalInput}" />
+                            </Border>
+
+                            <!--  Hisob (valyuta + balans) — 'User' rolida yashiriladi  -->
+                            <TextBlock Style="{StaticResource SectionHeader}" Text="HISOB" />
+                            <WrapPanel Orientation="Horizontal">
+                                <StackPanel Width="200" Margin="0,0,12,0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Valyuta turi" />
+                                    <Border
+                                        x:Name="brValutaType"
+                                        Style="{StaticResource FieldShell}"
+                                        Visibility="Collapsed">
+                                        <ComboBox
+                                            x:Name="cbxValutaType"
+                                            VerticalContentAlignment="Center"
+                                            md:HintAssist.Hint="Valyuta"
+                                            md:TextFieldAssist.DecorationVisibility="Collapsed"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            FontSize="15"
+                                            IsEditable="False"
+                                            IsTextSearchEnabled="False"
+                                            Style="{StaticResource MaterialDesignComboBox}" />
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel Width="200" Margin="0,0,12,0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Qarzdorlik" />
+                                    <Border
+                                        x:Name="brDebt"
+                                        Style="{StaticResource FieldShell}"
+                                        Visibility="Collapsed">
+                                        <TextBox
+                                            x:Name="tbDebt"
+                                            md:HintAssist.Hint="0.00"
+                                            Style="{StaticResource ModalInput}"
+                                            Foreground="{DynamicResource Danger}"
+                                            DataObject.Pasting="NumericTextBox_Pasting"
+                                            PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                            TextChanged="TbDebt_TextChanged" />
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel Width="200">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Haqdorlik" />
+                                    <Border
+                                        x:Name="brAccount"
+                                        Style="{StaticResource FieldShell}"
+                                        Visibility="Collapsed">
+                                        <TextBox
+                                            x:Name="tbAccount"
+                                            md:HintAssist.Hint="0.00"
+                                            Style="{StaticResource ModalInput}"
+                                            Foreground="{DynamicResource Success}"
+                                            DataObject.Pasting="NumericTextBox_Pasting"
+                                            PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                            TextChanged="TbAccount_TextChanged" />
+                                    </Border>
+                                </StackPanel>
+                            </WrapPanel>
+
+                            <!--  Tizimga kirish + bo'lim ruxsatlari (admin Hodim tahrirlaganda)  -->
+                            <StackPanel x:Name="pnlEmployeeAccess" Visibility="Collapsed">
+                                <TextBlock Style="{StaticResource SectionHeader}" Text="TIZIMGA KIRISH" />
+                                <StackPanel Orientation="Horizontal">
+                                    <ToggleButton
+                                        x:Name="tglHasAccess"
+                                        Margin="0,0,12,10"
+                                        VerticalAlignment="Center"
+                                        Content="🗝"
+                                        Style="{StaticResource MaterialDesignActionLightToggleButton}"
+                                        ToolTip="Tizimga kirish uchun login/parol biriktirish" />
+
+                                    <StackPanel Width="220" Margin="0,0,12,0">
+                                        <TextBlock Style="{StaticResource FieldLabel}" Text="Username" />
+                                        <Border
+                                            x:Name="brLogin"
+                                            Style="{StaticResource FieldShell}"
+                                            Visibility="{Binding IsChecked, ElementName=tglHasAccess, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <TextBox
+                                                x:Name="txtUsername"
+                                                md:HintAssist.Hint="Login"
+                                                Style="{StaticResource ModalInput}" />
+                                        </Border>
+                                    </StackPanel>
+
+                                    <StackPanel Width="220">
+                                        <TextBlock Style="{StaticResource FieldLabel}" Text="Parol" />
+                                        <Border
+                                            x:Name="brPassword"
+                                            Style="{StaticResource FieldShell}"
+                                            Visibility="{Binding IsChecked, ElementName=tglHasAccess, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <PasswordBox
+                                                x:Name="txtPassword"
+                                                VerticalContentAlignment="Center"
+                                                md:HintAssist.Hint="Parol"
+                                                md:TextFieldAssist.DecorationVisibility="Collapsed"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                FontSize="15" />
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!--  Bo'lim ruxsatlari: shablon + checkboxlar (login access yoqilganda)  -->
+                                <Border
+                                    x:Name="brPermissions"
+                                    Margin="0,4,0,0"
+                                    Padding="14,12"
+                                    Background="{DynamicResource SurfaceMuted}"
+                                    BorderBrush="{DynamicResource HairlineBorder}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Visibility="{Binding IsChecked, ElementName=tglHasAccess, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,10">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <md:PackIcon
+                                                    Width="18"
+                                                    Height="18"
+                                                    VerticalAlignment="Center"
+                                                    Foreground="{DynamicResource Accent}"
+                                                    Kind="ShieldKeyOutline" />
+                                                <TextBlock
+                                                    Margin="8,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    FontWeight="Bold"
+                                                    Foreground="{DynamicResource InkSecondary}"
+                                                    Text="Bo'lim ruxsatlari" />
+                                            </StackPanel>
+
+                                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                                <TextBlock
+                                                    Margin="0,0,8,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="12"
+                                                    Foreground="{DynamicResource InkMuted}"
+                                                    Text="Shablon:" />
+                                                <ComboBox
+                                                    x:Name="cbAccessPreset"
+                                                    Width="150"
+                                                    VerticalContentAlignment="Center"
+                                                    md:HintAssist.Hint="Tanlash"
+                                                    md:TextFieldAssist.DecorationVisibility="Collapsed"
+                                                    FontSize="14"
+                                                    SelectionChanged="CbAccessPreset_SelectionChanged"
+                                                    Style="{StaticResource MaterialDesignComboBox}" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <UniformGrid Columns="3">
+                                            <CheckBox x:Name="chkSales" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="Savdo" FontSize="13" />
+                                            <CheckBox x:Name="chkReturns" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="Qaytarish" FontSize="13" />
+                                            <CheckBox x:Name="chkPayments" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="To'lov" FontSize="13" />
+                                            <CheckBox x:Name="chkProducts" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="Mahsulot" FontSize="13" />
+                                            <CheckBox x:Name="chkBarcode" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="Barkod" FontSize="13" />
+                                            <CheckBox x:Name="chkSupply" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="Ta'minot" FontSize="13" />
+                                            <CheckBox x:Name="chkUsers" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="User" FontSize="13" />
+                                            <CheckBox x:Name="chkReports" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="Hisobot" FontSize="13" />
+                                            <CheckBox x:Name="chkSettings" Margin="0,3" Checked="Perm_Changed" Unchecked="Perm_Changed" Content="Sozlama" FontSize="13" />
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!--  Modal footer  -->
+                    <StackPanel
+                        Grid.Row="2"
+                        Margin="0,18,0,0"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+                        <Button
+                            x:Name="btnSave"
+                            Height="38"
+                            MinWidth="120"
+                            Margin="0,0,10,0"
+                            Padding="16,0"
+                            md:ButtonAssist.CornerRadius="9"
+                            Background="{DynamicResource SuccessStrong}"
+                            BorderThickness="0"
+                            Content="💾 Saqlash"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource OnAccent}"
+                            ToolTip="Saqlash"
+                            Visibility="Collapsed" />
+
+                        <Button
+                            x:Name="btnUpdate"
+                            Height="38"
+                            MinWidth="120"
+                            Margin="0,0,10,0"
+                            Padding="16,0"
+                            md:ButtonAssist.CornerRadius="9"
+                            Background="{DynamicResource Accent}"
+                            BorderThickness="0"
+                            Content="🔄 Yangilash"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource OnAccent}"
+                            ToolTip="Yangilash"
+                            Visibility="Collapsed" />
+
+                        <Button
+                            x:Name="btnCancel"
+                            Height="38"
+                            MinWidth="120"
+                            Padding="16,0"
+                            md:ButtonAssist.CornerRadius="9"
+                            Background="{DynamicResource SurfaceChip}"
+                            BorderBrush="{DynamicResource HairlineBorder}"
+                            BorderThickness="1"
+                            Click="BtnCancel_Click"
+                            Content="❌ Bekor qilish"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkSecondary}"
+                            ToolTip="Bekor qilish" />
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Page>

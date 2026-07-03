@@ -2,7 +2,7 @@ namespace Forex.Wpf.Common.Services;
 
 using Forex.Wpf.ViewModels;
 
-public enum BarcodeUnit { Qop, Pachka }
+public enum BarcodeUnit { Qop, Pack }
 
 public sealed record BarcodeMatch(ProductViewModel Product, ProductTypeViewModel ProductType, BarcodeUnit Unit);
 
@@ -22,8 +22,8 @@ public static class BarcodeResolver
                 if (string.Equals(type.QopBarcode, code, StringComparison.OrdinalIgnoreCase))
                     return new BarcodeMatch(product, type, BarcodeUnit.Qop);
 
-                if (string.Equals(type.PachkaBarcode, code, StringComparison.OrdinalIgnoreCase))
-                    return new BarcodeMatch(product, type, BarcodeUnit.Pachka);
+                if (string.Equals(type.PackBarcode, code, StringComparison.OrdinalIgnoreCase))
+                    return new BarcodeMatch(product, type, BarcodeUnit.Pack);
             }
         }
 

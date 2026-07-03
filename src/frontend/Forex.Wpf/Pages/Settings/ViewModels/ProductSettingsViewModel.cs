@@ -270,7 +270,7 @@ public partial class ProductSettingsViewModel : ViewModelBase
     {
         if (type is null || SelectedProduct is null) return;
 
-        if (string.IsNullOrWhiteSpace(type.QopBarcode))
+        if (string.IsNullOrWhiteSpace(type.QopBarcode) && string.IsNullOrWhiteSpace(type.PackBarcode))
         {
             WarningMessage = "Avval 'Barkod yaratish' tugmasini bosing.";
             return;
@@ -278,15 +278,16 @@ public partial class ProductSettingsViewModel : ViewModelBase
 
         var title = $"{SelectedProduct.Code} {SelectedProduct.Name}".Trim();
 
-        var labels = new List<LabelItem>
+        // Barkod bo'limidagi kabi modal — razmerni tanlab, nusxa soni bilan chop etish.
+        var vm = new Forex.Wpf.Windows.BarcodeLabelPreviewViewModel(
+            title, type.Type,
+            type.BundleItemCount ?? 0, type.PackItemCount ?? 0,
+            type.QopBarcode, type.PackBarcode, SelectedProduct.DisplayImagePath);
+
+        new Forex.Wpf.Windows.BarcodePreviewWindow(vm)
         {
-            new(title, type.Type, "QOP", type.BundleItemCount ?? 0, type.QopBarcode)
-        };
-
-        if (!string.IsNullOrWhiteSpace(type.PachkaBarcode) && type.PachkaItemCount is > 0)
-            labels.Add(new(title, type.Type, "PACHKA", type.PachkaItemCount ?? 0, type.PachkaBarcode));
-
-        LabelPrintService.ShowPreview(labels, AppPreferences.Instance.LabelPrinter);
+            Owner = System.Windows.Application.Current.MainWindow
+        }.ShowDialog();
     }
 
     [RelayCommand]

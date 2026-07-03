@@ -193,7 +193,7 @@ public partial class BarcodePageViewModel : ViewModelBase
         }
 
         Copies = 1;
-        OpenPopup(match.Product, match.ProductType, match.Unit == BarcodeUnit.Pachka);
+        OpenPopup(match.Product, match.ProductType, match.Unit == BarcodeUnit.Pack);
     }
 
     [RelayCommand]
@@ -211,9 +211,9 @@ public partial class BarcodePageViewModel : ViewModelBase
         OpenPopup(product, type, SelectedUnit == "To'plam");
     }
 
-    private void OpenPopup(ProductViewModel product, ProductTypeViewModel type, bool isPachka)
+    private void OpenPopup(ProductViewModel product, ProductTypeViewModel type, bool isPack)
     {
-        var code = isPachka ? type.PachkaBarcode : type.QopBarcode;
+        var code = isPack ? type.PackBarcode : type.QopBarcode;
         if (string.IsNullOrWhiteSpace(code))
         {
             WarningMessage = "Bu razmer uchun barkod yo'q. Sozlamalar → Mahsulotlar'da barkod yarating.";
@@ -222,8 +222,8 @@ public partial class BarcodePageViewModel : ViewModelBase
 
         Title = $"{product.Code} {product.Name}".Trim();
         Size = type.Type;
-        UnitLabel = isPachka ? "TO'PLAM" : "QOP";
-        Pairs = isPachka ? (type.PachkaItemCount ?? 0) : (type.BundleItemCount ?? 0);
+        UnitLabel = isPack ? "TO'PLAM" : "QOP";
+        Pairs = isPack ? (type.PackItemCount ?? 0) : (type.BundleItemCount ?? 0);
         Barcode = code;
         BarcodeImage = BarcodeImageService.Render(code);
         ImagePath = product.DisplayImagePath;

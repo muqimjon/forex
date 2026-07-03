@@ -52,6 +52,8 @@
                             Width="260"
                             Padding="8,0"
                             VerticalContentAlignment="Center"
+                            Background="Transparent"
+                            Foreground="{DynamicResource InkPrimary}"
                             BorderThickness="0"
                             FontSize="14"
                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

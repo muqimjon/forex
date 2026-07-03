@@ -28,6 +28,11 @@ public class User : Auditable
     // Autentifikatsiya
     public string? PasswordHash { get; set; }
     public string? Username { get; set; }
+
+    // Bo'lim ruxsatlari (AccessPermissions bitmask). Login qila oladigan hodimlar uchun.
+    // 0 = hech qanday bo'lim. admin username doim All hisoblanadi (JWT/AuthStore darajasida).
+    public long AccessMask { get; set; }
+
     public bool IsActive { get; set; } = true;
     public bool TwoFactorEnabled { get; set; }
     public DateTime? LastLoginDate { get; set; }

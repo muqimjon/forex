@@ -13,6 +13,13 @@ public partial class SaleItemViewModel : ViewModelBase
     [ObservableProperty] private int? bundleItemCount;
     [ObservableProperty] private int? totalCount;
     [ObservableProperty] private int? restockCount;
+
+    // Skaner bilan ishlashda: qatordagi mahsulot ombordagi qoldiqdan oshib ketgan bo'lsa true.
+    // DataGrid qatorini ajratib ko'rsatish uchun ishlatiladi.
+    [ObservableProperty] private bool isInsufficient;
+
+    // Qaytarishда birlik (Qop / To'plam / Dona) — datagridда ko'rsatish uchun.
+    [ObservableProperty] private string? unit;
     [ObservableProperty] private decimal? unitPrice;
     [ObservableProperty] private decimal? costtPrice;
     [ObservableProperty] private decimal? benifit;

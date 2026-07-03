@@ -14,7 +14,8 @@ public static class AppDbContextInitializer
         // await context.Database.MigrateAsync();
 
         // 2. Admin foydalanuvchisini qo'shish
-        if (!await context.Users.AnyAsync(u => u.Username == "admin"))
+        var existingAdmin = await context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
+        if (existingAdmin is null)
         {
             var admin = new User
             {
@@ -23,10 +24,17 @@ public static class AppDbContextInitializer
                 Email = "admin@forex.uz",
                 Role = UserRole.Hodim,
                 PasswordHash = hasher.HashPassword("741"),
-                NormalizedName = "SYSTEM ADMIN"
+                NormalizedName = "SYSTEM ADMIN",
+                AccessMask = (long)AccessPermissions.All
             };
 
             context.Users.Add(admin);
+            await context.SaveAsync(default);
+        }
+        else if (existingAdmin.AccessMask != (long)AccessPermissions.All)
+        {
+            // Mavjud admin barcha bo'limlarga ega bo'lishini kafolatlaymiz.
+            existingAdmin.AccessMask = (long)AccessPermissions.All;
             await context.SaveAsync(default);
         }
 

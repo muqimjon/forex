@@ -325,7 +325,21 @@ public partial class AddSalePageViewModel : ViewModelBase
         DistinctProductsCount = SaleItems.Select(x => x.Product?.Code).Distinct().Count();
         TotalBundlesCount = SaleItems.Sum(x => x.BundleCount ?? 0);
         TotalQuantityCount = SaleItems.Sum(x => x.TotalCount ?? 0);
+
+        UpdateShortages();
     }
+
+    // Har bir qatorni ombordagi qoldiq bilan solishtiradi: qoldiq (AvailableCount) manfiy bo'lsa,
+    // demak shu tur bo'yicha savatdagi miqdor ombordan oshgan — qator "yetarli emas" deb belgilanadi.
+    private void UpdateShortages()
+    {
+        foreach (var item in SaleItems)
+            item.IsInsufficient = (item.ProductType?.AvailableCount ?? 0) < 0;
+    }
+
+    // Savatdagi yetarli bo'lmagan qatorlar (ombordan oshib ketganlar).
+    private List<SaleItemViewModel> InsufficientItems() =>
+        SaleItems.Where(i => (i.ProductType?.AvailableCount ?? 0) < 0).ToList();
 
     private void RecalculateTotalAmountWithUserBalance()
     {
@@ -550,9 +564,9 @@ public partial class AddSalePageViewModel : ViewModelBase
             return;
         }
 
-        if (match.Unit == BarcodeUnit.Pachka)
+        if (match.Unit == BarcodeUnit.Pack)
         {
-            WarningMessage = "Bu pachka barkodi. Savdo faqat qop bilan amalga oshiriladi.";
+            WarningMessage = "Bu to'plam barkodi. Savdo faqat qop bilan amalga oshiriladi.";
             return;
         }
 
@@ -843,6 +857,20 @@ public partial class AddSalePageViewModel : ViewModelBase
         if (Customer is null)
         {
             WarningMessage = "Mijoz tanlanmagan!";
+            return;
+        }
+
+        var shortItems = InsufficientItems();
+        if (shortItems.Count > 0)
+        {
+            var lines = string.Join("\n", shortItems.Select(i =>
+                $"• {i.Product?.Code} {i.Product?.Name} ({i.ProductType?.Type})"));
+            MessageBox.Show(
+                "Quyidagi mahsulotlar omborda yetarli emas. Har birini tahrirlab (✎), " +
+                "kerakli miqdorni omborga kirim qiling, so'ng qayta yuboring:\n\n" + lines,
+                "Yetarli emas",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
             return;
         }
 
@@ -1193,6 +1221,14 @@ public partial class AddSalePageViewModel : ViewModelBase
                 infoGrid.Measure(new Size(tableWidth, double.PositiveInfinity));
                 container.Children.Add(infoGrid);
                 currentY += infoGrid.DesiredSize.Height + 8;
+
+                // "Savdo: {izoh}" — hujjat savdo ekanini bildiradi; tagida mahsulotlar ro'yxati keladi.
+                var noteBlock = new TextBlock { FontSize = 13, Margin = new Thickness(0, 0, 0, 8), TextWrapping = TextWrapping.Wrap };
+                noteBlock.Inlines.Add(new Run("Savdo: ") { Foreground = new SolidColorBrush(DocMuted) });
+                noteBlock.Inlines.Add(new Run(string.IsNullOrWhiteSpace(Note) ? "—" : Note) { Foreground = new SolidColorBrush(DocInk), FontWeight = FontWeights.SemiBold });
+                noteBlock.Measure(new Size(tableWidth, double.PositiveInfinity));
+                container.Children.Add(noteBlock);
+                currentY += noteBlock.DesiredSize.Height + 8;
 
                 var divider = new Border
                 {

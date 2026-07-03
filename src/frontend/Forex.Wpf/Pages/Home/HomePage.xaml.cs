@@ -61,8 +61,17 @@ public partial class HomePage : Page
         RegisterFocusNavigation();
         RegisterGlobalShortcuts();
         await LoadUserAvatar();
-        UpdateChips("Week");
-        await DashboardViewModel.LoadAsync();
+
+        // Boshqaruv paneli pul/savdo aylanmasini ko'rsatadi — faqat ruxsati bo'lganlarga.
+        if (AuthStore.Instance.CanDashboard)
+        {
+            UpdateChips("Week");
+            await DashboardViewModel.LoadAsync();
+        }
+        else
+        {
+            dashboardRoot.Visibility = Visibility.Collapsed;
+        }
     }
 
     private async void Chip_Click(object sender, RoutedEventArgs e)
@@ -87,55 +96,80 @@ public partial class HomePage : Page
 
     private void RegisterGlobalShortcuts()
     {
-        btnSale.RegisterShortcut(Key.F1);
-        btnCash.RegisterShortcut(Key.F2);
-        btnProduct.RegisterShortcut(Key.F3);
-        btnSupply.RegisterShortcut(Key.F4);
-        btnUser.RegisterShortcut(Key.F5);
-        btnReports.RegisterShortcut(Key.F6);
-        btnSettings.RegisterShortcut(Key.F7);
+        // Tezkor tugmalar faqat ruxsat berilgan bo'limlar uchun ishlaydi
+        // (yashirin bo'limni F-tugma orqali ochib bo'lmasin).
+        var auth = AuthStore.Instance;
+        if (auth.CanSales) btnSale.RegisterShortcut(Key.F1);
+        if (auth.CanPayments) btnCash.RegisterShortcut(Key.F2);
+        if (auth.CanProducts) btnProduct.RegisterShortcut(Key.F3);
+        if (auth.CanSupply) btnSupply.RegisterShortcut(Key.F4);
+        if (auth.CanUsers) btnUser.RegisterShortcut(Key.F5);
+        if (auth.CanReports) btnReports.RegisterShortcut(Key.F6);
+        if (auth.CanSettings) btnSettings.RegisterShortcut(Key.F7);
     }
 
     private void RegisterFocusNavigation()
     {
-        FocusNavigator.RegisterElements(
-        [
-            btnSale,
-            btnCash,
-            btnProduct,
-            btnSupply,
-            btnUser,
-            btnReports,
-            btnSettings,
-        ]);
+        // Faqat ko'rinadigan (ruxsatli) tugmalarni fokus navigatsiyasiga qo'shamiz.
+        var auth = AuthStore.Instance;
+        var elements = new List<System.Windows.UIElement>();
+        if (auth.CanSales) elements.Add(btnSale);
+        if (auth.CanPayments) elements.Add(btnCash);
+        if (auth.CanProducts) elements.Add(btnProduct);
+        if (auth.CanSupply) elements.Add(btnSupply);
+        if (auth.CanUsers) elements.Add(btnUser);
+        if (auth.CanReports) elements.Add(btnReports);
+        if (auth.CanSettings) elements.Add(btnSettings);
+
+        FocusNavigator.RegisterElements(elements);
     }
 
+    // Har bir handler — mudofaa chuqurligi uchun ruxsatni qayta tekshiradi
+    // (tugma yashirin bo'lsa ham xavfsiz).
     private void BtnUser_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new UserPage());
+    {
+        if (AuthStore.Instance.CanUsers) Main.NavigateTo(new UserPage());
+    }
 
     private void BtnProduct_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new ProductPage());
+    {
+        if (AuthStore.Instance.CanProducts) Main.NavigateTo(new ProductPage());
+    }
 
     private void BtnBarcode_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new BarcodePage());
+    {
+        if (AuthStore.Instance.CanBarcode) Main.NavigateTo(new BarcodePage());
+    }
 
     private void BtnCash_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new TransactionPage());
+    {
+        if (AuthStore.Instance.CanPayments) Main.NavigateTo(new TransactionPage());
+    }
 
     private void BtnSale_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SalePage());
+    {
+        if (AuthStore.Instance.CanSales) Main.NavigateTo(new SalePage());
+    }
 
     private void BtnReturn_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new AddReturnPage());
+    {
+        if (AuthStore.Instance.CanReturns) Main.NavigateTo(new ReturnPage());
+    }
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SettingsPage());
+    {
+        if (AuthStore.Instance.CanSettings) Main.NavigateTo(new SettingsPage());
+    }
 
     private void BtnSupply_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new SupplyPage());
+    {
+        if (AuthStore.Instance.CanSupply) Main.NavigateTo(new SupplyPage());
+    }
 
     private void btnReports_Click(object sender, RoutedEventArgs e)
-        => Main.NavigateTo(new ReportsPage());
+    {
+        if (AuthStore.Instance.CanReports) Main.NavigateTo(new ReportsPage());
+    }
 
     private void BtnLogout_Click(object sender, RoutedEventArgs e)
     {
@@ -146,6 +180,9 @@ public partial class HomePage : Page
 
     private void BtnOverdue_Click(object sender, RoutedEventArgs e)
     {
+        // Muddati o'tgan qarzlar — pul/mijoz ma'lumoti, faqat Hisobot ruxsati bo'lganlarga.
+        if (!AuthStore.Instance.CanReports) return;
+
         var window = new OverdueAccountsWindow();
         window.ShowDialog();
     }
@@ -178,7 +215,7 @@ public partial class HomePage : Page
     private void BtnAccountSettings_Click(object sender, RoutedEventArgs e)
     {
         userProfilePopup.IsOpen = false;
-        Main.NavigateTo(new SettingsPage());
+        if (AuthStore.Instance.CanSettings) Main.NavigateTo(new SettingsPage());
     }
 
     private void BtnNotifications_Click(object sender, RoutedEventArgs e)

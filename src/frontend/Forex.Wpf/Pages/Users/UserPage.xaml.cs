@@ -28,6 +28,7 @@ public partial class UserPage : Page
     private bool isCreatingNewUser = false;
     private UserResponse? currentUser;
     private string _filterRole = string.Empty;
+    private bool _syncingPerms = false; // ruxsat checkbox↔shablon sinxronizatsiyasi loop'ini oldini oladi
 
     public UserPage()
     {
@@ -47,6 +48,7 @@ public partial class UserPage : Page
         LoadValyutaType();
         LoadUsers();
         UpdateRoleList();
+        cbAccessPreset.ItemsSource = AccessPermissionHelper.PresetNames.ToList();
         lstRoleFilter.SelectedIndex = 0;
 
         Loaded += Page_Loaded;
@@ -146,6 +148,9 @@ public partial class UserPage : Page
                 Password = (tglHasAccess.IsChecked == true && !string.IsNullOrWhiteSpace(txtPassword.Password))
                             ? txtPassword.Password.Trim() : null,
 
+                // Bo'lim ruxsatlari — faqat login access berilganda; aks holda 0.
+                AccessMask = (tglHasAccess.IsChecked == true) ? (long)GetPermMaskFromChecks() : 0,
+
                 Accounts = []
             };
 
@@ -167,7 +172,7 @@ public partial class UserPage : Page
                 MessageBox.Show("Muvaffaqiyatli yangilandi.", "Ok", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadUsers();
                 ClearForm();
-                brUserForm.Visibility = Visibility.Collapsed;
+                userEditOverlay.Visibility = Visibility.Collapsed;
             }
         }
         catch (Exception ex)
@@ -347,6 +352,7 @@ public partial class UserPage : Page
             Role = role,
             Username = txtUsername.Text.Trim(),
             Password = txtPassword.Password.Trim(),
+            AccessMask = (tglHasAccess.IsChecked == true) ? (long)GetPermMaskFromChecks() : 0,
             Accounts = [
                 new()
                 {
@@ -424,6 +430,8 @@ public partial class UserPage : Page
         // 🔴 User default qiymat
         cbRole.SelectedItem = "User";
         isCreatingNewUser = false; // 🔴 Reset
+
+        ResetPermissions();
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -513,11 +521,15 @@ public partial class UserPage : Page
 
             // Agar logini bo'lsa, toggleni yoqib qo'yamiz
             tglHasAccess.IsChecked = !string.IsNullOrEmpty(currentUser.Username);
+
+            // Bo'lim ruxsatlarini mask'dan tiklaymiz
+            LoadPermissions(currentUser.AccessMask);
         }
         else
         {
             pnlEmployeeAccess.Visibility = Visibility.Collapsed;
             tglHasAccess.IsChecked = false;
+            ResetPermissions();
         }
 
         // Accountlar qismi... (o'zgarishsiz qoladi)
@@ -552,7 +564,7 @@ public partial class UserPage : Page
 
         if (result == MessageBoxResult.Yes)
         {
-            brUserForm.Visibility = Visibility.Visible;
+            userEditOverlay.Visibility = Visibility.Visible;
             LoadingUser(user.Id);
         }
     }
@@ -575,6 +587,74 @@ public partial class UserPage : Page
     private static void SaveUser(UserResponse response)
     {
         response.IsEditing = false;
+    }
+
+    // ───────────────────────── Bo'lim ruxsatlari (mask ↔ checkbox ↔ shablon) ─────────────────────────
+
+    private AccessPermissions GetPermMaskFromChecks()
+    {
+        AccessPermissions m = AccessPermissions.None;
+        if (chkSales.IsChecked == true) m |= AccessPermissions.Sales;
+        if (chkReturns.IsChecked == true) m |= AccessPermissions.Returns;
+        if (chkPayments.IsChecked == true) m |= AccessPermissions.Payments;
+        if (chkProducts.IsChecked == true) m |= AccessPermissions.Products;
+        if (chkBarcode.IsChecked == true) m |= AccessPermissions.Barcode;
+        if (chkSupply.IsChecked == true) m |= AccessPermissions.Supply;
+        if (chkUsers.IsChecked == true) m |= AccessPermissions.Users;
+        if (chkReports.IsChecked == true) m |= AccessPermissions.Reports;
+        if (chkSettings.IsChecked == true) m |= AccessPermissions.Settings;
+        return m;
+    }
+
+    private void ApplyMaskToChecks(AccessPermissions m)
+    {
+        _syncingPerms = true;
+        chkSales.IsChecked = m.HasFlag(AccessPermissions.Sales);
+        chkReturns.IsChecked = m.HasFlag(AccessPermissions.Returns);
+        chkPayments.IsChecked = m.HasFlag(AccessPermissions.Payments);
+        chkProducts.IsChecked = m.HasFlag(AccessPermissions.Products);
+        chkBarcode.IsChecked = m.HasFlag(AccessPermissions.Barcode);
+        chkSupply.IsChecked = m.HasFlag(AccessPermissions.Supply);
+        chkUsers.IsChecked = m.HasFlag(AccessPermissions.Users);
+        chkReports.IsChecked = m.HasFlag(AccessPermissions.Reports);
+        chkSettings.IsChecked = m.HasFlag(AccessPermissions.Settings);
+        _syncingPerms = false;
+    }
+
+    // Tahrirlash/tozalash paytida mask'dan checkbox va shablonni tiklaydi.
+    private void LoadPermissions(long mask)
+    {
+        var perms = (AccessPermissions)mask;
+        ApplyMaskToChecks(perms);
+        _syncingPerms = true;
+        cbAccessPreset.SelectedItem = AccessPermissionHelper.MatchPreset(perms);
+        _syncingPerms = false;
+    }
+
+    private void ResetPermissions()
+    {
+        ApplyMaskToChecks(AccessPermissions.None);
+        _syncingPerms = true;
+        cbAccessPreset.SelectedItem = null;
+        _syncingPerms = false;
+    }
+
+    // Shablon tanlanganda checkboxlarni to'ldiradi.
+    private void CbAccessPreset_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncingPerms) return;
+        var mask = AccessPermissionHelper.PresetMask(cbAccessPreset.SelectedItem as string);
+        if (mask is not null)
+            ApplyMaskToChecks(mask.Value);
+    }
+
+    // Checkbox qo'lda o'zgarganda shablonni mos nomga (yoki "Moslashtirilgan"ga) o'tkazadi.
+    private void Perm_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_syncingPerms) return;
+        _syncingPerms = true;
+        cbAccessPreset.SelectedItem = AccessPermissionHelper.MatchPreset(GetPermMaskFromChecks());
+        _syncingPerms = false;
     }
 
     [GeneratedRegex(@"[^\d]")]
@@ -724,7 +804,7 @@ public partial class UserPage : Page
         btnUpdate.Visibility = Visibility.Collapsed;
         btnCancel.Visibility = Visibility.Collapsed;
         btnSave.Visibility = GetSaveButtonVisibility();
-        brUserForm.Visibility = Visibility.Collapsed;
+        userEditOverlay.Visibility = Visibility.Collapsed;
         currentUser = null!;
     }
 }

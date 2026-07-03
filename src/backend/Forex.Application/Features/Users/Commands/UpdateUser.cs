@@ -26,6 +26,7 @@ public record UpdateUserCommand(
     string? Description,
     string? Password,
     string? TempImagePath,
+    long AccessMask,
     List<UpdateUserAccountDto> Accounts) : IRequest<bool>;
 
 public class UpdateUserCommandHandler(
@@ -74,6 +75,9 @@ public class UpdateUserCommandHandler(
                 if (loginExists) throw new AppException("Bu login allaqachon band!");
             }
             user.Username = request.Username;
+
+            // Bo'lim ruxsatlarini faqat admin o'zgartira oladi (login/parol kabi).
+            user.AccessMask = request.AccessMask;
         }
 
         // Image handling - same as Product logic

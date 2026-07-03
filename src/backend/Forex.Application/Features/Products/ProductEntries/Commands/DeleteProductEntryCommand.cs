@@ -26,6 +26,12 @@ public class DeleteProductEntryCommandHandler(IAppDbContext context)
 
             context.ProductEntries.Remove(entry);
 
+            // Drop the residue once its last intake is gone, so no empty (0-count, 0-entry) residue lingers.
+            var remainingEntries = await context.ProductEntries
+                .CountAsync(e => e.ProductResidueId == residue.Id && e.Id != entry.Id, cancellationToken);
+            if (remainingEntries == 0)
+                context.ProductResidues.Remove(residue);
+
             return await context.CommitTransactionAsync(cancellationToken);
         }
         catch

@@ -174,7 +174,7 @@
 							FontSize="14"
 							IsReadOnly="True"
 							IsTabStop="False"
-							Text="{Binding TotalAmount, StringFormat={}{0:N2}}"
+							Background="Transparent" Foreground="{DynamicResource PrimaryTextColor}" VerticalContentAlignment="Center" Text="{Binding TotalAmount, StringFormat={}{0:N2}}"
 							TextAlignment="Right" />
 					</Border>
 				</Grid>
@@ -192,7 +192,7 @@
                             VerticalAlignment="Stretch"
                             BorderThickness="0"
                             FontSize="14"
-                            Text="{Binding Note}"
+                            Background="Transparent" Foreground="{DynamicResource PrimaryTextColor}" VerticalContentAlignment="Center" Text="{Binding Note}"
                             TextAlignment="Left" />
 					</Border>
 				</Grid>
@@ -284,7 +284,7 @@
                         VerticalContentAlignment="Center"
                         BorderThickness="0"
                         FontSize="12"
-                        Text="{Binding ExchangeRate, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
+                        Background="Transparent" Foreground="{DynamicResource PrimaryTextColor}" Text="{Binding ExchangeRate, StringFormat={}{0:N0}, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}"
                         TextAlignment="Right" />
 				</Border>
 			</Grid>
@@ -426,10 +426,9 @@
 		<Grid Grid.Row="3" Margin="0,5,0,5">
 			<DataGrid
                 x:Name="dataGrid"
-                AlternatingRowBackground="{DynamicResource SurfaceMuted}"
+                AlternationCount="2"
                 AutoGenerateColumns="False"
                 Background="{DynamicResource SurfaceCard}"
-                RowBackground="{DynamicResource SurfaceCard}"
                 BorderBrush="{DynamicResource HairlineBorder}"
                 BorderThickness="2"
                 CanUserAddRows="False"
@@ -462,6 +461,22 @@
 						<Setter Property="FontWeight" Value="SemiBold" />
 					</Style>
 				</DataGrid.Resources>
+
+				<DataGrid.RowStyle>
+					<Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+						<Setter Property="Background" Value="{DynamicResource SurfaceCard}" />
+						<Style.Triggers>
+							<Trigger Property="ItemsControl.AlternationIndex" Value="1">
+								<Setter Property="Background" Value="{DynamicResource SurfaceMuted}" />
+							</Trigger>
+							<!--  Omborda yetarli bo'lmagan qatorlarni ajratib ko'rsatish  -->
+							<DataTrigger Binding="{Binding IsInsufficient}" Value="True">
+								<Setter Property="Background" Value="{DynamicResource DangerSoft}" />
+								<Setter Property="ToolTip" Value="Omborda yetarli emas — tahrirlab (✎) kerakli miqdorni kirim qiling" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</DataGrid.RowStyle>
 
 				<DataGrid.Columns>
 					<DataGridTemplateColumn Width="60" Header="T/r">

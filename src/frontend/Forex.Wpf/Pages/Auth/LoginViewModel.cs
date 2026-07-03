@@ -41,7 +41,8 @@ public class LoginViewModel(IApiAuth apiAuth) : ViewModelBase
             loginResp.Token,
             loginResp.User.Name,
             login,
-            loginResp.User.Id);
+            loginResp.User.Id,
+            loginResp.User.AccessMask);
 
         SuccessMessage = $"{AuthStore.Instance.FullName}, Forex tizimiga muvaffaqiyatli kirildi";
         return true;

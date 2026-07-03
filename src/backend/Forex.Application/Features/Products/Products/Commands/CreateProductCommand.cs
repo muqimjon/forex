@@ -85,7 +85,7 @@ public class CreateProductCommandHandler(
                 {
                     Type = typeCmd.Type,
                     BundleItemCount = typeCmd.BundleItemCount,
-                    PachkaItemCount = typeCmd.PachkaItemCount,
+                    PackItemCount = typeCmd.PackItemCount,
                     UnitPrice = typeCmd.UnitPrice,
                     Product = product,
                     Currency = defaultCurrency,

@@ -171,7 +171,10 @@
                             <ComboBox
                                 x:Name="cbCurrency"
                                 Padding="5,1"
+                                Background="Transparent"
                                 BorderThickness="0"
+                                Style="{StaticResource MaterialDesignComboBox}"
+                                md:TextFieldAssist.DecorationVisibility="Collapsed"
                                 DisplayMemberPath="Name"
                                 FontSize="14"
                                 ItemsSource="{Binding AvailableCurrencies}"
@@ -196,6 +199,8 @@
                             <TextBox
                                 x:Name="tbKirim"
                                 Padding="3,0"
+                                Background="Transparent"
+                                Foreground="{DynamicResource PrimaryTextColor}"
                                 BorderThickness="0"
                                 FontSize="14"
                                 PreviewTextInput="NumericTextBox_PreviewTextInput"
@@ -220,7 +225,10 @@
                             <ComboBox
                                 x:Name="cbPaymentMethod"
                                 Padding="5,1"
+                                Background="Transparent"
                                 BorderThickness="0"
+                                Style="{StaticResource MaterialDesignComboBox}"
+                                md:TextFieldAssist.DecorationVisibility="Collapsed"
                                 FontSize="14"
                                 ItemsSource="{Binding AvailablePaymentMethods}"
                                 SelectedItem="{Binding Transaction.PaymentMethod}">
@@ -250,6 +258,8 @@
                             <TextBox
                                 x:Name="tbChiqim"
                                 Padding="3,0"
+                                Background="Transparent"
+                                Foreground="{DynamicResource PrimaryTextColor}"
                                 BorderThickness="0"
                                 FontSize="14"
                                 PreviewTextInput="NumericTextBox_PreviewTextInput"
@@ -274,6 +284,8 @@
                             <TextBox
                                 x:Name="tbExchangeRate"
                                 Padding="3,0"
+                                Background="Transparent"
+                                Foreground="{DynamicResource PrimaryTextColor}"
                                 BorderThickness="0"
                                 FontSize="14"
                                 IsEnabled="{Binding IsExchangeRateEnabled}"
@@ -298,6 +310,8 @@
                             <TextBox
                                 x:Name="tbDiscount"
                                 Padding="3,0"
+                                Background="Transparent"
+                                Foreground="{DynamicResource PrimaryTextColor}"
                                 BorderThickness="0"
                                 FontSize="14"
                                 IsEnabled="{Binding IsDiscountEnabled}"
@@ -324,6 +338,8 @@
                             <TextBox
                                 x:Name="tbDescription"
                                 Padding="3,0"
+                                Background="Transparent"
+                                Foreground="{DynamicResource PrimaryTextColor}"
                                 BorderThickness="0"
                                 FontSize="14"
                                 Text="{Binding Transaction.Description}" />

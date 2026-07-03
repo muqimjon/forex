@@ -59,9 +59,9 @@ public partial class ProductPage : Page
             box.Clear();
 
             if (!string.IsNullOrWhiteSpace(code))
-                vm.ScanFillCommand.Execute(code);
+                vm.ScanToCartCommand.Execute(code);
 
-            FocusNavigator.FocusElement(tbxBundle.input);
+            // Batch: fokus skanerda qoladi — ketma-ket tez skaner qilish uchun.
         };
     }
 

@@ -13,7 +13,7 @@ public partial class ProductEntryViewModel : ViewModelBase
     [ObservableProperty] private ProductionOrigin? productionOrigin;
     [ObservableProperty] private string productionOriginName = string.Empty;
     [ObservableProperty] private int? bundleItemCount;
-    [ObservableProperty] private int? pachkaItemCount;
+    [ObservableProperty] private int? packItemCount;
     [ObservableProperty] private int? bundleCount;
     [ObservableProperty] private decimal? unitPrice;
     [ObservableProperty] private ProductTypeViewModel? productType;

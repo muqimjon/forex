@@ -13,7 +13,7 @@ public class UpdateProductEntryCommand : IRequest<long>
     public DateTime Date { get; set; }
     public int Count { get; set; }
     public int BundleItemCount { get; set; }
-    public int PachkaItemCount { get; set; }
+    public int PackItemCount { get; set; }
     public decimal PreparationCostPerUnit { get; set; }
     public decimal UnitPrice { get; set; }
     public ProductionOrigin ProductionOrigin { get; set; }
@@ -42,7 +42,7 @@ public class UpdateProductEntryCommandHandler(
                 Date = request.Date,
                 Count = request.Count,
                 BundleItemCount = request.BundleItemCount,
-                PachkaItemCount = request.PachkaItemCount,
+                PackItemCount = request.PackItemCount,
                 PreparationCostPerUnit = request.PreparationCostPerUnit,
                 UnitPrice = request.UnitPrice,
                 ProductionOrigin = request.ProductionOrigin,
