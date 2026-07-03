@@ -34,6 +34,7 @@ public partial class SupplyPage : Page
     {
         this.ResizeWindow(940, 640);
         ShortcutAttacher.RegisterShortcut(btnBack, Key.Escape);
+        ShortcutAttacher.RegisterShortcut(btnSubmit, Key.Enter, ModifierKeys.Control);
     }
 
     private void SetupUserComboBox()

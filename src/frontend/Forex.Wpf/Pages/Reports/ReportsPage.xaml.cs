@@ -41,12 +41,7 @@ public partial class ReportsPage : Page
     private void RegisterGlobalShortcuts()
     {
         btnBack.RegisterShortcut(Key.Escape);
-
-        this.RegisterShortcut(Key.F1, () => tabReports.SelectedIndex = 0);
-        this.RegisterShortcut(Key.F2, () => tabReports.SelectedIndex = 1);
-        this.RegisterShortcut(Key.F3, () => tabReports.SelectedIndex = 2);
-        this.RegisterShortcut(Key.F4, () => tabReports.SelectedIndex = 3);
-        this.RegisterShortcut(Key.F5, () => tabReports.SelectedIndex = 4);
+        tabReports.RegisterTabShortcuts();
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

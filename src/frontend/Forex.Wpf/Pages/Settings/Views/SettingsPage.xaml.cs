@@ -33,41 +33,7 @@ public partial class SettingsPage : Page
     private void RegisterGlobalShortcuts()
     {
         ShortcutAttacher.RegisterShortcut(btnBack, Key.Escape);
-
-        ShortcutAttacher.RegisterShortcut(
-            targetElement: this,
-            key: Key.F1,
-            targetAction: () => tabControl.SelectedIndex = 0,
-            tooltipText: "Mahsulotlar sozlamalari (F1)"
-        );
-
-        ShortcutAttacher.RegisterShortcut(
-            targetElement: this,
-            key: Key.F2,
-            targetAction: () => tabControl.SelectedIndex = 1,
-            tooltipText: "Valyutalar sozlamalari (F2)"
-        );
-
-        ShortcutAttacher.RegisterShortcut(
-            targetElement: this,
-            key: Key.F3,
-            targetAction: () => tabControl.SelectedIndex = 2,
-            tooltipText: "O'lchov birliklari sozlamalari (F3)"
-        );
-
-        ShortcutAttacher.RegisterShortcut(
-            targetElement: this,
-            key: Key.F4,
-            targetAction: () => tabControl.SelectedIndex = 3,
-            tooltipText: "Server sozlamalari (F4)"
-        );
-
-        ShortcutAttacher.RegisterShortcut(
-            targetElement: this,
-            key: Key.F5,
-            targetAction: () => tabControl.SelectedIndex = 4,
-            tooltipText: "Dastur sozlamalari (F5)"
-        );
+        tabControl.RegisterTabShortcuts();
     }
 
     private void BtnBack_Click(object sender, RoutedEventArgs e)

@@ -216,6 +216,42 @@ public static class ShortcutAttacher
         RegisterShortcut(targetButton, key, buttonAction, modifiers);
     }
 
+    public static void RegisterTabShortcuts(this TabControl tabControl)
+    {
+        if (tabControl is null)
+            return;
+
+        void register()
+        {
+            var view = FindRootView(tabControl);
+            if (view is null)
+                return;
+
+            int max = (int)Key.F12 - (int)Key.F1;
+            for (int i = 0; i < tabControl.Items.Count && i <= max; i++)
+            {
+                int index = i;
+                var key = (Key)((int)Key.F1 + i);
+                view.RegisterShortcut(key, () => tabControl.SelectedIndex = index);
+
+                if (tabControl.Items[i] is TabItem tab && tab.Header is string header)
+                    tab.ToolTip = $"{header} ({key})";
+            }
+        }
+
+        if (tabControl.IsLoaded)
+            register();
+        else
+        {
+            void loaded(object? s, RoutedEventArgs e)
+            {
+                tabControl.Loaded -= loaded;
+                register();
+            }
+            tabControl.Loaded += loaded;
+        }
+    }
+
     private static string KeyCombinationToString(Key key, ModifierKeys modifiers)
     {
         var parts = new List<string>();

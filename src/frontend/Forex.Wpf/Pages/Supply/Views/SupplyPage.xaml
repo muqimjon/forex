@@ -189,6 +189,7 @@
                     </StackPanel>
 
                     <Button
+                        x:Name="btnSubmit"
                         Grid.Row="1"
                         Grid.Column="4"
                         Grid.ColumnSpan="2"

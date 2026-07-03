@@ -94,34 +94,39 @@ public partial class HomePage : Page
         button.Foreground = active ? ChipActiveFg : ChipInactiveFg;
     }
 
+    // Menyudagi tugmalar tartibi (ko'rinishdagi navbat) — F-tugma va fokus navigatsiyasi
+    // shu bitta manbadan olinadi, shuning uchun doim mos keladi.
+    private List<Button> VisibleMenuButtons()
+    {
+        var auth = AuthStore.Instance;
+        var ordered = new (bool can, Button btn)[]
+        {
+            (auth.CanSales, btnSale),
+            (auth.CanReturns, btnReturn),
+            (auth.CanPayments, btnCash),
+            (auth.CanProducts, btnProduct),
+            (auth.CanBarcode, btnBarcode),
+            (auth.CanSupply, btnSupply),
+            (auth.CanUsers, btnUser),
+            (auth.CanReports, btnReports),
+            (auth.CanSettings, btnSettings),
+        };
+
+        return ordered.Where(x => x.can).Select(x => x.btn).ToList();
+    }
+
     private void RegisterGlobalShortcuts()
     {
-        // Tezkor tugmalar faqat ruxsat berilgan bo'limlar uchun ishlaydi
-        // (yashirin bo'limni F-tugma orqali ochib bo'lmasin).
-        var auth = AuthStore.Instance;
-        if (auth.CanSales) btnSale.RegisterShortcut(Key.F1);
-        if (auth.CanPayments) btnCash.RegisterShortcut(Key.F2);
-        if (auth.CanProducts) btnProduct.RegisterShortcut(Key.F3);
-        if (auth.CanSupply) btnSupply.RegisterShortcut(Key.F4);
-        if (auth.CanUsers) btnUser.RegisterShortcut(Key.F5);
-        if (auth.CanReports) btnReports.RegisterShortcut(Key.F6);
-        if (auth.CanSettings) btnSettings.RegisterShortcut(Key.F7);
+        // Ko'rinadigan tugmalarga navbat bo'yicha F1, F2, F3... beriladi.
+        var buttons = VisibleMenuButtons();
+        int max = (int)Key.F12 - (int)Key.F1;
+        for (int i = 0; i < buttons.Count && i <= max; i++)
+            buttons[i].RegisterShortcut((Key)((int)Key.F1 + i));
     }
 
     private void RegisterFocusNavigation()
     {
-        // Faqat ko'rinadigan (ruxsatli) tugmalarni fokus navigatsiyasiga qo'shamiz.
-        var auth = AuthStore.Instance;
-        var elements = new List<System.Windows.UIElement>();
-        if (auth.CanSales) elements.Add(btnSale);
-        if (auth.CanPayments) elements.Add(btnCash);
-        if (auth.CanProducts) elements.Add(btnProduct);
-        if (auth.CanSupply) elements.Add(btnSupply);
-        if (auth.CanUsers) elements.Add(btnUser);
-        if (auth.CanReports) elements.Add(btnReports);
-        if (auth.CanSettings) elements.Add(btnSettings);
-
-        FocusNavigator.RegisterElements(elements);
+        FocusNavigator.RegisterElements(VisibleMenuButtons().Cast<System.Windows.UIElement>().ToList());
     }
 
     // Har bir handler — mudofaa chuqurligi uchun ruxsatni qayta tekshiradi
