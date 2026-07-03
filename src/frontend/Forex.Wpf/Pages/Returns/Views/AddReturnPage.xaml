@@ -460,11 +460,20 @@
 					<Style x:Key="CenterAlignedCellStyle" TargetType="TextBlock">
 						<Setter Property="TextAlignment" Value="Center" />
 					</Style>
-					<Style TargetType="DataGridColumnHeader">
-						<Setter Property="HorizontalContentAlignment" Value="Center" />
-						<Setter Property="FontWeight" Value="SemiBold" />
-					</Style>
 				</DataGrid.Resources>
+
+				<DataGrid.ColumnHeaderStyle>
+					<Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="DataGridColumnHeader">
+						<Setter Property="Background" Value="{DynamicResource GridHeaderBg}" />
+						<Setter Property="Foreground" Value="{DynamicResource GridHeaderInk}" />
+						<Setter Property="BorderBrush" Value="{DynamicResource HairlineBorder}" />
+						<Setter Property="SeparatorBrush" Value="{DynamicResource HairlineBorder}" />
+						<Setter Property="FontWeight" Value="SemiBold" />
+						<Setter Property="Padding" Value="10,0" />
+						<Setter Property="HorizontalContentAlignment" Value="Center" />
+						<Setter Property="VerticalContentAlignment" Value="Center" />
+					</Style>
+				</DataGrid.ColumnHeaderStyle>
 
 				<DataGrid.Columns>
 					<DataGridTemplateColumn Width="60" Header="T/r">
@@ -539,12 +548,6 @@
                         Header="Jami summa" />
 
 					<DataGridTemplateColumn Width="90" Header="Amallar">
-						<DataGridTemplateColumn.HeaderStyle>
-							<Style TargetType="DataGridColumnHeader">
-								<Setter Property="HorizontalContentAlignment" Value="Center" />
-								<Setter Property="FontWeight" Value="SemiBold" />
-							</Style>
-						</DataGridTemplateColumn.HeaderStyle>
 						<DataGridTemplateColumn.CellStyle>
 							<Style TargetType="DataGridCell">
 								<Setter Property="Padding" Value="4" />
