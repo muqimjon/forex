@@ -4,8 +4,8 @@ using FluentValidation;
 
 public class GetPresignedUrlQueryValidator : AbstractValidator<GetPresignedUrlQuery>
 {
-    private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp", ".pdf", ".doc", ".docx", ".xls", ".xlsx"];
-    private static readonly string[] AllowedFolders = ["products", "users", "documents"];
+    private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+    private static readonly string[] AllowedFolders = ["products", "users"];
 
     public GetPresignedUrlQueryValidator()
     {
