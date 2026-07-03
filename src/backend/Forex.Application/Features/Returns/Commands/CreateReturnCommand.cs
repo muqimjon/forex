@@ -124,8 +124,9 @@ public class CreateReturnCommandHandler(
 
         foreach (var cmd in commands.Where(c => c.TotalCount > 0 || c.BundleCount > 0))
         {
-            var residue = residues.FirstOrDefault(r => r.ProductTypeId == cmd.ProductTypeId);
-            var bundleItemCount = residue?.ProductType.BundleItemCount ?? 0;
+            var residue = residues.FirstOrDefault(r => r.ProductTypeId == cmd.ProductTypeId)
+                ?? throw new NotFoundException(nameof(ProductResidue), nameof(cmd.ProductTypeId), cmd.ProductTypeId);
+            var bundleItemCount = residue.ProductType.BundleItemCount;
             var totalCount = cmd.TotalCount > 0 ? cmd.TotalCount : cmd.BundleCount * bundleItemCount;
 
             items.Add(new ReturnItem

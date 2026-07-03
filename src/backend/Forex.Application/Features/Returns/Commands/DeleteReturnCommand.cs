@@ -72,10 +72,12 @@ public class DeleteReturnCommandHandler(
     {
         foreach (var item in returnItems)
         {
+            if (item.RestockCount <= 0) continue;
+
             var residue = residues.FirstOrDefault(r => r.ProductTypeId == item.ProductTypeId)
                 ?? throw new NotFoundException(nameof(ProductResidue), nameof(item.ProductTypeId), item.ProductTypeId);
 
-            residue.Count -= item.TotalCount;
+            residue.Count -= item.RestockCount;
         }
     }
 }

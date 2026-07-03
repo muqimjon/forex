@@ -96,6 +96,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         base.OnModelCreating(modelBuilder);
 
+        // Parallel savdo/to'lov/qaytarishlarda yo'qolgan yangilanishlarni aniqlash uchun (Postgres xmin).
+        modelBuilder.Entity<ProductResidue>()
+            .Property<uint>("xmin").HasColumnName("xmin").HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate().IsConcurrencyToken();
+        modelBuilder.Entity<Account>()
+            .Property<uint>("xmin").HasColumnName("xmin").HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate().IsConcurrencyToken();
+
         modelBuilder.Entity<Account>()
             .ToTable("Accounts")
             .HasDiscriminator<string>("AccountType")
