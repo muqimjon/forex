@@ -30,8 +30,81 @@ public partial class BarcodePage : Page
     {
         this.ResizeWindow(1280, 800);
         SetupScanBox();
-        productList.SelectionChanged += (_, _) => FocusScan();
+        SetupKeyboardFlow();
         FocusScan();
+    }
+
+    private void SetupKeyboardFlow()
+    {
+        if (tbxSearch.input is { } scan)
+            scan.PreviewKeyDown += (_, e) =>
+            {
+                if (e.Key == Key.Tab && (Keyboard.Modifiers & ModifierKeys.Shift) == 0 && productList.Items.Count > 0)
+                {
+                    e.Handled = true;
+                    FocusListItem(productList);
+                }
+            };
+
+        productList.PreviewKeyDown += (_, e) =>
+        {
+            if (e.Key == Key.Enter && vm.DetailProduct is not null)
+            {
+                e.Handled = true;
+                FocusListItem(razmerList);
+            }
+        };
+
+        razmerList.PreviewKeyDown += (_, e) =>
+        {
+            if (e.Key != Key.Enter) return;
+            e.Handled = true;
+            FocusListItem(unitList);
+        };
+
+        unitList.PreviewKeyDown += (_, e) =>
+        {
+            if (e.Key != Key.Enter) return;
+            e.Handled = true;
+            copiesBoxSide.Focus();
+            copiesBoxSide.SelectAll();
+        };
+
+        copiesBoxSide.PreviewKeyDown += (_, e) =>
+        {
+            if (e.Key != Key.Enter) return;
+            e.Handled = true;
+            NormalizeCopies(copiesBoxSide);
+            vm.ShowCommand.Execute(null);
+        };
+
+        PreviewKeyDown += Page_PreviewKeyDown;
+    }
+
+    private void Page_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && (Keyboard.Modifiers & ModifierKeys.Control) != 0
+            && !vm.IsPopupOpen && vm.DetailProduct is not null)
+        {
+            e.Handled = true;
+            vm.ShowCommand.Execute(null);
+        }
+    }
+
+    private static void FocusListItem(ListBox list)
+    {
+        if (list.Items.Count == 0) return;
+        if (list.SelectedIndex < 0) list.SelectedIndex = 0;
+        var index = list.SelectedIndex;
+
+        list.Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+        {
+            list.UpdateLayout();
+            if (list.ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem item)
+                item.Focus();
+            else
+                list.Focus();
+        });
     }
 
     private void SetupScanBox()

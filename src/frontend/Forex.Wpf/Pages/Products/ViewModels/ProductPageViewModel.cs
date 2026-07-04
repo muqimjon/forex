@@ -474,7 +474,7 @@ public partial class ProductPageViewModel : ViewModelBase
         if (existing is not null) CurrentProduct.SelectedType = existing;
         else if (Confirm($"'{newValue}' yangi razmer sifatida qo'shilsinmi?"))
         {
-            CurrentProduct.SelectedType = new() { Type = newValue };
+            CurrentProduct.SelectedType = new() { Type = newValue, PackItemCount = 6 };
             types.Add(CurrentProduct.SelectedType);
 
             CurrentProduct.ProductTypes = new ObservableCollection<ProductTypeViewModel>(types);

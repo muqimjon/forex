@@ -38,7 +38,7 @@ public partial class BarcodePageViewModel : ViewModelBase
     [ObservableProperty] private ProductViewModel? selectedProduct;
     [ObservableProperty] private ProductViewModel? detailProduct;
     [ObservableProperty] private ProductTypeViewModel? selectedType;
-    [ObservableProperty] private ObservableCollection<string> units = ["Qop", "To'plam"];
+    [ObservableProperty] private ObservableCollection<string> units = ["Qop", "Pachka"];
     [ObservableProperty] private string selectedUnit = "Qop";
 
     [ObservableProperty] private string title = string.Empty;
@@ -208,7 +208,7 @@ public partial class BarcodePageViewModel : ViewModelBase
         }
 
         if (Copies < 1) Copies = 1;
-        OpenPopup(product, type, SelectedUnit == "To'plam");
+        OpenPopup(product, type, SelectedUnit == "Pachka");
     }
 
     private void OpenPopup(ProductViewModel product, ProductTypeViewModel type, bool isPack)
@@ -222,7 +222,7 @@ public partial class BarcodePageViewModel : ViewModelBase
 
         Title = $"{product.Code} {product.Name}".Trim();
         Size = type.Type;
-        UnitLabel = isPack ? "TO'PLAM" : "QOP";
+        UnitLabel = isPack ? "PACHKA" : "QOP";
         Pairs = isPack ? (type.PackItemCount ?? 0) : (type.BundleItemCount ?? 0);
         Barcode = code;
         BarcodeImage = BarcodeImageService.Render(code);

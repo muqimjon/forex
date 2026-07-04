@@ -417,7 +417,7 @@
                         </ScrollViewer.Style>
                         <StackPanel Margin="20">
                             <Border
-                                Height="{Binding ActualWidth, RelativeSource={RelativeSource Self}}"
+                                Height="300"
                                 Background="{DynamicResource SurfaceMuted}"
                                 CornerRadius="10">
                                 <Image Source="{Binding DetailProduct.DisplayImagePath, Converter={StaticResource ImageResolver}}" Stretch="Uniform" />
@@ -437,6 +437,7 @@
 
                             <TextBlock Style="{StaticResource SectionLabel}" Text="RAZMER" />
                             <ListBox
+                                x:Name="razmerList"
                                 Background="Transparent"
                                 BorderThickness="0"
                                 ItemContainerStyle="{StaticResource ChipSize}"
@@ -454,6 +455,7 @@
 
                             <TextBlock Style="{StaticResource SectionLabel}" Text="BARKOD TURI" />
                             <ListBox
+                                x:Name="unitList"
                                 Background="Transparent"
                                 BorderThickness="0"
                                 ItemContainerStyle="{StaticResource ChipSegment}"

@@ -43,6 +43,9 @@ public partial class ProductPage : Page
         RegisterGlobalShortcuts();
         SetupFilterProductComboBox();
         SetupScanBox();
+
+        if (tbxScan.input is { } scan)
+            FocusNavigator.FocusElement(scan);
     }
 
     private void SetupScanBox()
